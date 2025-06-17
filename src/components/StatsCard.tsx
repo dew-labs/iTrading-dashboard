@@ -1,5 +1,5 @@
-import React from 'react';
-import { DivideIcon as LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
+import React from 'react'
+import { DivideIcon as LucideIcon, TrendingUp, TrendingDown } from 'lucide-react'
 
 interface StatsCardProps {
   title: string;
@@ -43,7 +43,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default StatsCard;
+export default StatsCard

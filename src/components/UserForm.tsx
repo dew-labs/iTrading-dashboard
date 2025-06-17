@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import Checkbox from './Checkbox';
+import React, { useState, useEffect } from 'react'
+import Checkbox from './Checkbox'
 
 interface User {
   id?: number;
@@ -29,11 +29,11 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
     phone: '',
     avatar: '',
     password: ''
-  });
+  })
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [sendWelcomeEmail, setSendWelcomeEmail] = useState(true);
-  const [requirePasswordChange, setRequirePasswordChange] = useState(true);
+  const [showPassword, setShowPassword] = useState(false)
+  const [sendWelcomeEmail, setSendWelcomeEmail] = useState(true)
+  const [requirePasswordChange, setRequirePasswordChange] = useState(true)
 
   useEffect(() => {
     if (user) {
@@ -46,32 +46,32 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
         phone: user.phone || '',
         avatar: user.avatar || '',
         password: '' // Never pre-fill password
-      });
+      })
     }
-  }, [user]);
+  }, [user])
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const submitData = { ...formData };
-    
+    e.preventDefault()
+    const submitData = { ...formData }
+
     // Remove password if editing and it's empty
     if (user && !submitData.password) {
-      delete submitData.password;
+      delete submitData.password
     }
-    
-    onSubmit(submitData);
-  };
+
+    onSubmit(submitData)
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
-    });
-  };
+    })
+  }
 
   const departments = [
     'IT', 'Marketing', 'Sales', 'HR', 'Finance', 'Operations', 'Design', 'Customer Service'
-  ];
+  ]
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -198,7 +198,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
               alt="Avatar preview"
               className="w-16 h-16 rounded-full object-cover border border-gray-200"
               onError={(e) => {
-                e.currentTarget.style.display = 'none';
+                e.currentTarget.style.display = 'none'
               }}
             />
           </div>
@@ -248,14 +248,14 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
       {!user && (
         <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
           <h4 className="text-sm font-medium text-gray-900">User Setup Options</h4>
-          
+
           <Checkbox
             checked={sendWelcomeEmail}
             onChange={setSendWelcomeEmail}
             label="Send welcome email"
             description="Send an email with login instructions and account details"
           />
-          
+
           <Checkbox
             checked={requirePasswordChange}
             onChange={setRequirePasswordChange}
@@ -290,7 +290,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
         </button>
       </div>
     </form>
-  );
-};
+  )
+}
 
-export default UserForm;
+export default UserForm

@@ -1,20 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { Post } from '../types/database';
+import React, { useState, useEffect } from 'react'
+import { Post, PostInsert } from '../types/database'
+
+interface Category {
+  id: string;
+  name: string;
+}
 
 interface PostFormProps {
   post?: Post | null;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: PostInsert) => void;
   onCancel: () => void;
+  categories: Category[];
 }
 
 const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<PostInsert>({
     title: '',
-    type: 'news' as const,
-    status: 'draft' as const,
-    author: 'John Smith',
-    content: ''
-  });
+    content: '',
+    type: 'news' as 'news' | 'event',
+    status: 'draft' as 'published' | 'draft' | 'archived',
+    author: '',
+    excerpt: '',
+    featured_image: null,
+    tags: [],
+    event_date: null,
+    event_location: null
+  })
 
   useEffect(() => {
     if (post) {
@@ -23,27 +34,39 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
         type: post.type,
         status: post.status,
         author: post.author,
-        content: post.content || ''
-      });
+        content: post.content || '',
+        excerpt: post.excerpt || '',
+        featured_image: post.featured_image,
+        tags: post.tags || [],
+        event_date: post.event_date,
+        event_location: post.event_location
+      })
     }
-  }, [post]);
+  }, [post])
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
+    e.preventDefault()
+    onSubmit(formData)
+  }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
-    });
-  };
+    })
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="title"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           Title
         </label>
         <input
@@ -59,7 +82,10 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="type"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Type
           </label>
           <select
@@ -75,7 +101,10 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
         </div>
 
         <div>
-          <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="status"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Status
           </label>
           <select
@@ -93,7 +122,10 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
       </div>
 
       <div>
-        <label htmlFor="author" className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="author"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           Author
         </label>
         <input
@@ -108,13 +140,16 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
       </div>
 
       <div>
-        <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="content"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           Content
         </label>
         <textarea
           id="content"
           name="content"
-          value={formData.content}
+          value={formData.content || ''}
           onChange={handleChange}
           rows={6}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
@@ -138,7 +173,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
         </button>
       </div>
     </form>
-  );
-};
+  )
+}
 
-export default PostForm;
+export default PostForm

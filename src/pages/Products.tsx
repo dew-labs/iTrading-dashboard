@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Plus, Search, Edit2, Trash2, Package, DollarSign } from 'lucide-react';
-import Table from '../components/Table';
-import Modal from '../components/Modal';
-import ProductForm from '../components/ProductForm';
-import Select from '../components/Select';
+import React, { useState } from 'react'
+import { Plus, Search, Edit2, Trash2, Package, DollarSign } from 'lucide-react'
+import Table from '../components/Table'
+import Modal from '../components/Modal'
+import ProductForm from '../components/ProductForm'
+import Select from '../components/Select'
 
 interface Product {
   id: number;
@@ -58,49 +58,49 @@ const Products: React.FC = () => {
       sku: 'PCL-004',
       image: 'https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg'
     }
-  ]);
+  ])
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategory, setFilterCategory] = useState<string>('all');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterCategory, setFilterCategory] = useState<string>('all')
+  const [filterStatus, setFilterStatus] = useState<string>('all')
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
 
-  const categories = [...new Set(products.map(p => p.category))];
+  const categories = [...new Set(products.map(p => p.category))]
 
   const categoryOptions = [
     { value: 'all', label: 'All Categories' },
     ...categories.map(category => ({ value: category, label: category }))
-  ];
+  ]
 
   const statusOptions = [
     { value: 'all', label: 'All Status' },
     { value: 'active', label: 'Active' },
     { value: 'inactive', label: 'Inactive' },
     { value: 'out-of-stock', label: 'Out of Stock' }
-  ];
+  ]
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.sku.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = filterCategory === 'all' || product.category === filterCategory;
-    const matchesStatus = filterStatus === 'all' || product.status === filterStatus;
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
+                         product.sku.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesCategory = filterCategory === 'all' || product.category === filterCategory
+    const matchesStatus = filterStatus === 'all' || product.status === filterStatus
+    return matchesSearch && matchesCategory && matchesStatus
+  })
 
   const handleEdit = (product: Product) => {
-    setEditingProduct(product);
-    setIsModalOpen(true);
-  };
+    setEditingProduct(product)
+    setIsModalOpen(true)
+  }
 
   const handleDelete = (id: number) => {
-    console.log('Delete product:', id);
-  };
+    console.log('Delete product:', id)
+  }
 
   const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingProduct(null);
-  };
+    setIsModalOpen(false)
+    setEditingProduct(null)
+  }
 
   const columns = [
     {
@@ -134,8 +134,8 @@ const Products: React.FC = () => {
       accessor: 'stock' as keyof Product,
       render: (value: number) => (
         <span className={`font-medium ${
-          value === 0 ? 'text-red-600' : 
-          value < 10 ? 'text-yellow-600' : 'text-green-600'
+          value === 0 ? 'text-red-600'
+            : value < 10 ? 'text-yellow-600' : 'text-green-600'
         }`}>
           {value}
         </span>
@@ -146,9 +146,9 @@ const Products: React.FC = () => {
       accessor: 'status' as keyof Product,
       render: (value: string) => (
         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-          value === 'active' ? 'bg-green-100 text-green-800' :
-          value === 'inactive' ? 'bg-gray-100 text-gray-800' :
-          'bg-red-100 text-red-800'
+          value === 'active' ? 'bg-green-100 text-green-800'
+            : value === 'inactive' ? 'bg-gray-100 text-gray-800'
+              : 'bg-red-100 text-red-800'
         }`}>
           {value.replace('-', ' ')}
         </span>
@@ -174,11 +174,11 @@ const Products: React.FC = () => {
         </div>
       )
     }
-  ];
+  ]
 
-  const totalValue = products.reduce((sum, product) => sum + (product.price * product.stock), 0);
-  const lowStockCount = products.filter(p => p.stock < 10 && p.stock > 0).length;
-  const outOfStockCount = products.filter(p => p.stock === 0).length;
+  const totalValue = products.reduce((sum, product) => sum + (product.price * product.stock), 0)
+  const lowStockCount = products.filter(p => p.stock < 10 && p.stock > 0).length
+  const outOfStockCount = products.filter(p => p.stock === 0).length
 
   return (
     <div className="space-y-6">
@@ -187,7 +187,7 @@ const Products: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900">Products</h1>
           <p className="mt-1 text-gray-600">Manage your product inventory</p>
         </div>
-        <button 
+        <button
           onClick={() => setIsModalOpen(true)}
           className="flex items-center px-4 py-2 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-black hover:to-gray-900 transition-colors"
         >
@@ -209,7 +209,7 @@ const Products: React.FC = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-gradient-to-br from-gray-900 to-black rounded-lg flex items-center justify-center">
@@ -221,7 +221,7 @@ const Products: React.FC = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-gradient-to-br from-gray-900 to-black rounded-lg flex items-center justify-center">
@@ -233,7 +233,7 @@ const Products: React.FC = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-gradient-to-br from-gray-900 to-black rounded-lg flex items-center justify-center">
@@ -261,14 +261,14 @@ const Products: React.FC = () => {
                 className="pl-10 pr-4 py-2 w-full sm:w-64 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
               />
             </div>
-            
+
             <Select
               options={categoryOptions}
               value={filterCategory}
               onChange={setFilterCategory}
               className="w-full sm:w-48"
             />
-            
+
             <Select
               options={statusOptions}
               value={filterStatus}
@@ -276,7 +276,7 @@ const Products: React.FC = () => {
               className="w-full sm:w-40"
             />
           </div>
-          
+
           <div className="text-sm text-gray-600">
             {filteredProducts.length} products found
           </div>
@@ -294,17 +294,17 @@ const Products: React.FC = () => {
         onClose={handleCloseModal}
         title={editingProduct ? 'Edit Product' : 'Add New Product'}
       >
-        <ProductForm 
+        <ProductForm
           product={editingProduct}
           onSubmit={(data) => {
-            console.log('Product data:', data);
-            handleCloseModal();
+            console.log('Product data:', data)
+            handleCloseModal()
           }}
           onCancel={handleCloseModal}
         />
       </Modal>
     </div>
-  );
-};
+  )
+}
 
-export default Products;
+export default Products

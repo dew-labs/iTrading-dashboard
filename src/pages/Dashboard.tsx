@@ -1,8 +1,8 @@
-import React from 'react';
-import { 
-  TrendingUp, 
-  Users, 
-  FileText, 
+import React from 'react'
+import {
+  TrendingUp,
+  Users,
+  FileText,
   Package,
   Eye,
   Calendar,
@@ -10,9 +10,9 @@ import {
   Activity,
   ArrowUpRight,
   ArrowDownRight
-} from 'lucide-react';
-import StatsCard from '../components/StatsCard';
-import Chart from '../components/Chart';
+} from 'lucide-react'
+import StatsCard from '../components/StatsCard'
+import Chart from '../components/Chart'
 
 const Dashboard: React.FC = () => {
   const stats = [
@@ -48,7 +48,7 @@ const Dashboard: React.FC = () => {
       icon: Eye,
       color: 'bg-gradient-to-br from-orange-500 to-orange-600'
     }
-  ];
+  ]
 
   const recentActivity = [
     { action: 'New user registered', user: 'Sarah Wilson', time: '2 minutes ago', type: 'user' },
@@ -56,14 +56,14 @@ const Dashboard: React.FC = () => {
     { action: 'News post published', user: 'Emma Davis', time: '1 hour ago', type: 'post' },
     { action: 'Banner activated', user: 'John Smith', time: '2 hours ago', type: 'banner' },
     { action: 'User account suspended', user: 'Admin', time: '3 hours ago', type: 'user' }
-  ];
+  ]
 
   const quickStats = [
     { label: 'Revenue', value: '$45,210', change: '+12.5%', positive: true },
     { label: 'Orders', value: '1,429', change: '+8.2%', positive: true },
     { label: 'Conversion', value: '3.24%', change: '-0.5%', positive: false },
-    { label: 'Avg. Order', value: '$156', change: '+5.1%', positive: true },
-  ];
+    { label: 'Avg. Order', value: '$156', change: '+5.1%', positive: true }
+  ]
 
   return (
     <div className="space-y-8">
@@ -144,14 +144,14 @@ const Dashboard: React.FC = () => {
             </div>
             <Activity className="w-5 h-5 text-gray-400" />
           </div>
-          
+
           <div className="space-y-4">
             {recentActivity.map((activity, index) => (
               <div key={index} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
                 <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                  activity.type === 'user' ? 'bg-blue-500' :
-                  activity.type === 'product' ? 'bg-purple-500' :
-                  activity.type === 'post' ? 'bg-green-500' : 'bg-orange-500'
+                  activity.type === 'user' ? 'bg-blue-500'
+                    : activity.type === 'product' ? 'bg-purple-500'
+                      : activity.type === 'post' ? 'bg-green-500' : 'bg-orange-500'
                 }`} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900">{activity.action}</p>
@@ -161,7 +161,7 @@ const Dashboard: React.FC = () => {
               </div>
             ))}
           </div>
-          
+
           <button className="w-full mt-4 text-sm text-gray-900 hover:text-black font-medium">
             View all activity
           </button>
@@ -176,7 +176,7 @@ const Dashboard: React.FC = () => {
             <p className="text-gray-600">Frequently used actions and shortcuts</p>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <button className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-all group">
             <FileText className="w-8 h-8 text-gray-400 group-hover:text-gray-900" />
@@ -185,7 +185,7 @@ const Dashboard: React.FC = () => {
               <div className="text-sm text-gray-500">Add news or event</div>
             </div>
           </button>
-          
+
           <button className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-all group">
             <Package className="w-8 h-8 text-gray-400 group-hover:text-gray-900" />
             <div className="ml-3 text-left">
@@ -193,7 +193,7 @@ const Dashboard: React.FC = () => {
               <div className="text-sm text-gray-500">Manage inventory</div>
             </div>
           </button>
-          
+
           <button className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-all group">
             <Users className="w-8 h-8 text-gray-400 group-hover:text-gray-900" />
             <div className="ml-3 text-left">
@@ -201,7 +201,7 @@ const Dashboard: React.FC = () => {
               <div className="text-sm text-gray-500">Add team member</div>
             </div>
           </button>
-          
+
           <button className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-all group">
             <TrendingUp className="w-8 h-8 text-gray-400 group-hover:text-gray-900" />
             <div className="ml-3 text-left">
@@ -212,7 +212,7 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard

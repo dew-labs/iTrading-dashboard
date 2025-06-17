@@ -1,9 +1,9 @@
-import React from 'react';
+import React from 'react'
 
 interface Column<T> {
   header: string;
   accessor: keyof T;
-  render?: (value: any, row: T) => React.ReactNode;
+  render?: (value: unknown, row: T) => React.ReactNode;
 }
 
 interface TableProps<T> {
@@ -11,7 +11,10 @@ interface TableProps<T> {
   columns: Column<T>[];
 }
 
-function Table<T extends Record<string, any>>({ data, columns }: TableProps<T>) {
+function Table<T extends Record<string, unknown>> ({
+  data,
+  columns
+}: TableProps<T>) {
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200">
       <div className="overflow-x-auto">
@@ -38,15 +41,14 @@ function Table<T extends Record<string, any>>({ data, columns }: TableProps<T>) 
                   >
                     {column.render
                       ? column.render(row[column.accessor], row)
-                      : String(row[column.accessor])
-                    }
+                      : String(row[column.accessor])}
                   </td>
                 ))}
               </tr>
             ))}
           </tbody>
         </table>
-        
+
         {data.length === 0 && (
           <div className="text-center py-12 bg-white">
             <p className="text-gray-500">No data available</p>
@@ -54,7 +56,7 @@ function Table<T extends Record<string, any>>({ data, columns }: TableProps<T>) 
         )}
       </div>
     </div>
-  );
+  )
 }
 
-export default Table;
+export default Table

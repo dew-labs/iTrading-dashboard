@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { Plus, Search, Edit2, Trash2, Eye, EyeOff, Calendar, BarChart3 } from 'lucide-react';
-import Table from '../components/Table';
-import Modal from '../components/Modal';
-import BannerForm from '../components/BannerForm';
-import Checkbox from '../components/Checkbox';
-import Select from '../components/Select';
+import React, { useState } from 'react'
+import { Plus, Search, Edit2, Trash2, Eye, EyeOff, Calendar, BarChart3 } from 'lucide-react'
+import Table from '../components/Table'
+import Modal from '../components/Modal'
+import BannerForm from '../components/BannerForm'
+import Checkbox from '../components/Checkbox'
+import Select from '../components/Select'
 
 interface Banner {
   id: number;
@@ -64,14 +64,14 @@ const Banners: React.FC = () => {
       impressions: 8900,
       image: 'https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg'
     }
-  ]);
+  ])
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterPlacement, setFilterPlacement] = useState<string>('all');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
-  const [selectedBanners, setSelectedBanners] = useState<number[]>([]);
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterPlacement, setFilterPlacement] = useState<string>('all')
+  const [filterStatus, setFilterStatus] = useState<string>('all')
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingBanner, setEditingBanner] = useState<Banner | null>(null)
+  const [selectedBanners, setSelectedBanners] = useState<number[]>([])
 
   const placementOptions = [
     { value: 'all', label: 'All Placements' },
@@ -79,56 +79,56 @@ const Banners: React.FC = () => {
     { value: 'sidebar', label: 'Sidebar' },
     { value: 'footer', label: 'Footer' },
     { value: 'popup', label: 'Popup' }
-  ];
+  ]
 
   const statusOptions = [
     { value: 'all', label: 'All Status' },
     { value: 'active', label: 'Active' },
     { value: 'inactive', label: 'Inactive' },
     { value: 'scheduled', label: 'Scheduled' }
-  ];
+  ]
 
   const filteredBanners = banners.filter(banner => {
-    const matchesSearch = banner.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesPlacement = filterPlacement === 'all' || banner.placement === filterPlacement;
-    const matchesStatus = filterStatus === 'all' || banner.status === filterStatus;
-    return matchesSearch && matchesPlacement && matchesStatus;
-  });
+    const matchesSearch = banner.title.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesPlacement = filterPlacement === 'all' || banner.placement === filterPlacement
+    const matchesStatus = filterStatus === 'all' || banner.status === filterStatus
+    return matchesSearch && matchesPlacement && matchesStatus
+  })
 
   const handleEdit = (banner: Banner) => {
-    setEditingBanner(banner);
-    setIsModalOpen(true);
-  };
+    setEditingBanner(banner)
+    setIsModalOpen(true)
+  }
 
   const handleDelete = (id: number) => {
-    console.log('Delete banner:', id);
-  };
+    console.log('Delete banner:', id)
+  }
 
   const handleBulkAction = (action: string) => {
-    console.log(`Bulk ${action} for banners:`, selectedBanners);
-    setSelectedBanners([]);
-  };
+    console.log(`Bulk ${action} for banners:`, selectedBanners)
+    setSelectedBanners([])
+  }
 
   const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingBanner(null);
-  };
+    setIsModalOpen(false)
+    setEditingBanner(null)
+  }
 
   const toggleBannerSelection = (id: number) => {
-    setSelectedBanners(prev => 
+    setSelectedBanners(prev =>
       prev.includes(id) ? prev.filter(bannerId => bannerId !== id) : [...prev, id]
-    );
-  };
+    )
+  }
 
   const toggleSelectAll = () => {
     setSelectedBanners(
       selectedBanners.length === filteredBanners.length ? [] : filteredBanners.map(b => b.id)
-    );
-  };
+    )
+  }
 
   const calculateCTR = (clicks: number, impressions: number) => {
-    return impressions > 0 ? ((clicks / impressions) * 100).toFixed(2) : '0.00';
-  };
+    return impressions > 0 ? ((clicks / impressions) * 100).toFixed(2) : '0.00'
+  }
 
   const columns = [
     {
@@ -171,9 +171,9 @@ const Banners: React.FC = () => {
       accessor: 'status' as keyof Banner,
       render: (value: string) => (
         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-          value === 'active' ? 'bg-green-100 text-green-800' :
-          value === 'scheduled' ? 'bg-blue-100 text-blue-800' :
-          'bg-gray-100 text-gray-800'
+          value === 'active' ? 'bg-green-100 text-green-800'
+            : value === 'scheduled' ? 'bg-blue-100 text-blue-800'
+              : 'bg-gray-100 text-gray-800'
         }`}>
           {value}
         </span>
@@ -226,12 +226,12 @@ const Banners: React.FC = () => {
         </div>
       )
     }
-  ];
+  ]
 
-  const totalClicks = banners.reduce((sum, banner) => sum + banner.clicks, 0);
-  const totalImpressions = banners.reduce((sum, banner) => sum + banner.impressions, 0);
-  const activeBanners = banners.filter(b => b.status === 'active').length;
-  const averageCTR = calculateCTR(totalClicks, totalImpressions);
+  const totalClicks = banners.reduce((sum, banner) => sum + banner.clicks, 0)
+  const totalImpressions = banners.reduce((sum, banner) => sum + banner.impressions, 0)
+  const activeBanners = banners.filter(b => b.status === 'active').length
+  const averageCTR = calculateCTR(totalClicks, totalImpressions)
 
   return (
     <div className="space-y-6">
@@ -240,7 +240,7 @@ const Banners: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900">Banners</h1>
           <p className="mt-1 text-gray-600">Manage your promotional banners and campaigns</p>
         </div>
-        <button 
+        <button
           onClick={() => setIsModalOpen(true)}
           className="flex items-center px-4 py-2 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-black hover:to-gray-900 transition-colors"
         >
@@ -262,7 +262,7 @@ const Banners: React.FC = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-gradient-to-br from-gray-900 to-black rounded-lg flex items-center justify-center">
@@ -274,7 +274,7 @@ const Banners: React.FC = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-gradient-to-br from-gray-900 to-black rounded-lg flex items-center justify-center">
@@ -286,7 +286,7 @@ const Banners: React.FC = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-gradient-to-br from-gray-900 to-black rounded-lg flex items-center justify-center">
@@ -327,7 +327,7 @@ const Banners: React.FC = () => {
                 </button>
               </div>
             )}
-            
+
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -338,14 +338,14 @@ const Banners: React.FC = () => {
                 className="pl-10 pr-4 py-2 w-full sm:w-64 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
               />
             </div>
-            
+
             <Select
               options={placementOptions}
               value={filterPlacement}
               onChange={setFilterPlacement}
               className="w-full sm:w-48"
             />
-            
+
             <Select
               options={statusOptions}
               value={filterStatus}
@@ -353,7 +353,7 @@ const Banners: React.FC = () => {
               className="w-full sm:w-40"
             />
           </div>
-          
+
           <div className="flex items-center space-x-2 text-sm text-gray-600">
             <Calendar className="w-4 h-4" />
             <span>{filteredBanners.length} banners found</span>
@@ -372,17 +372,17 @@ const Banners: React.FC = () => {
         onClose={handleCloseModal}
         title={editingBanner ? 'Edit Banner' : 'Create New Banner'}
       >
-        <BannerForm 
+        <BannerForm
           banner={editingBanner}
           onSubmit={(data) => {
-            console.log('Banner data:', data);
-            handleCloseModal();
+            console.log('Banner data:', data)
+            handleCloseModal()
           }}
           onCancel={handleCloseModal}
         />
       </Modal>
     </div>
-  );
-};
+  )
+}
 
-export default Banners;
+export default Banners

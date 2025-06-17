@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
-import { useAuthStore } from '../store/authStore';
-import LoadingSpinner from './LoadingSpinner';
-import toast from 'react-hot-toast';
+import React, { useState } from 'react'
+import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react'
+import { useAuthStore } from '../store/authStore'
+import LoadingSpinner from './LoadingSpinner'
+import toast from 'react-hot-toast'
 
 interface AuthFormProps {
   mode: 'login' | 'signup';
@@ -15,55 +15,57 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
     password: '',
     fullName: '',
     confirmPassword: ''
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  })
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  const { signIn, signUp, loading } = useAuthStore();
+  const { signIn, signUp, loading } = useAuthStore()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (mode === 'signup') {
       if (formData.password !== formData.confirmPassword) {
-        toast.error('Passwords do not match');
-        return;
+        toast.error('Passwords do not match')
+        return
       }
       if (formData.password.length < 8) {
-        toast.error('Password must be at least 8 characters long');
-        return;
+        toast.error('Password must be at least 8 characters long')
+        return
       }
     }
 
     try {
       if (mode === 'login') {
-        const { error } = await signIn(formData.email, formData.password);
+        const { error } = await signIn(formData.email, formData.password)
         if (error) {
-          toast.error(error);
+          toast.error(error)
         } else {
-          toast.success('Welcome back!');
+          toast.success('Welcome back!')
         }
       } else {
         const { error } = await signUp(formData.email, formData.password, {
           full_name: formData.fullName
-        });
+        })
         if (error) {
-          toast.error(error);
+          toast.error(error)
         } else {
-          toast.success('Account created! Please check your email to verify your account.');
+          toast.success(
+            'Account created! Please check your email to verify your account.'
+          )
         }
       }
-    } catch (error) {
-      toast.error('An unexpected error occurred');
+    } catch {
+      toast.error('An unexpected error occurred')
     }
-  };
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value
-    }));
-  };
+    }))
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-4">
@@ -76,17 +78,19 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
             {mode === 'login' ? 'Welcome Back' : 'Create Account'}
           </h1>
           <p className="text-gray-600 mt-2">
-            {mode === 'login' 
-              ? 'Sign in to access your dashboard' 
-              : 'Join us to get started'
-            }
+            {mode === 'login'
+              ? 'Sign in to access your dashboard'
+              : 'Join us to get started'}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {mode === 'signup' && (
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="fullName"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Full Name
               </label>
               <div className="relative">
@@ -106,7 +110,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Email Address
             </label>
             <div className="relative">
@@ -125,7 +132,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Password
             </label>
             <div className="relative">
@@ -146,14 +156,21 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
               </button>
             </div>
           </div>
 
           {mode === 'signup' && (
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Confirm Password
               </label>
               <div className="relative">
@@ -173,7 +190,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -186,15 +207,19 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
           >
             {loading ? (
               <LoadingSpinner size="sm" className="text-white" />
+            ) : mode === 'login' ? (
+              'Sign In'
             ) : (
-              mode === 'login' ? 'Sign In' : 'Create Account'
+              'Create Account'
             )}
           </button>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-gray-600">
-            {mode === 'login' ? "Don't have an account? " : "Already have an account? "}
+            {mode === 'login'
+              ? 'Don\'t have an account? '
+              : 'Already have an account? '}
             <button
               onClick={onToggleMode}
               className="text-gray-900 hover:text-black font-medium"
@@ -205,7 +230,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AuthForm;
+export default AuthForm

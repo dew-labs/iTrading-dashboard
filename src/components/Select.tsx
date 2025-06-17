@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Check } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react'
+import { ChevronDown, Check } from 'lucide-react'
 
 interface SelectOption {
   value: string;
@@ -34,14 +34,14 @@ const Select: React.FC<SelectProps> = ({
   label,
   error,
   required = false,
-  'aria-label': ariaLabel,
+  'aria-label': ariaLabel
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [focusedIndex, setFocusedIndex] = useState(-1);
-  const selectRef = useRef<HTMLDivElement>(null);
-  const optionsRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false)
+  const [focusedIndex, setFocusedIndex] = useState(-1)
+  const selectRef = useRef<HTMLDivElement>(null)
+  const optionsRef = useRef<HTMLDivElement>(null)
 
-  const selectedOption = options.find(option => option.value === value);
+  const selectedOption = options.find(option => option.value === value)
 
   // Size configurations
   const sizeConfig = {
@@ -63,74 +63,74 @@ const Select: React.FC<SelectProps> = ({
       icon: 'w-5 h-5',
       dropdown: 'mt-2'
     }
-  };
+  }
 
-  const config = sizeConfig[size];
+  const config = sizeConfig[size]
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-        setFocusedIndex(-1);
+        setIsOpen(false)
+        setFocusedIndex(-1)
       }
-    };
+    }
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // Handle keyboard navigation
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (disabled) return;
+    if (disabled) return
 
     switch (event.key) {
-      case 'Enter':
-      case ' ':
-        event.preventDefault();
-        if (isOpen && focusedIndex >= 0) {
-          const option = options[focusedIndex];
-          if (!option.disabled) {
-            onChange(option.value);
-            setIsOpen(false);
-            setFocusedIndex(-1);
-          }
-        } else {
-          setIsOpen(!isOpen);
+    case 'Enter':
+    case ' ':
+      event.preventDefault()
+      if (isOpen && focusedIndex >= 0) {
+        const option = options[focusedIndex]
+        if (!option.disabled) {
+          onChange(option.value)
+          setIsOpen(false)
+          setFocusedIndex(-1)
         }
-        break;
-      case 'Escape':
-        setIsOpen(false);
-        setFocusedIndex(-1);
-        break;
-      case 'ArrowDown':
-        event.preventDefault();
-        if (!isOpen) {
-          setIsOpen(true);
-        } else {
-          const nextIndex = focusedIndex < options.length - 1 ? focusedIndex + 1 : 0;
-          setFocusedIndex(nextIndex);
-        }
-        break;
-      case 'ArrowUp':
-        event.preventDefault();
-        if (!isOpen) {
-          setIsOpen(true);
-        } else {
-          const prevIndex = focusedIndex > 0 ? focusedIndex - 1 : options.length - 1;
-          setFocusedIndex(prevIndex);
-        }
-        break;
+      } else {
+        setIsOpen(!isOpen)
+      }
+      break
+    case 'Escape':
+      setIsOpen(false)
+      setFocusedIndex(-1)
+      break
+    case 'ArrowDown':
+      event.preventDefault()
+      if (!isOpen) {
+        setIsOpen(true)
+      } else {
+        const nextIndex = focusedIndex < options.length - 1 ? focusedIndex + 1 : 0
+        setFocusedIndex(nextIndex)
+      }
+      break
+    case 'ArrowUp':
+      event.preventDefault()
+      if (!isOpen) {
+        setIsOpen(true)
+      } else {
+        const prevIndex = focusedIndex > 0 ? focusedIndex - 1 : options.length - 1
+        setFocusedIndex(prevIndex)
+      }
+      break
     }
-  };
+  }
 
   const handleOptionClick = (option: SelectOption) => {
     if (!option.disabled) {
-      onChange(option.value);
-      setIsOpen(false);
-      setFocusedIndex(-1);
+      onChange(option.value)
+      setIsOpen(false)
+      setFocusedIndex(-1)
     }
-  };
+  }
 
   const getButtonStyles = () => {
     const baseStyles = `
@@ -139,22 +139,22 @@ const Select: React.FC<SelectProps> = ({
       transition-all duration-200 ease-in-out
       focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent
       ${config.button}
-    `;
+    `
 
     if (disabled) {
-      return `${baseStyles} border-gray-300 bg-gray-50 text-gray-400 cursor-not-allowed`;
+      return `${baseStyles} border-gray-300 bg-gray-50 text-gray-400 cursor-not-allowed`
     }
 
     if (error) {
-      return `${baseStyles} border-red-300 hover:border-red-400 text-gray-900`;
+      return `${baseStyles} border-red-300 hover:border-red-400 text-gray-900`
     }
 
     if (variant === 'minimal') {
-      return `${baseStyles} border-transparent hover:bg-gray-50 text-gray-900`;
+      return `${baseStyles} border-transparent hover:bg-gray-50 text-gray-900`
     }
 
-    return `${baseStyles} border-gray-300 hover:border-gray-900 text-gray-900 hover:shadow-md`;
-  };
+    return `${baseStyles} border-gray-300 hover:border-gray-900 text-gray-900 hover:shadow-md`
+  }
 
   const getDropdownStyles = () => {
     return `
@@ -163,10 +163,10 @@ const Select: React.FC<SelectProps> = ({
       ${config.dropdown}
       ${isOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'}
       transition-all duration-200 ease-out
-    `;
-  };
+    `
+  }
 
-  const selectId = `select-${Math.random().toString(36).substr(2, 9)}`;
+  const selectId = `select-${Math.random().toString(36).substr(2, 9)}`
 
   return (
     <div className={`relative ${className}`}>
@@ -200,7 +200,7 @@ const Select: React.FC<SelectProps> = ({
           <span className={selectedOption ? 'text-gray-900' : 'text-gray-500'}>
             {selectedOption ? selectedOption.label : placeholder}
           </span>
-          
+
           <ChevronDown
             className={`${config.icon} text-gray-400 transition-transform duration-200 ${
               isOpen ? 'rotate-180' : ''
@@ -223,25 +223,25 @@ const Select: React.FC<SelectProps> = ({
                   ${config.option}
                   flex items-center justify-between cursor-pointer
                   transition-colors duration-150
-                  ${option.disabled 
-                    ? 'text-gray-400 cursor-not-allowed bg-gray-50' 
-                    : focusedIndex === index
-                      ? 'bg-gray-900 text-white'
-                      : option.value === value
-                        ? 'bg-gray-100 text-gray-900'
-                        : 'text-gray-900 hover:bg-gray-50'
-                  }
+                  ${option.disabled
+                ? 'text-gray-400 cursor-not-allowed bg-gray-50'
+                : focusedIndex === index
+                  ? 'bg-gray-900 text-white'
+                  : option.value === value
+                    ? 'bg-gray-100 text-gray-900'
+                    : 'text-gray-900 hover:bg-gray-50'
+              }
                   ${index === 0 ? 'rounded-t-lg' : ''}
                   ${index === options.length - 1 ? 'rounded-b-lg' : ''}
                 `}
               >
                 <span className={option.disabled ? 'opacity-50' : ''}>{option.label}</span>
-                
+
                 {option.value === value && (
-                  <Check 
+                  <Check
                     className={`w-4 h-4 ${
                       focusedIndex === index ? 'text-white' : 'text-gray-900'
-                    }`} 
+                    }`}
                   />
                 )}
               </div>
@@ -257,7 +257,7 @@ const Select: React.FC<SelectProps> = ({
         </p>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Select;
+export default Select

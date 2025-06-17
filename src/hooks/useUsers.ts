@@ -1,30 +1,30 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { User, UserInsert, UserUpdate } from '../types/database';
-import toast from 'react-hot-toast';
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
+import { User, UserInsert, UserUpdate } from '../types/database'
+import toast from 'react-hot-toast'
 
 export const useUsers = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const fetchUsers = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
 
-      if (error) throw error;
-      setUsers(data || []);
+      if (error) throw error
+      setUsers(data || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-      toast.error('Failed to fetch users');
+      setError(err instanceof Error ? err.message : 'An error occurred')
+      toast.error('Failed to fetch users')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const createUser = async (user: UserInsert) => {
     try {
@@ -32,18 +32,18 @@ export const useUsers = () => {
         .from('users')
         .insert([{ ...user, updated_at: new Date().toISOString() }])
         .select()
-        .single();
+        .single()
 
-      if (error) throw error;
-      setUsers(prev => [data, ...prev]);
-      toast.success('User created successfully');
-      return { data, error: null };
+      if (error) throw error
+      setUsers(prev => [data, ...prev])
+      toast.success('User created successfully')
+      return { data, error: null }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to create user';
-      toast.error(errorMessage);
-      return { data: null, error: errorMessage };
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create user'
+      toast.error(errorMessage)
+      return { data: null, error: errorMessage }
     }
-  };
+  }
 
   const updateUser = async (id: string, updates: UserUpdate) => {
     try {
@@ -52,53 +52,53 @@ export const useUsers = () => {
         .update({ ...updates, updated_at: new Date().toISOString() })
         .eq('id', id)
         .select()
-        .single();
+        .single()
 
-      if (error) throw error;
-      setUsers(prev => prev.map(user => user.id === id ? data : user));
-      toast.success('User updated successfully');
-      return { data, error: null };
+      if (error) throw error
+      setUsers(prev => prev.map(user => user.id === id ? data : user))
+      toast.success('User updated successfully')
+      return { data, error: null }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update user';
-      toast.error(errorMessage);
-      return { data: null, error: errorMessage };
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update user'
+      toast.error(errorMessage)
+      return { data: null, error: errorMessage }
     }
-  };
+  }
 
   const deleteUser = async (id: string) => {
     try {
       const { error } = await supabase
         .from('users')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
 
-      if (error) throw error;
-      setUsers(prev => prev.filter(user => user.id !== id));
-      toast.success('User deleted successfully');
-      return { error: null };
+      if (error) throw error
+      setUsers(prev => prev.filter(user => user.id !== id))
+      toast.success('User deleted successfully')
+      return { error: null }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to delete user';
-      toast.error(errorMessage);
-      return { error: errorMessage };
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete user'
+      toast.error(errorMessage)
+      return { error: errorMessage }
     }
-  };
+  }
 
   const updateLastLogin = async (id: string) => {
     try {
       const { error } = await supabase
         .from('users')
         .update({ last_login: new Date().toISOString() })
-        .eq('id', id);
+        .eq('id', id)
 
-      if (error) throw error;
+      if (error) throw error
     } catch (err) {
-      console.error('Failed to update last login:', err);
+      console.error('Failed to update last login:', err)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    fetchUsers()
+  }, [])
 
   return {
     users,
@@ -109,5 +109,5 @@ export const useUsers = () => {
     deleteUser,
     updateLastLogin,
     refetch: fetchUsers
-  };
-};
+  }
+}

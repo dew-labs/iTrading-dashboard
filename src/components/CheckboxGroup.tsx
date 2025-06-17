@@ -1,5 +1,5 @@
-import React from 'react';
-import Checkbox from './Checkbox';
+import React from 'react'
+import Checkbox from './Checkbox'
 
 interface CheckboxOption {
   id: string;
@@ -34,18 +34,18 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
   disabled = false,
   className = '',
   orientation = 'vertical',
-  'aria-label': ariaLabel,
+  'aria-label': ariaLabel
 }) => {
   const handleCheckboxChange = (value: string, checked: boolean) => {
     if (checked) {
-      onChange([...selectedValues, value]);
+      onChange([...selectedValues, value])
     } else {
-      onChange(selectedValues.filter(v => v !== value));
+      onChange(selectedValues.filter(v => v !== value))
     }
-  };
+  }
 
-  const groupId = `checkbox-group-${Math.random().toString(36).substr(2, 9)}`;
-  const descriptionId = description ? `${groupId}-description` : undefined;
+  const groupId = `checkbox-group-${Math.random().toString(36).substr(2, 9)}`
+  const descriptionId = description ? `${groupId}-description` : undefined
 
   return (
     <div className={className}>
@@ -70,10 +70,10 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
         aria-label={!label ? ariaLabel : undefined}
         aria-describedby={descriptionId}
         className={`
-          ${orientation === 'horizontal' 
-            ? 'flex flex-wrap gap-6' 
-            : 'space-y-3'
-          }
+          ${orientation === 'horizontal'
+      ? 'flex flex-wrap gap-6'
+      : 'space-y-3'
+    }
         `}
       >
         {options.map((option) => (
@@ -91,7 +91,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default CheckboxGroup;
+export default CheckboxGroup

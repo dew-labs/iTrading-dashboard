@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { AlertCircle, X, ExternalLink } from 'lucide-react';
+import React, { useState } from 'react'
+import { AlertCircle, X, ExternalLink } from 'lucide-react'
 
 const DemoNotice: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(true);
-  
-  const isDemo = import.meta.env.VITE_SUPABASE_URL?.includes('demo-project') || 
-                 !import.meta.env.VITE_SUPABASE_URL ||
-                 import.meta.env.VITE_SUPABASE_URL === 'https://demo-project.supabase.co';
+  const [isVisible, setIsVisible] = useState(true)
 
-  if (!isDemo || !isVisible) return null;
+  const isDemo = import.meta.env.VITE_SUPABASE_URL?.includes('demo-project') ||
+                 !import.meta.env.VITE_SUPABASE_URL ||
+                 import.meta.env.VITE_SUPABASE_URL === 'https://demo-project.supabase.co'
+
+  if (!isDemo || !isVisible) return null
 
   return (
     <div className="bg-amber-50 border-l-4 border-amber-400 p-4 relative">
@@ -18,11 +18,11 @@ const DemoNotice: React.FC = () => {
         </div>
         <div className="ml-3 flex-1">
           <p className="text-sm text-amber-700">
-            <strong>Demo Mode:</strong> This dashboard is running in demo mode. To enable full functionality, 
+            <strong>Demo Mode:</strong> This dashboard is running in demo mode. To enable full functionality,
             please set up your Supabase project and configure the environment variables.
-            <a 
-              href="https://supabase.com/dashboard" 
-              target="_blank" 
+            <a
+              href="https://supabase.com/dashboard"
+              target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center ml-2 text-amber-800 hover:text-amber-900 underline"
             >
@@ -43,7 +43,7 @@ const DemoNotice: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default DemoNotice;
+export default DemoNotice

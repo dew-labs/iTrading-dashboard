@@ -1,15 +1,15 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { 
-  Home, 
-  FileText, 
-  Package, 
-  Image, 
-  Users, 
+import React from 'react'
+import { NavLink } from 'react-router-dom'
+import {
+  Home,
+  FileText,
+  Package,
+  Image,
+  Users,
   X,
   ChevronRight,
   ChevronLeft
-} from 'lucide-react';
+} from 'lucide-react'
 
 interface SidebarProps {
   isOpen: boolean;
@@ -18,45 +18,45 @@ interface SidebarProps {
   setIsCollapsed: (collapsed: boolean) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ 
-  isOpen, 
-  setIsOpen, 
-  isCollapsed, 
-  setIsCollapsed 
+const Sidebar: React.FC<SidebarProps> = ({
+  isOpen,
+  setIsOpen,
+  isCollapsed,
+  setIsCollapsed
 }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home, path: '/' },
     { id: 'posts', label: 'Posts', icon: FileText, path: '/posts' },
     { id: 'products', label: 'Products', icon: Package, path: '/products' },
     { id: 'banners', label: 'Banners', icon: Image, path: '/banners' },
-    { id: 'users', label: 'Users', icon: Users, path: '/users' },
-  ];
+    { id: 'users', label: 'Users', icon: Users, path: '/users' }
+  ]
 
   const toggleCollapse = () => {
-    setIsCollapsed(!isCollapsed);
+    setIsCollapsed(!isCollapsed)
     // Close mobile sidebar when toggling collapse on desktop
     if (window.innerWidth >= 1024) {
-      setIsOpen(false);
+      setIsOpen(false)
     }
-  };
+  }
 
   return (
     <>
       {/* Mobile overlay */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-20 bg-black bg-opacity-50 lg:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
-      
+
       {/* Sidebar */}
       <div className={`fixed inset-y-0 left-0 z-30 bg-white shadow-xl transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       } ${
         isCollapsed ? 'lg:w-20' : 'lg:w-64'
       } w-64`}>
-        
+
         {/* Header */}
         <div className={`flex items-center justify-between h-20 px-6 border-b border-gray-200 flex-shrink-0 ${
           isCollapsed ? 'lg:px-4' : ''
@@ -73,7 +73,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               iTrading
             </span>
           </div>
-          
+
           {/* Mobile close button */}
           <button
             onClick={() => setIsOpen(false)}
@@ -81,7 +81,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           >
             <X className="w-5 h-5 text-gray-500" />
           </button>
-          
+
           {/* Desktop collapse button - positioned absolutely when collapsed */}
           <button
             onClick={toggleCollapse}
@@ -96,12 +96,12 @@ const Sidebar: React.FC<SidebarProps> = ({
             )}
           </button>
         </div>
-        
+
         {/* Navigation - flex-1 to take remaining space */}
         <nav className={`flex-1 py-6 space-y-2 overflow-y-auto ${isCollapsed ? 'lg:px-2' : 'px-4'}`}>
           {menuItems.map((item) => {
-            const Icon = item.icon;
-            
+            const Icon = item.icon
+
             return (
               <NavLink
                 key={item.id}
@@ -109,8 +109,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
                   `group relative flex items-center text-left rounded-xl transition-all duration-200 ${
-                    isCollapsed 
-                      ? 'lg:justify-center lg:px-3 lg:py-3 px-4 py-3' 
+                    isCollapsed
+                      ? 'lg:justify-center lg:px-3 lg:py-3 px-4 py-3'
                       : 'px-4 py-3'
                   } ${
                     isActive
@@ -124,19 +124,19 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <Icon className={`w-5 h-5 flex-shrink-0 ${
                       isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-900'
                     }`} />
-                    
+
                     <span className={`font-medium transition-all duration-300 ${
                       isCollapsed ? 'lg:hidden ml-3' : 'ml-3'
                     }`}>
                       {item.label}
                     </span>
-                    
+
                     <ChevronRight className={`w-4 h-4 ml-auto transition-transform flex-shrink-0 ${
                       isActive ? 'text-white rotate-90' : 'text-gray-400 group-hover:text-gray-900'
                     } ${
                       isCollapsed ? 'lg:hidden' : ''
                     }`} />
-                    
+
                     {/* Tooltip for collapsed state */}
                     {isCollapsed && (
                       <div className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 hidden lg:block">
@@ -147,12 +147,12 @@ const Sidebar: React.FC<SidebarProps> = ({
                   </>
                 )}
               </NavLink>
-            );
+            )
           })}
         </nav>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

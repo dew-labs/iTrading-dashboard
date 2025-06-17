@@ -1,5 +1,5 @@
-import React, { forwardRef } from 'react';
-import { Check, Minus } from 'lucide-react';
+import React, { forwardRef } from 'react'
+import { Check, Minus } from 'lucide-react'
 
 interface CheckboxProps {
   id?: string;
@@ -37,9 +37,9 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
 }, ref) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!disabled && onChange) {
-      onChange(event.target.checked);
+      onChange(event.target.checked)
     }
-  };
+  }
 
   // Size configurations
   const sizeConfig = {
@@ -61,9 +61,9 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
       text: 'text-base',
       description: 'text-sm'
     }
-  };
+  }
 
-  const config = sizeConfig[size];
+  const config = sizeConfig[size]
 
   // Base checkbox styles
   const checkboxBaseStyles = `
@@ -73,7 +73,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
     cursor-pointer group
     ${config.checkbox}
     ${variant === 'rounded' ? 'rounded-full' : 'rounded-md'}
-  `;
+  `
 
   // Checkbox state styles
   const getCheckboxStyles = () => {
@@ -82,7 +82,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
         ${checkboxBaseStyles}
         border-gray-300 bg-gray-100 cursor-not-allowed
         ${checked || indeterminate ? 'bg-gray-400 border-gray-400' : ''}
-      `;
+      `
     }
 
     if (checked || indeterminate) {
@@ -92,7 +92,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
         hover:from-black hover:to-gray-900
         shadow-lg shadow-gray-900/25
         transform hover:scale-105
-      `;
+      `
     }
 
     return `
@@ -100,18 +100,18 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
       border-gray-300 bg-white
       hover:border-gray-900 hover:bg-gray-50
       group-hover:shadow-md
-    `;
-  };
+    `
+  }
 
   // Icon styles
   const iconStyles = `
     ${config.icon}
     transition-all duration-200 ease-in-out
     ${checked || indeterminate ? 'text-white opacity-100 scale-100' : 'text-transparent opacity-0 scale-75'}
-  `;
+  `
 
-  const checkboxId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
-  const descriptionId = description ? `${checkboxId}-description` : undefined;
+  const checkboxId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`
+  const descriptionId = description ? `${checkboxId}-description` : undefined
 
   return (
     <div className={`flex items-start space-x-3 ${className}`}>
@@ -131,7 +131,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
           className="sr-only"
           {...props}
         />
-        
+
         {/* Custom checkbox */}
         <label
           htmlFor={checkboxId}
@@ -142,9 +142,9 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
           tabIndex={disabled ? -1 : 0}
           onKeyDown={(e) => {
             if (e.key === ' ' || e.key === 'Enter') {
-              e.preventDefault();
+              e.preventDefault()
               if (!disabled && onChange) {
-                onChange(!checked);
+                onChange(!checked)
               }
             }
           }}
@@ -155,7 +155,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
           ) : (
             <Check className={iconStyles} strokeWidth={3} />
           )}
-          
+
           {/* Ripple effect */}
           <div className="absolute inset-0 rounded-md opacity-0 group-active:opacity-20 bg-gray-900 transition-opacity duration-150" />
         </label>
@@ -191,9 +191,9 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
         </div>
       )}
     </div>
-  );
-});
+  )
+})
 
-Checkbox.displayName = 'Checkbox';
+Checkbox.displayName = 'Checkbox'
 
-export default Checkbox;
+export default Checkbox

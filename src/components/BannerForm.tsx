@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 
 interface Banner {
   id?: number;
@@ -28,7 +28,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
     image: '',
     link: '',
     description: ''
-  });
+  })
 
   useEffect(() => {
     if (banner) {
@@ -41,21 +41,21 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
         image: banner.image,
         link: banner.link || '',
         description: banner.description || ''
-      });
+      })
     }
-  }, [banner]);
+  }, [banner])
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
+    e.preventDefault()
+    onSubmit(formData)
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
-    });
-  };
+    })
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -164,7 +164,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
               alt="Preview"
               className="h-24 w-auto rounded border border-gray-200"
               onError={(e) => {
-                e.currentTarget.style.display = 'none';
+                e.currentTarget.style.display = 'none'
               }}
             />
           </div>
@@ -217,7 +217,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
         </button>
       </div>
     </form>
-  );
-};
+  )
+}
 
-export default BannerForm;
+export default BannerForm

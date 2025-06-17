@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 
 interface Product {
   id?: number;
@@ -26,7 +26,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
     status: 'active' as const,
     sku: '',
     description: ''
-  });
+  })
 
   useEffect(() => {
     if (product) {
@@ -38,22 +38,22 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
         status: product.status,
         sku: product.sku,
         description: product.description || ''
-      });
+      })
     }
-  }, [product]);
+  }, [product])
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
+    e.preventDefault()
+    onSubmit(formData)
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
+    const { name, value, type } = e.target
     setFormData({
       ...formData,
       [name]: type === 'number' ? parseFloat(value) || 0 : value
-    });
-  };
+    })
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -187,7 +187,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
         </button>
       </div>
     </form>
-  );
-};
+  )
+}
 
-export default ProductForm;
+export default ProductForm

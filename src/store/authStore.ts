@@ -1,16 +1,21 @@
-import { create } from 'zustand';
-import { User } from '@supabase/supabase-js';
-import { supabase, signIn, signOut, signUp } from '../lib/supabase';
+import { create } from 'zustand'
+import { supabase } from '../lib/supabase'
+import { User } from '../types/database'
 
 interface AuthState {
   user: User | null;
   loading: boolean;
   initialized: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-  signUp: (email: string, password: string, metadata?: any) => Promise<{ error: string | null }>;
+  signIn: (email: string, password: string) => Promise<{ error?: string }>;
+  signUp: (
+    email: string,
+    password: string,
+    metadata?: Record<string, unknown>
+  ) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
   initialize: () => Promise<void>;
   setDemoUser: () => void;
+  getCurrentUser: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -19,45 +24,63 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   initialized: false,
 
   signIn: async (email: string, password: string) => {
-    set({ loading: true });
+    set({ loading: true })
     try {
-      const { data, error } = await signIn(email, password);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
       if (error) {
-        return { error: error.message };
+        set({ loading: false })
+        return { error: error.message }
       }
-      set({ user: data.user });
-      return { error: null };
-    } catch (error) {
-      return { error: 'An unexpected error occurred' };
-    } finally {
-      set({ loading: false });
+
+      set({ user: data.user, loading: false })
+      return {}
+    } catch {
+      set({ loading: false })
+      return { error: 'Login failed' }
     }
   },
 
-  signUp: async (email: string, password: string, metadata?: any) => {
-    set({ loading: true });
+  signUp: async (
+    email: string,
+    password: string,
+    metadata?: Record<string, unknown>
+  ) => {
+    set({ loading: true })
     try {
-      const { data, error } = await signUp(email, password, metadata);
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: metadata
+        }
+      })
+
       if (error) {
-        return { error: error.message };
+        set({ loading: false })
+        return { error: error.message }
       }
-      return { error: null };
-    } catch (error) {
-      return { error: 'An unexpected error occurred' };
-    } finally {
-      set({ loading: false });
+
+      set({ loading: false })
+      return {}
+    } catch {
+      set({ loading: false })
+      return { error: 'Sign up failed' }
     }
   },
 
   signOut: async () => {
-    set({ loading: true });
+    set({ loading: true })
     try {
-      await signOut();
-      set({ user: null });
+      await supabase.auth.signOut()
+      set({ user: null })
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error('Sign out error:', error)
     } finally {
-      set({ loading: false });
+      set({ loading: false })
     }
   },
 
@@ -73,36 +96,44 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       updated_at: new Date().toISOString(),
       aud: 'authenticated',
       role: 'authenticated'
-    } as User;
-    
-    set({ user: demoUser });
+    } as User
+
+    set({ user: demoUser })
   },
 
   initialize: async () => {
     try {
       // Check if we're in demo mode
-      const isDemo = import.meta.env.VITE_SUPABASE_URL?.includes('demo-project') || 
-                     !import.meta.env.VITE_SUPABASE_URL ||
-                     import.meta.env.VITE_SUPABASE_URL === 'https://demo-project.supabase.co';
+      const isDemo =
+        import.meta.env.VITE_SUPABASE_URL?.includes('demo-project') ||
+        !import.meta.env.VITE_SUPABASE_URL ||
+        import.meta.env.VITE_SUPABASE_URL ===
+          'https://demo-project.supabase.co'
 
       if (isDemo) {
         // In demo mode, automatically set a demo user
-        get().setDemoUser();
-        set({ initialized: true });
-        return;
+        get().setDemoUser()
+        set({ initialized: true })
+        return
       }
 
-      const { data: { session } } = await supabase.auth.getSession();
-      set({ user: session?.user ?? null, initialized: true });
+      const {
+        data: { session }
+      } = await supabase.auth.getSession()
+      set({ user: session?.user ?? null, initialized: true })
 
       supabase.auth.onAuthStateChange((event, session) => {
-        set({ user: session?.user ?? null });
-      });
+        set({ user: session?.user ?? null })
+      })
     } catch (error) {
-      console.error('Auth initialization error:', error);
+      console.error('Auth initialization error:', error)
       // In case of error, still set demo user for development
-      get().setDemoUser();
-      set({ initialized: true });
+      get().setDemoUser()
+      set({ initialized: true })
     }
   },
-}));
+
+  getCurrentUser: async () => {
+    // Implementation of getCurrentUser method
+  }
+}))
