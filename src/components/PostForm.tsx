@@ -1,30 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import { Post, PostInsert } from '../types/database'
 
-interface Category {
-  id: string;
-  name: string;
-}
-
 interface PostFormProps {
   post?: Post | null;
   onSubmit: (data: PostInsert) => void;
   onCancel: () => void;
-  categories: Category[];
 }
 
 const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState<PostInsert>({
     title: '',
     content: '',
-    type: 'news' as 'news' | 'event',
-    status: 'draft' as 'published' | 'draft' | 'archived',
-    author: '',
-    excerpt: '',
-    featured_image: null,
-    tags: [],
-    event_date: null,
-    event_location: null
+    type: 'news'
   })
 
   useEffect(() => {
@@ -32,14 +19,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
       setFormData({
         title: post.title,
         type: post.type,
-        status: post.status,
-        author: post.author,
-        content: post.content || '',
-        excerpt: post.excerpt || '',
-        featured_image: post.featured_image,
-        tags: post.tags || [],
-        event_date: post.event_date,
-        event_location: post.event_location
+        content: post.content || ''
       })
     }
   }, [post])
@@ -80,63 +60,25 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label
-            htmlFor="type"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Type
-          </label>
-          <select
-            id="type"
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-          >
-            <option value="news">News</option>
-            <option value="event">Event</option>
-          </select>
-        </div>
-
-        <div>
-          <label
-            htmlFor="status"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Status
-          </label>
-          <select
-            id="status"
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-          >
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-            <option value="archived">Archived</option>
-          </select>
-        </div>
-      </div>
-
       <div>
         <label
-          htmlFor="author"
+          htmlFor="type"
           className="block text-sm font-medium text-gray-700 mb-1"
         >
-          Author
+          Type
         </label>
-        <input
-          type="text"
-          id="author"
-          name="author"
-          value={formData.author}
+        <select
+          id="type"
+          name="type"
+          value={formData.type}
           onChange={handleChange}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-          required
-        />
+        >
+          <option value="news">News</option>
+          <option value="event">Event</option>
+          <option value="terms_of_use">Terms of Use</option>
+          <option value="privacy_policy">Privacy Policy</option>
+        </select>
       </div>
 
       <div>
@@ -151,7 +93,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
           name="content"
           value={formData.content || ''}
           onChange={handleChange}
-          rows={6}
+          rows={8}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
           placeholder="Write your post content here..."
         />
