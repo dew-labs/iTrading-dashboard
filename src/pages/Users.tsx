@@ -24,15 +24,59 @@ const Users: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<DatabaseUser | null>(null)
+  const [sortColumn, setSortColumn] = useState<keyof DatabaseUser | null>('created_at')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
 
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (user.full_name && user.full_name.toLowerCase().includes(searchTerm.toLowerCase()))
-    const matchesRole = filterRole === 'all' || user.role === filterRole
-    const matchesStatus = filterStatus === 'all' || user.status === filterStatus
-    return matchesSearch && matchesRole && matchesStatus
-  })
+  const filteredUsers = users
+    .filter((user) => {
+      const matchesSearch =
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (user.full_name && user.full_name.toLowerCase().includes(searchTerm.toLowerCase()))
+      const matchesRole = filterRole === 'all' || user.role === filterRole
+      const matchesStatus = filterStatus === 'all' || user.status === filterStatus
+      return matchesSearch && matchesRole && matchesStatus
+    })
+    .sort((a, b) => {
+      if (!sortColumn) return 0
+
+      let aValue: string | number | null
+      let bValue: string | number | null
+
+      switch (sortColumn) {
+      case 'email':
+        aValue = a.email.toLowerCase()
+        bValue = b.email.toLowerCase()
+        break
+      case 'full_name':
+        aValue = (a.full_name || '').toLowerCase()
+        bValue = (b.full_name || '').toLowerCase()
+        break
+      case 'role':
+        aValue = a.role
+        bValue = b.role
+        break
+      case 'status':
+        aValue = a.status
+        bValue = b.status
+        break
+      case 'last_login':
+        aValue = a.last_login ? new Date(a.last_login).getTime() : 0
+        bValue = b.last_login ? new Date(b.last_login).getTime() : 0
+        break
+      case 'created_at':
+        aValue = new Date(a.created_at).getTime()
+        bValue = new Date(b.created_at).getTime()
+        break
+      default:
+        return 0
+      }
+
+      if (sortDirection === 'asc') {
+        return aValue > bValue ? 1 : -1
+      } else {
+        return aValue < bValue ? 1 : -1
+      }
+    })
 
   const handleEdit = (user: DatabaseUser) => {
     setEditingUser(user)
@@ -72,10 +116,20 @@ const Users: React.FC = () => {
     { value: 'inactive', label: 'Inactive' }
   ]
 
+  const handleSort = (column: keyof DatabaseUser) => {
+    if (column === sortColumn) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortColumn(column)
+      setSortDirection('desc')
+    }
+  }
+
   const columns = [
     {
       header: 'User',
       accessor: 'email' as keyof DatabaseUser,
+      sortable: true,
       render: (value: unknown, row: DatabaseUser) => (
         <div>
           <div className="font-medium text-gray-900">{row.full_name || 'No name'}</div>
@@ -86,6 +140,7 @@ const Users: React.FC = () => {
     {
       header: 'Role',
       accessor: 'role' as keyof DatabaseUser,
+      sortable: true,
       render: (value: unknown) => {
         const role = value as string
         return (
@@ -103,6 +158,7 @@ const Users: React.FC = () => {
     {
       header: 'Status',
       accessor: 'status' as keyof DatabaseUser,
+      sortable: true,
       render: (value: unknown) => {
         const status = value as string
         const statusConfig = {
@@ -124,6 +180,7 @@ const Users: React.FC = () => {
     {
       header: 'Last Login',
       accessor: 'last_login' as keyof DatabaseUser,
+      sortable: true,
       render: (value: unknown) => {
         const lastLogin = value as string | null
         return lastLogin ? new Date(lastLogin).toLocaleDateString() : 'Never'
@@ -132,6 +189,7 @@ const Users: React.FC = () => {
     {
       header: 'Created',
       accessor: 'created_at' as keyof DatabaseUser,
+      sortable: true,
       render: (value: unknown) => new Date(value as string).toLocaleDateString()
     },
     {
@@ -261,7 +319,13 @@ const Users: React.FC = () => {
           </div>
         </div>
 
-        <Table data={filteredUsers} columns={columns} />
+        <Table
+          data={filteredUsers}
+          columns={columns}
+          sortColumn={sortColumn}
+          sortDirection={sortDirection}
+          onSort={handleSort}
+        />
       </div>
 
       <Modal

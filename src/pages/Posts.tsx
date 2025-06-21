@@ -35,8 +35,8 @@ const Posts: React.FC = () => {
     'all' | 'news' | 'event' | 'terms_of_use' | 'privacy_policy'
   >('all')
   const [filterStatus, setFilterStatus] = useState<'all' | 'draft' | 'published'>('all')
-  const [sortBy, setSortBy] = useState<'created_at' | 'title' | 'updated_at'>('created_at')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+  const [sortColumn, setSortColumn] = useState<keyof Post | null>('created_at')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -70,26 +70,21 @@ const Posts: React.FC = () => {
 
     // Sort posts
     filtered.sort((a, b) => {
-      const extendedA = a as ExtendedPost
-      const extendedB = b as ExtendedPost
       let aValue: string | number
       let bValue: string | number
 
-      switch (sortBy) {
+      switch (sortColumn) {
       case 'title':
         aValue = a.title.toLowerCase()
         bValue = b.title.toLowerCase()
         break
-      case 'updated_at':
-        aValue = new Date(extendedA.updated_at || a.created_at).getTime()
-        bValue = new Date(extendedB.updated_at || b.created_at).getTime()
-        break
+      case 'created_at':
       default:
         aValue = new Date(a.created_at).getTime()
         bValue = new Date(b.created_at).getTime()
       }
 
-      if (sortOrder === 'asc') {
+      if (sortDirection === 'asc') {
         return aValue > bValue ? 1 : -1
       } else {
         return aValue < bValue ? 1 : -1
@@ -97,7 +92,7 @@ const Posts: React.FC = () => {
     })
 
     return filtered
-  }, [posts, searchTerm, filterType, filterStatus, sortBy, sortOrder])
+  }, [posts, searchTerm, filterType, filterStatus, sortColumn, sortDirection])
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedPosts.length / itemsPerPage)
@@ -207,16 +202,20 @@ const Posts: React.FC = () => {
     { value: 'published', label: 'Published' }
   ]
 
-  const sortOptions = [
-    { value: 'created_at', label: 'Created Date' },
-    { value: 'updated_at', label: 'Updated Date' },
-    { value: 'title', label: 'Title' }
-  ]
+  const handleSort = (column: keyof Post) => {
+    if (column === sortColumn) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortColumn(column)
+      setSortDirection('desc')
+    }
+  }
 
   const columns = [
     {
       header: 'Title',
       accessor: 'title' as keyof Post,
+      sortable: true,
       render: (value: unknown, row: Post) => {
         const extendedRow = row as ExtendedPost
         const titleValue = value as string
@@ -257,7 +256,8 @@ const Posts: React.FC = () => {
     },
     {
       header: 'Updated',
-      accessor: 'updated_at' as keyof Post,
+      accessor: 'created_at' as keyof Post,
+      sortable: true,
       render: (value: unknown, row: Post) => {
         const extendedRow = row as ExtendedPost
         const date = extendedRow.updated_at
@@ -354,7 +354,7 @@ const Posts: React.FC = () => {
           </div>
 
           {/* Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Select
               options={typeOptions}
               value={filterType}
@@ -374,29 +374,19 @@ const Posts: React.FC = () => {
               }}
               className="w-full"
             />
-
-            <Select
-              options={sortOptions}
-              value={sortBy}
-              onChange={(value) => setSortBy(value as typeof sortBy)}
-              className="w-full"
-            />
-
-            <select
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-            >
-              <option value="desc">Newest First</option>
-              <option value="asc">Oldest First</option>
-            </select>
           </div>
         </div>
       </div>
 
       {/* Table */}
       <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-        <Table data={paginatedPosts} columns={columns} />
+        <Table
+          data={paginatedPosts}
+          columns={columns}
+          sortColumn={sortColumn}
+          sortDirection={sortDirection}
+          onSort={handleSort}
+        />
 
         {/* Pagination */}
         {totalPages > 1 && (

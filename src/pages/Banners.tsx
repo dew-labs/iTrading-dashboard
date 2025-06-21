@@ -14,16 +14,49 @@ const Banners: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null)
+  const [sortColumn, setSortColumn] = useState<keyof Banner | null>('created_at')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
 
-  const filteredBanners = banners.filter((banner) => {
-    const matchesSearch =
-      banner.target_url?.toLowerCase().includes(searchTerm.toLowerCase()) || false
-    const matchesStatus =
-      filterStatus === 'all' ||
-      (filterStatus === 'active' && banner.is_active) ||
-      (filterStatus === 'inactive' && !banner.is_active)
-    return matchesSearch && matchesStatus
-  })
+  const filteredBanners = banners
+    .filter((banner) => {
+      const matchesSearch = banner.target_url
+        ? banner.target_url.toLowerCase().includes(searchTerm.toLowerCase())
+        : true
+      const matchesStatus =
+        filterStatus === 'all' ||
+        (filterStatus === 'active' && banner.is_active) ||
+        (filterStatus === 'inactive' && !banner.is_active)
+      return matchesSearch && matchesStatus
+    })
+    .sort((a, b) => {
+      if (!sortColumn) return 0
+
+      let aValue: string | number | boolean
+      let bValue: string | number | boolean
+
+      switch (sortColumn) {
+      case 'target_url':
+        aValue = (a.target_url || '').toLowerCase()
+        bValue = (b.target_url || '').toLowerCase()
+        break
+      case 'is_active':
+        aValue = a.is_active ? 1 : 0
+        bValue = b.is_active ? 1 : 0
+        break
+      case 'created_at':
+        aValue = new Date(a.created_at).getTime()
+        bValue = new Date(b.created_at).getTime()
+        break
+      default:
+        return 0
+      }
+
+      if (sortDirection === 'asc') {
+        return aValue > bValue ? 1 : -1
+      } else {
+        return aValue < bValue ? 1 : -1
+      }
+    })
 
   const handleEdit = (banner: Banner) => {
     setEditingBanner(banner)
@@ -60,13 +93,25 @@ const Banners: React.FC = () => {
     { value: 'inactive', label: 'Inactive' }
   ]
 
+  const handleSort = (column: keyof Banner) => {
+    if (column === sortColumn) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortColumn(column)
+      setSortDirection('desc')
+    }
+  }
+
   const columns = [
     {
       header: 'Banner',
       accessor: 'target_url' as keyof Banner,
-      render: (value: string | null, row: Banner) => (
+      sortable: true,
+      render: (value: unknown, row: Banner) => (
         <div>
-          <div className="font-medium text-gray-900">{value || 'No target URL'}</div>
+          <div className="font-medium text-gray-900">
+            {(value as string | null) || 'No target URL'}
+          </div>
           <div className="text-sm text-gray-500">ID: {row.id.slice(0, 8)}...</div>
         </div>
       )
@@ -74,7 +119,8 @@ const Banners: React.FC = () => {
     {
       header: 'Status',
       accessor: 'is_active' as keyof Banner,
-      render: (value: boolean) => (
+      sortable: true,
+      render: (value: unknown) => (
         <span
           className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
             value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
@@ -87,16 +133,17 @@ const Banners: React.FC = () => {
     {
       header: 'Target URL',
       accessor: 'target_url' as keyof Banner,
-      render: (value: string | null) => (
+      sortable: true,
+      render: (value: unknown) => (
         <div className="max-w-xs truncate">
           {value ? (
             <a
-              href={value}
+              href={value as string}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 hover:text-blue-800 underline"
             >
-              {value}
+              {value as string}
             </a>
           ) : (
             <span className="text-gray-500">No URL</span>
@@ -107,12 +154,13 @@ const Banners: React.FC = () => {
     {
       header: 'Created',
       accessor: 'created_at' as keyof Banner,
-      render: (value: string) => new Date(value).toLocaleDateString()
+      sortable: true,
+      render: (value: unknown) => new Date(value as string).toLocaleDateString()
     },
     {
       header: 'Actions',
       accessor: 'id' as keyof Banner,
-      render: (value: string, row: Banner) => (
+      render: (value: unknown, row: Banner) => (
         <div className="flex space-x-2">
           <button
             onClick={() => handleToggleStatus(row)}
@@ -132,7 +180,7 @@ const Banners: React.FC = () => {
             <Edit2 className="w-4 h-4" />
           </button>
           <button
-            onClick={() => handleDelete(value)}
+            onClick={() => handleDelete(value as string)}
             className="p-1 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
           >
             <Trash2 className="w-4 h-4" />
@@ -254,7 +302,13 @@ const Banners: React.FC = () => {
 
       {/* Table */}
       <div className="bg-white shadow-sm">
-        <Table data={filteredBanners} columns={columns} />
+        <Table
+          data={filteredBanners}
+          columns={columns}
+          sortColumn={sortColumn}
+          sortDirection={sortDirection}
+          onSort={handleSort}
+        />
       </div>
 
       {/* Modal */}

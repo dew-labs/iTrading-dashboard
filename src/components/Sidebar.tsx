@@ -1,15 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import {
-  Home,
-  FileText,
-  Package,
-  Image,
-  Users,
-  X,
-  ChevronRight,
-  ChevronLeft
-} from 'lucide-react'
+import { Home, FileText, Package, Image, Users, X, ChevronRight, ChevronLeft } from 'lucide-react'
 
 interface SidebarProps {
   isOpen: boolean;
@@ -18,12 +9,7 @@ interface SidebarProps {
   setIsCollapsed: (collapsed: boolean) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({
-  isOpen,
-  setIsOpen,
-  isCollapsed,
-  setIsCollapsed
-}) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIsCollapsed }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home, path: '/' },
     { id: 'posts', label: 'Posts', icon: FileText, path: '/posts' },
@@ -45,31 +31,36 @@ const Sidebar: React.FC<SidebarProps> = ({
       {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-20 bg-black bg-opacity-50 lg:hidden"
+          className="fixed inset-0 z-20 backdrop-blur-sm backdrop-opacity-75 bg-white/20 lg:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-30 bg-white shadow-xl transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      } ${
-        isCollapsed ? 'lg:w-20' : 'lg:w-64'
-      } w-64`}>
-
+      <div
+        className={`fixed inset-y-0 left-0 z-30 bg-white shadow-xl transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        } ${isCollapsed ? 'lg:w-20' : 'lg:w-64'} w-64`}
+      >
         {/* Header */}
-        <div className={`flex items-center justify-between h-20 px-6 border-b border-gray-200 flex-shrink-0 ${
-          isCollapsed ? 'lg:px-4' : ''
-        }`}>
-          <div className={`flex items-center transition-all duration-300 ${
-            isCollapsed ? 'lg:justify-center lg:w-full' : ''
-          }`}>
+        <div
+          className={`flex items-center justify-between h-20 px-6 border-b border-gray-200 flex-shrink-0 ${
+            isCollapsed ? 'lg:px-4' : ''
+          }`}
+        >
+          <div
+            className={`flex items-center transition-all duration-300 ${
+              isCollapsed ? 'lg:justify-center lg:w-full' : ''
+            }`}
+          >
             <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-gray-900 to-black rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">i</span>
             </div>
-            <span className={`ml-3 text-xl font-bold text-gray-900 transition-all duration-300 ${
-              isCollapsed ? 'lg:hidden' : ''
-            }`}>
+            <span
+              className={`ml-3 text-xl font-bold text-gray-900 transition-all duration-300 ${
+                isCollapsed ? 'lg:hidden' : ''
+              }`}
+            >
               iTrading
             </span>
           </div>
@@ -86,7 +77,9 @@ const Sidebar: React.FC<SidebarProps> = ({
           <button
             onClick={toggleCollapse}
             className={`hidden lg:flex p-1.5 rounded-md hover:bg-gray-100 transition-colors ${
-              isCollapsed ? 'absolute -right-3 top-1/2 transform -translate-y-1/2 bg-white border border-gray-200 shadow-md z-10' : ''
+              isCollapsed
+                ? 'absolute -right-3 top-1/2 transform -translate-y-1/2 bg-white border border-gray-200 shadow-md z-10'
+                : ''
             }`}
           >
             {isCollapsed ? (
@@ -98,7 +91,9 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Navigation - flex-1 to take remaining space */}
-        <nav className={`flex-1 py-6 space-y-2 overflow-y-auto ${isCollapsed ? 'lg:px-2' : 'px-4'}`}>
+        <nav
+          className={`flex-1 py-6 space-y-2 overflow-y-auto ${isCollapsed ? 'lg:px-2' : 'px-4'}`}
+        >
           {menuItems.map((item) => {
             const Icon = item.icon
 
@@ -109,9 +104,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
                   `group relative flex items-center text-left rounded-xl transition-all duration-200 ${
-                    isCollapsed
-                      ? 'lg:justify-center lg:px-3 lg:py-3 px-4 py-3'
-                      : 'px-4 py-3'
+                    isCollapsed ? 'lg:justify-center lg:px-3 lg:py-3 px-4 py-3' : 'px-4 py-3'
                   } ${
                     isActive
                       ? 'bg-gradient-to-r from-gray-900 to-black text-white shadow-lg shadow-gray-900/25'
@@ -121,21 +114,27 @@ const Sidebar: React.FC<SidebarProps> = ({
               >
                 {({ isActive }) => (
                   <>
-                    <Icon className={`w-5 h-5 flex-shrink-0 ${
-                      isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-900'
-                    }`} />
+                    <Icon
+                      className={`w-5 h-5 flex-shrink-0 ${
+                        isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-900'
+                      }`}
+                    />
 
-                    <span className={`font-medium transition-all duration-300 ${
-                      isCollapsed ? 'lg:hidden ml-3' : 'ml-3'
-                    }`}>
+                    <span
+                      className={`font-medium transition-all duration-300 ${
+                        isCollapsed ? 'lg:hidden ml-3' : 'ml-3'
+                      }`}
+                    >
                       {item.label}
                     </span>
 
-                    <ChevronRight className={`w-4 h-4 ml-auto transition-transform flex-shrink-0 ${
-                      isActive ? 'text-white rotate-90' : 'text-gray-400 group-hover:text-gray-900'
-                    } ${
-                      isCollapsed ? 'lg:hidden' : ''
-                    }`} />
+                    <ChevronRight
+                      className={`w-4 h-4 ml-auto transition-transform flex-shrink-0 ${
+                        isActive
+                          ? 'text-white rotate-90'
+                          : 'text-gray-400 group-hover:text-gray-900'
+                      } ${isCollapsed ? 'lg:hidden' : ''}`}
+                    />
 
                     {/* Tooltip for collapsed state */}
                     {isCollapsed && (

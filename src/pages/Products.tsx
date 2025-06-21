@@ -14,15 +14,54 @@ const Products: React.FC = () => {
   const [filterSubscription, setFilterSubscription] = useState<string>('all')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [sortColumn, setSortColumn] = useState<keyof Product | null>('created_at')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
 
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesSubscription =
-      filterSubscription === 'all' ||
-      (filterSubscription === 'subscription' && product.subscription) ||
-      (filterSubscription === 'one-time' && !product.subscription)
-    return matchesSearch && matchesSubscription
-  })
+  const filteredProducts = products
+    .filter((product) => {
+      const matchesSearch =
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (product.description &&
+          product.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      const matchesSubscription =
+        filterSubscription === 'all' ||
+        (filterSubscription === 'subscription' && product.subscription) ||
+        (filterSubscription === 'one-time' && !product.subscription)
+      return matchesSearch && matchesSubscription
+    })
+    .sort((a, b) => {
+      if (!sortColumn) return 0
+
+      let aValue: string | number
+      let bValue: string | number
+
+      switch (sortColumn) {
+      case 'name':
+        aValue = a.name.toLowerCase()
+        bValue = b.name.toLowerCase()
+        break
+      case 'price':
+        aValue = a.price
+        bValue = b.price
+        break
+      case 'subscription':
+        aValue = a.subscription ? 1 : 0
+        bValue = b.subscription ? 1 : 0
+        break
+      case 'created_at':
+        aValue = new Date(a.created_at).getTime()
+        bValue = new Date(b.created_at).getTime()
+        break
+      default:
+        return 0
+      }
+
+      if (sortDirection === 'asc') {
+        return aValue > bValue ? 1 : -1
+      } else {
+        return aValue < bValue ? 1 : -1
+      }
+    })
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product)
@@ -55,27 +94,37 @@ const Products: React.FC = () => {
     { value: 'one-time', label: 'One-time' }
   ]
 
+  const handleSort = (column: keyof Product) => {
+    if (column === sortColumn) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortColumn(column)
+      setSortDirection('desc')
+    }
+  }
+
   const columns = [
     {
       header: 'Product',
       accessor: 'name' as keyof Product,
+      sortable: true,
       render: (value: unknown, row: Product) => (
         <div>
           <div className="font-medium text-gray-900">{value as string}</div>
-          <div className="text-sm text-gray-500">
-            {row.subscription ? 'Subscription' : 'One-time purchase'}
-          </div>
+          <div className="text-sm text-gray-500">{row.description || 'No description'}</div>
         </div>
       )
     },
     {
       header: 'Price',
       accessor: 'price' as keyof Product,
+      sortable: true,
       render: (value: unknown) => `$${(value as number).toFixed(2)}`
     },
     {
       header: 'Type',
       accessor: 'subscription' as keyof Product,
+      sortable: true,
       render: (value: unknown) => {
         const isSubscription = value as boolean
         return (
@@ -92,6 +141,7 @@ const Products: React.FC = () => {
     {
       header: 'Created',
       accessor: 'created_at' as keyof Product,
+      sortable: true,
       render: (value: unknown) => new Date(value as string).toLocaleDateString()
     },
     {
@@ -202,7 +252,13 @@ const Products: React.FC = () => {
           </div>
         </div>
 
-        <Table data={filteredProducts} columns={columns} />
+        <Table
+          data={filteredProducts}
+          columns={columns}
+          sortColumn={sortColumn}
+          sortDirection={sortDirection}
+          onSort={handleSort}
+        />
       </div>
 
       <Modal
