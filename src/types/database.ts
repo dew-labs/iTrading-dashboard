@@ -7,6 +7,7 @@ export interface Database {
           title: string;
           content: string | null;
           type: 'news' | 'event' | 'terms_of_use' | 'privacy_policy';
+          status: 'draft' | 'published';
           published_at: string;
           created_at: string;
         };
@@ -15,6 +16,7 @@ export interface Database {
           title: string;
           content?: string | null;
           type: 'news' | 'event' | 'terms_of_use' | 'privacy_policy';
+          status?: 'draft' | 'published';
           published_at?: string;
           created_at?: string;
         };
@@ -23,6 +25,7 @@ export interface Database {
           title?: string;
           content?: string | null;
           type?: 'news' | 'event' | 'terms_of_use' | 'privacy_policy';
+          status?: 'draft' | 'published';
           published_at?: string;
           created_at?: string;
         };

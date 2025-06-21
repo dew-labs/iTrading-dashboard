@@ -8,7 +8,10 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
-  AlertTriangle
+  AlertTriangle,
+  Clock,
+  User,
+  Tag
 } from 'lucide-react'
 import { usePosts } from '../hooks/usePosts'
 import { useAuthStore } from '../store/authStore'
@@ -16,24 +19,56 @@ import Table from '../components/Table'
 import Modal from '../components/Modal'
 import PostForm from '../components/PostForm'
 import LoadingSpinner from '../components/LoadingSpinner'
-import Select from '../components/Select'
+import TabNavigation from '../components/TabNavigation'
+import FilterDropdown from '../components/FilterDropdown'
 import type { Post, PostInsert } from '../types'
 
 // Extended Post type to include additional fields that might exist
 interface ExtendedPost extends Post {
   author?: string;
-  status?: 'draft' | 'published';
   views?: number;
   updated_at?: string;
 }
+
+// Tab configuration
+const POST_TABS = [
+  {
+    id: 'all',
+    label: 'All Posts',
+    count: 0,
+    description: 'All content posts'
+  },
+  {
+    id: 'news',
+    label: 'News',
+    count: 0,
+    description: 'News articles and updates'
+  },
+  {
+    id: 'event',
+    label: 'Events',
+    count: 0,
+    description: 'Event announcements and information'
+  },
+  {
+    id: 'terms_of_use',
+    label: 'Terms of Use',
+    count: 0,
+    description: 'Legal and policy documents'
+  },
+  {
+    id: 'privacy_policy',
+    label: 'Privacy Policy',
+    count: 0,
+    description: 'Privacy and data protection policies'
+  }
+]
 
 const Posts: React.FC = () => {
   const { posts, loading, createPost, updatePost, deletePost } = usePosts()
   const { user } = useAuthStore()
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterType, setFilterType] = useState<
-    'all' | 'news' | 'event' | 'terms_of_use' | 'privacy_policy'
-  >('all')
+  const [activeTab, setActiveTab] = useState<string>('all')
   const [filterStatus, setFilterStatus] = useState<'all' | 'draft' | 'published'>('all')
   const [sortColumn, setSortColumn] = useState<keyof Post | null>('created_at')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
@@ -52,6 +87,14 @@ const Posts: React.FC = () => {
   })
   const [viewingPost, setViewingPost] = useState<Post | null>(null)
 
+  // Calculate tab counts
+  const tabsWithCounts = useMemo(() => {
+    return POST_TABS.map((tab) => ({
+      ...tab,
+      count: tab.id === 'all' ? posts.length : posts.filter((post) => post.type === tab.id).length
+    }))
+  }, [posts])
+
   // Enhanced filtering and sorting
   const filteredAndSortedPosts = useMemo(() => {
     const filtered = posts.filter((post) => {
@@ -62,8 +105,8 @@ const Posts: React.FC = () => {
         (extendedPost.author &&
           extendedPost.author.toLowerCase().includes(searchTerm.toLowerCase()))
 
-      const matchesType = filterType === 'all' || post.type === filterType
-      const matchesStatus = filterStatus === 'all' || extendedPost.status === filterStatus
+      const matchesType = activeTab === 'all' || post.type === activeTab
+      const matchesStatus = filterStatus === 'all' || post.status === filterStatus
 
       return matchesSearch && matchesType && matchesStatus
     })
@@ -92,7 +135,7 @@ const Posts: React.FC = () => {
     })
 
     return filtered
-  }, [posts, searchTerm, filterType, filterStatus, sortColumn, sortDirection])
+  }, [posts, searchTerm, activeTab, filterStatus, sortColumn, sortDirection])
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedPosts.length / itemsPerPage)
@@ -166,6 +209,11 @@ const Posts: React.FC = () => {
     setCurrentPage(page)
   }
 
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId)
+    setCurrentPage(1) // Reset to first page when changing tabs
+  }
+
   const formatTypeLabel = (type: string) => {
     switch (type) {
     case 'terms_of_use':
@@ -188,13 +236,20 @@ const Posts: React.FC = () => {
     }
   }
 
-  const typeOptions = [
-    { value: 'all', label: 'All Types' },
-    { value: 'news', label: 'News' },
-    { value: 'event', label: 'Events' },
-    { value: 'terms_of_use', label: 'Terms of Use' },
-    { value: 'privacy_policy', label: 'Privacy Policy' }
-  ]
+  const getTypeBadge = (type: string) => {
+    switch (type) {
+    case 'news':
+      return 'bg-blue-100 text-blue-800'
+    case 'event':
+      return 'bg-purple-100 text-purple-800'
+    case 'terms_of_use':
+      return 'bg-red-100 text-red-800'
+    case 'privacy_policy':
+      return 'bg-orange-100 text-orange-800'
+    default:
+      return 'bg-gray-100 text-gray-800'
+    }
+  }
 
   const statusOptions = [
     { value: 'all', label: 'All Status' },
@@ -213,57 +268,86 @@ const Posts: React.FC = () => {
 
   const columns = [
     {
-      header: 'Title',
+      header: 'Post Details',
       accessor: 'title' as keyof Post,
       sortable: true,
       render: (value: unknown, row: Post) => {
-        const extendedRow = row as ExtendedPost
-        const titleValue = value as string
         return (
-          <div>
-            <div className="font-medium text-gray-900">{titleValue}</div>
-            <div className="text-sm text-gray-500 flex items-center space-x-2">
-              <span>{formatTypeLabel(row.type)}</span>
-              <span
-                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(
-                  extendedRow.status || 'draft'
-                )}`}
-              >
-                {extendedRow.status || 'draft'}
-              </span>
+          <div className="flex items-start space-x-3">
+            <div className="flex-shrink-0">
+              <div className="w-10 h-10 bg-gradient-to-br from-gray-900 to-black rounded-lg flex items-center justify-center">
+                <Tag className="w-5 h-5 text-white" />
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-gray-900 truncate">{value as string}</div>
+              <div className="flex items-center space-x-2 mt-1">
+                <span
+                  className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getTypeBadge(
+                    row.type
+                  )}`}
+                >
+                  {formatTypeLabel(row.type)}
+                </span>
+              </div>
             </div>
           </div>
         )
       }
     },
     {
-      header: 'Author',
-      accessor: 'author' as keyof Post,
+      header: 'Status',
+      accessor: 'id' as keyof Post,
       render: (value: unknown, row: Post) => {
-        const extendedRow = row as ExtendedPost
-        return <div className="text-sm text-gray-900">{extendedRow.author || 'Unknown'}</div>
-      }
-    },
-    {
-      header: 'Views',
-      accessor: 'views' as keyof Post,
-      render: (value: unknown, row: Post) => {
-        const extendedRow = row as ExtendedPost
         return (
-          <div className="text-sm text-gray-900">{extendedRow.views?.toLocaleString() || 0}</div>
+          <span
+            className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(row.status)}`}
+          >
+            {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
+          </span>
         )
       }
     },
     {
-      header: 'Updated',
+      header: 'Author & Dates',
       accessor: 'created_at' as keyof Post,
       sortable: true,
       render: (value: unknown, row: Post) => {
         const extendedRow = row as ExtendedPost
-        const date = extendedRow.updated_at
-          ? new Date(extendedRow.updated_at)
-          : new Date(row.created_at)
-        return <div className="text-sm text-gray-900">{date.toLocaleDateString()}</div>
+        return (
+          <div className="text-sm">
+            <div className="flex items-center text-gray-900 mb-1">
+              <User className="w-4 h-4 mr-1 text-gray-400" />
+              <span>{extendedRow.author || 'Unknown Author'}</span>
+            </div>
+            <div className="flex items-center text-gray-500">
+              <Clock className="w-4 h-4 mr-1" />
+              <span>{new Date(value as string).toLocaleDateString()}</span>
+            </div>
+            {extendedRow.updated_at && (
+              <div className="text-xs text-gray-400 mt-1">
+                Updated: {new Date(extendedRow.updated_at).toLocaleDateString()}
+              </div>
+            )}
+          </div>
+        )
+      }
+    },
+    {
+      header: 'Engagement',
+      accessor: 'id' as keyof Post,
+      render: (value: unknown, row: Post) => {
+        const extendedRow = row as ExtendedPost
+        return (
+          <div className="text-sm text-gray-900">
+            <div className="flex items-center space-x-4">
+              <div className="text-center">
+                <div className="font-medium">{extendedRow.views?.toLocaleString() || 0}</div>
+                <div className="text-xs text-gray-500">Views</div>
+              </div>
+            </div>
+          </div>
+        )
       }
     },
     {
@@ -280,7 +364,7 @@ const Posts: React.FC = () => {
           </button>
           <button
             onClick={() => handleEdit(row)}
-            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded transition-colors"
+            className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
             title="Edit post"
           >
             <Edit2 className="w-4 h-4" />
@@ -316,77 +400,72 @@ const Posts: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900">Posts Management</h1>
           <p className="mt-1 text-gray-600">Create, edit, and manage your content posts</p>
         </div>
-        <button
-          onClick={() => {
-            if (!user) {
-              alert('You must be logged in to create posts')
-              return
-            }
-            setIsModalOpen(true)
-          }}
-          className="flex items-center px-4 py-2 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-black hover:to-gray-900 transition-colors"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Create Post
-        </button>
-      </div>
-
-      {/* Enhanced Filters */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <div className="space-y-4">
-          {/* Search */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search posts by title, content, or author..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-              />
-            </div>
-
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <Calendar className="w-4 h-4" />
-              <span>{filteredAndSortedPosts.length} posts found</span>
-            </div>
-          </div>
-
-          {/* Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Select
-              options={typeOptions}
-              value={filterType}
-              onChange={(value) => {
-                setFilterType(value as typeof filterType)
-                setCurrentPage(1)
-              }}
-              className="w-full"
-            />
-
-            <Select
-              options={statusOptions}
-              value={filterStatus}
-              onChange={(value) => {
-                setFilterStatus(value as typeof filterStatus)
-                setCurrentPage(1)
-              }}
-              className="w-full"
-            />
-          </div>
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={() => {
+              if (!user) {
+                alert('You must be logged in to create posts')
+                return
+              }
+              setIsModalOpen(true)
+            }}
+            className="flex items-center px-4 py-2 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-black hover:to-gray-900 transition-colors"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Create Post
+          </button>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-        <Table
-          data={paginatedPosts}
-          columns={columns}
-          sortColumn={sortColumn}
-          sortDirection={sortDirection}
-          onSort={handleSort}
-        />
+      {/* Tabs with Content Inside */}
+      <TabNavigation tabs={tabsWithCounts} activeTab={activeTab} onTabChange={handleTabChange}>
+        {/* Enhanced Filters */}
+        <div className="p-6 space-y-4">
+          {/* Search and filters row */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4">
+            <div className="flex-1 max-w-md">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search posts by title, content, or author..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <FilterDropdown
+                options={statusOptions}
+                value={filterStatus}
+                onChange={(value) => {
+                  setFilterStatus(value as typeof filterStatus)
+                  setCurrentPage(1)
+                }}
+                placeholder="Filter by Status"
+              />
+              <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <Calendar className="w-4 h-4" />
+                <span>
+                  Showing {startItem}-{endItem} of {filteredAndSortedPosts.length} posts
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Table with padding */}
+        <div className="px-6 pb-6">
+          <Table
+            data={paginatedPosts}
+            columns={columns}
+            sortColumn={sortColumn}
+            sortDirection={sortDirection}
+            onSort={handleSort}
+          />
+        </div>
 
         {/* Pagination */}
         {totalPages > 1 && (
@@ -456,9 +535,9 @@ const Posts: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
+      </TabNavigation>
 
-      {/* Create/Edit Modal */}
+      {/* Modals */}
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
@@ -468,94 +547,91 @@ const Posts: React.FC = () => {
       </Modal>
 
       {/* Delete Confirmation Modal */}
-      <Modal
-        isOpen={deleteConfirm.isOpen}
-        onClose={() =>
-          !deleteConfirm.isDeleting &&
-          setDeleteConfirm({ isOpen: false, post: null, isDeleting: false })
-        }
-        title=""
-      >
-        <div className="sm:flex sm:items-start">
-          <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-            <AlertTriangle className="h-6 w-6 text-red-600" />
-          </div>
-          <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">Delete Post</h3>
-            <div className="mt-2">
-              <p className="text-sm text-gray-500">
-                Are you sure you want to delete "{deleteConfirm.post?.title}"? This action cannot be
-                undone.
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-          <button
-            type="button"
-            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={confirmDelete}
-            disabled={deleteConfirm.isDeleting}
-          >
-            {deleteConfirm.isDeleting ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Deleting...
-              </>
-            ) : (
-              'Delete'
-            )}
-          </button>
-          <button
-            type="button"
-            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:w-auto sm:text-sm"
-            onClick={() => setDeleteConfirm({ isOpen: false, post: null, isDeleting: false })}
-            disabled={deleteConfirm.isDeleting}
-          >
-            Cancel
-          </button>
-        </div>
-      </Modal>
-
-      {/* View Post Modal */}
-      <Modal
-        isOpen={!!viewingPost}
-        onClose={() => setViewingPost(null)}
-        title={viewingPost?.title || ''}
-      >
-        {viewingPost && (
+      {deleteConfirm.isOpen && (
+        <Modal
+          isOpen={deleteConfirm.isOpen}
+          onClose={() => setDeleteConfirm({ isOpen: false, post: null, isDeleting: false })}
+          title="Delete Post"
+        >
           <div className="space-y-4">
-            <div className="flex items-center space-x-4 pb-4 border-b border-gray-200">
-              <span
-                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(
-                  (viewingPost as ExtendedPost).status || 'draft'
-                )}`}
-              >
-                {(viewingPost as ExtendedPost).status || 'draft'}
-              </span>
-              <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                {formatTypeLabel(viewingPost.type)}
-              </span>
-              <span className="text-sm text-gray-500">
-                {(viewingPost as ExtendedPost).views || 0} views
-              </span>
-            </div>
-
-            <div className="prose max-w-none">
-              <div className="whitespace-pre-wrap text-gray-900">
-                {viewingPost.content || 'No content available.'}
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Are you sure?</h3>
+                <p className="text-sm text-gray-500">
+                  This action cannot be undone. This will permanently delete the post "
+                  {deleteConfirm.post?.title}".
+                </p>
               </div>
             </div>
-
-            <div className="pt-4 border-t border-gray-200 text-sm text-gray-500">
-              <p>Created: {new Date(viewingPost.created_at).toLocaleDateString()}</p>
-              {(viewingPost as ExtendedPost).author && (
-                <p>Author: {(viewingPost as ExtendedPost).author}</p>
-              )}
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setDeleteConfirm({ isOpen: false, post: null, isDeleting: false })}
+                disabled={deleteConfirm.isDeleting}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={deleteConfirm.isDeleting}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleteConfirm.isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
             </div>
           </div>
-        )}
-      </Modal>
+        </Modal>
+      )}
+
+      {/* View Post Modal */}
+      {viewingPost && (
+        <Modal
+          isOpen={!!viewingPost}
+          onClose={() => setViewingPost(null)}
+          title={`View Post: ${viewingPost.title}`}
+        >
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-lg font-medium text-gray-900">{viewingPost.title}</h3>
+              <div className="flex items-center space-x-2 mt-2">
+                <span
+                  className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getTypeBadge(
+                    viewingPost.type
+                  )}`}
+                >
+                  {formatTypeLabel(viewingPost.type)}
+                </span>
+                <span
+                  className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(
+                    viewingPost.status
+                  )}`}
+                >
+                  {viewingPost.status.charAt(0).toUpperCase() + viewingPost.status.slice(1)}
+                </span>
+              </div>
+            </div>
+            {viewingPost.content && (
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Content</h4>
+                <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
+                  {viewingPost.content}
+                </div>
+              </div>
+            )}
+            <div className="flex justify-end">
+              <button
+                onClick={() => setViewingPost(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   )
 }

@@ -196,18 +196,20 @@ const Users: React.FC = () => {
       header: 'Actions',
       accessor: 'id' as keyof DatabaseUser,
       render: (value: unknown, row: DatabaseUser) => (
-        <div className="flex space-x-2">
+        <div className="flex space-x-1">
           <button
             onClick={() => handleEdit(row)}
-            className="p-1 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded transition-colors"
+            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded transition-colors"
+            title="Edit user"
           >
-            <Edit2 size={16} />
+            <Edit2 className="w-4 h-4" />
           </button>
           <button
             onClick={() => handleDelete(value as string)}
-            className="p-1 text-red-600 hover:text-red-900 hover:bg-red-50 rounded transition-colors"
+            className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+            title="Delete user"
           >
-            <Trash2 size={16} />
+            <Trash2 className="w-4 h-4" />
           </button>
         </div>
       )
@@ -285,11 +287,11 @@ const Users: React.FC = () => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-6 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
+            <div className="flex-1 max-w-md">
               <div className="relative">
                 <Search
                   className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  size={20}
+                  size={16}
                 />
                 <input
                   type="text"

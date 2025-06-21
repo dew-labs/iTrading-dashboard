@@ -34,3 +34,4 @@ Other Rules need to follow:
 - Avoid custom CSS unless absolutely necessary
 - Maintain consistent order of utility classes
 - Use Tailwind's responsive variants for adaptive designs
+- No need to run the application, it's already ran at localhost:5173
