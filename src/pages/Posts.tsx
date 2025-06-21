@@ -11,21 +11,15 @@ import { Post, PostInsert } from '../types/database'
 const Posts: React.FC = () => {
   const { posts, loading, createPost, updatePost, deletePost } = usePosts()
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterType, setFilterType] = useState<'all' | 'news' | 'event'>('all')
-  const [filterStatus, setFilterStatus] = useState<
-    'all' | 'published' | 'draft' | 'archived'
-  >('all')
+  const [filterType, setFilterType] = useState<'all' | 'news' | 'event' | 'terms_of_use' | 'privacy_policy'>('all')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingPost, setEditingPost] = useState<Post | null>(null)
 
   const filteredPosts = posts.filter((post) => {
     const matchesSearch =
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.author.toLowerCase().includes(searchTerm.toLowerCase())
+      post.title.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesType = filterType === 'all' || post.type === filterType
-    const matchesStatus =
-      filterStatus === 'all' || post.status === filterStatus
-    return matchesSearch && matchesType && matchesStatus
+    return matchesSearch && matchesType
   })
 
   const handleEdit = (post: Post) => {
@@ -53,17 +47,23 @@ const Posts: React.FC = () => {
     handleCloseModal()
   }
 
+  const formatTypeLabel = (type: string) => {
+    switch (type) {
+    case 'terms_of_use':
+      return 'Terms of Use'
+    case 'privacy_policy':
+      return 'Privacy Policy'
+    default:
+      return type.charAt(0).toUpperCase() + type.slice(1)
+    }
+  }
+
   const typeOptions = [
     { value: 'all', label: 'All Types' },
     { value: 'news', label: 'News' },
-    { value: 'event', label: 'Events' }
-  ]
-
-  const statusOptions = [
-    { value: 'all', label: 'All Status' },
-    { value: 'published', label: 'Published' },
-    { value: 'draft', label: 'Draft' },
-    { value: 'archived', label: 'Archived' }
+    { value: 'event', label: 'Events' },
+    { value: 'terms_of_use', label: 'Terms of Use' },
+    { value: 'privacy_policy', label: 'Privacy Policy' }
   ]
 
   const columns = [
@@ -73,40 +73,30 @@ const Posts: React.FC = () => {
       render: (value: string, row: Post) => (
         <div>
           <div className="font-medium text-gray-900">{value}</div>
-          <div className="text-sm text-gray-500 capitalize">{row.type}</div>
+          <div className="text-sm text-gray-500">{formatTypeLabel(row.type)}</div>
         </div>
       )
     },
     {
-      header: 'Status',
-      accessor: 'status' as keyof Post,
+      header: 'Type',
+      accessor: 'type' as keyof Post,
       render: (value: string) => (
-        <span
-          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-            value === 'published'
-              ? 'bg-green-100 text-green-800'
-              : value === 'draft'
-                ? 'bg-yellow-100 text-yellow-800'
-                : 'bg-gray-100 text-gray-800'
-          }`}
-        >
-          {value}
+        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+          {formatTypeLabel(value)}
         </span>
       )
     },
     {
-      header: 'Author',
-      accessor: 'author' as keyof Post
+      header: 'Published',
+      accessor: 'published_at' as keyof Post,
+      render: (value: string | null) =>
+        value ? new Date(value).toLocaleDateString() : 'Not published'
     },
     {
-      header: 'Date',
+      header: 'Created',
       accessor: 'created_at' as keyof Post,
-      render: (value: string) => new Date(value).toLocaleDateString()
-    },
-    {
-      header: 'Views',
-      accessor: 'views' as keyof Post,
-      render: (value: number) => value.toLocaleString()
+      render: (value: string | null) =>
+        value ? new Date(value).toLocaleDateString() : '-'
     },
     {
       header: 'Actions',
@@ -181,18 +171,7 @@ const Posts: React.FC = () => {
               options={typeOptions}
               value={filterType}
               onChange={(value) =>
-                setFilterType(value as 'all' | 'news' | 'event')
-              }
-              className="w-full sm:w-40"
-            />
-
-            <Select
-              options={statusOptions}
-              value={filterStatus}
-              onChange={(value) =>
-                setFilterStatus(
-                  value as 'all' | 'published' | 'draft' | 'archived'
-                )
+                setFilterType(value as 'all' | 'news' | 'event' | 'terms_of_use' | 'privacy_policy')
               }
               className="w-full sm:w-40"
             />

@@ -1,43 +1,27 @@
 import React, { useState, useEffect } from 'react'
-
-interface Product {
-  id?: number;
-  name: string;
-  category: string;
-  price: number;
-  stock: number;
-  status: 'active' | 'inactive' | 'out-of-stock';
-  sku: string;
-  description?: string;
-}
+import { Product, ProductInsert } from '../types/database'
 
 interface ProductFormProps {
   product?: Product | null;
-  onSubmit: (data: Omit<Product, 'id'>) => void;
+  onSubmit: (data: ProductInsert) => void;
   onCancel: () => void;
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ProductInsert>({
     name: '',
-    category: '',
     price: 0,
-    stock: 0,
-    status: 'active' as const,
-    sku: '',
-    description: ''
+    description: '',
+    subscription: false
   })
 
   useEffect(() => {
     if (product) {
       setFormData({
         name: product.name,
-        category: product.category,
         price: product.price,
-        stock: product.stock,
-        status: product.status,
-        sku: product.sku,
-        description: product.description || ''
+        description: product.description || '',
+        subscription: product.subscription
       })
     }
   }, [product])
@@ -47,12 +31,21 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
     onSubmit(formData)
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target
-    setFormData({
-      ...formData,
-      [name]: type === 'number' ? parseFloat(value) || 0 : value
-    })
+
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked
+      setFormData({
+        ...formData,
+        [name]: checked
+      })
+    } else {
+      setFormData({
+        ...formData,
+        [name]: type === 'number' ? parseFloat(value) || 0 : value
+      })
+    }
   }
 
   return (
@@ -67,93 +60,26 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
           name="name"
           value={formData.name}
           onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
           required
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="sku" className="block text-sm font-medium text-gray-700 mb-1">
-            SKU
-          </label>
-          <input
-            type="text"
-            id="sku"
-            name="sku"
-            value={formData.sku}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
-            Category
-          </label>
-          <input
-            type="text"
-            id="category"
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            required
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
-            Price ($)
-          </label>
-          <input
-            type="number"
-            id="price"
-            name="price"
-            value={formData.price}
-            onChange={handleChange}
-            step="0.01"
-            min="0"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">
-            Stock Quantity
-          </label>
-          <input
-            type="number"
-            id="stock"
-            name="stock"
-            value={formData.stock}
-            onChange={handleChange}
-            min="0"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            required
-          />
-        </div>
-      </div>
-
       <div>
-        <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
-          Status
+        <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
+          Price ($)
         </label>
-        <select
-          id="status"
-          name="status"
-          value={formData.status}
+        <input
+          type="number"
+          id="price"
+          name="price"
+          value={formData.price}
           onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-        >
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-          <option value="out-of-stock">Out of Stock</option>
-        </select>
+          step="0.01"
+          min="0"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+          required
+        />
       </div>
 
       <div>
@@ -163,12 +89,34 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
         <textarea
           id="description"
           name="description"
-          value={formData.description}
+          value={formData.description || ''}
           onChange={handleChange}
           rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
           placeholder="Product description..."
         />
+      </div>
+
+      <div className="flex items-center">
+        <input
+          type="checkbox"
+          id="subscription"
+          name="subscription"
+          checked={formData.subscription}
+          onChange={handleChange}
+          className="h-4 w-4 text-gray-900 focus:ring-gray-900 border-gray-300 rounded"
+        />
+        <label htmlFor="subscription" className="ml-2 block text-sm text-gray-700">
+          Subscription Product
+        </label>
+      </div>
+
+      <div className="bg-gray-50 p-4 rounded-lg">
+        <h4 className="text-sm font-medium text-gray-900 mb-2">Image Management</h4>
+        <p className="text-xs text-gray-600">
+          Product images are managed through the centralized Images table.
+          After creating the product, you can upload and associate images using the image management system.
+        </p>
       </div>
 
       <div className="flex justify-end space-x-3 pt-4">
@@ -181,7 +129,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
         </button>
         <button
           type="submit"
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          className="px-4 py-2 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-black hover:to-gray-900 transition-colors"
         >
           {product ? 'Update' : 'Add'} Product
         </button>

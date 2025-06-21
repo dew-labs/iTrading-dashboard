@@ -1,91 +1,26 @@
 import React, { useState } from 'react'
-import { Plus, Search, Edit2, Trash2, Package, DollarSign } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Package, DollarSign, Calendar } from 'lucide-react'
+import { useProducts } from '../hooks/useProducts'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import ProductForm from '../components/ProductForm'
+import LoadingSpinner from '../components/LoadingSpinner'
 import Select from '../components/Select'
-
-interface Product {
-  id: number;
-  name: string;
-  category: string;
-  price: number;
-  stock: number;
-  status: 'active' | 'inactive' | 'out-of-stock';
-  sku: string;
-  image: string;
-}
+import { Product, ProductInsert } from '../types/database'
 
 const Products: React.FC = () => {
-  const [products] = useState<Product[]>([
-    {
-      id: 1,
-      name: 'Premium Wireless Headphones',
-      category: 'Electronics',
-      price: 299.99,
-      stock: 45,
-      status: 'active',
-      sku: 'PWH-001',
-      image: 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg'
-    },
-    {
-      id: 2,
-      name: 'Smart Fitness Watch',
-      category: 'Wearables',
-      price: 199.99,
-      stock: 0,
-      status: 'out-of-stock',
-      sku: 'SFW-002',
-      image: 'https://images.pexels.com/photos/437037/pexels-photo-437037.jpeg'
-    },
-    {
-      id: 3,
-      name: 'Ergonomic Office Chair',
-      category: 'Furniture',
-      price: 449.99,
-      stock: 12,
-      status: 'active',
-      sku: 'EOC-003',
-      image: 'https://images.pexels.com/photos/586996/pexels-photo-586996.jpeg'
-    },
-    {
-      id: 4,
-      name: 'Professional Camera Lens',
-      category: 'Photography',
-      price: 899.99,
-      stock: 8,
-      status: 'inactive',
-      sku: 'PCL-004',
-      image: 'https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg'
-    }
-  ])
-
+  const { products, loading, createProduct, updateProduct, deleteProduct } = useProducts()
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterCategory, setFilterCategory] = useState<string>('all')
-  const [filterStatus, setFilterStatus] = useState<string>('all')
+  const [filterSubscription, setFilterSubscription] = useState<string>('all')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
 
-  const categories = [...new Set(products.map(p => p.category))]
-
-  const categoryOptions = [
-    { value: 'all', label: 'All Categories' },
-    ...categories.map(category => ({ value: category, label: category }))
-  ]
-
-  const statusOptions = [
-    { value: 'all', label: 'All Status' },
-    { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' },
-    { value: 'out-of-stock', label: 'Out of Stock' }
-  ]
-
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.sku.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = filterCategory === 'all' || product.category === filterCategory
-    const matchesStatus = filterStatus === 'all' || product.status === filterStatus
-    return matchesSearch && matchesCategory && matchesStatus
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSubscription = filterSubscription === 'all' ||
+      (filterSubscription === 'subscription' && product.subscription) ||
+      (filterSubscription === 'one-time' && !product.subscription)
+    return matchesSearch && matchesSubscription
   })
 
   const handleEdit = (product: Product) => {
@@ -93,8 +28,10 @@ const Products: React.FC = () => {
     setIsModalOpen(true)
   }
 
-  const handleDelete = (id: number) => {
-    console.log('Delete product:', id)
+  const handleDelete = async (id: number) => {
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      await deleteProduct(id)
+    }
   }
 
   const handleCloseModal = () => {
@@ -102,27 +39,33 @@ const Products: React.FC = () => {
     setEditingProduct(null)
   }
 
+  const handleSubmit = async (data: ProductInsert) => {
+    if (editingProduct) {
+      await updateProduct(editingProduct.id, data)
+    } else {
+      await createProduct(data)
+    }
+    handleCloseModal()
+  }
+
+  const subscriptionOptions = [
+    { value: 'all', label: 'All Types' },
+    { value: 'subscription', label: 'Subscription' },
+    { value: 'one-time', label: 'One-time' }
+  ]
+
   const columns = [
     {
       header: 'Product',
       accessor: 'name' as keyof Product,
       render: (value: string, row: Product) => (
-        <div className="flex items-center">
-          <img
-            src={row.image}
-            alt={value}
-            className="w-10 h-10 rounded-lg object-cover mr-3"
-          />
-          <div>
-            <div className="font-medium text-gray-900">{value}</div>
-            <div className="text-sm text-gray-500">{row.sku}</div>
+        <div>
+          <div className="font-medium text-gray-900">{value}</div>
+          <div className="text-sm text-gray-500">
+            {row.subscription ? 'Subscription' : 'One-time purchase'}
           </div>
         </div>
       )
-    },
-    {
-      header: 'Category',
-      accessor: 'category' as keyof Product
     },
     {
       header: 'Price',
@@ -130,29 +73,20 @@ const Products: React.FC = () => {
       render: (value: number) => `$${value.toFixed(2)}`
     },
     {
-      header: 'Stock',
-      accessor: 'stock' as keyof Product,
-      render: (value: number) => (
-        <span className={`font-medium ${
-          value === 0 ? 'text-red-600'
-            : value < 10 ? 'text-yellow-600' : 'text-green-600'
+      header: 'Type',
+      accessor: 'subscription' as keyof Product,
+      render: (value: boolean) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+          value ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
         }`}>
-          {value}
+          {value ? 'Subscription' : 'One-time'}
         </span>
       )
     },
     {
-      header: 'Status',
-      accessor: 'status' as keyof Product,
-      render: (value: string) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-          value === 'active' ? 'bg-green-100 text-green-800'
-            : value === 'inactive' ? 'bg-gray-100 text-gray-800'
-              : 'bg-red-100 text-red-800'
-        }`}>
-          {value.replace('-', ' ')}
-        </span>
-      )
+      header: 'Created',
+      accessor: 'created_at' as keyof Product,
+      render: (value: string) => new Date(value).toLocaleDateString()
     },
     {
       header: 'Actions',
@@ -176,16 +110,24 @@ const Products: React.FC = () => {
     }
   ]
 
-  const totalValue = products.reduce((sum, product) => sum + (product.price * product.stock), 0)
-  const lowStockCount = products.filter(p => p.stock < 10 && p.stock > 0).length
-  const outOfStockCount = products.filter(p => p.stock === 0).length
+  const totalValue = products.reduce((sum, product) => sum + product.price, 0)
+  const subscriptionProducts = products.filter(p => p.subscription).length
+  const oneTimeProducts = products.filter(p => !p.subscription).length
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <LoadingSpinner size="lg" className="text-gray-900" />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Products</h1>
-          <p className="mt-1 text-gray-600">Manage your product inventory</p>
+          <p className="mt-1 text-gray-600">Manage your product catalog</p>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
@@ -216,8 +158,8 @@ const Products: React.FC = () => {
               <DollarSign className="w-5 h-5 text-white" />
             </div>
             <div className="ml-4">
-              <div className="text-2xl font-bold text-gray-900">${totalValue.toLocaleString()}</div>
-              <div className="text-gray-600">Inventory Value</div>
+              <div className="text-2xl font-bold text-gray-900">${totalValue.toFixed(2)}</div>
+              <div className="text-gray-600">Total Value</div>
             </div>
           </div>
         </div>
@@ -228,8 +170,8 @@ const Products: React.FC = () => {
               <Package className="w-5 h-5 text-white" />
             </div>
             <div className="ml-4">
-              <div className="text-2xl font-bold text-gray-900">{lowStockCount}</div>
-              <div className="text-gray-600">Low Stock</div>
+              <div className="text-2xl font-bold text-gray-900">{subscriptionProducts}</div>
+              <div className="text-gray-600">Subscriptions</div>
             </div>
           </div>
         </div>
@@ -240,8 +182,8 @@ const Products: React.FC = () => {
               <Package className="w-5 h-5 text-white" />
             </div>
             <div className="ml-4">
-              <div className="text-2xl font-bold text-gray-900">{outOfStockCount}</div>
-              <div className="text-gray-600">Out of Stock</div>
+              <div className="text-2xl font-bold text-gray-900">{oneTimeProducts}</div>
+              <div className="text-gray-600">One-time</div>
             </div>
           </div>
         </div>
@@ -263,22 +205,16 @@ const Products: React.FC = () => {
             </div>
 
             <Select
-              options={categoryOptions}
-              value={filterCategory}
-              onChange={setFilterCategory}
-              className="w-full sm:w-48"
-            />
-
-            <Select
-              options={statusOptions}
-              value={filterStatus}
-              onChange={setFilterStatus}
+              options={subscriptionOptions}
+              value={filterSubscription}
+              onChange={setFilterSubscription}
               className="w-full sm:w-40"
             />
           </div>
 
-          <div className="text-sm text-gray-600">
-            {filteredProducts.length} products found
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <Calendar className="w-4 h-4" />
+            <span>{filteredProducts.length} products found</span>
           </div>
         </div>
       </div>
@@ -296,10 +232,7 @@ const Products: React.FC = () => {
       >
         <ProductForm
           product={editingProduct}
-          onSubmit={(data) => {
-            console.log('Product data:', data)
-            handleCloseModal()
-          }}
+          onSubmit={handleSubmit}
           onCancel={handleCloseModal}
         />
       </Modal>

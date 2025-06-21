@@ -1,20 +1,63 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { Banner, BannerInsert, BannerUpdate } from '../types/database'
 import toast from 'react-hot-toast'
+
+// Demo data for when Supabase is not configured
+const demoData: Banner[] = [
+  {
+    id: '1',
+    target_url: 'https://example.com/welcome',
+    is_active: true,
+    created_at: '2024-01-15T10:00:00Z'
+  },
+  {
+    id: '2',
+    target_url: 'https://example.com/promotion',
+    is_active: true,
+    created_at: '2024-01-14T09:00:00Z'
+  },
+  {
+    id: '3',
+    target_url: 'https://example.com/new-features',
+    is_active: true,
+    created_at: '2024-01-13T14:00:00Z'
+  },
+  {
+    id: '4',
+    target_url: 'https://example.com/maintenance',
+    is_active: false,
+    created_at: '2024-01-12T11:00:00Z'
+  }
+]
 
 export const useBanners = () => {
   const [banners, setBanners] = useState<Banner[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchBanners = async () => {
+  const isDemo =
+    import.meta.env.VITE_SUPABASE_URL?.includes('demo-project') ||
+    !import.meta.env.VITE_SUPABASE_URL ||
+    import.meta.env.VITE_SUPABASE_URL === 'https://demo-project.supabase.co'
+
+  const fetchBanners = useCallback(async () => {
     try {
       setLoading(true)
+
+      if (isDemo) {
+        // Use demo data
+        setTimeout(() => {
+          setBanners(demoData)
+          setLoading(false)
+        }, 500) // Simulate loading
+        return
+      }
+
       const { data, error } = await supabase
         .from('banners')
         .select('*')
-        .order('priority', { ascending: false })
+        .order('created_at', { ascending: false })
 
       if (error) throw error
       setBanners(data || [])
@@ -24,94 +67,97 @@ export const useBanners = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [isDemo])
 
   const createBanner = async (banner: BannerInsert) => {
     try {
+      if (isDemo) {
+        const newBanner: Banner = {
+          id: (Math.max(...banners.map((b) => parseInt(b.id))) + 1).toString(),
+          ...banner,
+          created_at: new Date().toISOString()
+        }
+        setBanners((prev) => [newBanner, ...prev])
+        toast.success('Banner created successfully (Demo Mode)')
+        return { data: newBanner, error: null }
+      }
+
       const { data, error } = await supabase
         .from('banners')
-        .insert([{ ...banner, updated_at: new Date().toISOString() }])
+        .insert([banner])
         .select()
         .single()
 
       if (error) throw error
-      setBanners(prev => [data, ...prev])
+      setBanners((prev) => [data, ...prev])
       toast.success('Banner created successfully')
       return { data, error: null }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to create banner'
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to create banner'
       toast.error(errorMessage)
       return { data: null, error: errorMessage }
     }
   }
 
-  const updateBanner = async (id: number, updates: BannerUpdate) => {
+  const updateBanner = async (id: string, updates: BannerUpdate) => {
     try {
+      if (isDemo) {
+        const updatedBanner = {
+          ...banners.find((b) => b.id === id)!,
+          ...updates
+        }
+        setBanners((prev) =>
+          prev.map((banner) => (banner.id === id ? updatedBanner : banner))
+        )
+        toast.success('Banner updated successfully (Demo Mode)')
+        return { data: updatedBanner, error: null }
+      }
+
       const { data, error } = await supabase
         .from('banners')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update(updates)
         .eq('id', id)
         .select()
         .single()
 
       if (error) throw error
-      setBanners(prev => prev.map(banner => banner.id === id ? data : banner))
+      setBanners((prev) => prev.map((banner) => (banner.id === id ? data : banner)))
       toast.success('Banner updated successfully')
       return { data, error: null }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update banner'
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to update banner'
       toast.error(errorMessage)
       return { data: null, error: errorMessage }
     }
   }
 
-  const deleteBanner = async (id: number) => {
+  const deleteBanner = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('banners')
-        .delete()
-        .eq('id', id)
+      if (isDemo) {
+        setBanners((prev) => prev.filter((banner) => banner.id !== id))
+        toast.success('Banner deleted successfully (Demo Mode)')
+        return { error: null }
+      }
+
+      const { error } = await supabase.from('banners').delete().eq('id', id)
 
       if (error) throw error
-      setBanners(prev => prev.filter(banner => banner.id !== id))
+      setBanners((prev) => prev.filter((banner) => banner.id !== id))
       toast.success('Banner deleted successfully')
       return { error: null }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to delete banner'
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to delete banner'
       toast.error(errorMessage)
       return { error: errorMessage }
     }
   }
 
-  const trackClick = async (id: number) => {
-    try {
-      const { error } = await supabase
-        .from('banners')
-        .update({ clicks: supabase.sql`clicks + 1` })
-        .eq('id', id)
-
-      if (error) throw error
-    } catch (err) {
-      console.error('Failed to track click:', err)
-    }
-  }
-
-  const trackImpression = async (id: number) => {
-    try {
-      const { error } = await supabase
-        .from('banners')
-        .update({ impressions: supabase.sql`impressions + 1` })
-        .eq('id', id)
-
-      if (error) throw error
-    } catch (err) {
-      console.error('Failed to track impression:', err)
-    }
-  }
-
   useEffect(() => {
     fetchBanners()
-  }, [])
+  }, [fetchBanners])
 
   return {
     banners,
@@ -120,8 +166,6 @@ export const useBanners = () => {
     createBanner,
     updateBanner,
     deleteBanner,
-    trackClick,
-    trackImpression,
     refetch: fetchBanners
   }
 }
