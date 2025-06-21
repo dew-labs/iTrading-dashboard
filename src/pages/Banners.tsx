@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
-import { Plus, Search, Edit2, Trash2, Eye, EyeOff, Calendar, BarChart3 } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Globe, ToggleLeft, ToggleRight } from 'lucide-react'
 import { useBanners } from '../hooks/useBanners'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import BannerForm from '../components/BannerForm'
 import LoadingSpinner from '../components/LoadingSpinner'
 import Select from '../components/Select'
-import { Banner, BannerInsert } from '../types/database'
+import type { Banner, BannerInsert } from '../types'
 
 const Banners: React.FC = () => {
   const { banners, loading, createBanner, updateBanner, deleteBanner } = useBanners()
@@ -15,9 +15,11 @@ const Banners: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null)
 
-  const filteredBanners = banners.filter(banner => {
-    const matchesSearch = banner.target_url?.toLowerCase().includes(searchTerm.toLowerCase()) || false
-    const matchesStatus = filterStatus === 'all' ||
+  const filteredBanners = banners.filter((banner) => {
+    const matchesSearch =
+      banner.target_url?.toLowerCase().includes(searchTerm.toLowerCase()) || false
+    const matchesStatus =
+      filterStatus === 'all' ||
       (filterStatus === 'active' && banner.is_active) ||
       (filterStatus === 'inactive' && !banner.is_active)
     return matchesSearch && matchesStatus
@@ -64,9 +66,7 @@ const Banners: React.FC = () => {
       accessor: 'target_url' as keyof Banner,
       render: (value: string | null, row: Banner) => (
         <div>
-          <div className="font-medium text-gray-900">
-            {value || 'No target URL'}
-          </div>
+          <div className="font-medium text-gray-900">{value || 'No target URL'}</div>
           <div className="text-sm text-gray-500">ID: {row.id.slice(0, 8)}...</div>
         </div>
       )
@@ -75,9 +75,11 @@ const Banners: React.FC = () => {
       header: 'Status',
       accessor: 'is_active' as keyof Banner,
       render: (value: boolean) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-          value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-        }`}>
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+            value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+          }`}
+        >
           {value ? 'Active' : 'Inactive'}
         </span>
       )
@@ -117,7 +119,11 @@ const Banners: React.FC = () => {
             className="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded transition-colors"
             title={row.is_active ? 'Deactivate banner' : 'Activate banner'}
           >
-            {row.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            {row.is_active ? (
+              <ToggleLeft className="w-4 h-4" />
+            ) : (
+              <ToggleRight className="w-4 h-4" />
+            )}
           </button>
           <button
             onClick={() => handleEdit(row)}
@@ -136,8 +142,8 @@ const Banners: React.FC = () => {
     }
   ]
 
-  const activeBanners = banners.filter(b => b.is_active).length
-  const inactiveBanners = banners.filter(b => !b.is_active).length
+  const activeBanners = banners.filter((b) => b.is_active).length
+  const inactiveBanners = banners.filter((b) => !b.is_active).length
 
   if (loading) {
     return (
@@ -168,7 +174,7 @@ const Banners: React.FC = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-gradient-to-br from-gray-900 to-black rounded-lg flex items-center justify-center">
-              <BarChart3 className="w-5 h-5 text-white" />
+              <Globe className="w-5 h-5 text-white" />
             </div>
             <div className="ml-4">
               <div className="text-2xl font-bold text-gray-900">{banners.length}</div>
@@ -180,7 +186,7 @@ const Banners: React.FC = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-gradient-to-br from-gray-900 to-black rounded-lg flex items-center justify-center">
-              <Eye className="w-5 h-5 text-white" />
+              <Globe className="w-5 h-5 text-white" />
             </div>
             <div className="ml-4">
               <div className="text-2xl font-bold text-gray-900">{activeBanners}</div>
@@ -192,7 +198,7 @@ const Banners: React.FC = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-gradient-to-br from-gray-900 to-black rounded-lg flex items-center justify-center">
-              <EyeOff className="w-5 h-5 text-white" />
+              <Globe className="w-5 h-5 text-white" />
             </div>
             <div className="ml-4">
               <div className="text-2xl font-bold text-gray-900">{inactiveBanners}</div>
@@ -204,7 +210,7 @@ const Banners: React.FC = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-gradient-to-br from-gray-900 to-black rounded-lg flex items-center justify-center">
-              <BarChart3 className="w-5 h-5 text-white" />
+              <Globe className="w-5 h-5 text-white" />
             </div>
             <div className="ml-4">
               <div className="text-2xl font-bold text-gray-900">
@@ -240,7 +246,7 @@ const Banners: React.FC = () => {
           </div>
 
           <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <Calendar className="w-4 h-4" />
+            <Globe className="w-4 h-4" />
             <span>{filteredBanners.length} banners found</span>
           </div>
         </div>
@@ -257,11 +263,7 @@ const Banners: React.FC = () => {
         onClose={handleCloseModal}
         title={editingBanner ? 'Edit Banner' : 'Create New Banner'}
       >
-        <BannerForm
-          banner={editingBanner}
-          onSubmit={handleSubmit}
-          onCancel={handleCloseModal}
-        />
+        <BannerForm banner={editingBanner} onSubmit={handleSubmit} onCancel={handleCloseModal} />
       </Modal>
     </div>
   )

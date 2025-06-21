@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
-import { User } from '../types/database'
+import type { User } from '@supabase/supabase-js'
 
 interface AuthState {
   user: User | null;
@@ -44,20 +44,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  signUp: async (
-    email: string,
-    password: string,
-    metadata?: Record<string, unknown>
-  ) => {
+  signUp: async (email: string, password: string, metadata?: Record<string, unknown>) => {
     set({ loading: true })
     try {
-      const { error } = await supabase.auth.signUp({
+      const signUpData: { email: string; password: string; options?: { data?: object } } = {
         email,
-        password,
-        options: {
-          data: metadata
-        }
-      })
+        password
+      }
+
+      if (metadata) {
+        signUpData.options = { data: metadata }
+      }
+
+      const { error } = await supabase.auth.signUp(signUpData)
 
       if (error) {
         set({ loading: false })
@@ -92,6 +91,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       user_metadata: {
         full_name: 'Demo User'
       },
+      app_metadata: {},
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       aud: 'authenticated',
@@ -107,8 +107,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const isDemo =
         import.meta.env.VITE_SUPABASE_URL?.includes('demo-project') ||
         !import.meta.env.VITE_SUPABASE_URL ||
-        import.meta.env.VITE_SUPABASE_URL ===
-          'https://demo-project.supabase.co'
+        import.meta.env.VITE_SUPABASE_URL === 'https://demo-project.supabase.co'
 
       if (isDemo) {
         // In demo mode, automatically set a demo user

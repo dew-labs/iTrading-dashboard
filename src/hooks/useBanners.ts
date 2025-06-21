@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
-import { Banner, BannerInsert, BannerUpdate } from '../types/database'
+import type { Banner, BannerInsert, BannerUpdate } from '../types'
 import toast from 'react-hot-toast'
 
 // Demo data for when Supabase is not configured
@@ -82,19 +82,14 @@ export const useBanners = () => {
         return { data: newBanner, error: null }
       }
 
-      const { data, error } = await supabase
-        .from('banners')
-        .insert([banner])
-        .select()
-        .single()
+      const { data, error } = await supabase.from('banners').insert([banner]).select().single()
 
       if (error) throw error
       setBanners((prev) => [data, ...prev])
       toast.success('Banner created successfully')
       return { data, error: null }
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to create banner'
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create banner'
       toast.error(errorMessage)
       return { data: null, error: errorMessage }
     }
@@ -107,9 +102,7 @@ export const useBanners = () => {
           ...banners.find((b) => b.id === id)!,
           ...updates
         }
-        setBanners((prev) =>
-          prev.map((banner) => (banner.id === id ? updatedBanner : banner))
-        )
+        setBanners((prev) => prev.map((banner) => (banner.id === id ? updatedBanner : banner)))
         toast.success('Banner updated successfully (Demo Mode)')
         return { data: updatedBanner, error: null }
       }
@@ -126,8 +119,7 @@ export const useBanners = () => {
       toast.success('Banner updated successfully')
       return { data, error: null }
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to update banner'
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update banner'
       toast.error(errorMessage)
       return { data: null, error: errorMessage }
     }
@@ -148,8 +140,7 @@ export const useBanners = () => {
       toast.success('Banner deleted successfully')
       return { error: null }
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to delete banner'
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete banner'
       toast.error(errorMessage)
       return { error: errorMessage }
     }

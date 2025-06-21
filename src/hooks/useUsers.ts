@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { User, UserInsert, UserUpdate } from '../types/database'
+import type { DatabaseUser, UserInsert, UserUpdate } from '../types'
 import toast from 'react-hot-toast'
 
 export const useUsers = () => {
-  const [users, setUsers] = useState<User[]>([])
+  const [users, setUsers] = useState<DatabaseUser[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -35,7 +35,7 @@ export const useUsers = () => {
         .single()
 
       if (error) throw error
-      setUsers(prev => [data, ...prev])
+      setUsers((prev) => [data, ...prev])
       toast.success('User created successfully')
       return { data, error: null }
     } catch (err) {
@@ -55,7 +55,7 @@ export const useUsers = () => {
         .single()
 
       if (error) throw error
-      setUsers(prev => prev.map(user => user.id === id ? data : user))
+      setUsers((prev) => prev.map((user) => (user.id === id ? data : user)))
       toast.success('User updated successfully')
       return { data, error: null }
     } catch (err) {
@@ -67,13 +67,10 @@ export const useUsers = () => {
 
   const deleteUser = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('users')
-        .delete()
-        .eq('id', id)
+      const { error } = await supabase.from('users').delete().eq('id', id)
 
       if (error) throw error
-      setUsers(prev => prev.filter(user => user.id !== id))
+      setUsers((prev) => prev.filter((user) => user.id !== id))
       toast.success('User deleted successfully')
       return { error: null }
     } catch (err) {

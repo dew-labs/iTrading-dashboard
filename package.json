@@ -40,6 +40,7 @@
     "lint-staged": "^16.1.2",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.10",
+    "ts-plugin-sort-import-suggestions": "^1.0.4",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.34.1",
     "vite": "^6.3.5"

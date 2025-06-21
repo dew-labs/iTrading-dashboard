@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Banner, BannerInsert } from '../types/database'
+import type { Banner, BannerInsert } from '../types'
 
 interface BannerFormProps {
   banner?: Banner | null;
@@ -69,8 +69,8 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
       <div className="bg-gray-50 p-4 rounded-lg">
         <h4 className="text-sm font-medium text-gray-900 mb-2">Image Management</h4>
         <p className="text-xs text-gray-600">
-          Banner images are managed through the centralized Images table.
-          After creating the banner, you can upload and associate images using the image management system.
+          Banner images are managed through the centralized Images table. After creating the banner,
+          you can upload and associate images using the image management system.
         </p>
       </div>
 

@@ -111,16 +111,10 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowProfileDropdown(false)
       }
-      if (
-        notificationRef.current &&
-        !notificationRef.current.contains(event.target as Node)
-      ) {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
         setShowNotifications(false)
       }
     }
@@ -137,7 +131,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const handleLanguageChange = (languageCode: string) => {
     setSelectedLanguage(languageCode)
     setShowProfileDropdown(false)
-    console.log('Language changed to:', languageCode)
+    // Language changed - could implement actual i18n logic here
   }
 
   const getNotificationIcon = (type: string) => {
@@ -211,9 +205,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 {/* Header */}
                 <div className="px-4 py-3 border-b border-gray-100">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-gray-900">
-                      Recent Activity
-                    </h3>
+                    <h3 className="font-semibold text-gray-900">Recent Activity</h3>
                     <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">
                       {recentNotifications.length} new
                     </span>
@@ -245,9 +237,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                               {notification.timestamp}
                             </div>
                           </div>
-                          <p className="text-xs text-gray-600 mt-1">
-                            by {notification.user}
-                          </p>
+                          <p className="text-xs text-gray-600 mt-1">by {notification.user}</p>
                           {notification.details && (
                             <p className="text-xs text-gray-500 mt-1 truncate">
                               {notification.details}
@@ -277,7 +267,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             >
               <div className="hidden sm:block text-right">
                 <p className="text-sm font-medium text-gray-900">
-                  {user?.full_name || 'User'}
+                  {user?.user_metadata?.full_name || 'User'}
                 </p>
                 <p className="text-xs text-gray-500">Administrator</p>
               </div>
@@ -313,7 +303,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">
-                        {user?.full_name || 'User'}
+                        {user?.user_metadata?.full_name || 'User'}
                       </p>
                       <p className="text-sm text-gray-500">{user?.email}</p>
                     </div>

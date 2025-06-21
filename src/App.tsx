@@ -7,7 +7,6 @@ import ProtectedRoute from './components/ProtectedRoute'
 import LoadingSpinner from './components/LoadingSpinner'
 import Login from './pages/Login'
 import DashboardLayout from './components/DashboardLayout'
-import DemoNotice from './components/DemoNotice'
 
 function App () {
   const { initialize, initialized, user } = useAuthStore()
@@ -31,12 +30,8 @@ function App () {
     <ErrorBoundary>
       <Router>
         <div className="App">
-          <DemoNotice />
           <Routes>
-            <Route
-              path="/login"
-              element={user ? <Navigate to="/" replace /> : <Login />}
-            />
+            <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
             <Route
               path="/*"
               element={

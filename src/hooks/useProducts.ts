@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
-import { Product, ProductInsert, ProductUpdate } from '../types/database'
+import type { Product, ProductInsert, ProductUpdate } from '../types'
 import toast from 'react-hot-toast'
 
 // Demo data for when Supabase is not configured
@@ -9,7 +9,8 @@ const demoData: Product[] = [
     id: 1,
     name: 'Premium Plan',
     price: 29.99,
-    description: 'Access to all premium features including advanced analytics, priority support, and unlimited storage.',
+    description:
+      'Access to all premium features including advanced analytics, priority support, and unlimited storage.',
     subscription: true,
     created_at: '2024-01-15T10:00:00Z'
   },
@@ -17,7 +18,8 @@ const demoData: Product[] = [
     id: 2,
     name: 'Professional Tools',
     price: 99.99,
-    description: 'Complete set of professional tools for advanced users. One-time purchase with lifetime updates.',
+    description:
+      'Complete set of professional tools for advanced users. One-time purchase with lifetime updates.',
     subscription: false,
     created_at: '2024-01-14T09:00:00Z'
   },
@@ -25,7 +27,8 @@ const demoData: Product[] = [
     id: 3,
     name: 'Enterprise Solution',
     price: 199.99,
-    description: 'Comprehensive enterprise solution with dedicated support, custom integrations, and advanced security.',
+    description:
+      'Comprehensive enterprise solution with dedicated support, custom integrations, and advanced security.',
     subscription: true,
     created_at: '2024-01-13T14:00:00Z'
   },
@@ -90,19 +93,14 @@ export const useProducts = () => {
         return { data: newProduct, error: null }
       }
 
-      const { data, error } = await supabase
-        .from('products')
-        .insert([product])
-        .select()
-        .single()
+      const { data, error } = await supabase.from('products').insert([product]).select().single()
 
       if (error) throw error
       setProducts((prev) => [data, ...prev])
       toast.success('Product created successfully')
       return { data, error: null }
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to create product'
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create product'
       toast.error(errorMessage)
       return { data: null, error: errorMessage }
     }
@@ -134,8 +132,7 @@ export const useProducts = () => {
       toast.success('Product updated successfully')
       return { data, error: null }
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to update product'
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update product'
       toast.error(errorMessage)
       return { data: null, error: errorMessage }
     }
@@ -156,8 +153,7 @@ export const useProducts = () => {
       toast.success('Product deleted successfully')
       return { error: null }
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to delete product'
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete product'
       toast.error(errorMessage)
       return { error: errorMessage }
     }

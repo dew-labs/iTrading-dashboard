@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Product, ProductInsert } from '../types/database'
+import type { Product, ProductInsert } from '../types'
 
 interface ProductFormProps {
   product?: Product | null;
@@ -114,8 +114,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
       <div className="bg-gray-50 p-4 rounded-lg">
         <h4 className="text-sm font-medium text-gray-900 mb-2">Image Management</h4>
         <p className="text-xs text-gray-600">
-          Product images are managed through the centralized Images table.
-          After creating the product, you can upload and associate images using the image management system.
+          Product images are managed through the centralized Images table. After creating the
+          product, you can upload and associate images using the image management system.
         </p>
       </div>
 

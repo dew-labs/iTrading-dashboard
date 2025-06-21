@@ -1,6 +1,5 @@
 import React from 'react'
 import {
-  TrendingUp,
   Users,
   FileText,
   Package,
@@ -11,10 +10,13 @@ import {
   ArrowUpRight,
   ArrowDownRight
 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import StatsCard from '../components/StatsCard'
 import Chart from '../components/Chart'
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate()
+
   const stats = [
     {
       title: 'Total Users',
@@ -51,11 +53,36 @@ const Dashboard: React.FC = () => {
   ]
 
   const recentActivity = [
-    { action: 'New user registered', user: 'Sarah Wilson', time: '2 minutes ago', type: 'user' },
-    { action: 'Product updated', user: 'Mike Johnson', time: '15 minutes ago', type: 'product' },
-    { action: 'News post published', user: 'Emma Davis', time: '1 hour ago', type: 'post' },
-    { action: 'Banner activated', user: 'John Smith', time: '2 hours ago', type: 'banner' },
-    { action: 'User account suspended', user: 'Admin', time: '3 hours ago', type: 'user' }
+    {
+      action: 'New user registered',
+      user: 'Sarah Wilson',
+      time: '2 minutes ago',
+      type: 'user'
+    },
+    {
+      action: 'Product updated',
+      user: 'Mike Johnson',
+      time: '15 minutes ago',
+      type: 'product'
+    },
+    {
+      action: 'News post published',
+      user: 'Emma Davis',
+      time: '1 hour ago',
+      type: 'post'
+    },
+    {
+      action: 'Banner activated',
+      user: 'John Smith',
+      time: '2 hours ago',
+      type: 'banner'
+    },
+    {
+      action: 'User account suspended',
+      user: 'Admin',
+      time: '3 hours ago',
+      type: 'user'
+    }
   ]
 
   const quickStats = [
@@ -71,7 +98,9 @@ const Dashboard: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="mt-2 text-gray-600">Welcome back! Here's what's happening with your business today.</p>
+          <p className="mt-2 text-gray-600">
+            Welcome back! Here's what's happening with your business today.
+          </p>
         </div>
         <div className="flex items-center space-x-3">
           <button className="flex items-center px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
@@ -88,15 +117,20 @@ const Dashboard: React.FC = () => {
       {/* Quick Stats Bar */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {quickStats.map((stat, index) => (
-          <div key={index} className="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+          <div
+            key={index}
+            className="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">{stat.label}</p>
                 <p className="text-xl font-bold text-gray-900">{stat.value}</p>
               </div>
-              <div className={`flex items-center text-sm font-medium ${
-                stat.positive ? 'text-green-600' : 'text-red-600'
-              }`}>
+              <div
+                className={`flex items-center text-sm font-medium ${
+                  stat.positive ? 'text-green-600' : 'text-red-600'
+                }`}
+              >
                 {stat.positive ? (
                   <ArrowUpRight className="w-4 h-4 mr-1" />
                 ) : (
@@ -147,24 +181,35 @@ const Dashboard: React.FC = () => {
 
           <div className="space-y-4">
             {recentActivity.map((activity, index) => (
-              <div key={index} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                  activity.type === 'user' ? 'bg-blue-500'
-                    : activity.type === 'product' ? 'bg-purple-500'
-                      : activity.type === 'post' ? 'bg-green-500' : 'bg-orange-500'
-                }`} />
+              <div
+                key={index}
+                className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <div
+                  className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
+                    activity.type === 'user'
+                      ? 'bg-blue-500'
+                      : activity.type === 'product'
+                        ? 'bg-purple-500'
+                        : activity.type === 'post'
+                          ? 'bg-green-500'
+                          : 'bg-orange-500'
+                  }`}
+                />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900">{activity.action}</p>
-                  <p className="text-xs text-gray-500">by {activity.user}</p>
-                  <p className="text-xs text-gray-400 mt-1">{activity.time}</p>
+                  <p className="text-sm text-gray-600">{activity.user}</p>
+                  <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
                 </div>
               </div>
             ))}
           </div>
 
-          <button className="w-full mt-4 text-sm text-gray-900 hover:text-black font-medium">
-            View all activity
-          </button>
+          <div className="mt-6 pt-4 border-t border-gray-200">
+            <button className="w-full text-center text-sm text-gray-600 hover:text-gray-900 transition-colors">
+              View all activity
+            </button>
+          </div>
         </div>
       </div>
 
@@ -173,40 +218,47 @@ const Dashboard: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
-            <p className="text-gray-600">Frequently used actions and shortcuts</p>
+            <p className="text-gray-600">Common tasks and shortcuts</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <button className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-all group">
-            <FileText className="w-8 h-8 text-gray-400 group-hover:text-gray-900" />
-            <div className="ml-3 text-left">
-              <div className="font-medium text-gray-900 group-hover:text-gray-900">Create Post</div>
-              <div className="text-sm text-gray-500">Add news or event</div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <button
+            onClick={() => navigate('/posts')}
+            className="flex items-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg hover:from-blue-100 hover:to-blue-200 transition-all group"
+          >
+            <div className="flex items-center justify-center w-12 h-12 bg-blue-500 rounded-lg mr-4 group-hover:scale-110 transition-transform">
+              <FileText className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-left">
+              <h4 className="font-semibold text-gray-900">Create Post</h4>
+              <p className="text-sm text-gray-600">Add new content</p>
             </div>
           </button>
 
-          <button className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-all group">
-            <Package className="w-8 h-8 text-gray-400 group-hover:text-gray-900" />
-            <div className="ml-3 text-left">
-              <div className="font-medium text-gray-900 group-hover:text-gray-900">Add Product</div>
-              <div className="text-sm text-gray-500">Manage inventory</div>
+          <button
+            onClick={() => navigate('/products')}
+            className="flex items-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg hover:from-purple-100 hover:to-purple-200 transition-all group"
+          >
+            <div className="flex items-center justify-center w-12 h-12 bg-purple-500 rounded-lg mr-4 group-hover:scale-110 transition-transform">
+              <Package className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-left">
+              <h4 className="font-semibold text-gray-900">Add Product</h4>
+              <p className="text-sm text-gray-600">Manage inventory</p>
             </div>
           </button>
 
-          <button className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-all group">
-            <Users className="w-8 h-8 text-gray-400 group-hover:text-gray-900" />
-            <div className="ml-3 text-left">
-              <div className="font-medium text-gray-900 group-hover:text-gray-900">Invite User</div>
-              <div className="text-sm text-gray-500">Add team member</div>
+          <button
+            onClick={() => navigate('/users')}
+            className="flex items-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg hover:from-green-100 hover:to-green-200 transition-all group"
+          >
+            <div className="flex items-center justify-center w-12 h-12 bg-green-500 rounded-lg mr-4 group-hover:scale-110 transition-transform">
+              <Users className="w-6 h-6 text-white" />
             </div>
-          </button>
-
-          <button className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-all group">
-            <TrendingUp className="w-8 h-8 text-gray-400 group-hover:text-gray-900" />
-            <div className="ml-3 text-left">
-              <div className="font-medium text-gray-900 group-hover:text-gray-900">View Analytics</div>
-              <div className="text-sm text-gray-500">Detailed reports</div>
+            <div className="text-left">
+              <h4 className="font-semibold text-gray-900">Invite User</h4>
+              <p className="text-sm text-gray-600">Team management</p>
             </div>
           </button>
         </div>

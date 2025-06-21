@@ -27,6 +27,44 @@ export interface Database {
           created_at?: string;
         };
       };
+      users: {
+        Row: {
+          id: string;
+          email: string;
+          full_name: string | null;
+          role: 'user' | 'admin';
+          status: 'invited' | 'active' | 'inactive';
+          phone: string | null;
+          avatar_url: string | null;
+          last_login: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          email: string;
+          full_name?: string | null;
+          role?: 'user' | 'admin';
+          status?: 'invited' | 'active' | 'inactive';
+          phone?: string | null;
+          avatar_url?: string | null;
+          last_login?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          full_name?: string | null;
+          role?: 'user' | 'admin';
+          status?: 'invited' | 'active' | 'inactive';
+          phone?: string | null;
+          avatar_url?: string | null;
+          last_login?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
       products: {
         Row: {
           id: number;
@@ -170,45 +208,4 @@ export interface Database {
       };
     };
   };
-}
-
-export type Post = Database['public']['Tables']['posts']['Row'];
-export type PostInsert = Database['public']['Tables']['posts']['Insert'];
-export type PostUpdate = Database['public']['Tables']['posts']['Update'];
-
-export type Product = Database['public']['Tables']['products']['Row'];
-export type ProductInsert = Database['public']['Tables']['products']['Insert'];
-export type ProductUpdate = Database['public']['Tables']['products']['Update'];
-
-export type Banner = Database['public']['Tables']['banners']['Row'];
-export type BannerInsert = Database['public']['Tables']['banners']['Insert'];
-export type BannerUpdate = Database['public']['Tables']['banners']['Update'];
-
-export type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
-export type UserProfileInsert = Database['public']['Tables']['user_profiles']['Insert'];
-export type UserProfileUpdate = Database['public']['Tables']['user_profiles']['Update'];
-
-export type Image = Database['public']['Tables']['images']['Row'];
-export type ImageInsert = Database['public']['Tables']['images']['Insert'];
-export type ImageUpdate = Database['public']['Tables']['images']['Update'];
-
-export type Notification = Database['public']['Tables']['notifications']['Row'];
-export type NotificationInsert = Database['public']['Tables']['notifications']['Insert'];
-export type NotificationUpdate = Database['public']['Tables']['notifications']['Update'];
-
-export type UserNotification = Database['public']['Tables']['user_notifications']['Row'];
-export type UserNotificationInsert = Database['public']['Tables']['user_notifications']['Insert'];
-export type UserNotificationUpdate = Database['public']['Tables']['user_notifications']['Update'];
-
-// Auth user type from Supabase
-export interface User {
-  id: string;
-  email?: string;
-  user_metadata?: {
-    full_name?: string;
-  };
-  created_at: string;
-  updated_at: string;
-  aud: string;
-  role?: string;
 }
