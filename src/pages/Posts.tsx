@@ -6,12 +6,13 @@ import {
   Trash2,
   Eye,
   Calendar,
-  ChevronLeft,
-  ChevronRight,
   AlertTriangle,
   Clock,
   User,
-  Tag
+  Tag,
+  FileText,
+  Bookmark,
+  TrendingUp
 } from 'lucide-react'
 import { usePosts } from '../hooks/usePosts'
 import { useAuthStore } from '../store/authStore'
@@ -381,9 +382,13 @@ const Posts: React.FC = () => {
     }
   ]
 
+  const publishedPosts = posts.filter((p) => p.status === 'published').length
+  const draftPosts = posts.filter((p) => p.status === 'draft').length
+  const totalViews = posts.reduce((sum, p) => sum + ((p as ExtendedPost).views || 0), 0)
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="min-h-full bg-gray-50 flex items-center justify-center">
         <LoadingSpinner size="lg" className="text-gray-900" />
       </div>
     )
@@ -393,245 +398,300 @@ const Posts: React.FC = () => {
   const endItem = Math.min(currentPage * itemsPerPage, filteredAndSortedPosts.length)
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Posts Management</h1>
-          <p className="mt-1 text-gray-600">Create, edit, and manage your content posts</p>
-        </div>
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={() => {
-              if (!user) {
-                alert('You must be logged in to create posts')
-                return
-              }
-              setIsModalOpen(true)
-            }}
-            className="flex items-center px-4 py-2 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-black hover:to-gray-900 transition-colors"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Create Post
-          </button>
-        </div>
-      </div>
+    <div className="min-h-full bg-gray-50">
+      <div className="max-w-full mx-auto px-3 sm:px-4 lg:px-6 py-6">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Posts Management</h1>
+              <p className="mt-2 text-gray-600">Create, edit, and manage your content posts</p>
+            </div>
+            <div className="mt-4 sm:mt-0 flex items-center space-x-3">
+              <button
+                onClick={() => {
+                  if (!user) {
+                    alert('You must be logged in to create posts')
+                    return
+                  }
+                  setIsModalOpen(true)
+                }}
+                className="flex items-center px-4 py-2.5 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-black hover:to-gray-900 transition-colors shadow-sm"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create Post
+              </button>
+            </div>
+          </div>
 
-      {/* Tabs with Content Inside */}
-      <TabNavigation tabs={tabsWithCounts} activeTab={activeTab} onTabChange={handleTabChange}>
-        {/* Enhanced Filters */}
-        <div className="p-6 space-y-4">
-          {/* Search and filters row */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4">
-            <div className="flex-1 max-w-md">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search posts by title, content, or author..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                />
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-gray-900 to-black rounded-xl flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-white" />
+                </div>
+                <div className="ml-4">
+                  <div className="text-2xl font-bold text-gray-900">{posts.length}</div>
+                  <div className="text-gray-600 font-medium">Total Posts</div>
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center space-x-3">
-              <FilterDropdown
-                options={statusOptions}
-                value={filterStatus}
-                onChange={(value) => {
-                  setFilterStatus(value as typeof filterStatus)
-                  setCurrentPage(1)
-                }}
-                placeholder="Filter by Status"
-              />
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <Calendar className="w-4 h-4" />
-                <span>
-                  Showing {startItem}-{endItem} of {filteredAndSortedPosts.length} posts
-                </span>
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                  <Bookmark className="w-6 h-6 text-white" />
+                </div>
+                <div className="ml-4">
+                  <div className="text-2xl font-bold text-gray-900">{publishedPosts}</div>
+                  <div className="text-gray-600 font-medium">Published</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center">
+                  <Edit2 className="w-6 h-6 text-white" />
+                </div>
+                <div className="ml-4">
+                  <div className="text-2xl font-bold text-gray-900">{draftPosts}</div>
+                  <div className="text-gray-600 font-medium">Drafts</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-white" />
+                </div>
+                <div className="ml-4">
+                  <div className="text-2xl font-bold text-gray-900">{totalViews.toLocaleString()}</div>
+                  <div className="text-gray-600 font-medium">Total Views</div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Table with padding */}
-        <div className="px-6 pb-6">
-          <Table
-            data={paginatedPosts}
-            columns={columns}
-            sortColumn={sortColumn}
-            sortDirection={sortDirection}
-            onSort={handleSort}
-          />
-        </div>
+          {/* Tabs with Content Inside */}
+          <TabNavigation tabs={tabsWithCounts} activeTab={activeTab} onTabChange={handleTabChange}>
+            {/* Enhanced Filters */}
+            <div className="p-6 space-y-4">
+              {/* Search and filters row */}
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4">
+                <div className="flex-1 max-w-md">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search posts by title, content, or author..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    />
+                  </div>
+                </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-            <div className="flex-1 flex justify-between sm:hidden">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Next
-              </button>
+                <div className="flex items-center space-x-3">
+                  <FilterDropdown
+                    options={statusOptions}
+                    value={filterStatus}
+                    onChange={(value) => {
+                      setFilterStatus(value as typeof filterStatus)
+                      setCurrentPage(1)
+                    }}
+                    placeholder="Filter by Status"
+                  />
+                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <Calendar className="w-4 h-4" />
+                    <span>
+                      Showing {startItem}-{endItem} of {filteredAndSortedPosts.length} posts
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-700">
-                  Showing <span className="font-medium">{startItem}</span> to{' '}
-                  <span className="font-medium">{endItem}</span> of{' '}
-                  <span className="font-medium">{filteredAndSortedPosts.length}</span> results
-                </p>
-              </div>
+            {/* Table with padding */}
+            <div className="px-6 pb-6">
+              <Table
+                data={paginatedPosts}
+                columns={columns}
+                sortColumn={sortColumn}
+                sortDirection={sortDirection}
+                onSort={handleSort}
+              />
+            </div>
 
-              <div>
-                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                <div className="flex-1 flex justify-between sm:hidden">
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <ChevronLeft className="h-5 w-5" />
+                    Previous
                   </button>
-
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    const page = i + 1
-                    return (
-                      <button
-                        key={page}
-                        onClick={() => handlePageChange(page)}
-                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                          page === currentPage
-                            ? 'z-10 bg-gray-900 border-gray-900 text-white'
-                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    )
-                  })}
-
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <ChevronRight className="h-5 w-5" />
+                    Next
                   </button>
-                </nav>
-              </div>
-            </div>
-          </div>
-        )}
-      </TabNavigation>
+                </div>
 
-      {/* Modals */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        title={editingPost ? 'Edit Post' : 'Create New Post'}
-      >
-        <PostForm post={editingPost} onSubmit={handleSubmit} onCancel={handleCloseModal} />
-      </Modal>
+                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm text-gray-700">
+                      Showing <span className="font-medium">{startItem}</span> to{' '}
+                      <span className="font-medium">{endItem}</span> of{' '}
+                      <span className="font-medium">{filteredAndSortedPosts.length}</span> results
+                    </p>
+                  </div>
 
-      {/* Delete Confirmation Modal */}
-      {deleteConfirm.isOpen && (
-        <Modal
-          isOpen={deleteConfirm.isOpen}
-          onClose={() => setDeleteConfirm({ isOpen: false, post: null, isDeleting: false })}
-          title="Delete Post"
-        >
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
-              </div>
-              <div>
-                <h3 className="text-lg font-medium text-gray-900">Are you sure?</h3>
-                <p className="text-sm text-gray-500">
-                  This action cannot be undone. This will permanently delete the post "
-                  {deleteConfirm.post?.title}".
-                </p>
-              </div>
-            </div>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setDeleteConfirm({ isOpen: false, post: null, isDeleting: false })}
-                disabled={deleteConfirm.isDeleting}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDelete}
-                disabled={deleteConfirm.isDeleting}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 disabled:opacity-50"
-              >
-                {deleteConfirm.isDeleting ? 'Deleting...' : 'Delete'}
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
+                  <div>
+                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                      <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        ←
+                      </button>
 
-      {/* View Post Modal */}
-      {viewingPost && (
-        <Modal
-          isOpen={!!viewingPost}
-          onClose={() => setViewingPost(null)}
-          title={`View Post: ${viewingPost.title}`}
-        >
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-medium text-gray-900">{viewingPost.title}</h3>
-              <div className="flex items-center space-x-2 mt-2">
-                <span
-                  className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getTypeBadge(
-                    viewingPost.type
-                  )}`}
-                >
-                  {formatTypeLabel(viewingPost.type)}
-                </span>
-                <span
-                  className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(
-                    viewingPost.status
-                  )}`}
-                >
-                  {viewingPost.status.charAt(0).toUpperCase() + viewingPost.status.slice(1)}
-                </span>
-              </div>
-            </div>
-            {viewingPost.content && (
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Content</h4>
-                <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
-                  {viewingPost.content}
+                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                        const page = i + 1
+                        return (
+                          <button
+                            key={page}
+                            onClick={() => handlePageChange(page)}
+                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                              page === currentPage
+                                ? 'z-10 bg-gray-900 border-gray-900 text-white'
+                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        )
+                      })}
+
+                      <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        →
+                      </button>
+                    </nav>
+                  </div>
                 </div>
               </div>
             )}
-            <div className="flex justify-end">
-              <button
-                onClick={() => setViewingPost(null)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
+          </TabNavigation>
+
+          {/* Modals */}
+          <Modal
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
+            title={editingPost ? 'Edit Post' : 'Create New Post'}
+          >
+            <PostForm post={editingPost} onSubmit={handleSubmit} onCancel={handleCloseModal} />
+          </Modal>
+
+          {/* Delete Confirmation Modal */}
+          {deleteConfirm.isOpen && (
+            <Modal
+              isOpen={deleteConfirm.isOpen}
+              onClose={() => setDeleteConfirm({ isOpen: false, post: null, isDeleting: false })}
+              title="Delete Post"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0">
+                    <AlertTriangle className="w-6 h-6 text-red-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900">Are you sure?</h3>
+                    <p className="text-sm text-gray-500">
+                      This action cannot be undone. This will permanently delete the post "
+                      {deleteConfirm.post?.title}".
+                    </p>
+                  </div>
+                </div>
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => setDeleteConfirm({ isOpen: false, post: null, isDeleting: false })}
+                    disabled={deleteConfirm.isDeleting}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDelete}
+                    disabled={deleteConfirm.isDeleting}
+                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 disabled:opacity-50"
+                  >
+                    {deleteConfirm.isDeleting ? 'Deleting...' : 'Delete'}
+                  </button>
+                </div>
+              </div>
+            </Modal>
+          )}
+
+          {/* View Post Modal */}
+          {viewingPost && (
+            <Modal
+              isOpen={!!viewingPost}
+              onClose={() => setViewingPost(null)}
+              title={`View Post: ${viewingPost.title}`}
+            >
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900">{viewingPost.title}</h3>
+                  <div className="flex items-center space-x-2 mt-2">
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getTypeBadge(
+                        viewingPost.type
+                      )}`}
+                    >
+                      {formatTypeLabel(viewingPost.type)}
+                    </span>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(
+                        viewingPost.status
+                      )}`}
+                    >
+                      {viewingPost.status.charAt(0).toUpperCase() + viewingPost.status.slice(1)}
+                    </span>
+                  </div>
+                </div>
+                {viewingPost.content && (
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Content</h4>
+                    <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
+                      {viewingPost.content}
+                    </div>
+                  </div>
+                )}
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => setViewingPost(null)}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </Modal>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
