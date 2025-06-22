@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { Home, FileText, Package, Image, Users, X, BarChart3, Settings, HelpCircle, Pin } from 'lucide-react'
+import { Home, FileText, Package, Image, Users, X, BarChart3, Settings, HelpCircle, Pin, Building2 } from 'lucide-react'
 import { usePermissions } from '../hooks/usePermissions'
 
 interface SidebarProps {
@@ -40,6 +40,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
       items: [
         { id: 'posts', label: 'Posts', icon: FileText, path: '/posts', resource: 'posts', action: 'read' },
         { id: 'products', label: 'Products', icon: Package, path: '/products', resource: 'products', action: 'read' },
+        { id: 'brokers', label: 'Brokers', icon: Building2, path: '/brokers', resource: 'brokers', action: 'read' },
         { id: 'banners', label: 'Banners', icon: Image, path: '/banners', resource: 'banners', action: 'read' },
         { id: 'users', label: 'Users', icon: Users, path: '/users', resource: 'users', action: 'read' }
       ]

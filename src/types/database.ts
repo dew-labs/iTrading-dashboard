@@ -255,6 +255,29 @@ export interface Database {
           created_at?: string;
         };
       };
+      brokers: {
+        Row: {
+          id: number;
+          established_at: string | null;
+          headquarter: string | null;
+          description: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: number;
+          established_at?: string | null;
+          headquarter?: string | null;
+          description?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: number;
+          established_at?: string | null;
+          headquarter?: string | null;
+          description?: string | null;
+          created_at?: string;
+        };
+      };
     };
   };
 }

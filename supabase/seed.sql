@@ -7,6 +7,7 @@ INSERT INTO role_permissions (role, resource, action) VALUES
 ('user', 'profile', 'update'),
 ('user', 'posts', 'read'),
 ('user', 'products', 'read'),
+('user', 'brokers', 'read'),
 ('user', 'banners', 'read'),
 
 -- Admin permissions
@@ -20,6 +21,10 @@ INSERT INTO role_permissions (role, resource, action) VALUES
 ('admin', 'products', 'create'),
 ('admin', 'products', 'update'),
 ('admin', 'products', 'delete'),
+('admin', 'brokers', 'read'),
+('admin', 'brokers', 'create'),
+('admin', 'brokers', 'update'),
+('admin', 'brokers', 'delete'),
 ('admin', 'banners', 'read'),
 ('admin', 'banners', 'create'),
 ('admin', 'banners', 'update'),
@@ -39,6 +44,10 @@ INSERT INTO role_permissions (role, resource, action) VALUES
 ('super_admin', 'products', 'create'),
 ('super_admin', 'products', 'update'),
 ('super_admin', 'products', 'delete'),
+('super_admin', 'brokers', 'read'),
+('super_admin', 'brokers', 'create'),
+('super_admin', 'brokers', 'update'),
+('super_admin', 'brokers', 'delete'),
 ('super_admin', 'banners', 'read'),
 ('super_admin', 'banners', 'create'),
 ('super_admin', 'banners', 'update'),
@@ -77,6 +86,17 @@ INSERT INTO products (name, price, description, subscription) VALUES
 ('Custom Development', 499.99, 'Custom development services tailored to your specific needs. Includes consultation and implementation.', false),
 ('Analytics Dashboard', 49.99, 'Advanced analytics and reporting dashboard with real-time insights and custom metrics.', true);
 
+-- Sample brokers
+INSERT INTO brokers (established_at, headquarter, description) VALUES
+('1971-02-05', 'New York, USA', 'Leading investment company founded by Charles Schwab, offering comprehensive brokerage services, financial planning, and investment management for individual and institutional clients.'),
+('1975-05-01', 'Omaha, Nebraska, USA', 'Interactive Brokers is a premier electronic trading platform providing direct access to global markets with competitive pricing and advanced trading technology.'),
+('1946-10-01', 'San Francisco, USA', 'One of the largest investment management companies in the world, known for low-cost index funds and ETFs that help investors build long-term wealth.'),
+('2013-04-18', 'Palo Alto, USA', 'Commission-free trading platform that democratizes finance for all, offering stocks, ETFs, options, and cryptocurrency trading through an intuitive mobile app.'),
+('1992-01-01', 'Boston, USA', 'Full-service brokerage firm providing investment services, wealth management, and financial planning with a focus on client relationships and personalized service.'),
+('1981-03-15', 'St. Petersburg, Florida, USA', 'Online discount brokerage offering low-cost trading, research tools, and educational resources for self-directed investors and active traders.'),
+('1963-06-12', 'Jersey City, USA', 'Premier investment bank and financial services company offering wealth management, investment banking, and trading services to institutions and high-net-worth individuals.'),
+('1870-07-01', 'New York, USA', 'Historic investment bank with a long tradition of providing investment banking, securities trading, and wealth management services to corporations and individuals worldwide.');
+
 -- Sample banners
 INSERT INTO banners (target_url, is_active) VALUES
 ('https://example.com/welcome', true),
@@ -97,6 +117,10 @@ INSERT INTO images (table_name, record_id, image_url, alt_text, mime_type) VALUE
 ('products', '1', 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg', 'Premium Plan illustration', 'image/jpeg'),
 ('products', '2', 'https://images.pexels.com/photos/437037/pexels-photo-437037.jpeg', 'Professional Tools showcase', 'image/jpeg'),
 ('products', '3', 'https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg', 'Enterprise Solution overview', 'image/jpeg'),
+('brokers', '1', 'https://images.pexels.com/photos/534216/pexels-photo-534216.jpeg', 'Charles Schwab office building', 'image/jpeg'),
+('brokers', '2', 'https://images.pexels.com/photos/3182773/pexels-photo-3182773.jpeg', 'Interactive Brokers trading floor', 'image/jpeg'),
+('brokers', '3', 'https://images.pexels.com/photos/4386321/pexels-photo-4386321.jpeg', 'Vanguard investment office', 'image/jpeg'),
+('brokers', '4', 'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg', 'Robinhood mobile trading', 'image/jpeg'),
 ('posts', '1', 'https://images.pexels.com/photos/1229861/pexels-photo-1229861.jpeg', 'Welcome announcement image', 'image/jpeg'),
 ('posts', '3', 'https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg', 'Conference event image', 'image/jpeg');
 

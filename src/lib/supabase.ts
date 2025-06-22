@@ -38,6 +38,10 @@ export const queryKeys = {
   products: () => ['products'] as const,
   product: (id: number) => ['products', id] as const,
 
+  // Brokers
+  brokers: () => ['brokers'] as const,
+  broker: (id: number) => ['brokers', id] as const,
+
   // Banners
   banners: () => ['banners'] as const,
   banner: (id: string) => ['banners', id] as const,

@@ -7,6 +7,7 @@ import Dashboard from '../pages/Dashboard'
 import Analytics from '../pages/Analytics'
 import Posts from '../pages/Posts'
 import Products from '../pages/Products'
+import Brokers from '../pages/Brokers'
 import Banners from '../pages/Banners'
 import Users from '../pages/Users'
 import Settings from '../pages/Settings'
@@ -50,6 +51,14 @@ const DashboardLayout: React.FC = () => {
               element={
                 <ProtectedRoute requiredPermission={{ resource: 'products', action: 'read' }}>
                   <Products />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/brokers"
+              element={
+                <ProtectedRoute requiredPermission={{ resource: 'brokers', action: 'read' }}>
+                  <Brokers />
                 </ProtectedRoute>
               }
             />
