@@ -2,6 +2,13 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ShieldOff, Home, ArrowLeft, Mail } from 'lucide-react'
 
+// Theme imports
+import {
+  getButtonClasses,
+  getTypographyClasses,
+  cn
+} from '../utils/theme'
+
 const Unauthorized: React.FC = () => {
   const navigate = useNavigate()
 
@@ -15,15 +22,15 @@ const Unauthorized: React.FC = () => {
         </div>
 
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className={cn(getTypographyClasses('h1'), 'text-4xl mb-4')}>
             Access Denied
           </h1>
 
-          <p className="text-xl text-gray-600 mb-6">
+          <p className={cn(getTypographyClasses('large'), 'mb-6')}>
             You don't have permission to access this page.
           </p>
 
-          <p className="text-gray-500">
+          <p className={getTypographyClasses('muted')}>
             Please contact your administrator if you believe this is an error.
           </p>
         </div>
@@ -31,7 +38,7 @@ const Unauthorized: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
           <button
             onClick={() => navigate(-1)}
-            className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium"
+            className={getButtonClasses('secondary', 'lg')}
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
             Go Back
@@ -39,7 +46,7 @@ const Unauthorized: React.FC = () => {
 
           <button
             onClick={() => navigate('/dashboard')}
-            className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-black hover:to-gray-900 transition-colors shadow-sm font-medium"
+            className={getButtonClasses('primary', 'lg')}
           >
             <Home className="w-5 h-5 mr-2" />
             Go to Dashboard
@@ -49,9 +56,9 @@ const Unauthorized: React.FC = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-center mb-4">
             <Mail className="w-6 h-6 text-gray-400 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-900">Need Help?</h3>
+            <h3 className={getTypographyClasses('h3')}>Need Help?</h3>
           </div>
-          <p className="text-gray-600">
+          <p className={getTypographyClasses('base')}>
             Contact your system administrator or reach out to{' '}
             <a
               href="mailto:support@example.com"
