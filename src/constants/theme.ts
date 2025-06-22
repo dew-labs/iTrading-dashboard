@@ -306,7 +306,7 @@ export const PATTERNS = {
     users: 'from-blue-500 to-blue-600',
     products: 'from-purple-500 to-purple-600',
     posts: 'from-green-500 to-green-600',
-    banners: 'from-orange-500 to-orange-600',
+    banners: 'from-teal-500 to-teal-600',
     dashboard: 'from-gray-900 to-black'
   }
 } as const

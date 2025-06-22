@@ -102,7 +102,7 @@ export const BADGE_VARIANTS = {
     news: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800',
     event: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800',
     terms_of_use: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800',
-    privacy_policy: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800',
+    privacy_policy: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800',
     subscription: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800',
     'one-time': 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800'
   }
@@ -116,7 +116,7 @@ export const ICON_VARIANTS = {
     users: 'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm bg-gradient-to-br from-blue-500 to-blue-600',
     products: 'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm bg-gradient-to-br from-purple-500 to-purple-600',
     posts: 'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm bg-gradient-to-br from-green-500 to-green-600',
-    banners: 'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm bg-gradient-to-br from-orange-500 to-orange-600',
+    banners: 'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm bg-gradient-to-br from-teal-500 to-teal-600',
     dashboard: 'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm bg-gradient-to-br from-gray-900 to-black'
   },
 

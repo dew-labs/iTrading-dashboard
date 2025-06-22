@@ -66,7 +66,7 @@ const Dashboard: React.FC = () => {
       icon: Image,
       path: '/banners',
       color: 'banners',
-      gradient: 'from-orange-500 to-orange-600'
+      gradient: 'from-teal-500 to-teal-600'
     }
   ]
 
@@ -160,7 +160,7 @@ const Dashboard: React.FC = () => {
               <div className="ml-4">
                 <div className={bannerStatsProps.valueClasses}>{banners.length}</div>
                 <div className={bannerStatsProps.labelClasses}>Banners</div>
-                <div className={cn(getTypographyClasses('xs'), 'text-orange-600 mt-1')}>
+                <div className={cn(getTypographyClasses('xs'), 'text-teal-600 mt-1')}>
                   {activeBanners} active
                 </div>
               </div>
@@ -251,7 +251,7 @@ const Dashboard: React.FC = () => {
                     </div>
                     <span className={getTypographyClasses('small')}>Active Promotions</span>
                   </div>
-                  <span className={cn(getTypographyClasses('h4'), 'text-orange-600')}>
+                  <span className={cn(getTypographyClasses('h4'), 'text-teal-600')}>
                     {activeBanners}/{banners.length}
                   </span>
                 </div>
@@ -304,15 +304,15 @@ const Dashboard: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-4">
+                <div className="bg-gradient-to-r from-teal-50 to-teal-100 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className={cn(getTypographyClasses('small'), 'text-orange-700')}>Banner Activity</p>
-                      <p className={cn(getTypographyClasses('h4'), 'text-orange-900')}>
+                      <p className={cn(getTypographyClasses('small'), 'text-teal-700')}>Banner Activity</p>
+                      <p className={cn(getTypographyClasses('h4'), 'text-teal-900')}>
                         {banners.length > 0 ? Math.round((activeBanners / banners.length) * 100) : 0}%
                       </p>
                     </div>
-                    <Image className="w-8 h-8 text-orange-500" />
+                    <Image className="w-8 h-8 text-teal-500" />
                   </div>
                 </div>
               </div>

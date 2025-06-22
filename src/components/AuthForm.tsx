@@ -71,7 +71,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-gray-900 to-black rounded-xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
             <span className="text-white font-bold text-xl">i</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900">
@@ -101,7 +101,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                   placeholder="Enter your full name"
                   required
                 />
@@ -124,7 +124,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                 placeholder="Enter your email"
                 required
               />
@@ -146,7 +146,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                 placeholder="Enter your password"
                 required
                 minLength={mode === 'signup' ? 8 : undefined}
@@ -181,7 +181,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                   placeholder="Confirm your password"
                   required
                 />
@@ -203,7 +203,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-gray-900 to-black text-white py-3 rounded-lg font-medium hover:from-black hover:to-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 text-white py-3 rounded-lg font-medium hover:from-teal-600 hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
           >
             {loading ? (
               <LoadingSpinner size="sm" className="text-white" />
@@ -222,7 +222,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
               : 'Already have an account? '}
             <button
               onClick={onToggleMode}
-              className="text-gray-900 hover:text-black font-medium"
+              className="text-teal-600 hover:text-teal-700 font-medium"
             >
               {mode === 'login' ? 'Sign up' : 'Sign in'}
             </button>

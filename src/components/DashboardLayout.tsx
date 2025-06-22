@@ -4,32 +4,38 @@ import Sidebar from './Sidebar'
 import Header from './Header'
 import ProtectedRoute from './ProtectedRoute'
 import Dashboard from '../pages/Dashboard'
+import Analytics from '../pages/Analytics'
 import Posts from '../pages/Posts'
 import Products from '../pages/Products'
 import Banners from '../pages/Banners'
 import Users from '../pages/Users'
+import Settings from '../pages/Settings'
+import Help from '../pages/Help'
 
 const DashboardLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar
-        isOpen={sidebarOpen}
-        setIsOpen={setSidebarOpen}
-        isCollapsed={sidebarCollapsed}
-        setIsCollapsed={setSidebarCollapsed}
+    <div className="h-screen bg-gray-50 flex flex-col">
+      {/* Header spans full width at top */}
+      <Header
+        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
       />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header
-          onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+      {/* Sidebar and main content below header */}
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar
+          isOpen={sidebarOpen}
+          setIsOpen={setSidebarOpen}
+          isCollapsed={sidebarCollapsed}
+          setIsCollapsed={setSidebarCollapsed}
         />
 
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/analytics" element={<Analytics />} />
             <Route
               path="/posts"
               element={
@@ -62,6 +68,8 @@ const DashboardLayout: React.FC = () => {
                 </ProtectedRoute>
               }
             />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/help" element={<Help />} />
           </Routes>
         </main>
       </div>

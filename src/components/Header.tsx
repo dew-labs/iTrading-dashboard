@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect, useMemo } from 'react'
 import {
   Menu,
   Bell,
-  Search,
   ChevronDown,
   Users,
   FileText,
@@ -158,41 +157,40 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
     case 'product':
       return 'bg-purple-100 text-purple-600'
     case 'banner':
-      return 'bg-orange-100 text-orange-600'
+      return 'bg-teal-100 text-teal-600'
     default:
       return 'bg-gray-100 text-gray-600'
     }
   }
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 relative z-10">
+    <header className="bg-white border-b border-gray-200 relative z-10">
       <div className="flex items-center justify-between h-20 px-6">
         <div className="flex items-center">
           <button
             onClick={onToggleSidebar}
-            className="lg:hidden p-2 rounded-md hover:bg-gray-100 transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <Menu className="w-5 h-5 text-gray-600" />
           </button>
 
-          <div className="ml-4 lg:ml-0">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="pl-10 pr-4 py-2.5 w-64 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent focus:bg-white transition-all"
-              />
+          {/* Logo */}
+          <div className="ml-4 lg:ml-0 flex items-center">
+            <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-lg">i</span>
+            </div>
+            <div className="ml-3">
+              <h1 className="text-xl font-bold text-gray-900">iTrading</h1>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3">
           {/* Notifications */}
           <div className="relative" ref={notificationRef}>
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="relative p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all group"
+              className="relative p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all group"
             >
               <Bell className="w-5 h-5" />
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
@@ -263,7 +261,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-              className="flex items-center space-x-3 pl-3 border-l border-gray-200 hover:bg-gray-50 rounded-lg transition-colors p-2"
+              className="flex items-center space-x-3 pl-4 border-l border-gray-200 hover:bg-gray-50 rounded-lg transition-colors p-2"
             >
               <div className="hidden sm:block text-right">
                 <p className="text-sm font-medium text-gray-900">
@@ -275,7 +273,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               </div>
 
               <div className="relative">
-                <div className="w-10 h-10 bg-gradient-to-br from-gray-900 to-black rounded-full flex items-center justify-center hover:shadow-lg transition-all duration-200 transform hover:scale-105">
+                <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-full flex items-center justify-center hover:shadow-lg transition-all duration-200 transform hover:scale-105">
                   <span className="text-white font-semibold text-sm">
                     {user?.email?.charAt(0).toUpperCase() || 'U'}
                   </span>
@@ -298,7 +296,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 {/* User Info Section */}
                 <div className="px-4 py-3 border-b border-gray-100">
                   <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-gray-900 to-black rounded-full flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-full flex items-center justify-center">
                       <span className="text-white font-semibold">
                         {user?.email?.charAt(0).toUpperCase() || 'U'}
                       </span>
@@ -323,7 +321,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                       onClick={() => handleLanguageChange(language.code)}
                       className={`w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors ${
                         selectedLanguage === language.code
-                          ? 'bg-gray-900 text-white'
+                          ? 'bg-teal-500 text-white'
                           : 'text-gray-700 hover:bg-gray-50'
                       }`}
                     >
