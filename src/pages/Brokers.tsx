@@ -14,6 +14,7 @@ import Table from '../components/Table'
 import Modal from '../components/Modal'
 import BrokerForm from '../components/BrokerForm'
 import PageLoadingSpinner from '../components/PageLoadingSpinner'
+import RecordImage from '../components/RecordImage'
 
 import PaginationSelector from '../components/PaginationSelector'
 import type { Broker, BrokerInsert } from '../types'
@@ -152,9 +153,14 @@ const Brokers: React.FC = () => {
         return (
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">
-              <div className={getIconClasses('table')}>
-                <Building2 className="w-4 h-4 text-white" />
-              </div>
+              <RecordImage
+                tableName="brokers"
+                recordId={row.id.toString()}
+                className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                fallbackClassName="w-12 h-12 rounded-lg bg-gradient-to-br from-gray-900 to-black flex items-center justify-center"
+                alt={`${value as string || 'Broker'} logo`}
+                fallbackIcon={<Building2 className="w-4 h-4 text-white" />}
+              />
             </div>
             <div className="flex-1 min-w-0">
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>

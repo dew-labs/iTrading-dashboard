@@ -46,6 +46,12 @@ export const queryKeys = {
   banners: () => ['banners'] as const,
   banner: (id: string) => ['banners', id] as const,
 
+  // Images
+  images: () => ['images'] as const,
+  image: (id: number) => ['images', id] as const,
+  imagesByTable: (tableName: string) => ['images', 'table', tableName] as const,
+  imagesByRecord: (tableName: string, recordId: string) => ['images', 'table', tableName, 'record', recordId] as const,
+
   // Permissions
   rolePermissions: (role: string) => ['role-permissions', role] as const,
   permissions: () => ['permissions'] as const

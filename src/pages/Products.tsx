@@ -8,13 +8,16 @@ import {
   DollarSign,
   Calendar,
   TrendingUp,
-  CheckCircle
+  CheckCircle,
+  Eye
 } from 'lucide-react'
 import { useProducts } from '../hooks/useProducts'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import ProductForm from '../components/ProductForm'
 import PageLoadingSpinner from '../components/PageLoadingSpinner'
+import RecordImage from '../components/RecordImage'
+import DetailViewModal from '../components/DetailViewModal'
 
 import FilterDropdown from '../components/FilterDropdown'
 import PaginationSelector from '../components/PaginationSelector'
@@ -40,6 +43,7 @@ const Products: React.FC = () => {
   const [filterSubscription, setFilterSubscription] = useState<string>('all')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [viewingProduct, setViewingProduct] = useState<Product | null>(null)
   const [sortColumn, setSortColumn] = useState<keyof Product | null>('created_at')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
@@ -114,6 +118,10 @@ const Products: React.FC = () => {
     setIsModalOpen(true)
   }
 
+  const handleView = (product: Product) => {
+    setViewingProduct(product)
+  }
+
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       await deleteProduct(id)
@@ -169,9 +177,14 @@ const Products: React.FC = () => {
         return (
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">
-              <div className={getIconClasses('table')}>
-                <Package className="w-4 h-4 text-white" />
-              </div>
+              <RecordImage
+                tableName="products"
+                recordId={row.id.toString()}
+                className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                fallbackClassName="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center"
+                alt={`${value as string} product image`}
+                fallbackIcon={<Package className="w-4 h-4 text-white" />}
+              />
             </div>
             <div className="flex-1 min-w-0">
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>{value as string}</div>
@@ -226,6 +239,13 @@ const Products: React.FC = () => {
       accessor: 'id' as keyof Product,
       render: (value: unknown, row: Product) => (
         <div className="flex space-x-1">
+          <button
+            onClick={() => handleView(row)}
+            className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+            title="View product details"
+          >
+            <Eye className={getIconClasses('action')} />
+          </button>
           <button
             onClick={() => handleEdit(row)}
             className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
@@ -479,6 +499,44 @@ const Products: React.FC = () => {
             onCancel={handleCloseModal}
           />
         </Modal>
+
+        {/* Detail View Modal */}
+        {viewingProduct && (
+          <DetailViewModal
+            isOpen={!!viewingProduct}
+            onClose={() => setViewingProduct(null)}
+            title={`Product Details: ${viewingProduct.name}`}
+            tableName="products"
+            recordId={viewingProduct.id.toString()}
+          >
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <p className="text-gray-900">{viewingProduct.name}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                  <p className="text-gray-900 font-semibold">${viewingProduct.price.toFixed(2)}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                  <p className="text-gray-900">{viewingProduct.subscription ? 'Subscription' : 'One-time'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Created</label>
+                  <p className="text-gray-900">{formatDateDisplay(viewingProduct.created_at)}</p>
+                </div>
+              </div>
+              {viewingProduct.description && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <p className="text-gray-900">{viewingProduct.description}</p>
+                </div>
+              )}
+            </div>
+          </DetailViewModal>
+        )}
       </div>
     </div>
   )

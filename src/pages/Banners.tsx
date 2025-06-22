@@ -18,6 +18,7 @@ import Table from '../components/Table'
 import Modal from '../components/Modal'
 import BannerForm from '../components/BannerForm'
 import PageLoadingSpinner from '../components/PageLoadingSpinner'
+import RecordImage from '../components/RecordImage'
 
 import FilterDropdown from '../components/FilterDropdown'
 import PaginationSelector from '../components/PaginationSelector'
@@ -170,9 +171,14 @@ const Banners: React.FC = () => {
         return (
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">
-              <div className={getIconClasses('table')}>
-                <Image className="w-4 h-4 text-white" />
-              </div>
+              <RecordImage
+                tableName="banners"
+                recordId={row.id}
+                className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                fallbackClassName="w-12 h-12 rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center"
+                alt={`Banner ${row.id.slice(0, 8)} image`}
+                fallbackIcon={<Image className="w-4 h-4 text-white" />}
+              />
             </div>
             <div className="flex-1 min-w-0">
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>

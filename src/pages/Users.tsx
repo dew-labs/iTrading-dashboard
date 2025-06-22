@@ -23,6 +23,7 @@ import PageLoadingSpinner from '../components/PageLoadingSpinner'
 import TabNavigation from '../components/TabNavigation'
 import FilterDropdown from '../components/FilterDropdown'
 import PaginationSelector from '../components/PaginationSelector'
+import RecordImage from '../components/RecordImage'
 import type { DatabaseUser, UserInsert } from '../types'
 
 // Theme imports
@@ -224,9 +225,34 @@ const Users: React.FC = () => {
         return (
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">
-              <div className={getIconClasses('table')}>
-                <User className="w-4 h-4 text-white" />
-              </div>
+              {row.avatar_url ? (
+                <img
+                  src={row.avatar_url}
+                  alt={`${row.full_name || 'User'} avatar`}
+                  className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                  onError={(e) => {
+                    // If avatar fails to load, show fallback
+                    const target = e.target as HTMLImageElement
+                    target.style.display = 'none'
+                    const parent = target.parentElement
+                    if (parent) {
+                      const fallback = document.createElement('div')
+                      fallback.className = 'w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center'
+                      fallback.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-white"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>'
+                      parent.appendChild(fallback)
+                    }
+                  }}
+                />
+              ) : (
+                <RecordImage
+                  tableName="users"
+                  recordId={row.id}
+                  className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                  fallbackClassName="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center"
+                  alt={`${row.full_name || 'User'} profile image`}
+                  fallbackIcon={<User className="w-4 h-4 text-white" />}
+                />
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>{row.full_name || 'No name'}</div>

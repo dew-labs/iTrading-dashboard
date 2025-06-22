@@ -24,6 +24,7 @@ import LoadingSpinner from '../components/LoadingSpinner'
 import TabNavigation from '../components/TabNavigation'
 import FilterDropdown from '../components/FilterDropdown'
 import PaginationSelector from '../components/PaginationSelector'
+import RecordImage from '../components/RecordImage'
 import type { Post, PostInsert } from '../types'
 
 // Theme imports
@@ -255,9 +256,14 @@ const Posts: React.FC = () => {
         return (
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">
-              <div className={getIconClasses('table')}>
-                <Tag className="w-4 h-4 text-white" />
-              </div>
+              <RecordImage
+                tableName="posts"
+                recordId={row.id.toString()}
+                className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                fallbackClassName="w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center"
+                alt={`${value as string} post image`}
+                fallbackIcon={<Tag className="w-4 h-4 text-white" />}
+              />
             </div>
             <div className="flex-1 min-w-0">
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>{value as string}</div>
