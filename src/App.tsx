@@ -6,6 +6,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import ProtectedRoute from './components/ProtectedRoute'
 import LoadingSpinner from './components/LoadingSpinner'
 import Login from './pages/Login'
+import Unauthorized from './pages/Unauthorized'
 import DashboardLayout from './components/DashboardLayout'
 
 function App () {
@@ -32,6 +33,7 @@ function App () {
         <div className="App">
           <Routes>
             <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
             <Route
               path="/*"
               element={

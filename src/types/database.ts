@@ -30,44 +30,6 @@ export interface Database {
           created_at?: string;
         };
       };
-      users: {
-        Row: {
-          id: string;
-          email: string;
-          full_name: string | null;
-          role: 'user' | 'admin';
-          status: 'invited' | 'active' | 'inactive';
-          phone: string | null;
-          avatar_url: string | null;
-          last_login: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          email: string;
-          full_name?: string | null;
-          role?: 'user' | 'admin';
-          status?: 'invited' | 'active' | 'inactive';
-          phone?: string | null;
-          avatar_url?: string | null;
-          last_login?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          email?: string;
-          full_name?: string | null;
-          role?: 'user' | 'admin';
-          status?: 'invited' | 'active' | 'inactive';
-          phone?: string | null;
-          avatar_url?: string | null;
-          last_login?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-      };
       products: {
         Row: {
           id: number;
@@ -126,6 +88,90 @@ export interface Database {
         Update: {
           id?: string;
           language_preference?: string | null;
+        };
+      };
+      users: {
+        Row: {
+          id: string;
+          email: string;
+          full_name: string | null;
+          role: 'user' | 'admin' | 'super_admin';
+          status: 'invited' | 'active' | 'inactive' | 'suspended';
+          phone: string | null;
+          avatar_url: string | null;
+          last_login: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          email: string;
+          full_name?: string | null;
+          role?: 'user' | 'admin' | 'super_admin';
+          status?: 'invited' | 'active' | 'inactive' | 'suspended';
+          phone?: string | null;
+          avatar_url?: string | null;
+          last_login?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          full_name?: string | null;
+          role?: 'user' | 'admin' | 'super_admin';
+          status?: 'invited' | 'active' | 'inactive' | 'suspended';
+          phone?: string | null;
+          avatar_url?: string | null;
+          last_login?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      user_permissions: {
+        Row: {
+          id: number;
+          user_id: string;
+          resource: string;
+          action: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: number;
+          user_id: string;
+          resource: string;
+          action: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: number;
+          user_id?: string;
+          resource?: string;
+          action?: string;
+          created_at?: string;
+        };
+      };
+      role_permissions: {
+        Row: {
+          id: number;
+          role: 'user' | 'admin' | 'super_admin';
+          resource: string;
+          action: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: number;
+          role: 'user' | 'admin' | 'super_admin';
+          resource: string;
+          action: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: number;
+          role?: 'user' | 'admin' | 'super_admin';
+          resource?: string;
+          action?: string;
+          created_at?: string;
         };
       };
       images: {

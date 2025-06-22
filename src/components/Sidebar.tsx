@@ -1,6 +1,7 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { Home, FileText, Package, Image, Users, X, ChevronRight, ChevronLeft } from 'lucide-react'
+import { usePermissions } from '../hooks/usePermissions'
 
 interface SidebarProps {
   isOpen: boolean;
@@ -9,14 +10,33 @@ interface SidebarProps {
   setIsCollapsed: (collapsed: boolean) => void;
 }
 
+interface MenuItem {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  path: string;
+  resource?: string;
+  action?: string;
+}
+
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIsCollapsed }) => {
-  const menuItems = [
+  const { can } = usePermissions()
+
+  const allMenuItems: MenuItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: Home, path: '/' },
-    { id: 'posts', label: 'Posts', icon: FileText, path: '/posts' },
-    { id: 'products', label: 'Products', icon: Package, path: '/products' },
-    { id: 'banners', label: 'Banners', icon: Image, path: '/banners' },
-    { id: 'users', label: 'Users', icon: Users, path: '/users' }
+    { id: 'posts', label: 'Posts', icon: FileText, path: '/posts', resource: 'posts', action: 'read' },
+    { id: 'products', label: 'Products', icon: Package, path: '/products', resource: 'products', action: 'read' },
+    { id: 'banners', label: 'Banners', icon: Image, path: '/banners', resource: 'banners', action: 'read' },
+    { id: 'users', label: 'Users', icon: Users, path: '/users', resource: 'users', action: 'read' }
   ]
+
+  // Filter menu items based on permissions
+  const menuItems = allMenuItems.filter(item => {
+    // Dashboard is always visible
+    if (!item.resource) return true
+    // Check if user has permission to view this resource
+    return can(item.resource, item.action || 'read')
+  })
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed)

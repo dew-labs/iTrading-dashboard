@@ -28,7 +28,7 @@ interface NotificationItem {
 }
 
 const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
-  const { user, signOut } = useAuthStore()
+  const { user, profile, signOut } = useAuthStore()
   const [showProfileDropdown, setShowProfileDropdown] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [selectedLanguage, setSelectedLanguage] = useState('en')
@@ -267,9 +267,11 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             >
               <div className="hidden sm:block text-right">
                 <p className="text-sm font-medium text-gray-900">
-                  {user?.user_metadata?.full_name || 'User'}
+                  {user?.user_metadata?.full_name || profile?.full_name || 'User'}
                 </p>
-                <p className="text-xs text-gray-500">Administrator</p>
+                <p className="text-xs text-gray-500 capitalize">
+                  {profile?.role === 'super_admin' ? 'Super Admin' : profile?.role || 'User'}
+                </p>
               </div>
 
               <div className="relative">
@@ -303,7 +305,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">
-                        {user?.user_metadata?.full_name || 'User'}
+                        {user?.user_metadata?.full_name || profile?.full_name || 'User'}
                       </p>
                       <p className="text-sm text-gray-500">{user?.email}</p>
                     </div>

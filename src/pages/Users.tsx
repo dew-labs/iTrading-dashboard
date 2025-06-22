@@ -7,23 +7,28 @@ import {
   Users as UsersIcon,
   UserCheck,
   UserX,
-  Shield
+  Shield,
+  Key
 } from 'lucide-react'
 import { useUsers } from '../hooks/useUsers'
+import { usePermissions } from '../hooks/usePermissions'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import UserForm from '../components/UserForm'
+import PermissionManager from '../components/PermissionManager'
 import LoadingSpinner from '../components/LoadingSpinner'
 import Select from '../components/Select'
 import type { DatabaseUser, UserInsert } from '../types'
 
 const Users: React.FC = () => {
   const { users, loading, createUser, updateUser, deleteUser } = useUsers()
+  const { isSuperAdmin } = usePermissions()
   const [searchTerm, setSearchTerm] = useState('')
   const [filterRole, setFilterRole] = useState<string>('all')
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<DatabaseUser | null>(null)
+  const [managingPermissionsFor, setManagingPermissionsFor] = useState<DatabaseUser | null>(null)
   const [sortColumn, setSortColumn] = useState<keyof DatabaseUser | null>('created_at')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
 
@@ -106,14 +111,16 @@ const Users: React.FC = () => {
   const roleOptions = [
     { value: 'all', label: 'All Roles' },
     { value: 'user', label: 'User' },
-    { value: 'admin', label: 'Admin' }
+    { value: 'admin', label: 'Admin' },
+    { value: 'super_admin', label: 'Super Admin' }
   ]
 
   const statusOptions = [
     { value: 'all', label: 'All Status' },
     { value: 'invited', label: 'Invited' },
     { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' }
+    { value: 'inactive', label: 'Inactive' },
+    { value: 'suspended', label: 'Suspended' }
   ]
 
   const handleSort = (column: keyof DatabaseUser) => {
@@ -143,14 +150,20 @@ const Users: React.FC = () => {
       sortable: true,
       render: (value: unknown) => {
         const role = value as string
+        const roleColors = {
+          user: 'bg-gray-100 text-gray-800',
+          admin: 'bg-purple-100 text-purple-800',
+          super_admin: 'bg-red-100 text-red-800'
+        }
         return (
           <span
             className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${
-              role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+              roleColors[role as keyof typeof roleColors] || 'bg-gray-100 text-gray-800'
             }`}
           >
+            {role === 'super_admin' && <Shield size={12} className="mr-1" />}
             {role === 'admin' && <Shield size={12} className="mr-1" />}
-            {role.charAt(0).toUpperCase() + role.slice(1)}
+            {role === 'super_admin' ? 'Super Admin' : role.charAt(0).toUpperCase() + role.slice(1)}
           </span>
         )
       }
@@ -164,7 +177,8 @@ const Users: React.FC = () => {
         const statusConfig = {
           active: 'bg-green-100 text-green-800',
           inactive: 'bg-red-100 text-red-800',
-          invited: 'bg-yellow-100 text-yellow-800'
+          invited: 'bg-yellow-100 text-yellow-800',
+          suspended: 'bg-orange-100 text-orange-800'
         }
         return (
           <span
@@ -204,6 +218,15 @@ const Users: React.FC = () => {
           >
             <Edit2 className="w-4 h-4" />
           </button>
+          {isSuperAdmin() && (
+            <button
+              onClick={() => setManagingPermissionsFor(row)}
+              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded transition-colors"
+              title="Manage permissions"
+            >
+              <Key className="w-4 h-4" />
+            </button>
+          )}
           <button
             onClick={() => handleDelete(value as string)}
             className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
@@ -219,7 +242,7 @@ const Users: React.FC = () => {
   const activeUsers = users.filter((u) => u.status === 'active').length
   const inactiveUsers = users.filter((u) => u.status === 'inactive').length
   const _invitedUsers = users.filter((u) => u.status === 'invited').length
-  const adminUsers = users.filter((u) => u.role === 'admin').length
+  const adminUsers = users.filter((u) => u.role === 'admin' || u.role === 'super_admin').length
 
   if (loading) {
     return (
@@ -336,6 +359,19 @@ const Users: React.FC = () => {
         title={editingUser ? 'Edit User' : 'Create New User'}
       >
         <UserForm user={editingUser} onSubmit={handleSubmit} onCancel={handleCloseModal} />
+      </Modal>
+
+      <Modal
+        isOpen={!!managingPermissionsFor}
+        onClose={() => setManagingPermissionsFor(null)}
+        title="Manage Permissions"
+      >
+        {managingPermissionsFor && (
+          <PermissionManager
+            user={managingPermissionsFor}
+            onClose={() => setManagingPermissionsFor(null)}
+          />
+        )}
       </Modal>
     </div>
   )

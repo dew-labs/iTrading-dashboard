@@ -1,17 +1,46 @@
 {
-  "stylelint.packageManager": "npm",
-  "npm.packageManager": "npm",
-  // Typescript
-  "typescript.tsdk": "./node_modules/typescript/lib",
-  "typescript.validate.enable": true, // Unlike javascript, we still need typescript validator as its not covered by eslint
-  "typescript.enablePromptUseWorkspaceTsdk": true,
-  // "typescript.tsserver.nodePath": "node", // Run typescript via our local node instead of vscode's node
-  // Eslint
+  "[json][jsonc][json5][javascript][javascriptreact][typescript][typescriptreact][vue]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "always",
+      "source.organizeImports": "never",
+      "source.organizeImports.ts": "never",
+      "source.sortImports": "never",
+      "source.sortImports.ts": "never"
+    },
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[scss][sass][less][css][postcss]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.stylelint": "always"
+    },
+    "editor.defaultFormatter": "stylelint.vscode-stylelint"
+  },
+  "cSpell.words": [],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "eslint.format.enable": true,
+  "eslint.rules.customizations": [
+    {
+      "rule": "prettier/prettier",
+      "severity": "off"
+    },
+    {
+      "rule": "simple-import-sort/imports",
+      "severity": "off"
+    },
+    {
+      "rule": "vitest/padding-*",
+      "severity": "off"
+    },
+    {
+      "rule": "jest-formatting/*",
+      "severity": "off"
+    }
+  ],
+  "eslint.runtime": "node",
   "eslint.useFlatConfig": true,
-  // Disable vscode default validator
-  "javascript.validate.enable": false,
-  "json.validate.enable": false,
-  // Use eslint to validate instead
   "eslint.validate": [
     "javascript",
     "javascriptreact",
@@ -22,79 +51,62 @@
     "jsonc",
     "json5"
   ],
-  // Use only eslint to format (because its included prettier rules)
-  // Disable vscode default formatter
-  "json.format.enable": false,
-  "javascript.format.enable": false,
-  "typescript.format.enable": false,
-  "eslint.format.enable": true,
-  "[json][jsonc][json5][javascript][javascriptreact][typescript][typescriptreact][vue]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "always",
-      // Imports are organize and sorted by eslint
-      "source.organizeImports": "never",
-      "source.sortImports": "never",
-      "source.organizeImports.ts": "never",
-      "source.sortImports.ts": "never"
-    }
-  },
-  "eslint.rules.customizations": [
-    {
-      "rule": "prettier/prettier",
-      "severity": "off" // Silent the stylistic rules in you IDE, but still auto fix them
-    },
-    {
-      "rule": "simple-import-sort/imports",
-      "severity": "off" // Silent the stylistic rules in you IDE, but still auto fix them
-    },
-    {
-      "rule": "vitest/padding-*",
-      "severity": "off" // Silent the stylistic rules in you IDE, but still auto fix them
-    },
-    {
-      "rule": "jest-formatting/*",
-      "severity": "off" // Silent the stylistic rules in you IDE, but still auto fix them
-    }
-  ],
-  // "eslint.runtime": "node", // Run eslint via our local node instead of vscode's node
-  // Stylelint
-  "stylelint.validate": ["css", "postcss", "scss", "sass", "less"],
-  "stylelint.snippet": ["css", "postcss", "scss", "sass", "less"],
-  // Use only styleleint to format (because its included prettier rules)
-  "[scss][sass][less][css][postcss]": {
-    "editor.defaultFormatter": "stylelint.vscode-stylelint",
-    "editor.codeActionsOnSave": {
-      "source.fixAll.stylelint": "always"
-    }
-  },
-  // svg files
-  "prettier.documentSelectors": ["**/*.svg"],
   "files.exclude": {
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
     "**/.DS_Store": true,
+    "**/.git": true,
+    "**/.hg": true,
+    "**/.pytest_cache": true,
+    "**/.svn": true,
+    "**/CVS": true,
     "**/Thumbs.db": true,
     "**/__pycache__": true,
-    "**/.pytest_cache": true,
     "**/node_modules": true,
-    "venv": true,
+    "**/routeTree.gen.ts": true,
     "*.sublime-*": true,
     "env*": true,
+    "venv": true
+  },
+  "files.readonlyInclude": {
     "**/routeTree.gen.ts": true
   },
-  "jsdoc-generator.includeTypes": false,
+  "files.watcherExclude": {
+    "**/routeTree.gen.ts": true
+  },
+  "i18n-ally.disabled": true,
+  "javascript.format.enable": false,
+  "javascript.validate.enable": false,
   "jsdoc-generator.includeAsync": false,
   "jsdoc-generator.includeExport": false,
-  "files.watcherExclude": { "**/routeTree.gen.ts": true },
-  "files.readonlyInclude": { "**/routeTree.gen.ts": true },
-  // allow autocomplete for ArkType expressions like "string | num"
-  "editor.quickSuggestions": { "strings": "on" },
-  // prioritize ArkType's "type" for autoimports
-  "typescript.preferences.autoImportSpecifierExcludeRegexes": ["^(node:)?os$"],
+  "jsdoc-generator.includeTypes": false,
+  "json.format.enable": false,
+  "json.validate.enable": false,
   "mise.configureExtensionsAutomatically": false,
-  "i18n-ally.disabled": true,
-  "cSpell.words": ["heroui", "Numberish", "Wolfy", "lqip"]
+  "npm.packageManager": "npm",
+  "prettier.documentSelectors": [
+    "**/*.svg"
+  ],
+  "stylelint.packageManager": "npm",
+  "stylelint.snippet": [
+    "css",
+    "postcss",
+    "scss",
+    "sass",
+    "less"
+  ],
+  "stylelint.validate": [
+    "css",
+    "postcss",
+    "scss",
+    "sass",
+    "less"
+  ],
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.format.enable": false,
+  "typescript.preferences.autoImportSpecifierExcludeRegexes": [
+    "^(node:)?os$"
+  ],
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "typescript.tsserver.nodePath": "node",
+  "typescript.validate.enable": true,
+  "terminal.integrated.defaultProfile.osx": "zsh"
 }

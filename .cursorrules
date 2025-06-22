@@ -35,3 +35,5 @@ Other Rules need to follow:
 - Maintain consistent order of utility classes
 - Use Tailwind's responsive variants for adaptive designs
 - No need to run the application, it's already ran at localhost:5173
+- Supabase running script with the --linked flag to run on cloud
+- Use zsh instead of bash

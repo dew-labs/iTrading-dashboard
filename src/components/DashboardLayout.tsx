@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import Header from './Header'
+import ProtectedRoute from './ProtectedRoute'
 import Dashboard from '../pages/Dashboard'
 import Posts from '../pages/Posts'
 import Products from '../pages/Products'
@@ -23,17 +24,44 @@ const DashboardLayout: React.FC = () => {
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header
-          onMenuClick={() => setSidebarOpen(!sidebarOpen)}
-          sidebarCollapsed={sidebarCollapsed}
+          onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         />
 
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/posts" element={<Posts />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/banners" element={<Banners />} />
-            <Route path="/users" element={<Users />} />
+            <Route
+              path="/posts"
+              element={
+                <ProtectedRoute requiredPermission={{ resource: 'posts', action: 'read' }}>
+                  <Posts />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/products"
+              element={
+                <ProtectedRoute requiredPermission={{ resource: 'products', action: 'read' }}>
+                  <Products />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/banners"
+              element={
+                <ProtectedRoute requiredPermission={{ resource: 'banners', action: 'read' }}>
+                  <Banners />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/users"
+              element={
+                <ProtectedRoute requiredPermission={{ resource: 'users', action: 'read' }}>
+                  <Users />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </main>
       </div>

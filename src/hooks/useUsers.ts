@@ -1,16 +1,27 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import type { DatabaseUser, UserInsert, UserUpdate } from '../types'
+import { inviteUser } from '../services/userService'
+import { usePermissions } from './usePermissions'
 import toast from 'react-hot-toast'
 
 export const useUsers = () => {
   const [users, setUsers] = useState<DatabaseUser[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { can } = usePermissions()
 
   const fetchUsers = async () => {
     try {
       setLoading(true)
+
+      // Check if user has permission to read users
+      if (!can('users', 'read')) {
+        setError('You do not have permission to view users')
+        setUsers([])
+        return
+      }
+
       const { data, error } = await supabase
         .from('users')
         .select('*')
@@ -18,6 +29,7 @@ export const useUsers = () => {
 
       if (error) throw error
       setUsers(data || [])
+      setError(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
       toast.error('Failed to fetch users')
@@ -28,16 +40,27 @@ export const useUsers = () => {
 
   const createUser = async (user: UserInsert) => {
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .insert([{ ...user, updated_at: new Date().toISOString() }])
-        .select()
-        .single()
+      // Check permission
+      if (!can('users', 'create')) {
+        toast.error('You do not have permission to create users')
+        return { data: null, error: 'Permission denied' }
+      }
 
-      if (error) throw error
-      setUsers((prev) => [data, ...prev])
-      toast.success('User created successfully')
-      return { data, error: null }
+      // Use the invite user service
+      const { success, error: inviteError, tempPassword } = await inviteUser(
+        user.email,
+        user.role,
+        user.full_name || undefined
+      )
+
+      if (!success) {
+        return { data: null, error: inviteError || 'Failed to create user' }
+      }
+
+      // Refresh the user list
+      await fetchUsers()
+
+      return { data: { email: user.email, tempPassword }, error: null }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to create user'
       toast.error(errorMessage)
@@ -47,6 +70,12 @@ export const useUsers = () => {
 
   const updateUser = async (id: string, updates: UserUpdate) => {
     try {
+      // Check permission
+      if (!can('users', 'update')) {
+        toast.error('You do not have permission to update users')
+        return { data: null, error: 'Permission denied' }
+      }
+
       const { data, error } = await supabase
         .from('users')
         .update({ ...updates, updated_at: new Date().toISOString() })
@@ -67,6 +96,12 @@ export const useUsers = () => {
 
   const deleteUser = async (id: string) => {
     try {
+      // Check permission
+      if (!can('users', 'delete')) {
+        toast.error('You do not have permission to delete users')
+        return { error: 'Permission denied' }
+      }
+
       const { error } = await supabase.from('users').delete().eq('id', id)
 
       if (error) throw error
@@ -95,7 +130,7 @@ export const useUsers = () => {
 
   useEffect(() => {
     fetchUsers()
-  }, [])
+  }, [can]) // Re-fetch when permissions change
 
   return {
     users,
