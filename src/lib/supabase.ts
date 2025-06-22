@@ -4,22 +4,15 @@ import type { Database } from '../types/database'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-// For development/demo purposes, provide fallback to prevent crashes
-const defaultUrl = 'https://demo-project.supabase.co'
-const defaultKey = 'demo_anon_key_placeholder'
-
-if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('demo-project')) {
-  console.warn(
-    '⚠️  Supabase environment variables not configured properly. Using demo mode.'
-  )
-  console.warn(
-    'Please set up your Supabase project and update the environment variables.'
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    '⚠️  Supabase environment variables are required. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.'
   )
 }
 
 export const supabase = createClient<Database>(
-  supabaseUrl || defaultUrl,
-  supabaseAnonKey || defaultKey,
+  supabaseUrl,
+  supabaseAnonKey,
   {
     auth: {
       autoRefreshToken: true,
@@ -29,18 +22,8 @@ export const supabase = createClient<Database>(
   }
 )
 
-// Auth helpers with error handling for demo mode
+// Auth helpers
 export const signIn = async (email: string, password: string) => {
-  if (!supabaseUrl || supabaseUrl.includes('demo-project')) {
-    return {
-      data: null,
-      error: {
-        message:
-          'Demo mode: Please configure Supabase to enable authentication'
-      }
-    }
-  }
-
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password
@@ -53,22 +36,11 @@ export const signUp = async (
   password: string,
   metadata?: Record<string, unknown>
 ) => {
-  if (!supabaseUrl || supabaseUrl.includes('demo-project')) {
-    return {
-      data: null,
-      error: {
-        message:
-          'Demo mode: Please configure Supabase to enable authentication'
-      }
-    }
-  }
-
+  const signUpOptions = metadata ? { options: { data: metadata } } : {}
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: {
-      data: metadata
-    }
+    ...signUpOptions
   })
   return { data, error }
 }

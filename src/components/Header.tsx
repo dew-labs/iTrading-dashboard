@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import {
   Menu,
   Bell,
@@ -40,8 +40,8 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
     { code: 'pt', name: 'Português', flag: '🇧🇷' }
   ]
 
-  // Mock recent activity data
-  const recentNotifications: NotificationItem[] = [
+  // Mock recent activity data - memoized to prevent recreating on every render
+  const recentNotifications: NotificationItem[] = useMemo(() => [
     {
       id: 1,
       type: 'user',
@@ -106,7 +106,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
       timestamp: '6 hours ago',
       details: 'Annual Conference 2024'
     }
-  ]
+  ], [])
 
   // Close dropdowns when clicking outside
   useEffect(() => {

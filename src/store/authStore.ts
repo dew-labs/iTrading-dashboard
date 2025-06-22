@@ -16,7 +16,7 @@ interface AuthState {
   ) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
   initialize: () => Promise<void>;
-  setDemoUser: () => void;
+
   getCurrentUser: () => Promise<void>;
   fetchUserProfile: () => Promise<void>;
 }
@@ -100,37 +100,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  setDemoUser: () => {
-    // Create a demo user for development
-    const demoUser = {
-      id: 'demo-user-id',
-      email: 'demo@example.com',
-      user_metadata: {
-        full_name: 'Demo User'
-      },
-      app_metadata: {},
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      aud: 'authenticated',
-      role: 'authenticated'
-    } as User
-
-    const demoProfile: DatabaseUser = {
-      id: 'demo-user-id',
-      email: 'demo@example.com',
-      full_name: 'Demo User',
-      role: 'admin',
-      status: 'active',
-      phone: null,
-      avatar_url: null,
-      last_login: new Date().toISOString(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
-
-    set({ user: demoUser, profile: demoProfile })
-  },
-
   fetchUserProfile: async () => {
     const { user } = get()
     if (!user) return
@@ -151,19 +120,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   initialize: async () => {
     try {
-      // Check if we're in demo mode
-      const isDemo =
-        import.meta.env.VITE_SUPABASE_URL?.includes('demo-project') ||
-        !import.meta.env.VITE_SUPABASE_URL ||
-        import.meta.env.VITE_SUPABASE_URL === 'https://demo-project.supabase.co'
-
-      if (isDemo) {
-        // In demo mode, automatically set a demo user
-        get().setDemoUser()
-        set({ initialized: true })
-        return
-      }
-
       const {
         data: { session }
       } = await supabase.auth.getSession()
@@ -176,17 +132,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ initialized: true })
 
       supabase.auth.onAuthStateChange(async (event, session) => {
-        set({ user: session?.user ?? null })
-        if (session?.user) {
-          await get().fetchUserProfile()
-        } else {
-          set({ profile: null })
+        const currentUser = get().user
+        const newUser = session?.user ?? null
+
+        // Only update if user actually changed to prevent unnecessary re-renders
+        if (currentUser?.id !== newUser?.id) {
+          set({ user: newUser })
+          if (newUser) {
+            await get().fetchUserProfile()
+          } else {
+            set({ profile: null })
+          }
         }
       })
     } catch (error) {
       console.error('Auth initialization error:', error)
-      // In case of error, still set demo user for development
-      get().setDemoUser()
       set({ initialized: true })
     }
   },

@@ -13,8 +13,10 @@ function App () {
   const { initialize, initialized, user } = useAuthStore()
 
   useEffect(() => {
-    initialize()
-  }, [initialize])
+    if (!initialized) {
+      initialize()
+    }
+  }, [initialize, initialized])
 
   if (!initialized) {
     return (

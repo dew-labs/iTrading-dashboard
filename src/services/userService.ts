@@ -23,7 +23,7 @@ export const inviteUser = async (
   fullName?: string
 ): Promise<{ success: boolean; error?: string; tempPassword?: string }> => {
   try {
-    // For demo purposes, we'll return the temp password
+    // Return the temp password for admin use
     // In production, this should be sent via email
     const tempPassword = generateTempPassword()
 

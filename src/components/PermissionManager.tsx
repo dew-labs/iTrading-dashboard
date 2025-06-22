@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Shield, X, Plus, Trash2 } from 'lucide-react'
 import { getUserPermissions, grantPermission, revokePermission } from '../services/userService'
 import { usePermissions } from '../hooks/usePermissions'
@@ -27,11 +27,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose }) 
     'read', 'create', 'update', 'delete'
   ]
 
-  useEffect(() => {
-    fetchPermissions()
-  }, [user.id])
-
-  const fetchPermissions = async () => {
+  const fetchPermissions = useCallback(async () => {
     setLoading(true)
     try {
       const userPermissions = await getUserPermissions(user.id)
@@ -41,7 +37,11 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose }) 
     } finally {
       setLoading(false)
     }
-  }
+  }, [user.id])
+
+  useEffect(() => {
+    fetchPermissions()
+  }, [fetchPermissions])
 
   const handleGrant = async () => {
     if (!newResource) {

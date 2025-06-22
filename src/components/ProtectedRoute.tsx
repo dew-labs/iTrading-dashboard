@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { usePermissions } from '../hooks/usePermissions'
@@ -15,7 +15,7 @@ interface ProtectedRouteProps {
   redirectTo?: string;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+const ProtectedRoute: React.FC<ProtectedRouteProps> = memo(({
   children,
   requiredRole,
   requiredPermission,
@@ -55,6 +55,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   return <>{children}</>
-}
+})
 
 export default ProtectedRoute

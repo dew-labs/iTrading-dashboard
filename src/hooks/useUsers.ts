@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import type { DatabaseUser, UserInsert, UserUpdate } from '../types'
 import { inviteUser } from '../services/userService'
@@ -11,7 +11,7 @@ export const useUsers = () => {
   const [error, setError] = useState<string | null>(null)
   const { can } = usePermissions()
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true)
 
@@ -36,7 +36,7 @@ export const useUsers = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [can])
 
   const createUser = async (user: UserInsert) => {
     try {
@@ -130,7 +130,7 @@ export const useUsers = () => {
 
   useEffect(() => {
     fetchUsers()
-  }, [can]) // Re-fetch when permissions change
+  }, [fetchUsers]) // Re-fetch when permissions change
 
   return {
     users,

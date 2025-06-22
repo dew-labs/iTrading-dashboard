@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../store/authStore'
 import type { Permission, UserRole, RolePermission } from '../types'
@@ -58,7 +58,7 @@ export const usePermissions = (): UsePermissionsReturn => {
     fetchPermissions()
   }, [user, profile])
 
-  const can = (resource: string, action: string): boolean => {
+  const can = useCallback((resource: string, action: string): boolean => {
     if (!profile) return false
 
     // Super admins have all permissions
@@ -77,19 +77,19 @@ export const usePermissions = (): UsePermissionsReturn => {
     )
 
     return hasRolePermission
-  }
+  }, [profile, permissions, rolePermissions])
 
-  const hasRole = (role: UserRole): boolean => {
+  const hasRole = useCallback((role: UserRole): boolean => {
     return profile?.role === role
-  }
+  }, [profile?.role])
 
-  const isAdmin = (): boolean => {
+  const isAdmin = useCallback((): boolean => {
     return profile?.role === 'admin' || profile?.role === 'super_admin'
-  }
+  }, [profile?.role])
 
-  const isSuperAdmin = (): boolean => {
+  const isSuperAdmin = useCallback((): boolean => {
     return profile?.role === 'super_admin'
-  }
+  }, [profile?.role])
 
   return {
     permissions,
