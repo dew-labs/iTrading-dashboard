@@ -5,7 +5,7 @@ import { useUsers } from '../hooks/useUsers'
 import { useProducts } from '../hooks/useProducts'
 import { usePosts } from '../hooks/usePosts'
 import { useBanners } from '../hooks/useBanners'
-import LoadingSpinner from '../components/LoadingSpinner'
+import PageLoadingSpinner from '../components/PageLoadingSpinner'
 
 // Theme imports
 import {
@@ -79,9 +79,7 @@ const Dashboard: React.FC = () => {
   if (isLoading) {
     return (
       <div className={layout.container}>
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <LoadingSpinner size="lg" className="text-gray-900" />
-        </div>
+        <PageLoadingSpinner message="Loading dashboard data..." />
       </div>
     )
   }

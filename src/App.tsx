@@ -4,7 +4,7 @@ import { Toaster } from 'react-hot-toast'
 import { useAuthStore } from './store/authStore'
 import ErrorBoundary from './components/ErrorBoundary'
 import ProtectedRoute from './components/ProtectedRoute'
-import LoadingSpinner from './components/LoadingSpinner'
+import EnhancedLoadingScreen from './components/EnhancedLoadingScreen'
 import Login from './pages/Login'
 import Unauthorized from './pages/Unauthorized'
 import DashboardLayout from './components/DashboardLayout'
@@ -20,12 +20,10 @@ function App () {
 
   if (!initialized) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <LoadingSpinner size="lg" className="text-indigo-600 mb-4" />
-          <p className="text-gray-600">Initializing application...</p>
-        </div>
-      </div>
+      <EnhancedLoadingScreen
+        message="Initializing Application"
+        subtitle="Setting up your dashboard experience..."
+      />
     )
   }
 

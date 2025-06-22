@@ -11,6 +11,7 @@ import Banners from '../pages/Banners'
 import Users from '../pages/Users'
 import Settings from '../pages/Settings'
 import Help from '../pages/Help'
+import Unauthorized from '../pages/Unauthorized'
 
 const DashboardLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -70,6 +71,7 @@ const DashboardLayout: React.FC = () => {
             />
             <Route path="/settings" element={<Settings />} />
             <Route path="/help" element={<Help />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
           </Routes>
         </main>
       </div>

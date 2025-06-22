@@ -14,7 +14,7 @@ import { useProducts } from '../hooks/useProducts'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import ProductForm from '../components/ProductForm'
-import LoadingSpinner from '../components/LoadingSpinner'
+import PageLoadingSpinner from '../components/PageLoadingSpinner'
 
 import FilterDropdown from '../components/FilterDropdown'
 import PaginationSelector from '../components/PaginationSelector'
@@ -258,9 +258,7 @@ const Products: React.FC = () => {
   if (loading) {
     return (
       <div className={layout.container}>
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <LoadingSpinner size="lg" className="text-gray-900" />
-        </div>
+        <PageLoadingSpinner message="Loading products..." />
       </div>
     )
   }

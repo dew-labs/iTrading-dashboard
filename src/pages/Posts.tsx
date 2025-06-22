@@ -19,6 +19,7 @@ import { useAuthStore } from '../store/authStore'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import PostForm from '../components/PostForm'
+import PageLoadingSpinner from '../components/PageLoadingSpinner'
 import LoadingSpinner from '../components/LoadingSpinner'
 import TabNavigation from '../components/TabNavigation'
 import FilterDropdown from '../components/FilterDropdown'
@@ -367,9 +368,7 @@ const Posts: React.FC = () => {
   if (loading) {
     return (
       <div className={layout.container}>
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <LoadingSpinner size="lg" className="text-gray-900" />
-        </div>
+        <PageLoadingSpinner message="Loading posts..." />
       </div>
     )
   }
@@ -632,7 +631,7 @@ const Posts: React.FC = () => {
                 >
                   {deleteConfirm.isDeleting ? (
                     <div className="flex items-center">
-                      <LoadingSpinner size="sm" className="mr-2" />
+                      <LoadingSpinner size="sm" variant="gradient" className="mr-2" />
                       Deleting...
                     </div>
                   ) : (

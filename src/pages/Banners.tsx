@@ -17,7 +17,7 @@ import { useBanners } from '../hooks/useBanners'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import BannerForm from '../components/BannerForm'
-import LoadingSpinner from '../components/LoadingSpinner'
+import PageLoadingSpinner from '../components/PageLoadingSpinner'
 
 import FilterDropdown from '../components/FilterDropdown'
 import PaginationSelector from '../components/PaginationSelector'
@@ -280,9 +280,7 @@ const Banners: React.FC = () => {
   if (loading) {
     return (
       <div className={layout.container}>
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <LoadingSpinner size="lg" className="text-gray-900" />
-        </div>
+        <PageLoadingSpinner message="Loading banners..." />
       </div>
     )
   }

@@ -2,7 +2,7 @@ import React, { memo } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { usePermissions } from '../hooks/usePermissions'
-import LoadingSpinner from './LoadingSpinner'
+import EnhancedLoadingScreen from './EnhancedLoadingScreen'
 import type { UserRole } from '../types'
 
 interface ProtectedRouteProps {
@@ -26,12 +26,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = memo(({
 
   if (!initialized || authLoading || permissionsLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <LoadingSpinner size="lg" className="text-indigo-600 mb-4" />
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
+      <EnhancedLoadingScreen
+        message="Authenticating"
+        subtitle="Verifying your credentials and permissions..."
+      />
     )
   }
 

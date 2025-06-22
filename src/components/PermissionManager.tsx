@@ -102,7 +102,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose }) 
 
       {loading ? (
         <div className="flex justify-center py-8">
-          <LoadingSpinner size="lg" />
+          <LoadingSpinner size="lg" variant="gradient" />
         </div>
       ) : (
         <>

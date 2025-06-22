@@ -206,7 +206,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
             className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 text-white py-3 rounded-lg font-medium hover:from-teal-600 hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
           >
             {loading ? (
-              <LoadingSpinner size="sm" className="text-white" />
+              <div className="flex items-center space-x-2">
+                <LoadingSpinner size="sm" className="text-white" />
+                <span>Processing...</span>
+              </div>
             ) : mode === 'login' ? (
               'Sign In'
             ) : (
