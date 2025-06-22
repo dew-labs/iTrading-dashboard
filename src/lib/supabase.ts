@@ -22,6 +22,71 @@ export const supabase = createClient<Database>(
   }
 )
 
+// Query key factories for consistent caching
+export const queryKeys = {
+  // Users
+  users: () => ['users'] as const,
+  user: (id: string) => ['users', id] as const,
+  userPermissions: (userId: string) => ['user-permissions', userId] as const,
+
+  // Posts
+  posts: () => ['posts'] as const,
+  post: (id: number) => ['posts', id] as const,
+  postsByType: (type: string) => ['posts', 'type', type] as const,
+
+  // Products
+  products: () => ['products'] as const,
+  product: (id: number) => ['products', id] as const,
+
+  // Banners
+  banners: () => ['banners'] as const,
+  banner: (id: string) => ['banners', id] as const,
+
+  // Permissions
+  rolePermissions: (role: string) => ['role-permissions', role] as const,
+  permissions: () => ['permissions'] as const
+} as const
+
+// Helper functions for common Supabase operations
+export const supabaseHelpers = {
+  // Generic fetch function with error handling
+  async fetchData<T> (queryBuilder: PromiseLike<{ data: T[] | null; error: unknown }>): Promise<T[]> {
+    const { data, error } = await queryBuilder
+    if (error) throw new Error(error instanceof Error ? error.message : 'Unknown error')
+    return data || []
+  },
+
+  // Generic single item fetch
+  async fetchSingle<T> (queryBuilder: PromiseLike<{ data: T | null; error: unknown }>): Promise<T> {
+    const { data, error } = await queryBuilder
+    if (error) throw new Error(error instanceof Error ? error.message : 'Unknown error')
+    if (!data) throw new Error('Not found')
+    return data
+  },
+
+  // Generic insert with optimistic updates
+  async insertData<T> (queryBuilder: PromiseLike<{ data: T | null; error: unknown }>): Promise<T> {
+    const { data, error } = await queryBuilder
+    if (error) throw new Error(error instanceof Error ? error.message : 'Unknown error')
+    if (!data) throw new Error('Insert failed')
+    return data
+  },
+
+  // Generic update with optimistic updates
+  async updateData<T> (queryBuilder: PromiseLike<{ data: T | null; error: unknown }>): Promise<T> {
+    const { data, error } = await queryBuilder
+    if (error) throw new Error(error instanceof Error ? error.message : 'Unknown error')
+    if (!data) throw new Error('Update failed')
+    return data
+  },
+
+  // Generic delete
+  async deleteData (queryBuilder: PromiseLike<{ error: unknown }>): Promise<void> {
+    const { error } = await queryBuilder
+    if (error) throw new Error(error instanceof Error ? error.message : 'Unknown error')
+  }
+}
+
 // Auth helpers
 export const signIn = async (email: string, password: string) => {
   const { data, error } = await supabase.auth.signInWithPassword({

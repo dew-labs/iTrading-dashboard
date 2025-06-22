@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '../lib/supabase'
+import { useQuery } from '@tanstack/react-query'
+import { useCallback } from 'react'
+import { supabase, queryKeys, supabaseHelpers } from '../lib/supabase'
 import { useAuthStore } from '../store/authStore'
 import type { Permission, UserRole, RolePermission } from '../types'
 
@@ -12,51 +13,53 @@ interface UsePermissionsReturn {
   isSuperAdmin: () => boolean;
 }
 
+// Fetch functions
+const fetchUserPermissions = async (userId: string): Promise<Permission[]> => {
+  return supabaseHelpers.fetchData(
+    supabase
+      .from('user_permissions')
+      .select('resource, action')
+      .eq('user_id', userId)
+  )
+}
+
+const fetchRolePermissions = async (role: UserRole): Promise<RolePermission[]> => {
+  return supabaseHelpers.fetchData(
+    supabase
+      .from('role_permissions')
+      .select('*')
+      .eq('role', role)
+  )
+}
+
 export const usePermissions = (): UsePermissionsReturn => {
   const { user, profile } = useAuthStore()
-  const [permissions, setPermissions] = useState<Permission[]>([])
-  const [rolePermissions, setRolePermissions] = useState<RolePermission[]>([])
-  const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!user || !profile) {
-      setPermissions([])
-      setRolePermissions([])
-      setLoading(false)
-      return
-    }
+  // Fetch user-specific permissions
+  const {
+    data: userPermissions = [],
+    isLoading: userPermissionsLoading
+  } = useQuery({
+    queryKey: queryKeys.userPermissions(user?.id || ''),
+    queryFn: () => fetchUserPermissions(user!.id),
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000 // Keep in cache for 10 minutes
+  })
 
-    const fetchPermissions = async () => {
-      try {
-        setLoading(true)
+  // Fetch role-based permissions
+  const {
+    data: rolePermissions = [],
+    isLoading: rolePermissionsLoading
+  } = useQuery({
+    queryKey: queryKeys.rolePermissions(profile?.role || 'user'),
+    queryFn: () => fetchRolePermissions(profile!.role),
+    enabled: !!profile?.role,
+    staleTime: 10 * 60 * 1000, // 10 minutes - role permissions change rarely
+    gcTime: 30 * 60 * 1000 // Keep in cache for 30 minutes
+  })
 
-        // Fetch user-specific permissions
-        const { data: userPerms, error: userPermsError } = await supabase
-          .from('user_permissions')
-          .select('resource, action')
-          .eq('user_id', user.id)
-
-        if (userPermsError) throw userPermsError
-
-        // Fetch role-based permissions
-        const { data: rolePerms, error: rolePermsError } = await supabase
-          .from('role_permissions')
-          .select('*')
-          .eq('role', profile.role)
-
-        if (rolePermsError) throw rolePermsError
-
-        setPermissions(userPerms || [])
-        setRolePermissions(rolePerms || [])
-      } catch (error) {
-        console.error('Error fetching permissions:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchPermissions()
-  }, [user, profile])
+  const loading = userPermissionsLoading || rolePermissionsLoading
 
   const can = useCallback((resource: string, action: string): boolean => {
     if (!profile) return false
@@ -65,7 +68,7 @@ export const usePermissions = (): UsePermissionsReturn => {
     if (profile.role === 'super_admin') return true
 
     // Check user-specific permissions
-    const hasUserPermission = permissions.some(
+    const hasUserPermission = userPermissions.some(
       p => p.resource === resource && p.action === action
     )
 
@@ -77,7 +80,7 @@ export const usePermissions = (): UsePermissionsReturn => {
     )
 
     return hasRolePermission
-  }, [profile, permissions, rolePermissions])
+  }, [profile, userPermissions, rolePermissions])
 
   const hasRole = useCallback((role: UserRole): boolean => {
     return profile?.role === role
@@ -92,7 +95,7 @@ export const usePermissions = (): UsePermissionsReturn => {
   }, [profile?.role])
 
   return {
-    permissions,
+    permissions: userPermissions,
     loading,
     can,
     hasRole,

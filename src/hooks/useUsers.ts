@@ -1,52 +1,78 @@
-import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '../lib/supabase'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { supabase, queryKeys, supabaseHelpers } from '../lib/supabase'
 import type { DatabaseUser, UserInsert, UserUpdate } from '../types'
 import { inviteUser } from '../services/userService'
 import { usePermissions } from './usePermissions'
 import toast from 'react-hot-toast'
 
+// Fetch functions
+const fetchUsers = async (): Promise<DatabaseUser[]> => {
+  return supabaseHelpers.fetchData(
+    supabase
+      .from('users')
+      .select('*')
+      .order('created_at', { ascending: false })
+  )
+}
+
+const updateUserMutation = async ({ id, updates }: { id: string; updates: UserUpdate }): Promise<DatabaseUser> => {
+  return supabaseHelpers.updateData(
+    supabase
+      .from('users')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single()
+  )
+}
+
+const deleteUserMutation = async (id: string): Promise<void> => {
+  return supabaseHelpers.deleteData(
+    supabase.from('users').delete().eq('id', id)
+  )
+}
+
+const updateLastLoginMutation = async (id: string): Promise<void> => {
+  return supabaseHelpers.deleteData(
+    supabase
+      .from('users')
+      .update({ last_login: new Date().toISOString() })
+      .eq('id', id)
+  )
+}
+
 export const useUsers = () => {
-  const [users, setUsers] = useState<DatabaseUser[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const queryClient = useQueryClient()
   const { can } = usePermissions()
 
-  const fetchUsers = useCallback(async () => {
-    try {
-      setLoading(true)
-
-      // Check if user has permission to read users
+  // Main query for users list
+  const {
+    data: users = [],
+    isLoading: loading,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: queryKeys.users(),
+    queryFn: fetchUsers,
+    staleTime: 3 * 60 * 1000, // 3 minutes - user data changes less frequently
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    enabled: can('users', 'read'), // Only fetch if user has permission
+    select: (data) => {
+      // Additional permission check at data level
       if (!can('users', 'read')) {
-        setError('You do not have permission to view users')
-        setUsers([])
-        return
+        return []
       }
-
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      setUsers(data || [])
-      setError(null)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
-      toast.error('Failed to fetch users')
-    } finally {
-      setLoading(false)
+      return data
     }
-  }, [can])
+  })
 
-  const createUser = async (user: UserInsert) => {
-    try {
-      // Check permission
+  // Create user mutation - using service
+  const createMutation = useMutation({
+    mutationFn: async (user: UserInsert) => {
       if (!can('users', 'create')) {
-        toast.error('You do not have permission to create users')
-        return { data: null, error: 'Permission denied' }
+        throw new Error('You do not have permission to create users')
       }
 
-      // Use the invite user service
       const { success, error: inviteError, tempPassword } = await inviteUser(
         user.email,
         user.role,
@@ -54,92 +80,118 @@ export const useUsers = () => {
       )
 
       if (!success) {
-        return { data: null, error: inviteError || 'Failed to create user' }
+        throw new Error(inviteError || 'Failed to create user')
       }
 
+      return { email: user.email, tempPassword }
+    },
+    onError: (error) => {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create user'
+      toast.error(errorMessage)
+    },
+    onSuccess: () => {
       // Refresh the user list
-      await fetchUsers()
-
-      return { data: { email: user.email, tempPassword }, error: null }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to create user'
-      toast.error(errorMessage)
-      return { data: null, error: errorMessage }
+      queryClient.invalidateQueries({ queryKey: queryKeys.users() })
+      toast.success('User invited successfully')
     }
-  }
+  })
 
-  const updateUser = async (id: string, updates: UserUpdate) => {
-    try {
-      // Check permission
+  // Update user mutation
+  const updateMutation = useMutation({
+    mutationFn: updateUserMutation,
+    onMutate: async ({ id, updates }) => {
       if (!can('users', 'update')) {
-        toast.error('You do not have permission to update users')
-        return { data: null, error: 'Permission denied' }
+        throw new Error('You do not have permission to update users')
       }
 
-      const { data, error } = await supabase
-        .from('users')
-        .update({ ...updates, updated_at: new Date().toISOString() })
-        .eq('id', id)
-        .select()
-        .single()
+      await queryClient.cancelQueries({ queryKey: queryKeys.users() })
 
-      if (error) throw error
-      setUsers((prev) => prev.map((user) => (user.id === id ? data : user)))
+      const previousUsers = queryClient.getQueryData<DatabaseUser[]>(queryKeys.users())
+
+      // Optimistically update
+      queryClient.setQueryData<DatabaseUser[]>(queryKeys.users(), (old = []) =>
+        old.map((user) =>
+          user.id === id
+            ? { ...user, ...updates, updated_at: new Date().toISOString() }
+            : user
+        )
+      )
+
+      return { previousUsers }
+    },
+    onError: (error, variables, context) => {
+      if (context?.previousUsers) {
+        queryClient.setQueryData(queryKeys.users(), context.previousUsers)
+      }
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update user'
+      toast.error(errorMessage)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.users() })
       toast.success('User updated successfully')
-      return { data, error: null }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update user'
-      toast.error(errorMessage)
-      return { data: null, error: errorMessage }
     }
-  }
+  })
 
-  const deleteUser = async (id: string) => {
-    try {
-      // Check permission
+  // Delete user mutation
+  const deleteMutation = useMutation({
+    mutationFn: deleteUserMutation,
+    onMutate: async (deletedId) => {
       if (!can('users', 'delete')) {
-        toast.error('You do not have permission to delete users')
-        return { error: 'Permission denied' }
+        throw new Error('You do not have permission to delete users')
       }
 
-      const { error } = await supabase.from('users').delete().eq('id', id)
+      await queryClient.cancelQueries({ queryKey: queryKeys.users() })
 
-      if (error) throw error
-      setUsers((prev) => prev.filter((user) => user.id !== id))
-      toast.success('User deleted successfully')
-      return { error: null }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to delete user'
+      const previousUsers = queryClient.getQueryData<DatabaseUser[]>(queryKeys.users())
+
+      // Optimistically remove the user
+      queryClient.setQueryData<DatabaseUser[]>(queryKeys.users(), (old = []) =>
+        old.filter((user) => user.id !== deletedId)
+      )
+
+      return { previousUsers }
+    },
+    onError: (error, variables, context) => {
+      if (context?.previousUsers) {
+        queryClient.setQueryData(queryKeys.users(), context.previousUsers)
+      }
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete user'
       toast.error(errorMessage)
-      return { error: errorMessage }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.users() })
+      toast.success('User deleted successfully')
     }
-  }
+  })
 
-  const updateLastLogin = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('users')
-        .update({ last_login: new Date().toISOString() })
-        .eq('id', id)
-
-      if (error) throw error
-    } catch (err) {
-      console.error('Failed to update last login:', err)
+  // Update last login mutation (silent operation)
+  const updateLastLoginMutationHook = useMutation({
+    mutationFn: updateLastLoginMutation,
+    onError: (error) => {
+      console.error('Failed to update last login:', error)
+    },
+    onSuccess: () => {
+      // Silently update cache
+      queryClient.invalidateQueries({ queryKey: queryKeys.users() })
     }
-  }
+  })
 
-  useEffect(() => {
-    fetchUsers()
-  }, [fetchUsers]) // Re-fetch when permissions change
+  // Error handling for permissions
+  const permissionError = !can('users', 'read') ? 'You do not have permission to view users' : null
 
   return {
-    users,
+    users: permissionError ? [] : users,
     loading,
-    error,
-    createUser,
-    updateUser,
-    deleteUser,
-    updateLastLogin,
-    refetch: fetchUsers
+    error: permissionError ? new Error(permissionError) : (error as Error | null),
+    createUser: (user: UserInsert) => createMutation.mutateAsync(user),
+    updateUser: (id: string, updates: UserUpdate) =>
+      updateMutation.mutateAsync({ id, updates }),
+    deleteUser: (id: string) => deleteMutation.mutateAsync(id),
+    updateLastLogin: (id: string) => updateLastLoginMutationHook.mutate(id),
+    refetch,
+    // Additional states for UI feedback
+    isCreating: createMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending
   }
 }

@@ -90,7 +90,7 @@ const Select: React.FC<SelectProps> = ({
       event.preventDefault()
       if (isOpen && focusedIndex >= 0) {
         const option = options[focusedIndex]
-        if (!option.disabled) {
+        if (option && !option.disabled) {
           onChange(option.value)
           setIsOpen(false)
           setFocusedIndex(-1)

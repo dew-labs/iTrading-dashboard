@@ -24,7 +24,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   private resetError = () => {
-    this.setState({ hasError: false, error: undefined })
+    this.setState({ hasError: false })
   }
 
   public override render () {

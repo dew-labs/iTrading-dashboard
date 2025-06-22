@@ -81,9 +81,9 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
             key={option.id}
             id={option.id}
             label={option.label}
-            description={option.description}
+            {...(option.description && { description: option.description })}
             checked={selectedValues.includes(option.value)}
-            disabled={disabled || option.disabled}
+            disabled={disabled || (option.disabled ?? false)}
             size={size}
             variant={variant}
             onChange={(checked) => handleCheckboxChange(option.value, checked)}

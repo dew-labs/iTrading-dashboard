@@ -1,93 +1,165 @@
-import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '../lib/supabase'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { supabase, queryKeys, supabaseHelpers } from '../lib/supabase'
 import type { Banner, BannerInsert, BannerUpdate } from '../types'
 import toast from 'react-hot-toast'
 
+// Fetch functions
+const fetchBanners = async (): Promise<Banner[]> => {
+  return supabaseHelpers.fetchData(
+    supabase
+      .from('banners')
+      .select('*')
+      .order('created_at', { ascending: false })
+  )
+}
+
+const createBannerMutation = async (banner: BannerInsert): Promise<Banner> => {
+  return supabaseHelpers.insertData(
+    supabase.from('banners').insert([banner]).select().single()
+  )
+}
+
+const updateBannerMutation = async ({ id, updates }: { id: string; updates: BannerUpdate }): Promise<Banner> => {
+  return supabaseHelpers.updateData(
+    supabase
+      .from('banners')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single()
+  )
+}
+
+const deleteBannerMutation = async (id: string): Promise<void> => {
+  return supabaseHelpers.deleteData(
+    supabase.from('banners').delete().eq('id', id)
+  )
+}
+
 export const useBanners = () => {
-  const [banners, setBanners] = useState<Banner[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const queryClient = useQueryClient()
 
-  const fetchBanners = useCallback(async () => {
-    try {
-      setLoading(true)
+  // Main query for banners list
+  const {
+    data: banners = [],
+    isLoading: loading,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: queryKeys.banners(),
+    queryFn: fetchBanners,
+    staleTime: 5 * 60 * 1000, // 5 minutes - banners change infrequently
+    gcTime: 15 * 60 * 1000 // Keep in cache for 15 minutes
+  })
 
-      const { data, error } = await supabase
-        .from('banners')
-        .select('*')
-        .order('created_at', { ascending: false })
+  // Create banner mutation
+  const createMutation = useMutation({
+    mutationFn: createBannerMutation,
+    onMutate: async (newBanner) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.banners() })
 
-      if (error) throw error
-      setBanners(data || [])
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
-      toast.error('Failed to fetch banners')
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+      const previousBanners = queryClient.getQueryData<Banner[]>(queryKeys.banners())
 
-  const createBanner = async (banner: BannerInsert) => {
-    try {
-      const { data, error } = await supabase.from('banners').insert([banner]).select().single()
+      // Optimistically update
+      const optimisticBanner: Banner = {
+        id: crypto.randomUUID(), // Temporary ID
+        target_url: newBanner.target_url || null,
+        is_active: newBanner.is_active || false,
+        created_at: new Date().toISOString()
+      }
 
-      if (error) throw error
-      setBanners((prev) => [data, ...prev])
+      queryClient.setQueryData<Banner[]>(queryKeys.banners(), (old = []) => [
+        optimisticBanner,
+        ...old
+      ])
+
+      return { previousBanners }
+    },
+    onError: (error, variables, context) => {
+      if (context?.previousBanners) {
+        queryClient.setQueryData(queryKeys.banners(), context.previousBanners)
+      }
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create banner'
+      toast.error(errorMessage)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.banners() })
       toast.success('Banner created successfully')
-      return { data, error: null }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to create banner'
-      toast.error(errorMessage)
-      return { data: null, error: errorMessage }
     }
-  }
+  })
 
-  const updateBanner = async (id: string, updates: BannerUpdate) => {
-    try {
-      const { data, error } = await supabase
-        .from('banners')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single()
+  // Update banner mutation
+  const updateMutation = useMutation({
+    mutationFn: updateBannerMutation,
+    onMutate: async ({ id, updates }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.banners() })
 
-      if (error) throw error
-      setBanners((prev) => prev.map((banner) => (banner.id === id ? data : banner)))
+      const previousBanners = queryClient.getQueryData<Banner[]>(queryKeys.banners())
+
+      // Optimistically update
+      queryClient.setQueryData<Banner[]>(queryKeys.banners(), (old = []) =>
+        old.map((banner) =>
+          banner.id === id
+            ? { ...banner, ...updates }
+            : banner
+        )
+      )
+
+      return { previousBanners }
+    },
+    onError: (error, variables, context) => {
+      if (context?.previousBanners) {
+        queryClient.setQueryData(queryKeys.banners(), context.previousBanners)
+      }
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update banner'
+      toast.error(errorMessage)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.banners() })
       toast.success('Banner updated successfully')
-      return { data, error: null }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update banner'
-      toast.error(errorMessage)
-      return { data: null, error: errorMessage }
     }
-  }
+  })
 
-  const deleteBanner = async (id: string) => {
-    try {
-      const { error } = await supabase.from('banners').delete().eq('id', id)
+  // Delete banner mutation
+  const deleteMutation = useMutation({
+    mutationFn: deleteBannerMutation,
+    onMutate: async (deletedId) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.banners() })
 
-      if (error) throw error
-      setBanners((prev) => prev.filter((banner) => banner.id !== id))
+      const previousBanners = queryClient.getQueryData<Banner[]>(queryKeys.banners())
+
+      // Optimistically remove the banner
+      queryClient.setQueryData<Banner[]>(queryKeys.banners(), (old = []) =>
+        old.filter((banner) => banner.id !== deletedId)
+      )
+
+      return { previousBanners }
+    },
+    onError: (error, variables, context) => {
+      if (context?.previousBanners) {
+        queryClient.setQueryData(queryKeys.banners(), context.previousBanners)
+      }
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete banner'
+      toast.error(errorMessage)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.banners() })
       toast.success('Banner deleted successfully')
-      return { error: null }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to delete banner'
-      toast.error(errorMessage)
-      return { error: errorMessage }
     }
-  }
-
-  useEffect(() => {
-    fetchBanners()
-  }, [fetchBanners])
+  })
 
   return {
     banners,
     loading,
-    error,
-    createBanner,
-    updateBanner,
-    deleteBanner,
-    refetch: fetchBanners
+    error: error as Error | null,
+    createBanner: (banner: BannerInsert) => createMutation.mutateAsync(banner),
+    updateBanner: (id: string, updates: BannerUpdate) =>
+      updateMutation.mutateAsync({ id, updates }),
+    deleteBanner: (id: string) => deleteMutation.mutateAsync(id),
+    refetch,
+    // Additional states for UI feedback
+    isCreating: createMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending
   }
 }
