@@ -38,7 +38,7 @@ const PaginationSelector: React.FC<PaginationSelectorProps> = ({
   label = 'Show'
 }) => {
   // Ensure the current value is valid, fallback to default if not
-  const validValue = API.pagination.options.includes(value as any) ? value : API.pagination.defaultLimit
+  const validValue = (API.pagination.options as readonly number[]).includes(value) ? value : API.pagination.defaultLimit
 
   // Convert pagination options to Select component format
   const selectOptions = API.pagination.options.map(option => ({

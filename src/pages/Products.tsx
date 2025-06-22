@@ -368,10 +368,7 @@ const Products: React.FC = () => {
                     setFilterSubscription(value)
                     setCurrentPage(1)
                   }}
-                  placeholder="All Types"
-                  variant="outlined"
-                  size="sm"
-                  width="fixed"
+                  label="Type"
                 />
                 <PaginationSelector
                   value={itemsPerPage}

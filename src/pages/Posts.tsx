@@ -483,10 +483,7 @@ const Posts: React.FC = () => {
                     setFilterStatus(value as 'all' | 'draft' | 'published')
                     setCurrentPage(1)
                   }}
-                  placeholder="All Status"
-                  variant="outlined"
-                  size="sm"
-                  width="fixed"
+                  label="Status"
                 />
                 <PaginationSelector
                   value={itemsPerPage}

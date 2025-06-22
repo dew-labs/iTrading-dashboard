@@ -73,6 +73,7 @@ const Users: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [activeTab, setActiveTab] = useState<string>('all')
   const [filterStatus, setFilterStatus] = useState<string>('all')
+  const [filterRole, setFilterRole] = useState<string>('all')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<DatabaseUser | null>(null)
   const [managingPermissionsFor, setManagingPermissionsFor] = useState<DatabaseUser | null>(null)
@@ -98,9 +99,10 @@ const Users: React.FC = () => {
       const matchesSearch =
         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (user.full_name && user.full_name.toLowerCase().includes(searchTerm.toLowerCase()))
-      const matchesRole = activeTab === 'all' || user.role === activeTab
+      const matchesTab = activeTab === 'all' || user.role === activeTab
       const matchesStatus = filterStatus === 'all' || user.status === filterStatus
-      return matchesSearch && matchesRole && matchesStatus
+      const matchesRole = filterRole === 'all' || user.role === filterRole
+      return matchesSearch && matchesTab && matchesStatus && matchesRole
     })
 
     // Sort users
@@ -147,7 +149,7 @@ const Users: React.FC = () => {
     })
 
     return filtered
-  }, [users, searchTerm, activeTab, filterStatus, sortColumn, sortDirection])
+  }, [users, searchTerm, activeTab, filterStatus, filterRole, sortColumn, sortDirection])
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedUsers.length / itemsPerPage)
@@ -202,6 +204,7 @@ const Users: React.FC = () => {
 
   // Use predefined filter options from constants
   const statusOptions = [...FILTER_OPTIONS.userStatus]
+  const roleOptions = [...FILTER_OPTIONS.userRole]
 
   const handleSort = (column: keyof DatabaseUser) => {
     if (column === sortColumn) {
@@ -427,10 +430,16 @@ const Users: React.FC = () => {
                     setFilterStatus(value)
                     setCurrentPage(1)
                   }}
-                  placeholder="All Status"
-                  variant="outlined"
-                  size="sm"
-                  width="fixed"
+                  label="Status"
+                />
+                <FilterDropdown
+                  options={roleOptions}
+                  value={filterRole}
+                  onChange={(value) => {
+                    setFilterRole(value)
+                    setCurrentPage(1)
+                  }}
+                  label="Role"
                 />
                 <PaginationSelector
                   value={itemsPerPage}

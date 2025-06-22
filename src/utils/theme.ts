@@ -120,7 +120,7 @@ export const getResponsiveGridClasses = (config: {
 }
 
 // Enhanced debounce function
-export const createDebounce = <T extends (...args: any[]) => any>(
+export const createDebounce = <T extends (...args: unknown[]) => unknown>(
   func: T,
   delay: keyof typeof TIME.debounce = 'input'
 ): ((...args: Parameters<T>) => void) => {
@@ -133,7 +133,7 @@ export const createDebounce = <T extends (...args: any[]) => any>(
 }
 
 // Theme-aware search debounce (commonly used)
-export const createSearchDebounce = <T extends (...args: any[]) => any>(func: T) => {
+export const createSearchDebounce = <T extends (...args: unknown[]) => unknown>(func: T) => {
   return createDebounce(func, 'search')
 }
 

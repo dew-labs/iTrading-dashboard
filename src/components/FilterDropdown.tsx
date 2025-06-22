@@ -1,6 +1,5 @@
-import React from 'react'
-import { Filter } from 'lucide-react'
-import Select from './Select'
+import React, { useState, useRef, useEffect } from 'react'
+import { Filter, ChevronDown, X } from 'lucide-react'
 import { cn } from '../utils/theme'
 
 interface FilterOption {
@@ -17,148 +16,162 @@ interface FilterDropdownProps {
   value: string;
   /** Callback when selection changes */
   onChange: (value: string) => void;
-  /** Placeholder text when no option is selected */
-  placeholder?: string;
+  /** Filter name/label for display */
+  label: string;
   /** Additional CSS classes */
   className?: string;
-  /** Size variant */
-  size?: 'sm' | 'md' | 'lg';
-  /** Visual variant */
-  variant?: 'default' | 'minimal' | 'outlined';
-  /** Filter label for accessibility */
-  label?: string;
-  /** Show filter icon */
-  showIcon?: boolean;
+  /** Show clear button when value is not 'all' */
+  showClear?: boolean;
   /** Disable the filter */
   disabled?: boolean;
-  /** Error state */
-  error?: string;
-  /** Width constraint */
-  width?: 'auto' | 'full' | 'fixed';
 }
 
 const FilterDropdown: React.FC<FilterDropdownProps> = ({
   options,
   value,
   onChange,
-  placeholder = 'All',
-  className = '',
-  size = 'sm',
-  variant = 'outlined',
   label,
-  showIcon = true,
-  disabled = false,
-  error,
-  width = 'fixed'
+  className = '',
+  showClear = true,
+  disabled = false
 }) => {
-  // Convert FilterOption to SelectOption format
-  const selectOptions = options.map(option => ({
-    value: option.value,
-    label: option.label,
-    ...(option.disabled !== undefined && { disabled: option.disabled })
-  }))
+  const [isOpen, setIsOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // Get width classes
-  const getWidthClasses = () => {
-    switch (width) {
-    case 'full':
-      return 'w-full'
-    case 'auto':
-      return 'w-auto min-w-[120px]'
-    case 'fixed':
-    default:
-      return 'w-48'
+  const selectedOption = options.find(option => option.value === value)
+  const isActive = value !== 'all' && value !== ''
+  const hasMultipleOptions = options.length > 1
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
     }
-  }
 
-  // Get wrapper styles based on variant
-  const getWrapperClasses = () => {
-    const baseClasses = 'flex items-center space-x-2'
-
-    switch (variant) {
-    case 'minimal':
-      return cn(baseClasses, 'px-2 py-1 rounded-md hover:bg-gray-50 transition-colors')
-    case 'outlined':
-      return cn(baseClasses, 'px-3 py-2 border border-gray-200 rounded-lg bg-white hover:border-gray-300 transition-colors')
-    case 'default':
-    default:
-      return baseClasses
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
     }
+  }, [])
+
+  const handleClear = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onChange('all')
+    setIsOpen(false)
   }
 
-  // Custom render function for the select button to include filter icon
-  const customSelectComponent = showIcon ? (
-    <div className={cn(getWrapperClasses(), getWidthClasses())}>
-      <Filter className="w-4 h-4 text-gray-400 flex-shrink-0" />
-      <div className="flex-1 min-w-0">
-        <Select
-          options={selectOptions}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          size={size}
-          variant="minimal"
-          disabled={disabled}
-          {...(error && { error })}
-          aria-label={label || 'Filter options'}
-          className="border-none shadow-none"
-        />
-      </div>
-    </div>
-  ) : null
-
-  // If using custom wrapper, return it
-  if (showIcon && variant !== 'default') {
-    return (
-      <div className={cn('relative', className)}>
-        {label && (
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {label}
-          </label>
-        )}
-        {customSelectComponent}
-      </div>
-    )
+  const handleOptionClick = (optionValue: string) => {
+    onChange(optionValue)
+    setIsOpen(false)
   }
 
-  // Default implementation without custom wrapper
   return (
-    <div className={cn('relative', getWidthClasses(), className)}>
-      {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {label}
-        </label>
-      )}
+    <div className={cn('relative inline-block', className)} ref={dropdownRef}>
+      {/* Main Filter Button */}
+      <button
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        disabled={disabled}
+        className={cn(
+          'inline-flex items-center space-x-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-all duration-200',
+          'focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-1',
+          disabled
+            ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+            : isActive
+              ? 'bg-gray-900 text-white border-gray-900 shadow-md hover:shadow-lg'
+              : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400 hover:bg-gray-50',
+          isOpen && 'ring-2 ring-gray-900 ring-offset-1'
+        )}
+      >
+        {/* Filter Icon */}
+        <Filter className={cn(
+          'w-3.5 h-3.5',
+          isActive ? 'text-white' : 'text-gray-400'
+        )} />
 
-      <div className="relative">
-        {showIcon && (
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-            <Filter className="w-4 h-4 text-gray-400" />
-          </div>
+        {/* Label */}
+        <span className="whitespace-nowrap">{label}</span>
+
+        {/* Selected Value (if not 'all') */}
+        {isActive && selectedOption && (
+          <>
+            <span className={cn(
+              'text-xs px-1.5 py-0.5 rounded',
+              'bg-white/20 text-white border border-white/30'
+            )}>
+              {selectedOption.label}
+            </span>
+          </>
         )}
 
-        <Select
-          options={selectOptions}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          size={size}
-          variant={variant === 'minimal' ? 'minimal' : 'default'}
-          disabled={disabled}
-          {...(error && { error })}
-          aria-label={label || 'Filter options'}
-          className={cn(
-            showIcon && 'pl-10',
-            getWidthClasses()
-          )}
-        />
-      </div>
+        {/* Clear Button */}
+        {isActive && showClear && (
+          <button
+            onClick={handleClear}
+            className={cn(
+              'p-0.5 rounded hover:bg-white/20 transition-colors',
+              'text-white/80 hover:text-white'
+            )}
+            title={`Clear ${label.toLowerCase()} filter`}
+          >
+            <X className="w-3 h-3" />
+          </button>
+        )}
 
-      {error && (
-        <p className="mt-1 text-sm text-red-600" role="alert">
-          {error}
-        </p>
+        {/* Dropdown Arrow */}
+        {hasMultipleOptions && (
+          <ChevronDown className={cn(
+            'w-3.5 h-3.5 transition-transform duration-200',
+            isActive ? 'text-white' : 'text-gray-400',
+            isOpen && 'rotate-180'
+          )} />
+        )}
+
+      </button>
+
+      {/* Dropdown Menu */}
+      {isOpen && hasMultipleOptions && (
+        <div className={cn(
+          'absolute top-full left-0 mt-1 min-w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50',
+          'max-h-60 overflow-auto',
+          'animate-in fade-in-0 zoom-in-95 duration-100'
+        )}>
+          <div role="listbox">
+            {options.map((option, index) => (
+              <div
+                key={option.value}
+                role="option"
+                aria-selected={option.value === value}
+                aria-disabled={option.disabled}
+                onClick={() => !option.disabled && handleOptionClick(option.value)}
+                className={cn(
+                  'px-3 py-2 text-sm cursor-pointer',
+                  'flex items-center justify-between',
+                  'transition-colors duration-150',
+                  option.disabled
+                    ? 'text-gray-400 cursor-not-allowed bg-gray-50'
+                    : option.value === value
+                      ? 'bg-gray-900 text-white'
+                      : 'text-gray-900 hover:bg-gray-50',
+                  // Apply border radius to first and last items
+                  index === 0 ? 'rounded-t-lg' : '',
+                  index === options.length - 1 ? 'rounded-b-lg' : ''
+                )}
+              >
+                <span className={option.disabled ? 'opacity-50' : ''}>
+                  {option.label}
+                </span>
+
+                {option.value === value && (
+                  <div className="w-2 h-2 bg-white rounded-full" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       )}
+
     </div>
   )
 }
