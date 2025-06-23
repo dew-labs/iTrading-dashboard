@@ -15,21 +15,39 @@ interface UsePermissionsReturn {
 
 // Fetch functions
 const fetchUserPermissions = async (userId: string): Promise<Permission[]> => {
-  return supabaseHelpers.fetchData(
-    supabase
-      .from('user_permissions')
-      .select('resource, action')
-      .eq('user_id', userId)
-  )
+  try {
+    return supabaseHelpers.fetchData(
+      supabase
+        .from('user_permissions')
+        .select('resource, action')
+        .eq('user_id', userId)
+    )
+  } catch (error) {
+    // Handle deleted user case - return empty permissions instead of throwing
+    const errorMessage = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase()
+    if (errorMessage.includes('no rows found') ||
+        errorMessage.includes('unauthorized') ||
+        errorMessage.includes('forbidden')) {
+      console.warn('User permissions not accessible, returning empty permissions:', userId)
+      return []
+    }
+    throw error
+  }
 }
 
 const fetchRolePermissions = async (role: UserRole): Promise<RolePermission[]> => {
-  return supabaseHelpers.fetchData(
-    supabase
-      .from('role_permissions')
-      .select('*')
-      .eq('role', role)
-  )
+  try {
+    return supabaseHelpers.fetchData(
+      supabase
+        .from('role_permissions')
+        .select('*')
+        .eq('role', role)
+    )
+  } catch (_error) {
+    // Handle case where role permissions can't be fetched
+    console.warn('Role permissions not accessible, returning empty permissions:', role)
+    return []
+  }
 }
 
 export const usePermissions = (): UsePermissionsReturn => {
@@ -38,28 +56,52 @@ export const usePermissions = (): UsePermissionsReturn => {
   // Fetch user-specific permissions
   const {
     data: userPermissions = [],
-    isLoading: userPermissionsLoading
+    isLoading: userPermissionsLoading,
+    error: userPermissionsError
   } = useQuery({
     queryKey: queryKeys.userPermissions(user?.id || ''),
     queryFn: () => fetchUserPermissions(user!.id),
-    enabled: !!user?.id,
+    enabled: !!user?.id && !!profile, // Only fetch if profile exists
     staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000 // Keep in cache for 10 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    retry: (failureCount, error) => {
+      // Don't retry if it's an auth/user error
+      const errorMessage = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase()
+      if (errorMessage.includes('unauthorized') ||
+          errorMessage.includes('forbidden') ||
+          errorMessage.includes('no rows found')) {
+        return false
+      }
+      return failureCount < 3
+    }
   })
 
   // Fetch role-based permissions
   const {
     data: rolePermissions = [],
-    isLoading: rolePermissionsLoading
+    isLoading: rolePermissionsLoading,
+    error: rolePermissionsError
   } = useQuery({
     queryKey: queryKeys.rolePermissions(profile?.role || 'user'),
     queryFn: () => fetchRolePermissions(profile!.role),
     enabled: !!profile?.role,
     staleTime: 10 * 60 * 1000, // 10 minutes - role permissions change rarely
-    gcTime: 30 * 60 * 1000 // Keep in cache for 30 minutes
+    gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+    retry: (failureCount, _error) => {
+      // Don't retry role permission errors
+      return failureCount < 2
+    }
   })
 
   const loading = userPermissionsLoading || rolePermissionsLoading
+
+  // Log errors for debugging but don't throw
+  if (userPermissionsError) {
+    console.warn('User permissions error:', userPermissionsError)
+  }
+  if (rolePermissionsError) {
+    console.warn('Role permissions error:', rolePermissionsError)
+  }
 
   const can = useCallback((resource: string, action: string): boolean => {
     if (!profile) return false

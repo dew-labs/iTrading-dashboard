@@ -19,59 +19,51 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Create trigger function for handling new users
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
-DECLARE
-  user_role_val text;
-  user_status_val text;
 BEGIN
-  -- Temporarily disable RLS for this function
-  PERFORM set_config('row_security', 'off', true);
+    -- Check if user already exists to avoid duplicates
+    IF EXISTS (SELECT 1 FROM public.users WHERE id = NEW.id) THEN
+        RETURN NEW;
+    END IF;
 
-  -- Debug logging
-  RAISE NOTICE 'Creating user profile for: %, ID: %', NEW.email, NEW.id;
+    -- Insert new user with proper defaults
+    INSERT INTO public.users (
+        id,
+        email,
+        role,
+        status,
+        full_name,
+        phone,
+        avatar_url,
+        created_at,
+        updated_at
+    )
+    VALUES (
+        NEW.id,
+        NEW.email,
+        CASE
+            WHEN COALESCE(NEW.raw_user_meta_data->>'role', 'user') IN ('user', 'admin', 'super_admin')
+            THEN COALESCE(NEW.raw_user_meta_data->>'role', 'user')::user_role
+            ELSE 'user'::user_role
+        END,
+        CASE
+            WHEN COALESCE(NEW.raw_user_meta_data->>'status', 'invited') IN ('invited', 'active', 'inactive', 'suspended')
+            THEN COALESCE(NEW.raw_user_meta_data->>'status', 'invited')::user_status
+            ELSE 'invited'::user_status
+        END,
+        COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name'),
+        NEW.phone,
+        NEW.raw_user_meta_data->>'avatar_url',
+        NOW(),
+        NOW()
+    );
 
-  -- Get role from metadata with validation
-  user_role_val := COALESCE(NEW.raw_user_meta_data->>'role', 'user');
-  IF user_role_val NOT IN ('user', 'admin', 'super_admin') THEN
-    user_role_val := 'user';
-  END IF;
-
-  -- Get status from metadata with validation
-  user_status_val := COALESCE(NEW.raw_user_meta_data->>'status', 'active');
-  IF user_status_val NOT IN ('invited', 'active', 'inactive', 'suspended') THEN
-    user_status_val := 'active';
-  END IF;
-
-  -- Insert with validated values
-  INSERT INTO public.users (
-    id,
-    email,
-    role,
-    status,
-    full_name,
-    phone,
-    avatar_url
-  )
-  VALUES (
-    NEW.id,
-    NEW.email,
-    user_role_val::user_role,
-    user_status_val::user_status,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name'),
-    NEW.phone,
-    NEW.raw_user_meta_data->>'avatar_url'
-  );
-
-  -- Re-enable RLS
-  PERFORM set_config('row_security', 'on', true);
-
-  RAISE NOTICE 'Successfully created user profile for: %', NEW.email;
-  RETURN NEW;
-EXCEPTION
-  WHEN OTHERS THEN
-    -- Re-enable RLS in case of error
-    PERFORM set_config('row_security', 'on', true);
-    RAISE WARNING 'Failed to create user profile for % (ID: %): % - %', NEW.email, NEW.id, SQLSTATE, SQLERRM;
     RETURN NEW;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        -- Don't fail the auth process, just log the error
+        RAISE WARNING 'Failed to create user profile for % (ID: %): % - %', NEW.email, NEW.id, SQLSTATE, SQLERRM;
+        RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 

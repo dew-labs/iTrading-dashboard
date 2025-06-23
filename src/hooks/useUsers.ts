@@ -43,7 +43,7 @@ const updateLastLoginMutation = async (id: string): Promise<void> => {
 
 export const useUsers = () => {
   const queryClient = useQueryClient()
-  const { can } = usePermissions()
+  const { can, isSuperAdmin } = usePermissions()
 
   // Main query for users list
   const {
@@ -66,11 +66,11 @@ export const useUsers = () => {
     }
   })
 
-  // Create user mutation - using service
+  // Create user mutation - restricted to super admins only
   const createMutation = useMutation({
     mutationFn: async (user: UserInsert) => {
-      if (!can('users', 'create')) {
-        throw new Error('You do not have permission to create users')
+      if (!isSuperAdmin()) {
+        throw new Error('Only super admins can create users')
       }
 
       const { success, error: inviteError, tempPassword } = await inviteUser(

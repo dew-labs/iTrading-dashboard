@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import { useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from './store/authStore'
 import { COLORS } from './constants/colors'
 import { Z_INDEX } from './constants/spacing'
@@ -13,12 +14,21 @@ import DashboardLayout from './components/DashboardLayout'
 
 function App () {
   const { initialize, initialized, user } = useAuthStore()
+  const queryClient = useQueryClient()
 
   useEffect(() => {
+    // Provide cache clearing function to auth store
+    useAuthStore.setState({
+      clearUserCache: () => {
+        console.warn('Clearing React Query cache due to auth state change')
+        queryClient.clear()
+      }
+    })
+
     if (!initialized) {
       initialize()
     }
-  }, [initialize, initialized])
+  }, [initialize, initialized, queryClient])
 
   if (!initialized) {
     return (

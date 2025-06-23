@@ -365,15 +365,17 @@ const Users: React.FC = () => {
               Manage user accounts, roles, and permissions
             </p>
           </div>
-          <div className="mt-4 sm:mt-0 flex items-center space-x-3">
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className={getButtonClasses('primary', 'md')}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Create User
-            </button>
-          </div>
+          {isSuperAdmin() && (
+            <div className="mt-4 sm:mt-0 flex items-center space-x-3">
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className={getButtonClasses('primary', 'md')}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create User
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Stats Cards */}

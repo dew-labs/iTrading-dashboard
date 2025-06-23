@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
-import type { DatabaseUser, UserInsert, UserRole, UserStatus } from '../types'
+import { User, Shield, CheckCircle2, Sparkles, Users } from 'lucide-react'
+import type { DatabaseUser, UserInsert, UserRole } from '../types'
 import { usePermissions } from '../hooks/usePermissions'
-import Select from './Select'
+import { validators } from '../utils/format'
+import FormInput from './FormInput'
 
 interface UserFormProps {
   user?: DatabaseUser | null;
@@ -16,35 +18,41 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
     full_name: user?.full_name || '',
     phone: user?.phone || '',
     role: user?.role || 'user',
-    status: user?.status || 'active'
+    status: 'invited' // Always set to invited for new users
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
 
-    if (!formData.email) {
+    if (!validators.required(formData.email)) {
       newErrors.email = 'Email is required'
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    } else if (!validators.email(formData.email)) {
       newErrors.email = 'Invalid email format'
     }
 
-    if (!formData.full_name) {
+    if (!validators.required(formData.full_name)) {
       newErrors.full_name = 'Full name is required'
     }
 
-    if (formData.phone && !/^[\d\s\-+()]+$/.test(formData.phone)) {
-      newErrors.phone = 'Invalid phone number format'
+    if (formData.phone && !validators.phone(formData.phone)) {
+      newErrors.phone = 'Invalid phone number format. Use international format (e.g., +1 234 567 8900)'
     }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (validateForm()) {
-      onSubmit(formData)
+      setIsSubmitting(true)
+      try {
+        await onSubmit(formData)
+      } finally {
+        setIsSubmitting(false)
+      }
     }
   }
 
@@ -57,164 +65,230 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
     }
   }
 
-  const roleOptions: { value: UserRole; label: string; description: string }[] = [
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    const newErrors: Record<string, string> = { ...errors }
+
+    // Validate specific field on blur
+    switch (name) {
+    case 'email':
+      if (!validators.required(value)) {
+        newErrors.email = 'Email is required'
+      } else if (!validators.email(value)) {
+        newErrors.email = 'Invalid email format'
+      } else {
+        delete newErrors.email
+      }
+      break
+
+    case 'full_name':
+      if (!validators.required(value)) {
+        newErrors.full_name = 'Full name is required'
+      } else {
+        delete newErrors.full_name
+      }
+      break
+
+    case 'phone':
+      if (value && !validators.phone(value)) {
+        newErrors.phone = 'Invalid phone number format. Use international format (e.g., +1 234 567 8900)'
+      } else {
+        delete newErrors.phone
+      }
+      break
+    }
+
+    setErrors(newErrors)
+  }
+
+  const roleOptions: { value: UserRole; label: string; description: string; icon: React.ReactNode; color: string }[] = [
     {
       value: 'user',
       label: 'User',
-      description: 'Standard user with basic permissions'
+      description: 'Standard access with basic permissions',
+      icon: <User className="w-5 h-5" />,
+      color: 'from-blue-500 to-indigo-500'
     },
     {
       value: 'admin',
       label: 'Admin',
-      description: 'Administrator with management permissions'
+      description: 'Enhanced access with management capabilities',
+      icon: <Shield className="w-5 h-5" />,
+      color: 'from-purple-500 to-pink-500'
     },
     ...(isSuperAdmin() ? [{
       value: 'super_admin' as UserRole,
       label: 'Super Admin',
-      description: 'Full system access and permission management'
+      description: 'Complete system control and user management',
+      icon: <Sparkles className="w-5 h-5" />,
+      color: 'from-orange-500 to-red-500'
     }] : [])
   ]
 
-  const statusOptions: { value: UserStatus; label: string; color: string }[] = [
-    { value: 'invited', label: 'Invited', color: 'bg-yellow-100 text-yellow-800' },
-    { value: 'active', label: 'Active', color: 'bg-green-100 text-green-800' },
-    { value: 'inactive', label: 'Inactive', color: 'bg-gray-100 text-gray-800' },
-    { value: 'suspended', label: 'Suspended', color: 'bg-red-100 text-red-800' }
-  ]
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-          Email <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          disabled={!!user} // Can't change email for existing users
-          className={`mt-1 block w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 ${
-            errors.email ? 'border-red-300' : 'border-gray-300'
-          } ${user ? 'bg-gray-50 cursor-not-allowed' : ''}`}
-          placeholder="user@example.com"
-        />
-        {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
-        {!user && (
-          <p className="mt-1 text-sm text-gray-500">
-            An invitation will be sent to this email address
-          </p>
-        )}
-      </div>
+    <div className="relative max-w-2xl mx-auto">
+      {!user && (
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+          <div className="flex items-start space-x-3">
+            <Shield className="w-5 h-5 text-amber-600 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-medium text-amber-900">Super Admin Only</p>
+              <p className="text-amber-700">
+                Only super administrators can create new users in the dashboard.
+                Regular users can sign up through the mobile application.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
-      <div>
-        <label htmlFor="full_name" className="block text-sm font-medium text-gray-700">
-          Full Name <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          id="full_name"
-          name="full_name"
-          value={formData.full_name || ''}
-          onChange={handleChange}
-          className={`mt-1 block w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 ${
-            errors.full_name ? 'border-red-300' : 'border-gray-300'
-          }`}
-          placeholder="John Doe"
-        />
-        {errors.full_name && <p className="mt-1 text-sm text-red-600">{errors.full_name}</p>}
-      </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Basic Information */}
+        <div className="bg-gray-50 rounded-2xl p-6 space-y-6">
+          <h4 className="text-lg font-semibold text-gray-900 flex items-center">
+            <User className="w-5 h-5 mr-2" />
+            Basic Information
+          </h4>
 
-      <div>
-        <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-          Phone Number
-        </label>
-        <input
-          type="tel"
-          id="phone"
-          name="phone"
-          value={formData.phone || ''}
-          onChange={handleChange}
-          className={`mt-1 block w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 ${
-            errors.phone ? 'border-red-300' : 'border-gray-300'
-          }`}
-          placeholder="+1 (555) 123-4567"
-        />
-        {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
-      </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            <FormInput
+              name="email"
+              label="Email Address"
+              type="email"
+              placeholder="user@example.com"
+              required
+              disabled={!!user}
+              value={formData.email}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              icon="email"
+              {...(errors.email && { error: errors.email })}
+              {...(!user && { helpText: 'An invitation will be sent to this email address' })}
+            />
 
-      <div>
-        <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
-          Role <span className="text-red-500">*</span>
-        </label>
-        <div className="space-y-2">
-          {roleOptions.map((option) => (
-            <label
-              key={option.value}
-              className={`relative flex items-start p-3 border rounded-lg cursor-pointer hover:bg-gray-50 ${
-                formData.role === option.value ? 'border-gray-900 bg-gray-50' : 'border-gray-300'
-              }`}
-            >
-              <input
-                type="radio"
-                name="role"
-                value={option.value}
-                checked={formData.role === option.value}
-                onChange={handleChange}
-                className="mt-0.5 h-4 w-4 text-gray-900 border-gray-300 focus:ring-gray-900"
-              />
-              <div className="ml-3">
-                <span className="block text-sm font-medium text-gray-900">
-                  {option.label}
-                </span>
-                <span className="block text-sm text-gray-500">
-                  {option.description}
-                </span>
+            <FormInput
+              name="full_name"
+              label="Full Name"
+              placeholder="John Doe"
+              required
+              value={formData.full_name || ''}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              icon="user"
+              {...(errors.full_name && { error: errors.full_name })}
+            />
+          </div>
+
+          <FormInput
+            name="phone"
+            label="Phone Number"
+            type="tel"
+            placeholder="+1 (555) 123-4567"
+            value={formData.phone || ''}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            icon="phone"
+            {...(errors.phone && { error: errors.phone })}
+            helpText="Optional. Use international format with country code"
+          />
+        </div>
+
+        {/* Role Selection */}
+        <div className="bg-gray-50 rounded-2xl p-6 space-y-6">
+          <h4 className="text-lg font-semibold text-gray-900 flex items-center">
+            <Shield className="w-5 h-5 mr-2" />
+            User Role & Permissions
+          </h4>
+
+          <div className="grid gap-4">
+            {roleOptions.map((option) => (
+              <label
+                key={option.value}
+                className={`
+                  relative flex items-center p-4 border-2 rounded-xl cursor-pointer
+                  transition-all duration-200 hover:shadow-md group
+                  ${formData.role === option.value
+                ? 'border-gray-900 bg-white shadow-md'
+                : 'border-gray-200 hover:border-gray-300'
+              }
+                `}
+              >
+                <input
+                  type="radio"
+                  name="role"
+                  value={option.value}
+                  checked={formData.role === option.value}
+                  onChange={handleChange}
+                  className="sr-only"
+                />
+                <div className={`
+                  flex items-center justify-center w-12 h-12 rounded-lg mr-4
+                  bg-gradient-to-br ${option.color} text-white shadow-lg
+                  transition-transform group-hover:scale-105
+                `}>
+                  {option.icon}
+                </div>
+                <div className="flex-1">
+                  <h5 className="text-lg font-semibold text-gray-900">{option.label}</h5>
+                  <p className="text-sm text-gray-600">{option.description}</p>
+                </div>
+                {formData.role === option.value && (
+                  <CheckCircle2 className="w-6 h-6 text-gray-900" />
+                )}
+              </label>
+            ))}
+          </div>
+
+          {!user && (
+            <div className="flex items-start space-x-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <CheckCircle2 className="w-5 h-5 text-blue-600 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-medium text-blue-900">Invitation Process</p>
+                <p className="text-blue-700">
+                  The user will receive an email invitation with setup instructions.
+                  They'll be able to set their password during the account activation process.
+                </p>
               </div>
-            </label>
-          ))}
+            </div>
+          )}
         </div>
-      </div>
 
-      <div>
-        <Select
-          label="Status"
-          value={formData.status || 'active'}
-          onChange={(value) => setFormData((prev) => ({ ...prev, status: value as UserStatus }))}
-          options={statusOptions.map(option => ({
-            value: option.value,
-            label: option.label
-          }))}
-        />
-        <div className="mt-2 flex items-center space-x-2">
-          <span className="text-sm text-gray-500">Preview:</span>
-          <span
-            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-              statusOptions.find(s => s.value === formData.status)?.color || ''
-            }`}
+        {/* Action Buttons */}
+        <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isSubmitting}
+            className="px-6 py-3 text-gray-700 bg-white border-2 border-gray-300 rounded-xl
+                       hover:bg-gray-50 hover:border-gray-400 transition-all duration-200
+                       disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
           >
-            {statusOptions.find(s => s.value === formData.status)?.label}
-          </span>
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="px-8 py-3 bg-gradient-to-r from-gray-900 to-black text-white rounded-xl
+                       hover:from-black hover:to-gray-900 transition-all duration-200
+                       shadow-lg hover:shadow-xl transform hover:-translate-y-0.5
+                       disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
+                       flex items-center space-x-2 font-semibold min-w-[160px] justify-center"
+          >
+            {isSubmitting ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+                <span>{user ? 'Updating...' : 'Sending Invite...'}</span>
+              </>
+            ) : (
+              <>
+                <Users className="w-5 h-5" />
+                <span>{user ? 'Update User' : 'Send Invitation'}</span>
+              </>
+            )}
+          </button>
         </div>
-      </div>
-
-      <div className="flex justify-end space-x-3 pt-4 border-t">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="px-4 py-2 text-white bg-gradient-to-r from-gray-900 to-black rounded-lg hover:from-black hover:to-gray-900 transition-colors"
-        >
-          {user ? 'Update User' : 'Create User'}
-        </button>
-      </div>
-    </form>
+      </form>
+    </div>
   )
 }
 

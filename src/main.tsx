@@ -15,13 +15,51 @@ const queryClient = new QueryClient({
       // Enable background refetch
       refetchOnWindowFocus: false,
       // Retry failed queries 2 times
-      retry: 2,
+      retry: (failureCount, error) => {
+        // Don't retry auth errors to prevent infinite loops
+        const errorMessage = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase()
+        if (errorMessage.includes('unauthorized') ||
+            errorMessage.includes('forbidden') ||
+            errorMessage.includes('invalid') ||
+            errorMessage.includes('jwt') ||
+            errorMessage.includes('expired') ||
+            errorMessage.includes('no rows found')) {
+          return false
+        }
+        return failureCount < 2
+      },
       // Retry delay increases exponentially
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000)
     },
     mutations: {
       // Retry failed mutations once
-      retry: 1
+      retry: (failureCount, error) => {
+        // Don't retry auth errors for mutations either
+        const errorMessage = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase()
+        if (errorMessage.includes('unauthorized') ||
+            errorMessage.includes('forbidden') ||
+            errorMessage.includes('invalid') ||
+            errorMessage.includes('jwt') ||
+            errorMessage.includes('expired')) {
+          return false
+        }
+        return failureCount < 1
+      }
+    }
+  }
+})
+
+// Global error handler for auth issues
+queryClient.setMutationDefaults(['auth-error'], {
+  onError: (error) => {
+    const errorMessage = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase()
+    if (errorMessage.includes('unauthorized') ||
+        errorMessage.includes('forbidden') ||
+        errorMessage.includes('invalid') ||
+        errorMessage.includes('jwt') ||
+        errorMessage.includes('expired')) {
+      console.warn('Global auth error detected, user session may be invalid:', error)
+      // The auth store will handle the actual sign out
     }
   }
 })

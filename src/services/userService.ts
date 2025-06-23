@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase'
-import type { UserRole, Permission } from '../types'
+import type { UserRole, Permission, DatabaseUser } from '../types'
 import toast from 'react-hot-toast'
 
 /**
@@ -43,9 +43,90 @@ export const inviteUser = async (
 
     if (authError) throw authError
 
-    // The user profile will be created automatically by the database trigger
-    // But we can update it with additional info if needed
-    if (authData.user && fullName) {
+    if (!authData.user) {
+      throw new Error('No user data returned from signup')
+    }
+
+    /**
+     * Retry mechanism to handle timing gap between auth.users creation and public.users trigger
+     *
+     * Problem: After signup, there's a brief moment where:
+     * 1. User exists in auth.users (signup successful)
+     * 2. Trigger is still executing to create profile in public.users
+     * 3. API call to check profile returns 406 "Not Acceptable" due to RLS policies
+     *
+     * Solution: Implement exponential backoff retry mechanism:
+     * - Attempt 1: Wait 1000ms (1s)
+     * - Attempt 2: Wait 1500ms (1.5s)
+     * - Attempt 3: Wait 2250ms (2.25s)
+     * - Attempt 4: Wait 3375ms (3.375s)
+     * - Attempt 5: Wait 5000ms (5s - capped)
+     *
+     * Total wait time: ~13 seconds maximum before falling back to manual creation
+     */
+    const checkUserExists = async (userId: string, maxRetries: number = 5): Promise<DatabaseUser | null> => {
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          const { data: existingUser, error: checkError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', userId)
+            .single()
+
+          if (!checkError && existingUser) {
+            console.warn(`✅ User profile found on attempt ${attempt}`)
+            return existingUser
+          }
+
+          if (checkError && checkError.code !== 'PGRST116') {
+            console.error('Error checking user existence:', checkError)
+            // For non-"not found" errors, continue retrying
+          }
+
+          // Wait progressively longer between attempts (exponential backoff)
+          const waitTime = Math.min(1000 * Math.pow(1.5, attempt - 1), 5000) // Cap at 5 seconds
+          console.warn(`⏳ User profile not found on attempt ${attempt}/${maxRetries}, waiting ${waitTime}ms...`)
+
+          if (attempt < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, waitTime))
+          }
+        } catch (error) {
+          console.error(`Attempt ${attempt} failed:`, error)
+          if (attempt === maxRetries) {
+            throw error
+          }
+          // Wait before retry
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt))
+        }
+      }
+
+      return null
+    }
+
+    // Check if the user was created in public.users by the trigger
+    const existingUser = await checkUserExists(authData.user.id)
+
+    if (!existingUser) {
+      console.warn('⚠️ Trigger failed to create user profile, creating manually...')
+      // Manually create the user if trigger failed after all retries
+      const { error: manualError } = await supabase
+        .from('users')
+        .insert({
+          id: authData.user.id,
+          email: email,
+          role: role,
+          status: 'invited',
+          full_name: fullName
+        })
+
+      if (manualError) {
+        console.error('Manual user creation failed:', manualError)
+        throw new Error(`Failed to create user profile: ${manualError.message}`)
+      }
+
+      console.warn('✅ User profile created manually')
+    } else if (fullName && existingUser.full_name !== fullName) {
+      // Update user with additional info if needed
       await supabase
         .from('users')
         .update({

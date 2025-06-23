@@ -1,13 +1,11 @@
-import React, { useState } from 'react'
+import React from 'react'
 import AuthForm from '../components/AuthForm'
 
 const Login: React.FC = () => {
-  const [mode, setMode] = useState<'login' | 'signup'>('login')
-
   return (
     <AuthForm
-      mode={mode}
-      onToggleMode={() => setMode(mode === 'login' ? 'signup' : 'login')}
+      mode="login"
+      onToggleMode={() => {}} // No-op since we're removing signup
     />
   )
 }

@@ -2,6 +2,21 @@ import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import type { User } from '@supabase/supabase-js'
 import type { DatabaseUser } from '../types'
+import toast from 'react-hot-toast'
+
+/**
+ * Auth Store with Deleted User Protection
+ *
+ * This store handles authentication state and includes specific protection
+ * against infinite API loops when a user's account has been deleted from
+ * the database but their browser session still exists.
+ *
+ * Key Features:
+ * - Automatic sign-out when user profile is not found (deleted accounts)
+ * - JWT/session error handling with user-friendly messages
+ * - React Query cache clearing on sign-out to prevent stale data
+ * - Comprehensive error handling for auth-related issues
+ */
 
 interface AuthState {
   user: User | null;
@@ -9,16 +24,11 @@ interface AuthState {
   loading: boolean;
   initialized: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
-  signUp: (
-    email: string,
-    password: string,
-    metadata?: Record<string, unknown>
-  ) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
   initialize: () => Promise<void>;
-
   getCurrentUser: () => Promise<void>;
   fetchUserProfile: () => Promise<void>;
+  clearUserCache?: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -61,38 +71,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  signUp: async (email: string, password: string, metadata?: Record<string, unknown>) => {
-    set({ loading: true })
-    try {
-      const signUpData: { email: string; password: string; options?: { data?: object } } = {
-        email,
-        password
-      }
-
-      if (metadata) {
-        signUpData.options = { data: metadata }
-      }
-
-      const { error } = await supabase.auth.signUp(signUpData)
-
-      if (error) {
-        set({ loading: false })
-        return { error: error.message }
-      }
-
-      set({ loading: false })
-      return {}
-    } catch {
-      set({ loading: false })
-      return { error: 'Sign up failed' }
-    }
-  },
-
   signOut: async () => {
     set({ loading: true })
     try {
       await supabase.auth.signOut()
       set({ user: null, profile: null })
+
+      // Clear React Query cache to prevent stale data issues
+      if (get().clearUserCache) {
+        get().clearUserCache!()
+      }
     } catch (error) {
       console.error('Sign out error:', error)
     } finally {
@@ -111,10 +99,48 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         .eq('id', user.id)
         .single()
 
-      if (error) throw error
+      if (error) {
+        // Handle specific errors for deleted users
+        if (error.code === 'PGRST116' || error.message.includes('No rows found')) {
+          // User profile doesn't exist in database - sign them out
+          console.warn('User profile not found in database. Signing out user:', user.email)
+          toast.error('Your account has been removed. Please contact your administrator.', {
+            duration: 5000
+          })
+          await get().signOut()
+          return
+        }
+
+        // Handle other potential auth errors
+        if (error.message.includes('JWT') || error.message.includes('invalid') || error.message.includes('expired')) {
+          console.warn('Authentication error detected. Signing out user:', error.message)
+          toast.error('Your session has expired. Please sign in again.', {
+            duration: 4000
+          })
+          await get().signOut()
+          return
+        }
+
+        throw error
+      }
+
       set({ profile: data })
     } catch (error) {
       console.error('Error fetching user profile:', error)
+
+      // If it's a critical auth error, sign out the user
+      const errorMessage = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase()
+      if (errorMessage.includes('unauthorized') ||
+          errorMessage.includes('forbidden') ||
+          errorMessage.includes('invalid') ||
+          errorMessage.includes('jwt') ||
+          errorMessage.includes('expired')) {
+        console.warn('Critical auth error detected. Signing out user.')
+        toast.error('Authentication error. Please sign in again.', {
+          duration: 4000
+        })
+        await get().signOut()
+      }
     }
   },
 
