@@ -24,6 +24,8 @@ import TabNavigation from '../components/TabNavigation'
 import FilterDropdown from '../components/FilterDropdown'
 import PaginationSelector from '../components/PaginationSelector'
 import RecordImage from '../components/RecordImage'
+import Badge from '../components/Badge'
+import { USER_ROLES, USER_STATUSES } from '../constants/general'
 import type { DatabaseUser, UserInsert } from '../types'
 
 // Theme imports
@@ -31,8 +33,6 @@ import {
   getPageLayoutClasses,
   getButtonClasses,
   getStatsCardProps,
-  getRoleBadge,
-  getStatusBadge,
   getIconClasses,
   getTypographyClasses,
   cn
@@ -49,19 +49,19 @@ const USER_TABS = [
     description: 'All registered users'
   },
   {
-    id: 'user',
+    id: USER_ROLES.USER,
     label: 'Users',
     count: 0,
     description: 'Regular users'
   },
   {
-    id: 'admin',
+    id: USER_ROLES.ADMIN,
     label: 'Admins',
     count: 0,
     description: 'Administrator users'
   },
   {
-    id: 'super_admin',
+    id: USER_ROLES.SUPER_ADMIN,
     label: 'Super Admins',
     count: 0,
     description: 'Super administrator users'
@@ -258,12 +258,9 @@ const Users: React.FC = () => {
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>{row.full_name || 'No name'}</div>
               <div className={cn(getTypographyClasses('small'), 'truncate')}>{value as string}</div>
               <div className="flex items-center space-x-2 mt-1">
-                <span className={getRoleBadge(row.role)}>
-                  {(row.role === 'admin' || row.role === 'super_admin') && (
-                    <Shield className="w-3 h-3 mr-1" />
-                  )}
+                <Badge variant={row.role as any} size="sm" showIcon>
                   {formatRoleLabel(row.role)}
-                </span>
+                </Badge>
               </div>
             </div>
           </div>
@@ -275,9 +272,9 @@ const Users: React.FC = () => {
       accessor: 'id' as keyof DatabaseUser,
       render: (value: unknown, row: DatabaseUser) => {
         return (
-          <span className={getStatusBadge(row.status)}>
+          <Badge variant={row.status as any} size="sm" showIcon>
             {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
-          </span>
+          </Badge>
         )
       }
     },
@@ -334,9 +331,9 @@ const Users: React.FC = () => {
   ]
 
   // Stats calculations
-  const activeUsers = users.filter((u) => u.status === 'active').length
-  const invitedUsers = users.filter((u) => u.status === 'invited').length
-  const adminUsers = users.filter((u) => u.role === 'admin' || u.role === 'super_admin').length
+  const activeUsers = users.filter((u) => u.status === USER_STATUSES.ACTIVE).length
+  const invitedUsers = users.filter((u) => u.status === USER_STATUSES.INVITED).length
+  const adminUsers = users.filter((u) => u.role === USER_ROLES.ADMIN || u.role === USER_ROLES.SUPER_ADMIN).length
 
   const totalUsersProps = getStatsCardProps('users')
   const activeUsersProps = getStatsCardProps('users')

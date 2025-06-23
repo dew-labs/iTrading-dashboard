@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { User, Shield, CheckCircle2, Sparkles, Users } from 'lucide-react'
+import { User, Shield, CheckCircle2, Users, Sparkles } from 'lucide-react'
 import type { DatabaseUser, UserInsert, UserRole } from '../types'
 import { usePermissions } from '../hooks/usePermissions'
 import { validators } from '../utils/format'
+import { USER_ROLES } from '../constants/general'
 import FormInput from './FormInput'
 
 interface UserFormProps {
@@ -103,24 +104,24 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
 
   const roleOptions: { value: UserRole; label: string; description: string; icon: React.ReactNode; color: string }[] = [
     {
-      value: 'user',
+      value: USER_ROLES.USER,
       label: 'User',
       description: 'Standard access with basic permissions',
-      icon: <User className="w-5 h-5" />,
+      icon: <User className="w-6 h-6" />,
       color: 'from-blue-500 to-indigo-500'
     },
     {
-      value: 'admin',
+      value: USER_ROLES.ADMIN,
       label: 'Admin',
       description: 'Enhanced access with management capabilities',
-      icon: <Shield className="w-5 h-5" />,
+      icon: <Shield className="w-6 h-6" />,
       color: 'from-purple-500 to-pink-500'
     },
     ...(isSuperAdmin() ? [{
-      value: 'super_admin' as UserRole,
+      value: USER_ROLES.SUPER_ADMIN,
       label: 'Super Admin',
       description: 'Complete system control and user management',
-      icon: <Sparkles className="w-5 h-5" />,
+      icon: <Sparkles className="w-6 h-6" />,
       color: 'from-orange-500 to-red-500'
     }] : [])
   ]
@@ -200,16 +201,16 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
             User Role & Permissions
           </h4>
 
-          <div className="grid gap-4">
+          <div className="space-y-3">
             {roleOptions.map((option) => (
               <label
                 key={option.value}
                 className={`
-                  relative flex items-center p-4 border-2 rounded-xl cursor-pointer
-                  transition-all duration-200 hover:shadow-md group
+                  relative flex items-center p-5 border-2 rounded-2xl cursor-pointer
+                  transition-all duration-200 hover:shadow-lg group
                   ${formData.role === option.value
-                ? 'border-gray-900 bg-white shadow-md'
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-gray-900 bg-white shadow-lg ring-2 ring-gray-100'
+                : 'border-gray-200 hover:border-gray-300 bg-gray-50 hover:bg-white'
               }
                 `}
               >
@@ -222,18 +223,21 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
                   className="sr-only"
                 />
                 <div className={`
-                  flex items-center justify-center w-12 h-12 rounded-lg mr-4
+                  flex items-center justify-center w-14 h-14 rounded-2xl mr-5
                   bg-gradient-to-br ${option.color} text-white shadow-lg
-                  transition-transform group-hover:scale-105
+                  transition-all duration-200 group-hover:scale-105
+                  ${formData.role === option.value ? 'scale-105' : ''}
                 `}>
                   {option.icon}
                 </div>
                 <div className="flex-1">
-                  <h5 className="text-lg font-semibold text-gray-900">{option.label}</h5>
-                  <p className="text-sm text-gray-600">{option.description}</p>
+                  <h5 className="text-xl font-bold text-gray-900 mb-1">{option.label}</h5>
+                  <p className="text-sm text-gray-600 leading-relaxed">{option.description}</p>
                 </div>
                 {formData.role === option.value && (
-                  <CheckCircle2 className="w-6 h-6 text-gray-900" />
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-900 text-white ml-4">
+                    <CheckCircle2 className="w-5 h-5" />
+                  </div>
                 )}
               </label>
             ))}

@@ -1,6 +1,8 @@
 import React from 'react'
 import { Users, Package, FileText, Image, Plus, TrendingUp, Settings } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import Badge from '../components/Badge'
+import { USER_ROLES, USER_STATUSES, POST_STATUSES, PRODUCT_TYPES } from '../constants/general'
 import { useUsers } from '../hooks/useUsers'
 import { useProducts } from '../hooks/useProducts'
 import { usePosts } from '../hooks/usePosts'
@@ -204,6 +206,90 @@ const Dashboard: React.FC = () => {
                 </Link>
               )
             })}
+          </div>
+        </div>
+
+        {/* Badge Showcase */}
+        <div className={getCardClasses('base')}>
+          <div className="p-6">
+            <h2 className={getTypographyClasses('h2')}>System Status Indicators</h2>
+            <p className={cn(getTypographyClasses('description'), 'mt-1 mb-6')}>
+              Visual status badges used throughout the application
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* User Roles */}
+              <div>
+                <h3 className={cn(getTypographyClasses('h4'), 'mb-3')}>User Roles</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Badge variant={USER_ROLES.SUPER_ADMIN} showIcon />
+                    <Badge variant={USER_ROLES.SUPER_ADMIN} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Badge variant={USER_ROLES.ADMIN} showIcon />
+                    <Badge variant={USER_ROLES.ADMIN} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Badge variant={USER_ROLES.USER} showIcon />
+                    <Badge variant={USER_ROLES.USER} />
+                  </div>
+                </div>
+              </div>
+
+              {/* User Statuses */}
+              <div>
+                <h3 className={cn(getTypographyClasses('h4'), 'mb-3')}>User Statuses</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Badge variant={USER_STATUSES.ACTIVE} showIcon />
+                    <Badge variant={USER_STATUSES.ACTIVE} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Badge variant={USER_STATUSES.INACTIVE} showIcon />
+                    <Badge variant={USER_STATUSES.INACTIVE} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Badge variant={USER_STATUSES.SUSPENDED} showIcon />
+                    <Badge variant={USER_STATUSES.SUSPENDED} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Badge variant={USER_STATUSES.INVITED} showIcon />
+                    <Badge variant={USER_STATUSES.INVITED} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Content Types */}
+              <div>
+                <h3 className={cn(getTypographyClasses('h4'), 'mb-3')}>Content & Products</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Badge variant={POST_STATUSES.PUBLISHED} showIcon />
+                    <Badge variant={POST_STATUSES.PUBLISHED} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Badge variant={POST_STATUSES.DRAFT} showIcon />
+                    <Badge variant={POST_STATUSES.DRAFT} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Badge variant={PRODUCT_TYPES.SUBSCRIPTION} showIcon />
+                    <Badge variant={PRODUCT_TYPES.SUBSCRIPTION} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Badge variant={PRODUCT_TYPES.ONE_TIME} showIcon />
+                    <Badge variant={PRODUCT_TYPES.ONE_TIME} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+              <p className={cn(getTypographyClasses('small'), 'text-gray-600')}>
+                <span className="font-medium">Note:</span> These badges are used consistently across all pages with automatic icon integration.
+                The left column shows badges with icons, the right column shows the same badges without icons.
+              </p>
+            </div>
           </div>
         </div>
 

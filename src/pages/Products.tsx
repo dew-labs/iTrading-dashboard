@@ -18,6 +18,8 @@ import ProductForm from '../components/ProductForm'
 import PageLoadingSpinner from '../components/PageLoadingSpinner'
 import RecordImage from '../components/RecordImage'
 import DetailViewModal from '../components/DetailViewModal'
+import Badge from '../components/Badge'
+import { PRODUCT_TYPES } from '../constants/general'
 
 import FilterDropdown from '../components/FilterDropdown'
 import PaginationSelector from '../components/PaginationSelector'
@@ -28,7 +30,6 @@ import {
   getPageLayoutClasses,
   getButtonClasses,
   getStatsCardProps,
-  getTypeBadge,
   getIconClasses,
   getTypographyClasses,
   cn
@@ -62,8 +63,8 @@ const Products: React.FC = () => {
 
       const matchesSubscription =
         filterSubscription === 'all' ||
-        (filterSubscription === 'subscription' && product.subscription) ||
-        (filterSubscription === 'one-time' && !product.subscription)
+        (filterSubscription === PRODUCT_TYPES.SUBSCRIPTION && product.subscription) ||
+        (filterSubscription === PRODUCT_TYPES.ONE_TIME && !product.subscription)
 
       return matchesSearch && matchesSubscription
     })
@@ -192,9 +193,9 @@ const Products: React.FC = () => {
                 {row.description || 'No description'}
               </div>
               <div className="flex items-center space-x-2 mt-1">
-                <span className={getTypeBadge(row.subscription ? 'subscription' : 'one-time')}>
+                <Badge variant={row.subscription ? PRODUCT_TYPES.SUBSCRIPTION : PRODUCT_TYPES.ONE_TIME} size="sm" showIcon>
                   {row.subscription ? 'Subscription' : 'One-time'}
-                </span>
+                </Badge>
               </div>
             </div>
           </div>

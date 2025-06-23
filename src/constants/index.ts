@@ -7,6 +7,7 @@
 export * from './colors'
 export * from './spacing'
 export * from './components'
+export * from './general'
 
 // Re-export theme from the old file for backward compatibility
 export { TIME, API, FORMAT } from './theme'

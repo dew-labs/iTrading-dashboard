@@ -19,6 +19,7 @@ import Modal from '../components/Modal'
 import BannerForm from '../components/BannerForm'
 import PageLoadingSpinner from '../components/PageLoadingSpinner'
 import RecordImage from '../components/RecordImage'
+import Badge from '../components/Badge'
 
 import FilterDropdown from '../components/FilterDropdown'
 import PaginationSelector from '../components/PaginationSelector'
@@ -29,7 +30,6 @@ import {
   getPageLayoutClasses,
   getButtonClasses,
   getStatsCardProps,
-  getStatusBadge,
   getIconClasses,
   getTypographyClasses,
   cn
@@ -186,9 +186,9 @@ const Banners: React.FC = () => {
               </div>
               <div className={cn(getTypographyClasses('small'), 'truncate')}>ID: {row.id.slice(0, 8)}...</div>
               <div className="flex items-center space-x-2 mt-1">
-                <span className={getStatusBadge(row.is_active ? 'active' : 'inactive')}>
+                <Badge variant={row.is_active ? 'active' : 'inactive'} size="sm" showIcon>
                   {row.is_active ? 'Active' : 'Inactive'}
-                </span>
+                </Badge>
               </div>
             </div>
           </div>

@@ -25,6 +25,8 @@ import TabNavigation from '../components/TabNavigation'
 import FilterDropdown from '../components/FilterDropdown'
 import PaginationSelector from '../components/PaginationSelector'
 import RecordImage from '../components/RecordImage'
+import Badge from '../components/Badge'
+import { POST_STATUSES, POST_TYPES } from '../constants/general'
 import type { Post, PostInsert } from '../types'
 
 // Theme imports
@@ -32,8 +34,6 @@ import {
   getPageLayoutClasses,
   getButtonClasses,
   getStatsCardProps,
-  getStatusBadge,
-  getTypeBadge,
   getIconClasses,
   getTypographyClasses,
   cn
@@ -57,25 +57,25 @@ const POST_TABS = [
     description: 'All content posts'
   },
   {
-    id: 'news',
+    id: POST_TYPES.NEWS,
     label: 'News',
     count: 0,
     description: 'News articles and updates'
   },
   {
-    id: 'event',
+    id: POST_TYPES.EVENT,
     label: 'Events',
     count: 0,
     description: 'Event announcements and information'
   },
   {
-    id: 'terms_of_use',
+    id: POST_TYPES.TERMS_OF_USE,
     label: 'Terms of Use',
     count: 0,
     description: 'Legal and policy documents'
   },
   {
-    id: 'privacy_policy',
+    id: POST_TYPES.PRIVACY_POLICY,
     label: 'Privacy Policy',
     count: 0,
     description: 'Privacy and data protection policies'
@@ -268,9 +268,9 @@ const Posts: React.FC = () => {
             <div className="flex-1 min-w-0">
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>{value as string}</div>
               <div className="flex items-center space-x-2 mt-1">
-                <span className={getTypeBadge(row.type)}>
+                <Badge variant={row.type as any} size="sm" showIcon>
                   {formatTypeLabel(row.type)}
-                </span>
+                </Badge>
               </div>
             </div>
           </div>
@@ -282,9 +282,9 @@ const Posts: React.FC = () => {
       accessor: 'id' as keyof Post,
       render: (value: unknown, row: Post) => {
         return (
-          <span className={getStatusBadge(row.status)}>
+          <Badge variant={row.status as any} size="sm" showIcon>
             {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
-          </span>
+          </Badge>
         )
       }
     },
@@ -362,8 +362,8 @@ const Posts: React.FC = () => {
   ]
 
   // Stats calculations
-  const publishedPosts = posts.filter((p) => p.status === 'published').length
-  const draftPosts = posts.filter((p) => p.status === 'draft').length
+  const publishedPosts = posts.filter((p) => p.status === POST_STATUSES.PUBLISHED).length
+  const draftPosts = posts.filter((p) => p.status === POST_STATUSES.DRAFT).length
   const totalViews = posts.reduce((sum, p) => sum + ((p as ExtendedPost).views || 0), 0)
 
   const totalPostsProps = getStatsCardProps('posts')
@@ -658,12 +658,12 @@ const Posts: React.FC = () => {
           >
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className={getStatusBadge(viewingPost.status)}>
+                <Badge variant={viewingPost.status as any} size="sm" showIcon>
                   {viewingPost.status.charAt(0).toUpperCase() + viewingPost.status.slice(1)}
-                </span>
-                <span className={getTypeBadge(viewingPost.type)}>
+                </Badge>
+                <Badge variant={viewingPost.type as any} size="sm" showIcon>
                   {formatTypeLabel(viewingPost.type)}
-                </span>
+                </Badge>
               </div>
 
               <div className="prose max-w-none">

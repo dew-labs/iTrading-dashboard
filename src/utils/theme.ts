@@ -4,7 +4,6 @@
  */
 
 import {
-  BADGE_VARIANTS,
   BUTTON_VARIANTS,
   BUTTON_SIZES,
   CARD_VARIANTS,
@@ -18,21 +17,6 @@ import { TIME } from '../constants/theme'
 // Utility function to combine CSS classes
 export const cn = (...classes: (string | undefined | null | false)[]): string => {
   return classes.filter(Boolean).join(' ')
-}
-
-// Get status badge classes (optimized with pre-computed styles)
-export const getStatusBadge = (status: string): string => {
-  return BADGE_VARIANTS.status[status as keyof typeof BADGE_VARIANTS.status] || BADGE_VARIANTS.status.inactive
-}
-
-// Get role badge classes
-export const getRoleBadge = (role: string): string => {
-  return BADGE_VARIANTS.role[role as keyof typeof BADGE_VARIANTS.role] || BADGE_VARIANTS.role.user
-}
-
-// Get type badge classes
-export const getTypeBadge = (type: string): string => {
-  return BADGE_VARIANTS.type[type as keyof typeof BADGE_VARIANTS.type] || BADGE_VARIANTS.status.inactive
 }
 
 // Get button classes with variant and size
@@ -168,9 +152,6 @@ export const getStatsCardProps = (feature: keyof typeof ICON_VARIANTS.stats) => 
 // Export all utilities as default object
 export default {
   cn,
-  getStatusBadge,
-  getRoleBadge,
-  getTypeBadge,
   getButtonClasses,
   getCardClasses,
   getContainerClasses,

@@ -12,6 +12,7 @@ import {
   LogOut
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
+import Badge from './Badge'
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -257,35 +258,47 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             )}
           </div>
 
+          {/* Divider */}
+          <div className="w-px h-8 bg-gray-200 mx-4"></div>
+
           {/* User Profile Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-              className="flex items-center space-x-3 pl-4 border-l border-gray-200 hover:bg-gray-50 rounded-lg transition-colors p-2"
+              className="flex items-center space-x-3 hover:bg-gray-50 rounded-xl transition-all duration-200 py-3 px-4 group"
             >
-              <div className="hidden sm:block text-right">
-                <p className="text-sm font-medium text-gray-900">
+              <div className="hidden sm:block text-right min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate group-hover:text-gray-700 transition-colors">
                   {user?.user_metadata?.full_name || profile?.full_name || 'User'}
                 </p>
-                <p className="text-xs text-gray-500 capitalize">
-                  {profile?.role === 'super_admin' ? 'Super Admin' : profile?.role || 'User'}
-                </p>
+                <div className="flex items-center justify-end">
+                  {profile?.role && (
+                    <Badge
+                      variant={profile.role as any}
+                      size="sm"
+                      showIcon
+                    />
+                  )}
+                </div>
               </div>
 
-              <div className="relative">
-                <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-full flex items-center justify-center hover:shadow-lg transition-all duration-200 transform hover:scale-105">
-                  <span className="text-white font-semibold text-sm">
+              <div className="relative flex-shrink-0">
+                <div className="w-11 h-11 bg-gradient-to-br from-teal-500 via-cyan-500 to-blue-500 rounded-full flex items-center justify-center hover:shadow-xl transition-all duration-300 transform hover:scale-110 group-hover:rotate-3 ring-2 ring-white shadow-lg">
+                  <span className="text-white font-bold text-base tracking-wide">
                     {user?.email?.charAt(0).toUpperCase() || 'U'}
                   </span>
                 </div>
 
-                {/* Online indicator */}
-                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 border-2 border-white rounded-full"></div>
+                {/* Enhanced online indicator with pulse */}
+                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 border-2 border-white rounded-full shadow-sm">
+                  <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-75"></div>
+                  <div className="relative w-full h-full bg-green-400 rounded-full"></div>
+                </div>
               </div>
 
               <ChevronDown
-                className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
-                  showProfileDropdown ? 'rotate-180' : ''
+                className={`w-4 h-4 text-gray-400 transition-all duration-300 group-hover:text-gray-600 ${
+                  showProfileDropdown ? 'rotate-180 text-teal-500' : ''
                 }`}
               />
             </button>
@@ -294,18 +307,30 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             {showProfileDropdown && (
               <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
                 {/* User Info Section */}
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-full flex items-center justify-center">
-                      <span className="text-white font-semibold">
-                        {user?.email?.charAt(0).toUpperCase() || 'U'}
-                      </span>
+                <div className="px-4 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <div className="w-14 h-14 bg-gradient-to-br from-teal-500 via-cyan-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg ring-3 ring-white">
+                        <span className="text-white font-bold text-lg tracking-wide">
+                          {user?.email?.charAt(0).toUpperCase() || 'U'}
+                        </span>
+                      </div>
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full shadow-sm"></div>
                     </div>
-                    <div>
-                      <p className="font-medium text-gray-900">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-900 truncate text-base">
                         {user?.user_metadata?.full_name || profile?.full_name || 'User'}
                       </p>
-                      <p className="text-sm text-gray-500">{user?.email}</p>
+                      <p className="text-sm text-gray-500 truncate">{user?.email}</p>
+                      <div className="mt-1">
+                        {profile?.role && (
+                          <Badge
+                            variant={profile.role as any}
+                            size="md"
+                            showIcon
+                          />
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
