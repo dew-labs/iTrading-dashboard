@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import type { DatabaseUser, UserInsert, UserRole, UserStatus } from '../types'
 import { usePermissions } from '../hooks/usePermissions'
+import Select from './Select'
 
 interface UserFormProps {
   user?: DatabaseUser | null;
@@ -47,7 +48,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
     // Clear error when user starts typing
@@ -177,22 +178,15 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
       </div>
 
       <div>
-        <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-          Status
-        </label>
-        <select
-          id="status"
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
-        >
-          {statusOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <Select
+          label="Status"
+          value={formData.status || 'active'}
+          onChange={(value) => setFormData((prev) => ({ ...prev, status: value as UserStatus }))}
+          options={statusOptions.map(option => ({
+            value: option.value,
+            label: option.label
+          }))}
+        />
         <div className="mt-2 flex items-center space-x-2">
           <span className="text-sm text-gray-500">Preview:</span>
           <span

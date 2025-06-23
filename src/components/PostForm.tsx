@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { FileText, AlertCircle } from 'lucide-react'
 import type { Post, PostInsert } from '../types'
+import Select from './Select'
 
 interface PostFormProps {
   post?: Post | null;
@@ -132,40 +133,34 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
 
       {/* Type */}
       <div>
-        <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
-          Type *
-        </label>
-        <select
-          id="type"
-          name="type"
+        <Select
+          label="Type"
+          required
           value={formData.type}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+          onChange={(value) => setFormData({ ...formData, type: value as Post['type'] })}
+          options={[
+            { value: 'news', label: '📰 News' },
+            { value: 'event', label: '📅 Event' },
+            { value: 'terms_of_use', label: '📋 Terms of Use' },
+            { value: 'privacy_policy', label: '🔒 Privacy Policy' }
+          ]}
           disabled={isSubmitting}
-        >
-          <option value="news">📰 News</option>
-          <option value="event">📅 Event</option>
-          <option value="terms_of_use">📋 Terms of Use</option>
-          <option value="privacy_policy">🔒 Privacy Policy</option>
-        </select>
+        />
       </div>
 
       {/* Status */}
       <div>
-        <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
-          Status *
-        </label>
-        <select
-          id="status"
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+        <Select
+          label="Status"
+          required
+          value={formData.status || 'draft'}
+          onChange={(value) => setFormData({ ...formData, status: value as Post['status'] })}
+          options={[
+            { value: 'draft', label: '📝 Draft' },
+            { value: 'published', label: '✅ Published' }
+          ]}
           disabled={isSubmitting}
-        >
-          <option value="draft">📝 Draft</option>
-          <option value="published">✅ Published</option>
-        </select>
+        />
       </div>
 
       {/* Content */}

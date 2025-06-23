@@ -4,6 +4,7 @@ import { getUserPermissions, grantPermission, revokePermission } from '../servic
 import { usePermissions } from '../hooks/usePermissions'
 import type { DatabaseUser, Permission } from '../types'
 import LoadingSpinner from './LoadingSpinner'
+import Select from './Select'
 import toast from 'react-hot-toast'
 
 interface PermissionManagerProps {
@@ -157,39 +158,25 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose }) 
             {isAdding && (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Resource
-                    </label>
-                    <select
-                      value={newResource}
-                      onChange={(e) => setNewResource(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                    >
-                      <option value="">Select resource</option>
-                      {availableResources.map(resource => (
-                        <option key={resource} value={resource}>
-                          {resource.charAt(0).toUpperCase() + resource.slice(1)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Action
-                    </label>
-                    <select
-                      value={newAction}
-                      onChange={(e) => setNewAction(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                    >
-                      {availableActions.map(action => (
-                        <option key={action} value={action}>
-                          {action.charAt(0).toUpperCase() + action.slice(1)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    label="Resource"
+                    value={newResource}
+                    onChange={setNewResource}
+                    placeholder="Select resource"
+                    options={availableResources.map(resource => ({
+                      value: resource,
+                      label: resource.charAt(0).toUpperCase() + resource.slice(1)
+                    }))}
+                  />
+                  <Select
+                    label="Action"
+                    value={newAction}
+                    onChange={setNewAction}
+                    options={availableActions.map(action => ({
+                      value: action,
+                      label: action.charAt(0).toUpperCase() + action.slice(1)
+                    }))}
+                  />
                 </div>
                 <div className="flex justify-end space-x-3">
                   <button
