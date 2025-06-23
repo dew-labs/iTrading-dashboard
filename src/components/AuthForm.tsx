@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import LoadingSpinner from './LoadingSpinner'
-import toast from 'react-hot-toast'
+import { toast } from '../utils/toast'
 
 interface AuthFormProps {
   mode: 'login';

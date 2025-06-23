@@ -1,6 +1,6 @@
 import { supabase } from '../lib/supabase'
 import type { UserRole, Permission, DatabaseUser } from '../types'
-import toast from 'react-hot-toast'
+import { toast } from '../utils/toast'
 
 /**
  * Generate a secure temporary password

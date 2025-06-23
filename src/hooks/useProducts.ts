@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, queryKeys, supabaseHelpers } from '../lib/supabase'
 import type { Product, ProductInsert, ProductUpdate } from '../types'
-import toast from 'react-hot-toast'
+import { toast } from '../utils/toast'
 
 // Fetch functions
 const fetchProducts = async (): Promise<Product[]> => {

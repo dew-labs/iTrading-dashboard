@@ -5,7 +5,7 @@ import { usePermissions } from '../hooks/usePermissions'
 import type { DatabaseUser, Permission } from '../types'
 import LoadingSpinner from './LoadingSpinner'
 import Select from './Select'
-import toast from 'react-hot-toast'
+import { toast } from '../utils/toast'
 
 interface PermissionManagerProps {
   user: DatabaseUser;

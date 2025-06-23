@@ -3,7 +3,7 @@ import { supabase, queryKeys, supabaseHelpers } from '../lib/supabase'
 import type { DatabaseUser, UserInsert, UserUpdate } from '../types'
 import { inviteUser } from '../services/userService'
 import { usePermissions } from './usePermissions'
-import toast from 'react-hot-toast'
+import { toast } from '../utils/toast'
 
 // Fetch functions
 const fetchUsers = async (): Promise<DatabaseUser[]> => {

@@ -48,3 +48,34 @@
 
 /* Enhanced border utilities */
 .border-3 { border-width: 3px; }
+
+/* Sonner Toast - Enhanced styling */
+/* Ensure toasts appear above everything */
+[data-sonner-toaster] {
+  z-index: 1700 !important;
+}
+
+/* Toast styling improvements */
+[data-sonner-toast] {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+  padding: 16px !important;
+  font-weight: 500 !important;
+}
+
+/* Icon styling */
+[data-sonner-toast] [data-icon] {
+  margin-right: 12px !important;
+}
+
+
+
+/* Close button improvements */
+[data-sonner-toast] button[data-close-button] {
+  color: #9ca3af !important;
+  transition: color 0.2s ease !important;
+}
+
+[data-sonner-toast] button[data-close-button]:hover {
+  color: #374151 !important;
+}

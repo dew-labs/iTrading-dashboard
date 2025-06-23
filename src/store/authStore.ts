@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import type { User } from '@supabase/supabase-js'
 import type { DatabaseUser } from '../types'
-import toast from 'react-hot-toast'
+import { toast } from '../utils/toast'
 
 /**
  * Auth Store with Deleted User Protection
