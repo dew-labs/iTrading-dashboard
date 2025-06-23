@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { Shield, X, Plus, Trash2 } from 'lucide-react'
 import { getUserPermissions, grantPermission, revokePermission } from '../services/userService'
 import { usePermissions } from '../hooks/usePermissions'
+import { useTranslation } from '../hooks/useTranslation'
 import type { DatabaseUser, Permission } from '../types'
 import LoadingSpinner from './LoadingSpinner'
 import Select from './Select'
@@ -13,6 +14,7 @@ interface PermissionManagerProps {
 }
 
 const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose }) => {
+  const { t } = useTranslation()
   const { isSuperAdmin } = usePermissions()
   const [permissions, setPermissions] = useState<Permission[]>([])
   const [loading, setLoading] = useState(true)
@@ -34,11 +36,11 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose }) 
       const userPermissions = await getUserPermissions(user.id)
       setPermissions(userPermissions)
     } catch (_error) {
-      toast.error('Failed to load permissions')
+      toast.error(t('failedToLoadPermissions'))
     } finally {
       setLoading(false)
     }
-  }, [user.id])
+  }, [user.id, t])
 
   useEffect(() => {
     fetchPermissions()
@@ -46,7 +48,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose }) 
 
   const handleGrant = async () => {
     if (!newResource) {
-      toast.error('Please select a resource')
+      toast.error(t('pleaseSelectResource'))
       return
     }
 
@@ -55,7 +57,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose }) 
     )
 
     if (existingPermission) {
-      toast.error('Permission already exists')
+      toast.error(t('permissionAlreadyExists'))
       return
     }
 
@@ -79,7 +81,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose }) 
     return (
       <div className="p-6 text-center">
         <Shield className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-        <p className="text-gray-600">Only super admins can manage permissions</p>
+        <p className="text-gray-600">{t('onlySuperAdminsCanManage')}</p>
       </div>
     )
   }
@@ -88,7 +90,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose }) 
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Manage Permissions</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{t('managePermissionsTitle2')}</h3>
           <p className="text-sm text-gray-600 mt-1">
             User: {user.full_name || user.email} ({user.role})
           </p>
@@ -109,10 +111,10 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose }) 
         <>
           {/* Current Permissions */}
           <div className="mb-6">
-            <h4 className="text-sm font-medium text-gray-700 mb-3">Current Permissions</h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-3">{t('currentPermissions')}</h4>
             <div className="space-y-2">
               {permissions.length === 0 ? (
-                <p className="text-sm text-gray-500 italic">No custom permissions assigned</p>
+                <p className="text-sm text-gray-500 italic">{t('noCustomPermissions')}</p>
               ) : (
                 permissions.map((permission, index) => (
                   <div
@@ -130,7 +132,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose }) 
                     <button
                       onClick={() => handleRevoke(permission.resource, permission.action)}
                       className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
-                      title="Revoke permission"
+                      title={t('revokePermission')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -143,14 +145,14 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose }) 
           {/* Add New Permission */}
           <div className="border-t pt-6">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-sm font-medium text-gray-700">Add Permission</h4>
+              <h4 className="text-sm font-medium text-gray-700">{t('addPermission')}</h4>
               {!isAdding && (
                 <button
                   onClick={() => setIsAdding(true)}
                   className="flex items-center text-sm text-gray-900 hover:text-black"
                 >
                   <Plus className="w-4 h-4 mr-1" />
-                  Add Permission
+                  {t('addPermission')}
                 </button>
               )}
             </div>
@@ -162,10 +164,10 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose }) 
                     label="Resource"
                     value={newResource}
                     onChange={setNewResource}
-                    placeholder="Select resource"
+                    placeholder={t('forms:placeholders.selectResource')}
                     options={availableResources.map(resource => ({
                       value: resource,
-                      label: resource.charAt(0).toUpperCase() + resource.slice(1)
+                      label: t(resource)
                     }))}
                   />
                   <Select
@@ -174,7 +176,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose }) 
                     onChange={setNewAction}
                     options={availableActions.map(action => ({
                       value: action,
-                      label: action.charAt(0).toUpperCase() + action.slice(1)
+                      label: t(action)
                     }))}
                   />
                 </div>
@@ -187,13 +189,13 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose }) 
                     }}
                     className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                   >
-                    Cancel
+                    {t('cancel')}
                   </button>
                   <button
                     onClick={handleGrant}
                     className="px-4 py-2 text-white bg-gradient-to-r from-gray-900 to-black rounded-lg hover:from-black hover:to-gray-900 transition-colors"
                   >
-                    Grant Permission
+                    {t('grantPermission')}
                   </button>
                 </div>
               </div>
@@ -203,8 +205,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose }) 
           {/* Role Information */}
           <div className="mt-6 p-4 bg-blue-50 rounded-lg">
             <p className="text-sm text-blue-800">
-              <strong>Note:</strong> Users also inherit permissions from their role ({user.role}).
-              Custom permissions are in addition to role-based permissions.
+              <strong>{t('note')}:</strong> {t('userInheritsPermissions', { role: user.role })}
             </p>
           </div>
         </>

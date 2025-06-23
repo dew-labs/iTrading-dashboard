@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { useUsers } from '../hooks/useUsers'
 import { usePermissions } from '../hooks/usePermissions'
+import { useTranslation } from '../hooks/useTranslation'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import UserForm from '../components/UserForm'
@@ -37,40 +38,14 @@ import {
   getTypographyClasses,
   cn
 } from '../utils/theme'
-import { formatDateDisplay, formatRoleLabel } from '../utils/format'
+import { formatDateDisplay } from '../utils/format'
 import { INPUT_VARIANTS, FILTER_OPTIONS } from '../constants/components'
 
-// Tab configuration for roles
-const USER_TABS = [
-  {
-    id: 'all',
-    label: 'All Users',
-    count: 0,
-    description: 'All registered users'
-  },
-  {
-    id: USER_ROLES.USER,
-    label: 'Users',
-    count: 0,
-    description: 'Regular users'
-  },
-  {
-    id: USER_ROLES.ADMIN,
-    label: 'Admins',
-    count: 0,
-    description: 'Administrator users'
-  },
-  {
-    id: USER_ROLES.SUPER_ADMIN,
-    label: 'Super Admins',
-    count: 0,
-    description: 'Super administrator users'
-  }
-]
-
 const Users: React.FC = () => {
+  const { t } = useTranslation()
   const { users, loading, createUser, updateUser, deleteUser } = useUsers()
   const { isSuperAdmin } = usePermissions()
+
   const [searchTerm, setSearchTerm] = useState('')
   const [activeTab, setActiveTab] = useState<string>('all')
   const [filterStatus, setFilterStatus] = useState<string>('all')
@@ -88,11 +63,41 @@ const Users: React.FC = () => {
 
   // Calculate tab counts
   const tabsWithCounts = useMemo(() => {
+    // Tab configuration for roles - defined inside useMemo to avoid dependency issues
+    const USER_TABS = [
+      {
+        id: 'all',
+        labelKey: 'allUsers',
+        count: 0,
+        descriptionKey: 'allRegisteredUsers'
+      },
+      {
+        id: USER_ROLES.USER,
+        labelKey: 'usersTab',
+        count: 0,
+        descriptionKey: 'regularUsers'
+      },
+      {
+        id: USER_ROLES.ADMIN,
+        labelKey: 'admins',
+        count: 0,
+        descriptionKey: 'administratorUsers'
+      },
+      {
+        id: USER_ROLES.SUPER_ADMIN,
+        labelKey: 'superAdmins',
+        count: 0,
+        descriptionKey: 'superAdministratorUsers'
+      }
+    ]
+
     return USER_TABS.map((tab) => ({
       ...tab,
+      label: t(tab.labelKey),
+      description: t(tab.descriptionKey),
       count: tab.id === 'all' ? users.length : users.filter((user) => user.role === tab.id).length
     }))
-  }, [users])
+  }, [users, t])
 
   // Enhanced filtering and sorting
   const filteredAndSortedUsers = useMemo(() => {
@@ -165,7 +170,7 @@ const Users: React.FC = () => {
   }
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
+    if (window.confirm(t('deleteUserConfirm'))) {
       await deleteUser(id)
       // Reset to first page if current page becomes empty
       if (paginatedUsers.length === 1 && currentPage > 1) {
@@ -218,7 +223,7 @@ const Users: React.FC = () => {
 
   const columns = [
     {
-      header: 'User Details',
+      header: t('userDetails'),
       accessor: 'email' as keyof DatabaseUser,
       sortable: true,
       render: (value: unknown, row: DatabaseUser) => {
@@ -228,7 +233,7 @@ const Users: React.FC = () => {
               {row.avatar_url ? (
                 <img
                   src={row.avatar_url}
-                  alt={`${row.full_name || 'User'} avatar`}
+                  alt={`${row.full_name || t('user')} ${t('avatar')}`}
                   className="w-12 h-12 rounded-lg object-cover border border-gray-200"
                   onError={(e) => {
                     // If avatar fails to load, show fallback
@@ -249,17 +254,17 @@ const Users: React.FC = () => {
                   recordId={row.id}
                   className="w-12 h-12 rounded-lg object-cover border border-gray-200"
                   fallbackClassName="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center"
-                  alt={`${row.full_name || 'User'} profile image`}
+                  alt={`${row.full_name || t('user')} ${t('profileImage')}`}
                   fallbackIcon={<User className="w-4 h-4 text-white" />}
                 />
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <div className={cn(getTypographyClasses('h4'), 'truncate')}>{row.full_name || 'No name'}</div>
+              <div className={cn(getTypographyClasses('h4'), 'truncate')}>{row.full_name || t('noName')}</div>
               <div className={cn(getTypographyClasses('small'), 'truncate')}>{value as string}</div>
               <div className="flex items-center space-x-2 mt-1">
-                <Badge variant={row.role as any} size="sm" showIcon>
-                  {formatRoleLabel(row.role)}
+                <Badge variant={row.role as 'admin' | 'user' | 'super_admin'} size="sm" showIcon>
+                  {t(row.role === 'super_admin' ? 'superAdmin' : row.role)}
                 </Badge>
               </div>
             </div>
@@ -268,18 +273,18 @@ const Users: React.FC = () => {
       }
     },
     {
-      header: 'Status',
+      header: t('status'),
       accessor: 'id' as keyof DatabaseUser,
       render: (value: unknown, row: DatabaseUser) => {
         return (
-          <Badge variant={row.status as any} size="sm" showIcon>
-            {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
+          <Badge variant={row.status as 'active' | 'inactive' | 'invited'} size="sm" showIcon>
+            {t(row.status)}
           </Badge>
         )
       }
     },
     {
-      header: 'Login & Dates',
+      header: t('loginDates'),
       accessor: 'created_at' as keyof DatabaseUser,
       sortable: true,
       render: (value: unknown, row: DatabaseUser) => {
@@ -287,25 +292,25 @@ const Users: React.FC = () => {
           <div className={getTypographyClasses('small')}>
             <div className="flex items-center text-gray-900 mb-1">
               <Clock className="w-4 h-4 mr-1 text-gray-400" />
-              <span>Last: {row.last_login ? formatDateDisplay(row.last_login) : 'Never'}</span>
+              <span>{t('last')}: {row.last_login ? formatDateDisplay(row.last_login) : t('never')}</span>
             </div>
             <div className="flex items-center text-gray-500">
               <Calendar className="w-4 h-4 mr-1" />
-              <span>Joined: {formatDateDisplay(value as string)}</span>
+              <span>{t('joined')}: {formatDateDisplay(value as string)}</span>
             </div>
           </div>
         )
       }
     },
     {
-      header: 'Actions',
+      header: t('actions'),
       accessor: 'id' as keyof DatabaseUser,
       render: (value: unknown, row: DatabaseUser) => (
         <div className="flex space-x-1">
           <button
             onClick={() => handleEdit(row)}
             className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-            title="Edit user"
+            title={t('editUser')}
           >
             <Edit2 className={getIconClasses('action')} />
           </button>
@@ -313,7 +318,7 @@ const Users: React.FC = () => {
             <button
               onClick={() => setManagingPermissionsFor(row)}
               className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-              title="Manage permissions"
+              title={t('managePermissions')}
             >
               <Key className={getIconClasses('action')} />
             </button>
@@ -321,7 +326,7 @@ const Users: React.FC = () => {
           <button
             onClick={() => handleDelete(value as string)}
             className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-            title="Delete user"
+            title={t('deleteUser')}
           >
             <Trash2 className={getIconClasses('action')} />
           </button>
@@ -343,7 +348,7 @@ const Users: React.FC = () => {
   if (loading) {
     return (
       <div className={layout.container}>
-        <PageLoadingSpinner message="Loading users..." />
+        <PageLoadingSpinner message={t('loadingUsers')} />
       </div>
     )
   }
@@ -357,9 +362,9 @@ const Users: React.FC = () => {
         {/* Header */}
         <div className={layout.header}>
           <div>
-            <h1 className={getTypographyClasses('h1')}>Users Management</h1>
+            <h1 className={getTypographyClasses('h1')}>{t('usersManagement')}</h1>
             <p className={cn(getTypographyClasses('description'), 'mt-2')}>
-              Manage user accounts, roles, and permissions
+              {t('manageUserAccounts')}
             </p>
           </div>
           {isSuperAdmin() && (
@@ -369,7 +374,7 @@ const Users: React.FC = () => {
                 className={getButtonClasses('primary', 'md')}
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Create User
+                {t('createUser')}
               </button>
             </div>
           )}
@@ -384,7 +389,7 @@ const Users: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={totalUsersProps.valueClasses}>{users.length}</div>
-                <div className={totalUsersProps.labelClasses}>Total Users</div>
+                <div className={totalUsersProps.labelClasses}>{t('totalUsers')}</div>
               </div>
             </div>
           </div>
@@ -396,7 +401,7 @@ const Users: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={activeUsersProps.valueClasses}>{activeUsers}</div>
-                <div className={activeUsersProps.labelClasses}>Active Users</div>
+                <div className={activeUsersProps.labelClasses}>{t('activeUsers')}</div>
               </div>
             </div>
           </div>
@@ -408,7 +413,7 @@ const Users: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={adminUsersProps.valueClasses}>{adminUsers}</div>
-                <div className={adminUsersProps.labelClasses}>Admin Users</div>
+                <div className={adminUsersProps.labelClasses}>{t('adminUsers')}</div>
               </div>
             </div>
           </div>
@@ -420,7 +425,7 @@ const Users: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={invitedUsersProps.valueClasses}>{invitedUsers}</div>
-                <div className={invitedUsersProps.labelClasses}>Pending Invites</div>
+                <div className={invitedUsersProps.labelClasses}>{t('pendingInvites')}</div>
               </div>
             </div>
           </div>
@@ -437,7 +442,7 @@ const Users: React.FC = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search users by name or email..."
+                    placeholder={t('searchUsersPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className={cn(INPUT_VARIANTS.withIcon, 'py-2')}
@@ -453,7 +458,7 @@ const Users: React.FC = () => {
                     setFilterStatus(value)
                     setCurrentPage(1)
                   }}
-                  label="Status"
+                  label={t('status')}
                 />
                 <FilterDropdown
                   options={roleOptions}
@@ -462,7 +467,7 @@ const Users: React.FC = () => {
                     setFilterRole(value)
                     setCurrentPage(1)
                   }}
-                  label="Role"
+                  label={t('role')}
                 />
                 <PaginationSelector
                   value={itemsPerPage}
@@ -472,12 +477,7 @@ const Users: React.FC = () => {
                   }}
                   totalItems={filteredAndSortedUsers.length}
                 />
-                <div className={cn('flex items-center space-x-2', getTypographyClasses('small'))}>
-                  <Calendar className="w-4 h-4" />
-                  <span>
-                    Showing {startItem}-{endItem} of {filteredAndSortedUsers.length} users
-                  </span>
-                </div>
+
               </div>
             </div>
           </div>
@@ -502,23 +502,23 @@ const Users: React.FC = () => {
                   disabled={currentPage === 1}
                   className={getButtonClasses('secondary', 'md')}
                 >
-                  Previous
+                  {t('previous')}
                 </button>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className={cn(getButtonClasses('secondary', 'md'), 'ml-3')}
                 >
-                  Next
+                  {t('next')}
                 </button>
               </div>
 
               <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
                   <p className={getTypographyClasses('small')}>
-                    Showing <span className="font-medium">{startItem}</span> to{' '}
-                    <span className="font-medium">{endItem}</span> of{' '}
-                    <span className="font-medium">{filteredAndSortedUsers.length}</span> results
+                    {t('showing')} <span className="font-medium">{startItem}</span> {t('to')}{' '}
+                    <span className="font-medium">{endItem}</span> {t('of')}{' '}
+                    <span className="font-medium">{filteredAndSortedUsers.length}</span> {t('results')}
                   </p>
                 </div>
 
@@ -567,7 +567,7 @@ const Users: React.FC = () => {
         <Modal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          title={editingUser ? 'Edit User' : 'Create New User'}
+          title={editingUser ? t('editUserTitle') : t('createNewUser')}
         >
           <UserForm
             user={editingUser}
@@ -581,7 +581,9 @@ const Users: React.FC = () => {
           <Modal
             isOpen={true}
             onClose={() => setManagingPermissionsFor(null)}
-            title={`Manage Permissions - ${managingPermissionsFor.full_name || managingPermissionsFor.email}`}
+            title={t('managePermissionsTitle', {
+              userName: managingPermissionsFor.full_name || managingPermissionsFor.email
+            })}
           >
             <PermissionManager
               user={managingPermissionsFor}

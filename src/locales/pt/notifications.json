@@ -1,0 +1,61 @@
+{
+  "types": {
+    "user": "Atividade do Usuário",
+    "post": "Atividade de Conteúdo",
+    "product": "Atividade de Produto",
+    "banner": "Atividade de Banner",
+    "system": "Atividade do Sistema"
+  },
+  "actions": {
+    "created": "criado",
+    "updated": "atualizado",
+    "deleted": "excluído",
+    "published": "publicado",
+    "activated": "ativado",
+    "deactivated": "desativado",
+    "registered": "registrado",
+    "suspended": "suspenso",
+    "restored": "restaurado",
+    "uploaded": "enviado",
+    "downloaded": "baixado"
+  },
+  "messages": {
+    "userRegistered": "Novo usuário registrado",
+    "userUpdated": "Perfil do usuário atualizado",
+    "userSuspended": "Conta do usuário suspensa",
+    "userRestored": "Conta do usuário restaurada",
+    "postCreated": "Novo post criado",
+    "postUpdated": "Post atualizado",
+    "postPublished": "Post publicado",
+    "postDeleted": "Post excluído",
+    "productCreated": "Novo produto criado",
+    "productUpdated": "Produto atualizado",
+    "productDeleted": "Produto excluído",
+    "lowStockAlert": "Alerta de estoque baixo",
+    "bannerCreated": "Novo banner criado",
+    "bannerActivated": "Banner ativado",
+    "bannerDeactivated": "Banner desativado",
+    "systemBackupCompleted": "Backup do sistema concluído",
+    "systemMaintenanceScheduled": "Manutenção do sistema agendada",
+    "systemUpdateAvailable": "Atualização do sistema disponível"
+  },
+  "recentActivity": "Atividade Recente",
+  "viewAll": "Ver todas as notificações",
+  "markAsRead": "Marcar como lida",
+  "markAllAsRead": "Marcar todas como lidas",
+  "noNotifications": "Nenhuma notificação",
+  "newNotifications": "{{count}} nova(s)",
+  "timestamp": {
+    "now": "Agora mesmo",
+    "minuteAgo": "1 minuto atrás",
+    "minutesAgo": "{{count}} minutos atrás",
+    "hourAgo": "1 hora atrás",
+    "hoursAgo": "{{count}} horas atrás",
+    "dayAgo": "1 dia atrás",
+    "daysAgo": "{{count}} dias atrás",
+    "weekAgo": "1 semana atrás",
+    "weeksAgo": "{{count}} semanas atrás",
+    "monthAgo": "1 mês atrás",
+    "monthsAgo": "{{count}} meses atrás"
+  }
+}

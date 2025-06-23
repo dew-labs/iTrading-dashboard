@@ -12,6 +12,8 @@ import {
   LogOut
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
+import { LANGUAGES } from '../constants'
+import { useTranslation, useNotificationTranslation } from '../hooks/useTranslation'
 import Badge from './Badge'
 
 interface HeaderProps {
@@ -29,16 +31,12 @@ interface NotificationItem {
 
 const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const { user, profile, signOut } = useAuthStore()
+  const { t, language, changeLanguage } = useTranslation()
+  const { t: tNotifications } = useNotificationTranslation()
   const [showProfileDropdown, setShowProfileDropdown] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
-  const [selectedLanguage, setSelectedLanguage] = useState('en')
   const dropdownRef = useRef<HTMLDivElement>(null)
   const notificationRef = useRef<HTMLDivElement>(null)
-
-  const languages = [
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'pt', name: 'Português', flag: '🇧🇷' }
-  ]
 
   // Mock recent activity data - memoized to prevent recreating on every render
   const recentNotifications: NotificationItem[] = useMemo(() => [
@@ -129,9 +127,8 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   }
 
   const handleLanguageChange = (languageCode: string) => {
-    setSelectedLanguage(languageCode)
+    changeLanguage(languageCode)
     setShowProfileDropdown(false)
-    // Language changed - could implement actual i18n logic here
   }
 
   const getNotificationIcon = (type: string) => {
@@ -204,9 +201,9 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 {/* Header */}
                 <div className="px-4 py-3 border-b border-gray-100">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-gray-900">Recent Activity</h3>
+                    <h3 className="font-semibold text-gray-900">{tNotifications('recentActivity')}</h3>
                     <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">
-                      {recentNotifications.length} new
+                      {tNotifications('newNotifications', { count: recentNotifications.length })}
                     </span>
                   </div>
                 </div>
@@ -251,7 +248,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 {/* Footer */}
                 <div className="px-4 py-3 border-t border-gray-100">
                   <button className="w-full text-sm text-gray-900 hover:text-black font-medium text-center">
-                    View all notifications
+                    {tNotifications('viewAll')}
                   </button>
                 </div>
               </div>
@@ -269,15 +266,17 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             >
               <div className="hidden sm:block text-right min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate group-hover:text-gray-700 transition-colors">
-                  {user?.user_metadata?.full_name || profile?.full_name || 'User'}
+                  {user?.user_metadata?.full_name || profile?.full_name || t('user')}
                 </p>
                 <div className="flex items-center justify-end">
                   {profile?.role && (
                     <Badge
-                      variant={profile.role as any}
+                      variant={profile.role as 'admin' | 'user' | 'super_admin'}
                       size="sm"
                       showIcon
-                    />
+                    >
+                      {t(profile.role === 'super_admin' ? 'superAdmin' : profile.role)}
+                    </Badge>
                   )}
                 </div>
               </div>
@@ -319,16 +318,18 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-gray-900 truncate text-base">
-                        {user?.user_metadata?.full_name || profile?.full_name || 'User'}
+                        {user?.user_metadata?.full_name || profile?.full_name || t('user')}
                       </p>
                       <p className="text-sm text-gray-500 truncate">{user?.email}</p>
                       <div className="mt-1">
                         {profile?.role && (
                           <Badge
-                            variant={profile.role as any}
+                            variant={profile.role as 'admin' | 'user' | 'super_admin'}
                             size="md"
                             showIcon
-                          />
+                          >
+                            {t(profile.role === 'super_admin' ? 'superAdmin' : profile.role)}
+                          </Badge>
                         )}
                       </div>
                     </div>
@@ -338,22 +339,22 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 {/* Language Selection */}
                 <div className="px-2 py-2">
                   <div className="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Language
+                    {t('language')}
                   </div>
-                  {languages.map((language) => (
+                  {LANGUAGES.map((lang) => (
                     <button
-                      key={language.code}
-                      onClick={() => handleLanguageChange(language.code)}
+                      key={lang.code}
+                      onClick={() => handleLanguageChange(lang.code)}
                       className={`w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors ${
-                        selectedLanguage === language.code
+                        language === lang.code
                           ? 'bg-teal-500 text-white'
                           : 'text-gray-700 hover:bg-gray-50'
                       }`}
                     >
                       <Globe className="w-4 h-4 mr-3" />
-                      <span className="mr-2">{language.flag}</span>
-                      <span className="flex-1 text-left">{language.name}</span>
-                      {selectedLanguage === language.code && (
+                      <span className="mr-2">{lang.flag}</span>
+                      <span className="flex-1 text-left">{lang.name}</span>
+                      {language === lang.code && (
                         <div className="w-2 h-2 bg-white rounded-full"></div>
                       )}
                     </button>
@@ -370,7 +371,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                     className="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors group"
                   >
                     <LogOut className="w-4 h-4 mr-3 group-hover:scale-110 transition-transform" />
-                    Sign Out
+                    {t('signOut')}
                   </button>
                 </div>
               </div>

@@ -4,6 +4,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App.tsx'
 import './index.css'
 
+// Initialize i18n before rendering the app
+import './lib/i18n'
+
 // Create a query client with optimized defaults
 const queryClient = new QueryClient({
   defaultOptions: {

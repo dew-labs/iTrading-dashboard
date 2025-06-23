@@ -12,13 +12,10 @@ interface PaginationProps {
 const Pagination: React.FC<PaginationProps> = ({
   currentPage,
   totalPages,
-  totalItems,
-  itemsPerPage,
+  totalItems: _totalItems,
+  itemsPerPage: _itemsPerPage,
   onPageChange
 }) => {
-  const startItem = (currentPage - 1) * itemsPerPage + 1
-  const endItem = Math.min(currentPage * itemsPerPage, totalItems)
-
   const getVisiblePages = () => {
     const delta = 2
     const pages: number[] = []
@@ -68,13 +65,7 @@ const Pagination: React.FC<PaginationProps> = ({
       </div>
 
       <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm text-gray-700">
-            Showing <span className="font-medium">{startItem}</span> to{' '}
-            <span className="font-medium">{endItem}</span> of{' '}
-            <span className="font-medium">{totalItems}</span> results
-          </p>
-        </div>
+        <div></div>
 
         <div>
           <nav

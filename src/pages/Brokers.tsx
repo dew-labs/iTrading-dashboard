@@ -10,6 +10,7 @@ import {
   FileText
 } from 'lucide-react'
 import { useBrokers } from '../hooks/useBrokers'
+import { useTranslation } from '../hooks/useTranslation'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import BrokerForm from '../components/BrokerForm'
@@ -33,6 +34,7 @@ import { INPUT_VARIANTS } from '../constants/components'
 
 const Brokers: React.FC = () => {
   const { brokers, loading, createBroker, updateBroker, deleteBroker } = useBrokers()
+  const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -102,7 +104,7 @@ const Brokers: React.FC = () => {
   }
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Are you sure you want to delete this broker?')) {
+    if (window.confirm(t('brokers.deleteConfirm'))) {
       await deleteBroker(id)
       // Reset to first page if current page becomes empty
       if (paginatedBrokers.length === 1 && currentPage > 1) {
@@ -146,7 +148,7 @@ const Brokers: React.FC = () => {
 
   const columns = [
     {
-      header: 'Broker Information',
+      header: t('brokers.brokerInformation'),
       accessor: 'headquarter' as keyof Broker,
       sortable: true,
       render: (value: unknown, row: Broker) => {
@@ -164,10 +166,10 @@ const Brokers: React.FC = () => {
             </div>
             <div className="flex-1 min-w-0">
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>
-                {value as string || 'No Headquarter Info'}
+                {value as string || t('brokers.noHeadquarterInfo')}
               </div>
               <div className={cn(getTypographyClasses('small'), 'line-clamp-2')}>
-                {row.description || 'No description'}
+                {row.description || t('brokers.noDescription')}
               </div>
             </div>
           </div>
@@ -175,7 +177,7 @@ const Brokers: React.FC = () => {
       }
     },
     {
-      header: 'Established',
+      header: t('brokers.established'),
       accessor: 'established_at' as keyof Broker,
       sortable: true,
       render: (value: unknown) => {
@@ -187,14 +189,14 @@ const Brokers: React.FC = () => {
                 <span>{formatDateDisplay(value as string)}</span>
               </div>
             ) : (
-              <span className="text-gray-400">Not specified</span>
+              <span className="text-gray-400">{t('brokers.notSpecified')}</span>
             )}
           </div>
         )
       }
     },
     {
-      header: 'Created Date',
+      header: t('brokers.createdDate'),
       accessor: 'created_at' as keyof Broker,
       sortable: true,
       render: (value: unknown) => {
@@ -209,21 +211,21 @@ const Brokers: React.FC = () => {
       }
     },
     {
-      header: 'Actions',
+      header: t('brokers.actions'),
       accessor: 'id' as keyof Broker,
       render: (value: unknown, row: Broker) => (
         <div className="flex space-x-1">
           <button
             onClick={() => handleEdit(row)}
             className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-            title="Edit broker"
+            title={t('brokers.tooltips.editBroker')}
           >
             <Edit2 className={getIconClasses('action')} />
           </button>
           <button
             onClick={() => handleDelete(value as number)}
             className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-            title="Delete broker"
+            title={t('brokers.tooltips.deleteBroker')}
           >
             <Trash2 className={getIconClasses('action')} />
           </button>
@@ -248,13 +250,10 @@ const Brokers: React.FC = () => {
   if (loading) {
     return (
       <div className={layout.container}>
-        <PageLoadingSpinner message="Loading brokers..." />
+        <PageLoadingSpinner message={t('brokers.loadingBrokers')} />
       </div>
     )
   }
-
-  const startItem = (currentPage - 1) * itemsPerPage + 1
-  const endItem = Math.min(currentPage * itemsPerPage, filteredAndSortedBrokers.length)
 
   return (
     <div className={layout.container}>
@@ -262,9 +261,9 @@ const Brokers: React.FC = () => {
         {/* Header */}
         <div className={layout.header}>
           <div>
-            <h1 className={getTypographyClasses('h1')}>Brokers Management</h1>
+            <h1 className={getTypographyClasses('h1')}>{t('brokers.title')}</h1>
             <p className={cn(getTypographyClasses('description'), 'mt-2')}>
-              Manage broker information and details
+              {t('brokers.description')}
             </p>
           </div>
           <div className="mt-4 sm:mt-0 flex items-center space-x-3">
@@ -273,7 +272,7 @@ const Brokers: React.FC = () => {
               className={getButtonClasses('primary', 'md')}
             >
               <Plus className="w-4 h-4 mr-2" />
-              Add Broker
+              {t('brokers.addBroker')}
             </button>
           </div>
         </div>
@@ -287,7 +286,7 @@ const Brokers: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={totalBrokersProps.valueClasses}>{totalBrokers}</div>
-                <div className={totalBrokersProps.labelClasses}>Total Brokers</div>
+                <div className={totalBrokersProps.labelClasses}>{t('brokers.totalBrokers')}</div>
               </div>
             </div>
           </div>
@@ -299,7 +298,7 @@ const Brokers: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={hqProps.valueClasses}>{brokersWithHQ}</div>
-                <div className={hqProps.labelClasses}>With Headquarters</div>
+                <div className={hqProps.labelClasses}>{t('brokers.withHeadquarters')}</div>
               </div>
             </div>
           </div>
@@ -311,7 +310,7 @@ const Brokers: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={estDateProps.valueClasses}>{brokersWithEstDate}</div>
-                <div className={estDateProps.labelClasses}>With Est. Date</div>
+                <div className={estDateProps.labelClasses}>{t('brokers.withEstDate')}</div>
               </div>
             </div>
           </div>
@@ -323,7 +322,7 @@ const Brokers: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={recentProps.valueClasses}>{recentBrokers}</div>
-                <div className={recentProps.labelClasses}>Recent (30d)</div>
+                <div className={recentProps.labelClasses}>{t('brokers.recent30d')}</div>
               </div>
             </div>
           </div>
@@ -340,7 +339,7 @@ const Brokers: React.FC = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search brokers by headquarter or description..."
+                    placeholder={t('brokers.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className={cn(INPUT_VARIANTS.withIcon, 'py-2')}
@@ -357,12 +356,7 @@ const Brokers: React.FC = () => {
                   }}
                   totalItems={filteredAndSortedBrokers.length}
                 />
-                <div className={cn('flex items-center space-x-2', getTypographyClasses('small'))}>
-                  <Calendar className="w-4 h-4" />
-                  <span>
-                    Showing {startItem}-{endItem} of {filteredAndSortedBrokers.length} brokers
-                  </span>
-                </div>
+
               </div>
             </div>
           </div>
@@ -387,25 +381,19 @@ const Brokers: React.FC = () => {
                   disabled={currentPage === 1}
                   className={getButtonClasses('secondary', 'md')}
                 >
-                  Previous
+                  {t('brokers.previous')}
                 </button>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className={cn(getButtonClasses('secondary', 'md'), 'ml-3')}
                 >
-                  Next
+                  {t('brokers.next')}
                 </button>
               </div>
 
               <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                  <p className={getTypographyClasses('small')}>
-                    Showing <span className="font-medium">{startItem}</span> to{' '}
-                    <span className="font-medium">{endItem}</span> of{' '}
-                    <span className="font-medium">{filteredAndSortedBrokers.length}</span> results
-                  </p>
-                </div>
+                <div></div>
 
                 <div>
                   <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
@@ -452,7 +440,7 @@ const Brokers: React.FC = () => {
         <Modal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          title={editingBroker ? 'Edit Broker' : 'Add New Broker'}
+          title={editingBroker ? t('brokers.editBroker') : t('brokers.addNewBroker')}
         >
           <BrokerForm
             broker={editingBroker}

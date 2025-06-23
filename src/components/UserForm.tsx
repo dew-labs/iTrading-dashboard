@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { User, Shield, CheckCircle2, Users, Sparkles } from 'lucide-react'
 import type { DatabaseUser, UserInsert, UserRole } from '../types'
 import { usePermissions } from '../hooks/usePermissions'
+import { useTranslation } from '../hooks/useTranslation'
 import { validators } from '../utils/format'
 import { USER_ROLES } from '../constants/general'
 import FormInput from './FormInput'
@@ -13,6 +14,7 @@ interface UserFormProps {
 }
 
 const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
+  const { t } = useTranslation()
   const { isSuperAdmin } = usePermissions()
   const [formData, setFormData] = useState<UserInsert>({
     email: user?.email || '',
@@ -105,22 +107,22 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
   const roleOptions: { value: UserRole; label: string; description: string; icon: React.ReactNode; color: string }[] = [
     {
       value: USER_ROLES.USER,
-      label: 'User',
-      description: 'Standard access with basic permissions',
+      label: t('user'),
+      description: t('userRoleDescription'),
       icon: <User className="w-6 h-6" />,
       color: 'from-blue-500 to-indigo-500'
     },
     {
       value: USER_ROLES.ADMIN,
-      label: 'Admin',
-      description: 'Enhanced access with management capabilities',
+      label: t('admin'),
+      description: t('adminRoleDescription'),
       icon: <Shield className="w-6 h-6" />,
       color: 'from-purple-500 to-pink-500'
     },
     ...(isSuperAdmin() ? [{
       value: USER_ROLES.SUPER_ADMIN,
-      label: 'Super Admin',
-      description: 'Complete system control and user management',
+      label: t('superAdmin'),
+      description: t('superAdminRoleDescription'),
       icon: <Sparkles className="w-6 h-6" />,
       color: 'from-orange-500 to-red-500'
     }] : [])
@@ -170,7 +172,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
             <FormInput
               name="full_name"
               label="Full Name"
-              placeholder="John Doe"
+              placeholder={t('forms:placeholders.fullNamePlaceholder')}
               required
               value={formData.full_name || ''}
               onChange={handleChange}

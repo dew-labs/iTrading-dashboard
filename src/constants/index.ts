@@ -8,6 +8,7 @@ export * from './colors'
 export * from './spacing'
 export * from './components'
 export * from './general'
+export * from './languages'
 
 // Re-export theme from the old file for backward compatibility
 export { TIME, API, FORMAT } from './theme'
@@ -25,6 +26,15 @@ import {
 } from './spacing'
 import { COMPONENTS } from './components'
 import { TIME, API, FORMAT } from './theme'
+import {
+  LANGUAGE_CODES,
+  DEFAULT_LANGUAGE,
+  SUPPORTED_LANGUAGES_COUNT,
+  SUPPORTED_LANGUAGE_CODES,
+  LANGUAGE_INFO,
+  LANGUAGES,
+  I18N_NAMESPACES
+} from './languages'
 
 export const THEME = {
   // Colors
@@ -47,7 +57,18 @@ export const THEME = {
   // Time & API
   time: TIME,
   api: API,
-  format: FORMAT
+  format: FORMAT,
+
+  // Internationalization
+  language: {
+    codes: LANGUAGE_CODES,
+    default: DEFAULT_LANGUAGE,
+    count: SUPPORTED_LANGUAGES_COUNT,
+    supported: SUPPORTED_LANGUAGE_CODES,
+    info: LANGUAGE_INFO,
+    options: LANGUAGES,
+    namespaces: I18N_NAMESPACES
+  }
 } as const
 
 export default THEME

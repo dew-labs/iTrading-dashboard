@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Filter, ChevronDown, X } from 'lucide-react'
 import { cn } from '../utils/theme'
+import { useTranslation } from '../hooks/useTranslation'
 
 interface FilterOption {
   value: string;
-  label: string;
+  label?: string;
+  labelKey?: string;
   disabled?: boolean;
   description?: string;
 }
@@ -37,6 +39,15 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const { t } = useTranslation()
+
+  // Helper function to get the display label for an option
+  const getOptionLabel = (option: FilterOption): string => {
+    if (option.labelKey) {
+      return t(option.labelKey)
+    }
+    return option.label || option.value
+  }
 
   const selectedOption = options.find(option => option.value === value)
   const isActive = value !== 'all' && value !== ''
@@ -99,7 +110,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
               'text-xs px-1.5 py-0.5 rounded',
               'bg-white/20 text-white border border-white/30'
             )}>
-              {selectedOption.label}
+              {getOptionLabel(selectedOption)}
             </span>
           </>
         )}
@@ -159,7 +170,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
                 )}
               >
                 <span className={option.disabled ? 'opacity-50' : ''}>
-                  {option.label}
+                  {getOptionLabel(option)}
                 </span>
 
                 {option.value === value && (

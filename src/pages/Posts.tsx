@@ -5,7 +5,6 @@ import {
   Edit2,
   Trash2,
   Eye,
-  Calendar,
   AlertTriangle,
   Clock,
   User,
@@ -16,6 +15,7 @@ import {
 } from 'lucide-react'
 import { usePosts } from '../hooks/usePosts'
 import { useAuthStore } from '../store/authStore'
+import { useTranslation } from '../hooks/useTranslation'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import PostForm from '../components/PostForm'
@@ -38,7 +38,7 @@ import {
   getTypographyClasses,
   cn
 } from '../utils/theme'
-import { formatDateDisplay, formatTypeLabel } from '../utils/format'
+import { formatDateDisplay } from '../utils/format'
 import { INPUT_VARIANTS, FILTER_OPTIONS } from '../constants/components'
 
 // Extended Post type to include additional fields that might exist
@@ -48,43 +48,39 @@ interface ExtendedPost extends Post {
   updated_at?: string;
 }
 
-// Tab configuration
-const POST_TABS = [
+// Tab configuration keys
+const POST_TAB_CONFIGS = [
   {
     id: 'all',
-    label: 'All Posts',
-    count: 0,
-    description: 'All content posts'
+    labelKey: 'posts.tabs.all.label',
+    descriptionKey: 'posts.tabs.all.description'
   },
   {
     id: POST_TYPES.NEWS,
-    label: 'News',
-    count: 0,
-    description: 'News articles and updates'
+    labelKey: 'posts.tabs.news.label',
+    descriptionKey: 'posts.tabs.news.description'
   },
   {
     id: POST_TYPES.EVENT,
-    label: 'Events',
-    count: 0,
-    description: 'Event announcements and information'
+    labelKey: 'posts.tabs.event.label',
+    descriptionKey: 'posts.tabs.event.description'
   },
   {
     id: POST_TYPES.TERMS_OF_USE,
-    label: 'Terms of Use',
-    count: 0,
-    description: 'Legal and policy documents'
+    labelKey: 'posts.tabs.termsOfUse.label',
+    descriptionKey: 'posts.tabs.termsOfUse.description'
   },
   {
     id: POST_TYPES.PRIVACY_POLICY,
-    label: 'Privacy Policy',
-    count: 0,
-    description: 'Privacy and data protection policies'
+    labelKey: 'posts.tabs.privacyPolicy.label',
+    descriptionKey: 'posts.tabs.privacyPolicy.description'
   }
 ]
 
 const Posts: React.FC = () => {
   const { posts, loading, createPost, updatePost, deletePost } = usePosts()
   const { user } = useAuthStore()
+  const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
   const [activeTab, setActiveTab] = useState<string>('all')
   const [filterStatus, setFilterStatus] = useState<'all' | 'draft' | 'published'>('all')
@@ -108,13 +104,15 @@ const Posts: React.FC = () => {
   // Theme classes
   const layout = getPageLayoutClasses()
 
-  // Calculate tab counts
+  // Calculate tab counts with translations
   const tabsWithCounts = useMemo(() => {
-    return POST_TABS.map((tab) => ({
-      ...tab,
+    return POST_TAB_CONFIGS.map((tab) => ({
+      id: tab.id,
+      label: t(tab.labelKey),
+      description: t(tab.descriptionKey),
       count: tab.id === 'all' ? posts.length : posts.filter((post) => post.type === tab.id).length
     }))
-  }, [posts])
+  }, [posts, t])
 
   // Enhanced filtering and sorting
   const filteredAndSortedPosts = useMemo(() => {
@@ -172,7 +170,7 @@ const Posts: React.FC = () => {
   const handleEdit = (post: Post) => {
     // Security check - only allow editing if user is authenticated
     if (!user) {
-      alert('You must be logged in to edit posts')
+      alert(t('posts.loginRequired', { action: t('edit').toLowerCase() }))
       return
     }
     setEditingPost(post)
@@ -182,7 +180,7 @@ const Posts: React.FC = () => {
   const handleDelete = (post: Post) => {
     // Security check - only allow deleting if user is authenticated
     if (!user) {
-      alert('You must be logged in to delete posts')
+      alert(t('posts.loginRequired', { action: t('delete').toLowerCase() }))
       return
     }
     setDeleteConfirm({ isOpen: true, post, isDeleting: false })
@@ -249,7 +247,7 @@ const Posts: React.FC = () => {
 
   const columns = [
     {
-      header: 'Post Details',
+      header: t('posts.postDetails'),
       accessor: 'title' as keyof Post,
       sortable: true,
       render: (value: unknown, row: Post) => {
@@ -268,8 +266,8 @@ const Posts: React.FC = () => {
             <div className="flex-1 min-w-0">
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>{value as string}</div>
               <div className="flex items-center space-x-2 mt-1">
-                <Badge variant={row.type as any} size="sm" showIcon>
-                  {formatTypeLabel(row.type)}
+                <Badge variant={row.type as 'news' | 'event' | 'terms_of_use' | 'privacy_policy'} size="sm" showIcon>
+                  {t(row.type === 'terms_of_use' ? 'termsOfUse' : row.type === 'privacy_policy' ? 'privacyPolicy' : row.type)}
                 </Badge>
               </div>
             </div>
@@ -278,18 +276,18 @@ const Posts: React.FC = () => {
       }
     },
     {
-      header: 'Status',
+      header: t('posts.status'),
       accessor: 'id' as keyof Post,
       render: (value: unknown, row: Post) => {
         return (
-          <Badge variant={row.status as any} size="sm" showIcon>
-            {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
+          <Badge variant={row.status as 'published' | 'draft'} size="sm" showIcon>
+            {t(row.status)}
           </Badge>
         )
       }
     },
     {
-      header: 'Author & Dates',
+      header: t('posts.authorAndDates'),
       accessor: 'created_at' as keyof Post,
       sortable: true,
       render: (value: unknown, row: Post) => {
@@ -298,7 +296,7 @@ const Posts: React.FC = () => {
           <div className={getTypographyClasses('small')}>
             <div className="flex items-center text-gray-900 mb-1">
               <User className="w-4 h-4 mr-1 text-gray-400" />
-              <span>{extendedRow.author || 'Unknown Author'}</span>
+              <span>{extendedRow.author || t('posts.unknownAuthor')}</span>
             </div>
             <div className="flex items-center text-gray-500">
               <Clock className="w-4 h-4 mr-1" />
@@ -306,7 +304,7 @@ const Posts: React.FC = () => {
             </div>
             {extendedRow.updated_at && (
               <div className="text-xs text-gray-400 mt-1">
-                Updated: {formatDateDisplay(extendedRow.updated_at)}
+                {t('posts.updated')} {formatDateDisplay(extendedRow.updated_at)}
               </div>
             )}
           </div>
@@ -314,7 +312,7 @@ const Posts: React.FC = () => {
       }
     },
     {
-      header: 'Engagement',
+      header: t('posts.engagement'),
       accessor: 'id' as keyof Post,
       render: (value: unknown, row: Post) => {
         const extendedRow = row as ExtendedPost
@@ -323,7 +321,7 @@ const Posts: React.FC = () => {
             <div className="flex items-center space-x-4">
               <div className="text-center">
                 <div className="font-medium">{extendedRow.views?.toLocaleString() || 0}</div>
-                <div className="text-xs text-gray-500">Views</div>
+                <div className="text-xs text-gray-500">{t('posts.views')}</div>
               </div>
             </div>
           </div>
@@ -331,28 +329,28 @@ const Posts: React.FC = () => {
       }
     },
     {
-      header: 'Actions',
+      header: t('posts.actions'),
       accessor: 'id' as keyof Post,
       render: (value: unknown, row: Post) => (
         <div className="flex space-x-1">
           <button
             onClick={() => handleView(row)}
             className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-            title="View post"
+            title={t('posts.tooltips.viewPost')}
           >
             <Eye className={getIconClasses('action')} />
           </button>
           <button
             onClick={() => handleEdit(row)}
             className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-            title="Edit post"
+            title={t('posts.tooltips.editPost')}
           >
             <Edit2 className={getIconClasses('action')} />
           </button>
           <button
             onClick={() => handleDelete(row)}
             className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-            title="Delete post"
+            title={t('posts.tooltips.deletePost')}
           >
             <Trash2 className={getIconClasses('action')} />
           </button>
@@ -374,13 +372,10 @@ const Posts: React.FC = () => {
   if (loading) {
     return (
       <div className={layout.container}>
-        <PageLoadingSpinner message="Loading posts..." />
+        <PageLoadingSpinner message={t('posts.loadingPosts')} />
       </div>
     )
   }
-
-  const startItem = (currentPage - 1) * itemsPerPage + 1
-  const endItem = Math.min(currentPage * itemsPerPage, filteredAndSortedPosts.length)
 
   return (
     <div className={layout.container}>
@@ -388,16 +383,16 @@ const Posts: React.FC = () => {
         {/* Header */}
         <div className={layout.header}>
           <div>
-            <h1 className={getTypographyClasses('h1')}>Posts Management</h1>
+            <h1 className={getTypographyClasses('h1')}>{t('posts.title')}</h1>
             <p className={cn(getTypographyClasses('description'), 'mt-2')}>
-              Create, edit, and manage your content posts
+              {t('posts.description')}
             </p>
           </div>
           <div className="mt-4 sm:mt-0 flex items-center space-x-3">
             <button
               onClick={() => {
                 if (!user) {
-                  alert('You must be logged in to create posts')
+                  alert(t('posts.loginRequired', { action: t('create').toLowerCase() }))
                   return
                 }
                 setIsModalOpen(true)
@@ -405,7 +400,7 @@ const Posts: React.FC = () => {
               className={getButtonClasses('primary', 'md')}
             >
               <Plus className="w-4 h-4 mr-2" />
-              Create Post
+              {t('posts.createPost')}
             </button>
           </div>
         </div>
@@ -419,7 +414,7 @@ const Posts: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={totalPostsProps.valueClasses}>{posts.length}</div>
-                <div className={totalPostsProps.labelClasses}>Total Posts</div>
+                <div className={totalPostsProps.labelClasses}>{t('posts.totalPosts')}</div>
               </div>
             </div>
           </div>
@@ -431,7 +426,7 @@ const Posts: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={publishedProps.valueClasses}>{publishedPosts}</div>
-                <div className={publishedProps.labelClasses}>Published</div>
+                <div className={publishedProps.labelClasses}>{t('posts.published')}</div>
               </div>
             </div>
           </div>
@@ -443,7 +438,7 @@ const Posts: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={draftsProps.valueClasses}>{draftPosts}</div>
-                <div className={draftsProps.labelClasses}>Drafts</div>
+                <div className={draftsProps.labelClasses}>{t('posts.drafts')}</div>
               </div>
             </div>
           </div>
@@ -455,7 +450,7 @@ const Posts: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={viewsProps.valueClasses}>{totalViews.toLocaleString()}</div>
-                <div className={viewsProps.labelClasses}>Total Views</div>
+                <div className={viewsProps.labelClasses}>{t('posts.totalViews')}</div>
               </div>
             </div>
           </div>
@@ -472,7 +467,7 @@ const Posts: React.FC = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search posts by title, content, or author..."
+                    placeholder={t('posts.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className={cn(INPUT_VARIANTS.withIcon, 'py-2')}
@@ -488,7 +483,7 @@ const Posts: React.FC = () => {
                     setFilterStatus(value as 'all' | 'draft' | 'published')
                     setCurrentPage(1)
                   }}
-                  label="Status"
+                  label={t('posts.status')}
                 />
                 <PaginationSelector
                   value={itemsPerPage}
@@ -498,12 +493,7 @@ const Posts: React.FC = () => {
                   }}
                   totalItems={filteredAndSortedPosts.length}
                 />
-                <div className={cn('flex items-center space-x-2', getTypographyClasses('small'))}>
-                  <Calendar className="w-4 h-4" />
-                  <span>
-                    Showing {startItem}-{endItem} of {filteredAndSortedPosts.length} posts
-                  </span>
-                </div>
+
               </div>
             </div>
           </div>
@@ -528,25 +518,19 @@ const Posts: React.FC = () => {
                   disabled={currentPage === 1}
                   className={getButtonClasses('secondary', 'md')}
                 >
-                  Previous
+                  {t('posts.previous')}
                 </button>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className={cn(getButtonClasses('secondary', 'md'), 'ml-3')}
                 >
-                  Next
+                  {t('posts.next')}
                 </button>
               </div>
 
               <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                  <p className={getTypographyClasses('small')}>
-                    Showing <span className="font-medium">{startItem}</span> to{' '}
-                    <span className="font-medium">{endItem}</span> of{' '}
-                    <span className="font-medium">{filteredAndSortedPosts.length}</span> results
-                  </p>
-                </div>
+                <div></div>
 
                 <div>
                   <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
@@ -593,7 +577,7 @@ const Posts: React.FC = () => {
         <Modal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          title={editingPost ? 'Edit Post' : 'Create New Post'}
+          title={editingPost ? t('posts.editPost') : t('posts.createNewPost')}
         >
           <PostForm
             post={editingPost}
@@ -607,7 +591,7 @@ const Posts: React.FC = () => {
           <Modal
             isOpen={deleteConfirm.isOpen}
             onClose={() => setDeleteConfirm({ isOpen: false, post: null, isDeleting: false })}
-            title="Confirm Delete"
+            title={t('posts.confirmDelete')}
           >
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
@@ -615,9 +599,9 @@ const Posts: React.FC = () => {
                   <AlertTriangle className="w-8 h-8 text-red-500" />
                 </div>
                 <div>
-                  <h3 className={getTypographyClasses('h4')}>Delete Post</h3>
+                  <h3 className={getTypographyClasses('h4')}>{t('posts.deletePostTitle')}</h3>
                   <p className={getTypographyClasses('small')}>
-                    Are you sure you want to delete "{deleteConfirm.post?.title}"? This action cannot be undone.
+                    {t('posts.deleteConfirmText', { title: deleteConfirm.post?.title })}
                   </p>
                 </div>
               </div>
@@ -628,7 +612,7 @@ const Posts: React.FC = () => {
                   disabled={deleteConfirm.isDeleting}
                   className={getButtonClasses('secondary', 'md')}
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button
                   onClick={confirmDelete}
@@ -638,10 +622,10 @@ const Posts: React.FC = () => {
                   {deleteConfirm.isDeleting ? (
                     <div className="flex items-center">
                       <LoadingSpinner size="sm" variant="gradient" className="mr-2" />
-                      Deleting...
+                      {t('posts.deleting')}
                     </div>
                   ) : (
-                    'Delete'
+                    t('delete')
                   )}
                 </button>
               </div>
@@ -654,15 +638,15 @@ const Posts: React.FC = () => {
           <Modal
             isOpen={true}
             onClose={() => setViewingPost(null)}
-            title={`View Post: ${viewingPost.title}`}
+            title={`${t('posts.viewPost')}: ${viewingPost.title}`}
           >
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Badge variant={viewingPost.status as any} size="sm" showIcon>
-                  {viewingPost.status.charAt(0).toUpperCase() + viewingPost.status.slice(1)}
+                <Badge variant={viewingPost.status as 'published' | 'draft'} size="sm" showIcon>
+                  {t(viewingPost.status)}
                 </Badge>
-                <Badge variant={viewingPost.type as any} size="sm" showIcon>
-                  {formatTypeLabel(viewingPost.type)}
+                <Badge variant={viewingPost.type as 'news' | 'event' | 'terms_of_use' | 'privacy_policy'} size="sm" showIcon>
+                  {t(viewingPost.type === 'terms_of_use' ? 'termsOfUse' : viewingPost.type === 'privacy_policy' ? 'privacyPolicy' : viewingPost.type)}
                 </Badge>
               </div>
 
@@ -677,9 +661,9 @@ const Posts: React.FC = () => {
 
               <div className="pt-4 border-t">
                 <div className={cn('flex items-center justify-between', getTypographyClasses('small'))}>
-                  <span>Created: {formatDateDisplay(viewingPost.created_at)}</span>
+                  <span>{t('posts.created')} {formatDateDisplay(viewingPost.created_at)}</span>
                   {(viewingPost as ExtendedPost).views && (
-                    <span>Views: {(viewingPost as ExtendedPost).views?.toLocaleString()}</span>
+                    <span>{t('posts.views')}: {(viewingPost as ExtendedPost).views?.toLocaleString()}</span>
                   )}
                 </div>
               </div>
@@ -689,7 +673,7 @@ const Posts: React.FC = () => {
                   onClick={() => setViewingPost(null)}
                   className={getButtonClasses('secondary', 'md')}
                 >
-                  Close
+                  {t('close')}
                 </button>
               </div>
             </div>

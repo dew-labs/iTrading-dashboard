@@ -2,6 +2,7 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { Home, FileText, Package, Image, Users, X, BarChart3, Settings, HelpCircle, Pin, Building2 } from 'lucide-react'
 import { usePermissions } from '../hooks/usePermissions'
+import { useNavigationTranslation } from '../hooks/useTranslation'
 
 interface SidebarProps {
   isOpen: boolean;
@@ -12,7 +13,7 @@ interface SidebarProps {
 
 interface MenuItem {
   id: string;
-  label: string;
+  labelKey: string;
   icon: React.ComponentType<{ className?: string }>;
   path: string;
   resource?: string;
@@ -20,36 +21,37 @@ interface MenuItem {
 }
 
 interface MenuSection {
-  title: string;
+  titleKey: string;
   items: MenuItem[];
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIsCollapsed }) => {
   const { can } = usePermissions()
+  const { t } = useNavigationTranslation()
 
   const menuSections: MenuSection[] = [
     {
-      title: 'OVERVIEW',
+      titleKey: 'overview',
       items: [
-        { id: 'dashboard', label: 'Dashboard', icon: Home, path: '/' },
-        { id: 'analytics', label: 'Analytics', icon: BarChart3, path: '/analytics' }
+        { id: 'dashboard', labelKey: 'dashboard', icon: Home, path: '/' },
+        { id: 'analytics', labelKey: 'analytics', icon: BarChart3, path: '/analytics' }
       ]
     },
     {
-      title: 'MANAGEMENT',
+      titleKey: 'management',
       items: [
-        { id: 'posts', label: 'Posts', icon: FileText, path: '/posts', resource: 'posts', action: 'read' },
-        { id: 'products', label: 'Products', icon: Package, path: '/products', resource: 'products', action: 'read' },
-        { id: 'brokers', label: 'Brokers', icon: Building2, path: '/brokers', resource: 'brokers', action: 'read' },
-        { id: 'banners', label: 'Banners', icon: Image, path: '/banners', resource: 'banners', action: 'read' },
-        { id: 'users', label: 'Users', icon: Users, path: '/users', resource: 'users', action: 'read' }
+        { id: 'posts', labelKey: 'posts', icon: FileText, path: '/posts', resource: 'posts', action: 'read' },
+        { id: 'products', labelKey: 'products', icon: Package, path: '/products', resource: 'products', action: 'read' },
+        { id: 'brokers', labelKey: 'brokers', icon: Building2, path: '/brokers', resource: 'brokers', action: 'read' },
+        { id: 'banners', labelKey: 'banners', icon: Image, path: '/banners', resource: 'banners', action: 'read' },
+        { id: 'users', labelKey: 'users', icon: Users, path: '/users', resource: 'users', action: 'read' }
       ]
     },
     {
-      title: 'SETTINGS',
+      titleKey: 'settings',
       items: [
-        { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
-        { id: 'help', label: 'Help Center', icon: HelpCircle, path: '/help' }
+        { id: 'settings', labelKey: 'settings', icon: Settings, path: '/settings' },
+        { id: 'help', labelKey: 'help', icon: HelpCircle, path: '/help' }
       ]
     }
   ]
@@ -102,7 +104,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
         {/* Navigation - flex-1 to take remaining space */}
         <nav className={`flex-1 py-6 overflow-y-auto overflow-x-hidden ${isCollapsed ? 'lg:px-3' : 'px-6'}`}>
           {filteredSections.map((section, sectionIndex) => (
-            <div key={section.title} className={sectionIndex > 0 ? 'mt-8' : ''}>
+            <div key={section.titleKey} className={sectionIndex > 0 ? 'mt-8' : ''}>
               {/* Section Title */}
               <div
                 className={`mb-4 transition-all duration-300 ${
@@ -110,7 +112,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
                 }`}
               >
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
-                  {section.title}
+                  {t(section.titleKey).toUpperCase()}
                 </h3>
               </div>
 
@@ -147,7 +149,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
                               isCollapsed ? 'lg:hidden ml-3' : 'ml-3'
                             }`}
                           >
-                            {item.label}
+                            {t(item.labelKey)}
                           </span>
 
                           {/* Active indicator */}
@@ -158,7 +160,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
                           {/* Tooltip for collapsed state */}
                           {isCollapsed && (
                             <div className="absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 hidden lg:block">
-                              {item.label}
+                              {t(item.labelKey)}
                               <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
                             </div>
                           )}

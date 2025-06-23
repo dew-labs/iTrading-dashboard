@@ -1,0 +1,63 @@
+{
+  "general": {
+    "unknown": "An unknown error occurred",
+    "network": "Network error. Please check your connection.",
+    "server": "Server error. Please try again later.",
+    "timeout": "Request timeout. Please try again.",
+    "forbidden": "You don't have permission to perform this action.",
+    "notFound": "The requested resource was not found.",
+    "unauthorized": "You need to be logged in to perform this action.",
+    "badRequest": "Invalid request. Please check your input.",
+    "conflict": "A conflict occurred. Please refresh and try again.",
+    "tooManyRequests": "Too many requests. Please wait and try again."
+  },
+  "auth": {
+    "invalidCredentials": "Invalid email or password",
+    "emailNotVerified": "Please verify your email address",
+    "accountLocked": "Account is locked. Please contact support.",
+    "sessionExpired": "Your session has expired. Please log in again.",
+    "passwordTooWeak": "Password is too weak",
+    "emailAlreadyExists": "An account with this email already exists",
+    "invalidEmail": "Please enter a valid email address",
+    "passwordMismatch": "Passwords do not match",
+    "loginFailed": "Login failed. Please try again.",
+    "logoutFailed": "Logout failed. Please try again.",
+    "registrationFailed": "Registration failed. Please try again."
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidFormat": "Invalid format",
+    "tooShort": "Too short. Minimum {{min}} characters required.",
+    "tooLong": "Too long. Maximum {{max}} characters allowed.",
+    "invalidEmail": "Please enter a valid email address",
+    "invalidPhone": "Please enter a valid phone number",
+    "invalidUrl": "Please enter a valid URL",
+    "invalidDate": "Please enter a valid date",
+    "invalidNumber": "Please enter a valid number",
+    "negativeNumber": "Number cannot be negative",
+    "invalidFile": "Invalid file format",
+    "fileTooLarge": "File is too large. Maximum size: {{maxSize}}",
+    "invalidImage": "Invalid image format",
+    "imageTooLarge": "Image is too large. Maximum size: {{maxSize}}"
+  },
+  "operations": {
+    "createFailed": "Failed to create {{resource}}",
+    "updateFailed": "Failed to update {{resource}}",
+    "deleteFailed": "Failed to delete {{resource}}",
+    "loadFailed": "Failed to load {{resource}}",
+    "saveFailed": "Failed to save {{resource}}",
+    "uploadFailed": "Failed to upload file",
+    "downloadFailed": "Failed to download file",
+    "exportFailed": "Failed to export data",
+    "importFailed": "Failed to import data",
+    "copyFailed": "Failed to copy {{resource}}",
+    "moveFailed": "Failed to move {{resource}}"
+  },
+  "confirmActions": {
+    "delete": "Are you sure you want to delete this {{resource}}?",
+    "deleteMultiple": "Are you sure you want to delete {{count}} {{resource}}s?",
+    "unsavedChanges": "You have unsaved changes. Are you sure you want to leave?",
+    "permanentAction": "This action cannot be undone.",
+    "confirmLogout": "Are you sure you want to sign out?"
+  }
+}

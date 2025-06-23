@@ -1,0 +1,63 @@
+{
+  "general": {
+    "unknown": "Ocorreu um erro desconhecido",
+    "network": "Erro de rede. Verifique sua conexão.",
+    "server": "Erro do servidor. Tente novamente mais tarde.",
+    "timeout": "Tempo limite da solicitação. Tente novamente.",
+    "forbidden": "Você não tem permissão para executar esta ação.",
+    "notFound": "O recurso solicitado não foi encontrado.",
+    "unauthorized": "Você precisa estar logado para executar esta ação.",
+    "badRequest": "Solicitação inválida. Verifique sua entrada.",
+    "conflict": "Ocorreu um conflito. Atualize e tente novamente.",
+    "tooManyRequests": "Muitas solicitações. Aguarde e tente novamente."
+  },
+  "auth": {
+    "invalidCredentials": "E-mail ou senha inválidos",
+    "emailNotVerified": "Por favor, verifique seu endereço de e-mail",
+    "accountLocked": "A conta está bloqueada. Entre em contato com o suporte.",
+    "sessionExpired": "Sua sessão expirou. Faça login novamente.",
+    "passwordTooWeak": "A senha é muito fraca",
+    "emailAlreadyExists": "Já existe uma conta com este e-mail",
+    "invalidEmail": "Por favor, digite um endereço de e-mail válido",
+    "passwordMismatch": "As senhas não coincidem",
+    "loginFailed": "Falha no login. Tente novamente.",
+    "logoutFailed": "Falha no logout. Tente novamente.",
+    "registrationFailed": "Falha no registro. Tente novamente."
+  },
+  "validation": {
+    "required": "Este campo é obrigatório",
+    "invalidFormat": "Formato inválido",
+    "tooShort": "Muito curto. Mínimo de {{min}} caracteres necessários.",
+    "tooLong": "Muito longo. Máximo de {{max}} caracteres permitidos.",
+    "invalidEmail": "Por favor, digite um endereço de e-mail válido",
+    "invalidPhone": "Por favor, digite um número de telefone válido",
+    "invalidUrl": "Por favor, digite uma URL válida",
+    "invalidDate": "Por favor, digite uma data válida",
+    "invalidNumber": "Por favor, digite um número válido",
+    "negativeNumber": "O número não pode ser negativo",
+    "invalidFile": "Formato de arquivo inválido",
+    "fileTooLarge": "O arquivo é muito grande. Tamanho máximo: {{maxSize}}",
+    "invalidImage": "Formato de imagem inválido",
+    "imageTooLarge": "A imagem é muito grande. Tamanho máximo: {{maxSize}}"
+  },
+  "operations": {
+    "createFailed": "Falha ao criar {{resource}}",
+    "updateFailed": "Falha ao atualizar {{resource}}",
+    "deleteFailed": "Falha ao excluir {{resource}}",
+    "loadFailed": "Falha ao carregar {{resource}}",
+    "saveFailed": "Falha ao salvar {{resource}}",
+    "uploadFailed": "Falha ao enviar arquivo",
+    "downloadFailed": "Falha ao baixar arquivo",
+    "exportFailed": "Falha ao exportar dados",
+    "importFailed": "Falha ao importar dados",
+    "copyFailed": "Falha ao copiar {{resource}}",
+    "moveFailed": "Falha ao mover {{resource}}"
+  },
+  "confirmActions": {
+    "delete": "Tem certeza de que deseja excluir este {{resource}}?",
+    "deleteMultiple": "Tem certeza de que deseja excluir {{count}} {{resource}}s?",
+    "unsavedChanges": "Você tem alterações não salvas. Tem certeza de que deseja sair?",
+    "permanentAction": "Esta ação não pode ser desfeita.",
+    "confirmLogout": "Tem certeza de que deseja sair?"
+  }
+}

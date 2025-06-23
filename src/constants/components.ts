@@ -186,63 +186,62 @@ export const COMPONENTS = {
 export const FILTER_OPTIONS = {
   // User status filters
   userStatus: [
-    { value: 'all', label: 'All Status' },
-    { value: 'active', label: 'Active' },
-    { value: 'invited', label: 'Invited' },
-    { value: 'inactive', label: 'Inactive' }
+    { value: 'all', labelKey: 'allStatus' },
+    { value: 'active', labelKey: 'active' },
+    { value: 'invited', labelKey: 'invited' },
+    { value: 'inactive', labelKey: 'inactive' }
   ],
 
   // User role filters
   userRole: [
-    { value: 'all', label: 'All Roles' },
-    { value: 'super_admin', label: 'Super Admin' },
-    { value: 'admin', label: 'Admin' },
-    { value: 'editor', label: 'Editor' },
-    { value: 'viewer', label: 'Viewer' }
+    { value: 'all', labelKey: 'allRoles' },
+    { value: 'super_admin', labelKey: 'superAdmin' },
+    { value: 'admin', labelKey: 'admin' },
+    { value: 'user', labelKey: 'user' }
   ],
 
   // Product type filters
   productType: [
-    { value: 'all', label: 'All Types' },
-    { value: 'subscription', label: 'Subscription' },
-    { value: 'one-time', label: 'One-time' }
+    { value: 'all', labelKey: 'allTypes' },
+    { value: 'subscription', labelKey: 'subscription' },
+    { value: 'one-time', labelKey: 'oneTime' }
   ],
 
   // Post status filters
   postStatus: [
-    { value: 'all', label: 'All Status' },
-    { value: 'published', label: 'Published' },
-    { value: 'draft', label: 'Draft' }
+    { value: 'all', labelKey: 'allStatus' },
+    { value: 'published', labelKey: 'published' },
+    { value: 'draft', labelKey: 'draft' }
   ],
 
   // Post type filters
   postType: [
-    { value: 'all', label: 'All Types' },
-    { value: 'news', label: 'News' },
-    { value: 'tutorial', label: 'Tutorial' },
-    { value: 'guide', label: 'Guide' },
-    { value: 'announcement', label: 'Announcement' }
+    { value: 'all', labelKey: 'allTypes' },
+    { value: 'news', labelKey: 'news' },
+    { value: 'tutorial', labelKey: 'tutorial' },
+    { value: 'guide', labelKey: 'guide' },
+    { value: 'announcement', labelKey: 'announcement' }
   ],
 
   // Banner status filters
   bannerStatus: [
-    { value: 'all', label: 'All Status' },
-    { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' }
+    { value: 'all', labelKey: 'allStatus' },
+    { value: 'active', labelKey: 'active' },
+    { value: 'inactive', labelKey: 'inactive' }
   ],
 
   // Common sorting options
   sortOrder: [
-    { value: 'desc', label: 'Newest First' },
-    { value: 'asc', label: 'Oldest First' }
+    { value: 'desc', labelKey: 'newestFirst' },
+    { value: 'asc', labelKey: 'oldestFirst' }
   ],
 
   // Items per page options (already in API.pagination.options)
   itemsPerPage: [
-    { value: '10', label: '10 per page' },
-    { value: '25', label: '25 per page' },
-    { value: '50', label: '50 per page' },
-    { value: '100', label: '100 per page' }
+    { value: '10', labelKey: 'tenPerPage' },
+    { value: '25', labelKey: 'twentyFivePerPage' },
+    { value: '50', labelKey: 'fiftyPerPage' },
+    { value: '100', labelKey: 'hundredPerPage' }
   ]
 } as const
 

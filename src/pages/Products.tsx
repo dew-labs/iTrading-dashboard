@@ -12,6 +12,7 @@ import {
   Eye
 } from 'lucide-react'
 import { useProducts } from '../hooks/useProducts'
+import { useTranslation } from '../hooks/useTranslation'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import ProductForm from '../components/ProductForm'
@@ -39,6 +40,7 @@ import { INPUT_VARIANTS, FILTER_OPTIONS } from '../constants/components'
 
 const Products: React.FC = () => {
   const { products, loading, createProduct, updateProduct, deleteProduct } = useProducts()
+  const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
 
   const [filterSubscription, setFilterSubscription] = useState<string>('all')
@@ -124,7 +126,7 @@ const Products: React.FC = () => {
   }
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
+    if (window.confirm(t('products.deleteConfirm'))) {
       await deleteProduct(id)
       // Reset to first page if current page becomes empty
       if (paginatedProducts.length === 1 && currentPage > 1) {
@@ -171,7 +173,7 @@ const Products: React.FC = () => {
 
   const columns = [
     {
-      header: 'Product Details',
+      header: t('products.productDetails'),
       accessor: 'name' as keyof Product,
       sortable: true,
       render: (value: unknown, row: Product) => {
@@ -190,11 +192,11 @@ const Products: React.FC = () => {
             <div className="flex-1 min-w-0">
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>{value as string}</div>
               <div className={cn(getTypographyClasses('small'), 'truncate')}>
-                {row.description || 'No description'}
+                {row.description || t('products.noDescription')}
               </div>
               <div className="flex items-center space-x-2 mt-1">
                 <Badge variant={row.subscription ? PRODUCT_TYPES.SUBSCRIPTION : PRODUCT_TYPES.ONE_TIME} size="sm" showIcon>
-                  {row.subscription ? 'Subscription' : 'One-time'}
+                  {row.subscription ? t('products.subscription') : t('products.oneTime')}
                 </Badge>
               </div>
             </div>
@@ -203,7 +205,7 @@ const Products: React.FC = () => {
       }
     },
     {
-      header: 'Pricing',
+      header: t('products.pricing'),
       accessor: 'price' as keyof Product,
       sortable: true,
       render: (value: unknown, row: Product) => {
@@ -214,14 +216,14 @@ const Products: React.FC = () => {
               <span className="font-medium text-lg">${(value as number).toFixed(2)}</span>
             </div>
             <div className="text-xs text-gray-500">
-              {row.subscription ? 'per month' : 'one-time payment'}
+              {row.subscription ? t('products.perMonth') : t('products.oneTimePayment')}
             </div>
           </div>
         )
       }
     },
     {
-      header: 'Created Date',
+      header: t('products.createdDate'),
       accessor: 'created_at' as keyof Product,
       sortable: true,
       render: (value: unknown) => {
@@ -236,28 +238,28 @@ const Products: React.FC = () => {
       }
     },
     {
-      header: 'Actions',
+      header: t('products.actions'),
       accessor: 'id' as keyof Product,
       render: (value: unknown, row: Product) => (
         <div className="flex space-x-1">
           <button
             onClick={() => handleView(row)}
             className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-            title="View product details"
+            title={t('products.tooltips.viewProduct')}
           >
             <Eye className={getIconClasses('action')} />
           </button>
           <button
             onClick={() => handleEdit(row)}
             className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-            title="Edit product"
+            title={t('products.tooltips.editProduct')}
           >
             <Edit2 className={getIconClasses('action')} />
           </button>
           <button
             onClick={() => handleDelete(value as number)}
             className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-            title="Delete product"
+            title={t('products.tooltips.deleteProduct')}
           >
             <Trash2 className={getIconClasses('action')} />
           </button>
@@ -279,13 +281,10 @@ const Products: React.FC = () => {
   if (loading) {
     return (
       <div className={layout.container}>
-        <PageLoadingSpinner message="Loading products..." />
+        <PageLoadingSpinner message={t('products.loadingProducts')} />
       </div>
     )
   }
-
-  const startItem = (currentPage - 1) * itemsPerPage + 1
-  const endItem = Math.min(currentPage * itemsPerPage, filteredAndSortedProducts.length)
 
   return (
     <div className={layout.container}>
@@ -293,9 +292,9 @@ const Products: React.FC = () => {
         {/* Header */}
         <div className={layout.header}>
           <div>
-            <h1 className={getTypographyClasses('h1')}>Products Management</h1>
+            <h1 className={getTypographyClasses('h1')}>{t('products.title')}</h1>
             <p className={cn(getTypographyClasses('description'), 'mt-2')}>
-              Manage your product catalog and pricing
+              {t('products.description')}
             </p>
           </div>
           <div className="mt-4 sm:mt-0 flex items-center space-x-3">
@@ -304,7 +303,7 @@ const Products: React.FC = () => {
               className={getButtonClasses('primary', 'md')}
             >
               <Plus className="w-4 h-4 mr-2" />
-              Create Product
+              {t('products.createProduct')}
             </button>
           </div>
         </div>
@@ -318,7 +317,7 @@ const Products: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={totalProductsProps.valueClasses}>{products.length}</div>
-                <div className={totalProductsProps.labelClasses}>Total Products</div>
+                <div className={totalProductsProps.labelClasses}>{t('products.totalProducts')}</div>
               </div>
             </div>
           </div>
@@ -330,7 +329,7 @@ const Products: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={subscriptionProps.valueClasses}>{subscriptionProducts}</div>
-                <div className={subscriptionProps.labelClasses}>Subscriptions</div>
+                <div className={subscriptionProps.labelClasses}>{t('products.subscriptions')}</div>
               </div>
             </div>
           </div>
@@ -342,7 +341,7 @@ const Products: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={oneTimeProps.valueClasses}>{oneTimeProducts}</div>
-                <div className={oneTimeProps.labelClasses}>One-time</div>
+                <div className={oneTimeProps.labelClasses}>{t('products.oneTimeProducts')}</div>
               </div>
             </div>
           </div>
@@ -354,7 +353,7 @@ const Products: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={revenueProps.valueClasses}>${totalRevenue.toFixed(0)}</div>
-                <div className={revenueProps.labelClasses}>Total Value</div>
+                <div className={revenueProps.labelClasses}>{t('products.totalValue')}</div>
               </div>
             </div>
           </div>
@@ -371,7 +370,7 @@ const Products: React.FC = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search products by name or description..."
+                    placeholder={t('products.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className={cn(INPUT_VARIANTS.withIcon, 'py-2')}
@@ -387,7 +386,7 @@ const Products: React.FC = () => {
                     setFilterSubscription(value)
                     setCurrentPage(1)
                   }}
-                  label="Type"
+                  label={t('products.type')}
                 />
                 <PaginationSelector
                   value={itemsPerPage}
@@ -397,12 +396,7 @@ const Products: React.FC = () => {
                   }}
                   totalItems={filteredAndSortedProducts.length}
                 />
-                <div className={cn('flex items-center space-x-2', getTypographyClasses('small'))}>
-                  <Calendar className="w-4 h-4" />
-                  <span>
-                    Showing {startItem}-{endItem} of {filteredAndSortedProducts.length} products
-                  </span>
-                </div>
+
               </div>
             </div>
           </div>
@@ -427,25 +421,19 @@ const Products: React.FC = () => {
                   disabled={currentPage === 1}
                   className={getButtonClasses('secondary', 'md')}
                 >
-                  Previous
+                  {t('products.previous')}
                 </button>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className={cn(getButtonClasses('secondary', 'md'), 'ml-3')}
                 >
-                  Next
+                  {t('products.next')}
                 </button>
               </div>
 
               <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                  <p className={getTypographyClasses('small')}>
-                    Showing <span className="font-medium">{startItem}</span> to{' '}
-                    <span className="font-medium">{endItem}</span> of{' '}
-                    <span className="font-medium">{filteredAndSortedProducts.length}</span> results
-                  </p>
-                </div>
+                <div></div>
 
                 <div>
                   <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
@@ -492,7 +480,7 @@ const Products: React.FC = () => {
         <Modal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          title={editingProduct ? 'Edit Product' : 'Create New Product'}
+          title={editingProduct ? t('products.editProduct') : t('products.createNewProduct')}
         >
           <ProductForm
             product={editingProduct}
@@ -506,32 +494,32 @@ const Products: React.FC = () => {
           <DetailViewModal
             isOpen={!!viewingProduct}
             onClose={() => setViewingProduct(null)}
-            title={`Product Details: ${viewingProduct.name}`}
+            title={`${t('products.productDetails')}: ${viewingProduct.name}`}
             tableName="products"
             recordId={viewingProduct.id.toString()}
           >
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('products.name')}</label>
                   <p className="text-gray-900">{viewingProduct.name}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('products.price')}</label>
                   <p className="text-gray-900 font-semibold">${viewingProduct.price.toFixed(2)}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                  <p className="text-gray-900">{viewingProduct.subscription ? 'Subscription' : 'One-time'}</p>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('products.type')}</label>
+                  <p className="text-gray-900">{viewingProduct.subscription ? t('products.subscription') : t('products.oneTime')}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Created</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('products.created')}</label>
                   <p className="text-gray-900">{formatDateDisplay(viewingProduct.created_at)}</p>
                 </div>
               </div>
               {viewingProduct.description && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('products.description')}</label>
                   <p className="text-gray-900">{viewingProduct.description}</p>
                 </div>
               )}

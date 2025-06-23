@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { FileText, AlertCircle } from 'lucide-react'
 import type { Post, PostInsert } from '../types'
 import Select from './Select'
+import { useTranslation } from '../hooks/useTranslation'
 
 interface PostFormProps {
   post?: Post | null;
@@ -16,6 +17,7 @@ interface FormErrors {
 }
 
 const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
+  const { t } = useTranslation()
   const [formData, setFormData] = useState<PostInsert>({
     title: '',
     content: '',
@@ -156,8 +158,8 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
           value={formData.status || 'draft'}
           onChange={(value) => setFormData({ ...formData, status: value as Post['status'] })}
           options={[
-            { value: 'draft', label: '📝 Draft' },
-            { value: 'published', label: '✅ Published' }
+            { value: 'draft', label: `📝 ${t('draft')}` },
+            { value: 'published', label: `✅ ${t('published')}` }
           ]}
           disabled={isSubmitting}
         />

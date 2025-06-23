@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
+import { useTranslation } from '../hooks/useTranslation'
 import LoadingSpinner from './LoadingSpinner'
 import { toast } from '../utils/toast'
 
@@ -10,6 +11,7 @@ interface AuthFormProps {
 }
 
 const AuthForm: React.FC<AuthFormProps> = () => {
+  const { t } = useTranslation()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -26,10 +28,10 @@ const AuthForm: React.FC<AuthFormProps> = () => {
       if (error) {
         toast.error(error)
       } else {
-        toast.success('Welcome back!')
+        toast.success(t('welcomeBack'))
       }
     } catch {
-      toast.error('An unexpected error occurred')
+      toast.error(t('unexpectedError'))
     }
   }
 
@@ -47,9 +49,9 @@ const AuthForm: React.FC<AuthFormProps> = () => {
           <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
             <span className="text-white font-bold text-xl">i</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('adminDashboard')}</h1>
           <p className="text-gray-600 mt-2">
-            Sign in to access your dashboard
+            {t('signInToAccess')}
           </p>
         </div>
 
@@ -59,7 +61,7 @@ const AuthForm: React.FC<AuthFormProps> = () => {
               htmlFor="email"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Email Address
+              {t('emailAddress')}
             </label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -70,7 +72,7 @@ const AuthForm: React.FC<AuthFormProps> = () => {
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-black transition-colors duration-200"
-                placeholder="Enter your email"
+                placeholder={t('enterEmail')}
                 required
               />
             </div>
@@ -81,7 +83,7 @@ const AuthForm: React.FC<AuthFormProps> = () => {
               htmlFor="password"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Password
+              {t('password')}
             </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -92,7 +94,7 @@ const AuthForm: React.FC<AuthFormProps> = () => {
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-black transition-colors duration-200"
-                placeholder="Enter your password"
+                placeholder={t('enterPassword')}
                 required
               />
               <button
@@ -117,17 +119,17 @@ const AuthForm: React.FC<AuthFormProps> = () => {
             {loading ? (
               <div className="flex items-center space-x-2">
                 <LoadingSpinner size="sm" className="text-white" />
-                <span>Signing in...</span>
+                <span>{t('signingIn')}</span>
               </div>
             ) : (
-              'Sign In'
+              t('signIn')
             )}
           </button>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-gray-500 text-sm">
-            Admin access only. Contact your super admin for account access.
+            {t('adminAccessOnly')}
           </p>
         </div>
       </div>

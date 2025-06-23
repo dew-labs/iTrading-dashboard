@@ -1,0 +1,61 @@
+{
+  "types": {
+    "user": "User Activity",
+    "post": "Content Activity",
+    "product": "Product Activity",
+    "banner": "Banner Activity",
+    "system": "System Activity"
+  },
+  "actions": {
+    "created": "created",
+    "updated": "updated",
+    "deleted": "deleted",
+    "published": "published",
+    "activated": "activated",
+    "deactivated": "deactivated",
+    "registered": "registered",
+    "suspended": "suspended",
+    "restored": "restored",
+    "uploaded": "uploaded",
+    "downloaded": "downloaded"
+  },
+  "messages": {
+    "userRegistered": "New user registered",
+    "userUpdated": "User profile updated",
+    "userSuspended": "User account suspended",
+    "userRestored": "User account restored",
+    "postCreated": "New post created",
+    "postUpdated": "Post updated",
+    "postPublished": "Post published",
+    "postDeleted": "Post deleted",
+    "productCreated": "New product created",
+    "productUpdated": "Product updated",
+    "productDeleted": "Product deleted",
+    "lowStockAlert": "Low stock alert",
+    "bannerCreated": "New banner created",
+    "bannerActivated": "Banner activated",
+    "bannerDeactivated": "Banner deactivated",
+    "systemBackupCompleted": "System backup completed",
+    "systemMaintenanceScheduled": "System maintenance scheduled",
+    "systemUpdateAvailable": "System update available"
+  },
+  "recentActivity": "Recent Activity",
+  "viewAll": "View all notifications",
+  "markAsRead": "Mark as read",
+  "markAllAsRead": "Mark all as read",
+  "noNotifications": "No notifications",
+  "newNotifications": "{{count}} new",
+  "timestamp": {
+    "now": "Just now",
+    "minuteAgo": "1 minute ago",
+    "minutesAgo": "{{count}} minutes ago",
+    "hourAgo": "1 hour ago",
+    "hoursAgo": "{{count}} hours ago",
+    "dayAgo": "1 day ago",
+    "daysAgo": "{{count}} days ago",
+    "weekAgo": "1 week ago",
+    "weeksAgo": "{{count}} weeks ago",
+    "monthAgo": "1 month ago",
+    "monthsAgo": "{{count}} months ago"
+  }
+}

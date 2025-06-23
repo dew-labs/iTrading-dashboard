@@ -1,12 +1,11 @@
 import React from 'react'
 import { Users, Package, FileText, Image, Plus, TrendingUp, Settings } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import Badge from '../components/Badge'
-import { USER_ROLES, USER_STATUSES, POST_STATUSES, PRODUCT_TYPES } from '../constants/general'
 import { useUsers } from '../hooks/useUsers'
 import { useProducts } from '../hooks/useProducts'
 import { usePosts } from '../hooks/usePosts'
 import { useBanners } from '../hooks/useBanners'
+import { useTranslation } from '../hooks/useTranslation'
 import PageLoadingSpinner from '../components/PageLoadingSpinner'
 
 // Theme imports
@@ -21,6 +20,7 @@ import {
 } from '../utils/theme'
 
 const Dashboard: React.FC = () => {
+  const { t } = useTranslation()
   const { users, loading: usersLoading } = useUsers()
   const { products, loading: productsLoading } = useProducts()
   const { posts, loading: postsLoading } = usePosts()
@@ -39,32 +39,32 @@ const Dashboard: React.FC = () => {
   // Quick actions
   const quickActions = [
     {
-      title: 'Create User',
-      description: 'Add new user to the system',
+      titleKey: 'createUser',
+      descriptionKey: 'createUserDescription',
       icon: Users,
       path: '/users',
       color: 'users',
       gradient: 'from-blue-500 to-blue-600'
     },
     {
-      title: 'Add Product',
-      description: 'Create new product or service',
+      titleKey: 'addProduct',
+      descriptionKey: 'addProductDescription',
       icon: Package,
       path: '/products',
       color: 'products',
       gradient: 'from-purple-500 to-purple-600'
     },
     {
-      title: 'Write Post',
-      description: 'Create news or content post',
+      titleKey: 'writePost',
+      descriptionKey: 'writePostDescription',
       icon: FileText,
       path: '/posts',
       color: 'posts',
       gradient: 'from-green-500 to-green-600'
     },
     {
-      title: 'New Banner',
-      description: 'Add promotional banner',
+      titleKey: 'newBanner',
+      descriptionKey: 'newBannerDescription',
       icon: Image,
       path: '/banners',
       color: 'banners',
@@ -81,7 +81,7 @@ const Dashboard: React.FC = () => {
   if (isLoading) {
     return (
       <div className={layout.container}>
-        <PageLoadingSpinner message="Loading dashboard data..." />
+        <PageLoadingSpinner message={t('loadingDashboard')} />
       </div>
     )
   }
@@ -92,15 +92,15 @@ const Dashboard: React.FC = () => {
         {/* Header */}
         <div className={layout.header}>
           <div>
-            <h1 className={getTypographyClasses('h1')}>Dashboard</h1>
+            <h1 className={getTypographyClasses('h1')}>{t('dashboard')}</h1>
             <p className={cn(getTypographyClasses('description'), 'mt-2')}>
-              Welcome to your iTrading dashboard. Monitor your system overview and quick actions.
+              {t('welcomeMessage')}
             </p>
           </div>
           <div className="mt-4 sm:mt-0 flex items-center space-x-3">
             <Link to="/settings" className={getButtonClasses('secondary', 'md')}>
               <Settings className="w-4 h-4 mr-2" />
-              Settings
+              {t('settings')}
             </Link>
           </div>
         </div>
@@ -114,9 +114,9 @@ const Dashboard: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={userStatsProps.valueClasses}>{users.length}</div>
-                <div className={userStatsProps.labelClasses}>Total Users</div>
+                <div className={userStatsProps.labelClasses}>{t('totalUsers')}</div>
                 <div className={cn(getTypographyClasses('xs'), 'text-green-600 mt-1')}>
-                  {activeUsers} active
+                  {activeUsers} {t('active')}
                 </div>
               </div>
             </div>
@@ -129,9 +129,9 @@ const Dashboard: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={productStatsProps.valueClasses}>{products.length}</div>
-                <div className={productStatsProps.labelClasses}>Products</div>
+                <div className={productStatsProps.labelClasses}>{t('productsLabel')}</div>
                 <div className={cn(getTypographyClasses('xs'), 'text-purple-600 mt-1')}>
-                  {products.filter(p => p.subscription).length} subscriptions
+                  {products.filter(p => p.subscription).length} {t('subscriptions')}
                 </div>
               </div>
             </div>
@@ -144,9 +144,9 @@ const Dashboard: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={postStatsProps.valueClasses}>{posts.length}</div>
-                <div className={postStatsProps.labelClasses}>Content Posts</div>
+                <div className={postStatsProps.labelClasses}>{t('contentPosts')}</div>
                 <div className={cn(getTypographyClasses('xs'), 'text-green-600 mt-1')}>
-                  {publishedPosts} published
+                  {publishedPosts} {t('published')}
                 </div>
               </div>
             </div>
@@ -159,9 +159,9 @@ const Dashboard: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={bannerStatsProps.valueClasses}>{banners.length}</div>
-                <div className={bannerStatsProps.labelClasses}>Banners</div>
+                <div className={bannerStatsProps.labelClasses}>{t('bannersLabel')}</div>
                 <div className={cn(getTypographyClasses('xs'), 'text-teal-600 mt-1')}>
-                  {activeBanners} active
+                  {activeBanners} {t('active')}
                 </div>
               </div>
             </div>
@@ -171,9 +171,9 @@ const Dashboard: React.FC = () => {
         {/* Quick Actions */}
         <div className={getCardClasses('base')}>
           <div className="p-6">
-            <h2 className={getTypographyClasses('h2')}>Quick Actions</h2>
+            <h2 className={getTypographyClasses('h2')}>{t('quickActions')}</h2>
             <p className={cn(getTypographyClasses('description'), 'mt-1')}>
-              Get started with common tasks and operations
+              {t('quickActionsDescription')}
             </p>
           </div>
 
@@ -195,10 +195,10 @@ const Dashboard: React.FC = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className={cn(getTypographyClasses('h4'), 'group-hover:text-gray-700')}>
-                        {action.title}
+                        {t(action.titleKey)}
                       </h3>
                       <p className={cn(getTypographyClasses('small'), 'mt-1')}>
-                        {action.description}
+                        {t(action.descriptionKey)}
                       </p>
                     </div>
                     <Plus className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
@@ -209,98 +209,14 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Badge Showcase */}
-        <div className={getCardClasses('base')}>
-          <div className="p-6">
-            <h2 className={getTypographyClasses('h2')}>System Status Indicators</h2>
-            <p className={cn(getTypographyClasses('description'), 'mt-1 mb-6')}>
-              Visual status badges used throughout the application
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* User Roles */}
-              <div>
-                <h3 className={cn(getTypographyClasses('h4'), 'mb-3')}>User Roles</h3>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Badge variant={USER_ROLES.SUPER_ADMIN} showIcon />
-                    <Badge variant={USER_ROLES.SUPER_ADMIN} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Badge variant={USER_ROLES.ADMIN} showIcon />
-                    <Badge variant={USER_ROLES.ADMIN} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Badge variant={USER_ROLES.USER} showIcon />
-                    <Badge variant={USER_ROLES.USER} />
-                  </div>
-                </div>
-              </div>
-
-              {/* User Statuses */}
-              <div>
-                <h3 className={cn(getTypographyClasses('h4'), 'mb-3')}>User Statuses</h3>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Badge variant={USER_STATUSES.ACTIVE} showIcon />
-                    <Badge variant={USER_STATUSES.ACTIVE} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Badge variant={USER_STATUSES.INACTIVE} showIcon />
-                    <Badge variant={USER_STATUSES.INACTIVE} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Badge variant={USER_STATUSES.SUSPENDED} showIcon />
-                    <Badge variant={USER_STATUSES.SUSPENDED} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Badge variant={USER_STATUSES.INVITED} showIcon />
-                    <Badge variant={USER_STATUSES.INVITED} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Content Types */}
-              <div>
-                <h3 className={cn(getTypographyClasses('h4'), 'mb-3')}>Content & Products</h3>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Badge variant={POST_STATUSES.PUBLISHED} showIcon />
-                    <Badge variant={POST_STATUSES.PUBLISHED} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Badge variant={POST_STATUSES.DRAFT} showIcon />
-                    <Badge variant={POST_STATUSES.DRAFT} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Badge variant={PRODUCT_TYPES.SUBSCRIPTION} showIcon />
-                    <Badge variant={PRODUCT_TYPES.SUBSCRIPTION} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Badge variant={PRODUCT_TYPES.ONE_TIME} showIcon />
-                    <Badge variant={PRODUCT_TYPES.ONE_TIME} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-              <p className={cn(getTypographyClasses('small'), 'text-gray-600')}>
-                <span className="font-medium">Note:</span> These badges are used consistently across all pages with automatic icon integration.
-                The left column shows badges with icons, the right column shows the same badges without icons.
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Recent Activity Overview */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* System Overview */}
           <div className={getCardClasses('base')}>
             <div className="p-6">
-              <h3 className={getTypographyClasses('h3')}>System Overview</h3>
+              <h3 className={getTypographyClasses('h3')}>{t('systemOverview')}</h3>
               <p className={cn(getTypographyClasses('small'), 'mt-1 mb-4')}>
-                Current system status and metrics
+                {t('systemOverviewDescription')}
               </p>
 
               <div className="space-y-4">
@@ -309,7 +225,7 @@ const Dashboard: React.FC = () => {
                     <div className={getIconClasses('stats', 'users')}>
                       <Users className="w-6 h-6 text-white" />
                     </div>
-                    <span className={getTypographyClasses('small')}>Active Users</span>
+                    <span className={getTypographyClasses('small')}>{t('activeUsers')}</span>
                   </div>
                   <span className={cn(getTypographyClasses('h4'), 'text-blue-600')}>
                     {activeUsers}/{users.length}
@@ -321,7 +237,7 @@ const Dashboard: React.FC = () => {
                     <div className={getIconClasses('stats', 'posts')}>
                       <FileText className="w-6 h-6 text-white" />
                     </div>
-                    <span className={getTypographyClasses('small')}>Published Content</span>
+                    <span className={getTypographyClasses('small')}>{t('publishedContent')}</span>
                   </div>
                   <span className={cn(getTypographyClasses('h4'), 'text-green-600')}>
                     {publishedPosts}/{posts.length}
@@ -333,7 +249,7 @@ const Dashboard: React.FC = () => {
                     <div className={getIconClasses('stats', 'banners')}>
                       <Image className="w-6 h-6 text-white" />
                     </div>
-                    <span className={getTypographyClasses('small')}>Active Promotions</span>
+                    <span className={getTypographyClasses('small')}>{t('activePromotions')}</span>
                   </div>
                   <span className={cn(getTypographyClasses('h4'), 'text-teal-600')}>
                     {activeBanners}/{banners.length}
@@ -345,10 +261,10 @@ const Dashboard: React.FC = () => {
                     <div className={getIconClasses('stats', 'products')}>
                       <Package className="w-6 h-6 text-white" />
                     </div>
-                    <span className={getTypographyClasses('small')}>Product Catalog</span>
+                    <span className={getTypographyClasses('small')}>{t('productCatalog')}</span>
                   </div>
                   <span className={cn(getTypographyClasses('h4'), 'text-purple-600')}>
-                    {products.length} items
+                    {products.length} {t('items')}
                   </span>
                 </div>
               </div>
@@ -358,16 +274,16 @@ const Dashboard: React.FC = () => {
           {/* Quick Stats */}
           <div className={getCardClasses('base')}>
             <div className="p-6">
-              <h3 className={getTypographyClasses('h3')}>Quick Statistics</h3>
+              <h3 className={getTypographyClasses('h3')}>{t('quickStatistics')}</h3>
               <p className={cn(getTypographyClasses('small'), 'mt-1 mb-4')}>
-                Key performance indicators at a glance
+                {t('quickStatisticsDescription')}
               </p>
 
               <div className="space-y-4">
                 <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className={cn(getTypographyClasses('small'), 'text-blue-700')}>User Growth Rate</p>
+                      <p className={cn(getTypographyClasses('small'), 'text-blue-700')}>{t('userGrowthRate')}</p>
                       <p className={cn(getTypographyClasses('h4'), 'text-blue-900')}>
                         {users.length > 0 ? Math.round((activeUsers / users.length) * 100) : 0}%
                       </p>
@@ -379,7 +295,7 @@ const Dashboard: React.FC = () => {
                 <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className={cn(getTypographyClasses('small'), 'text-green-700')}>Content Published</p>
+                      <p className={cn(getTypographyClasses('small'), 'text-green-700')}>{t('contentPublished')}</p>
                       <p className={cn(getTypographyClasses('h4'), 'text-green-900')}>
                         {posts.length > 0 ? Math.round((publishedPosts / posts.length) * 100) : 0}%
                       </p>
@@ -391,7 +307,7 @@ const Dashboard: React.FC = () => {
                 <div className="bg-gradient-to-r from-teal-50 to-teal-100 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className={cn(getTypographyClasses('small'), 'text-teal-700')}>Banner Activity</p>
+                      <p className={cn(getTypographyClasses('small'), 'text-teal-700')}>{t('bannerActivity')}</p>
                       <p className={cn(getTypographyClasses('h4'), 'text-teal-900')}>
                         {banners.length > 0 ? Math.round((activeBanners / banners.length) * 100) : 0}%
                       </p>

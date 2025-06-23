@@ -14,6 +14,7 @@ import {
   XCircle
 } from 'lucide-react'
 import { useBanners } from '../hooks/useBanners'
+import { useTranslation } from '../hooks/useTranslation'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import BannerForm from '../components/BannerForm'
@@ -39,6 +40,7 @@ import { INPUT_VARIANTS, FILTER_OPTIONS } from '../constants/components'
 
 const Banners: React.FC = () => {
   const { banners, loading, createBanner, updateBanner, deleteBanner } = useBanners()
+  const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -113,7 +115,7 @@ const Banners: React.FC = () => {
   }
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this banner?')) {
+    if (window.confirm(t('banners.deleteConfirm'))) {
       await deleteBanner(id)
       // Reset to first page if current page becomes empty
       if (paginatedBanners.length === 1 && currentPage > 1) {
@@ -164,7 +166,7 @@ const Banners: React.FC = () => {
 
   const columns = [
     {
-      header: 'Banner Details',
+      header: t('banners.bannerDetails'),
       accessor: 'target_url' as keyof Banner,
       sortable: true,
       render: (value: unknown, row: Banner) => {
@@ -182,12 +184,12 @@ const Banners: React.FC = () => {
             </div>
             <div className="flex-1 min-w-0">
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>
-                {(value as string | null) || 'No target URL'}
+                {(value as string | null) || t('banners.noTargetUrl')}
               </div>
               <div className={cn(getTypographyClasses('small'), 'truncate')}>ID: {row.id.slice(0, 8)}...</div>
               <div className="flex items-center space-x-2 mt-1">
                 <Badge variant={row.is_active ? 'active' : 'inactive'} size="sm" showIcon>
-                  {row.is_active ? 'Active' : 'Inactive'}
+                  {row.is_active ? t('banners.active') : t('banners.inactive')}
                 </Badge>
               </div>
             </div>
@@ -196,7 +198,7 @@ const Banners: React.FC = () => {
       }
     },
     {
-      header: 'Target URL',
+      header: t('banners.targetUrl'),
       accessor: 'id' as keyof Banner,
       render: (value: unknown, row: Banner) => {
         return (
@@ -216,7 +218,7 @@ const Banners: React.FC = () => {
             ) : (
               <div className="flex items-center text-gray-500">
                 <Link className="w-4 h-4 mr-1" />
-                <span>No URL set</span>
+                <span>{t('banners.noUrlSet')}</span>
               </div>
             )}
           </div>
@@ -224,7 +226,7 @@ const Banners: React.FC = () => {
       }
     },
     {
-      header: 'Created Date',
+      header: t('banners.createdDate'),
       accessor: 'created_at' as keyof Banner,
       sortable: true,
       render: (value: unknown) => {
@@ -239,14 +241,14 @@ const Banners: React.FC = () => {
       }
     },
     {
-      header: 'Actions',
+      header: t('banners.actions'),
       accessor: 'id' as keyof Banner,
       render: (value: unknown, row: Banner) => (
         <div className="flex space-x-1">
           <button
             onClick={() => handleToggleStatus(row)}
             className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-            title={row.is_active ? 'Deactivate banner' : 'Activate banner'}
+            title={row.is_active ? t('banners.tooltips.deactivateBanner') : t('banners.tooltips.activateBanner')}
           >
             {row.is_active ? (
               <ToggleLeft className={getIconClasses('action')} />
@@ -257,14 +259,14 @@ const Banners: React.FC = () => {
           <button
             onClick={() => handleEdit(row)}
             className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-            title="Edit banner"
+            title={t('banners.tooltips.editBanner')}
           >
             <Edit2 className={getIconClasses('action')} />
           </button>
           <button
             onClick={() => handleDelete(value as string)}
             className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-            title="Delete banner"
+            title={t('banners.tooltips.deleteBanner')}
           >
             <Trash2 className={getIconClasses('action')} />
           </button>
@@ -286,13 +288,10 @@ const Banners: React.FC = () => {
   if (loading) {
     return (
       <div className={layout.container}>
-        <PageLoadingSpinner message="Loading banners..." />
+        <PageLoadingSpinner message={t('banners.loadingBanners')} />
       </div>
     )
   }
-
-  const startItem = (currentPage - 1) * itemsPerPage + 1
-  const endItem = Math.min(currentPage * itemsPerPage, filteredAndSortedBanners.length)
 
   return (
     <div className={layout.container}>
@@ -300,9 +299,9 @@ const Banners: React.FC = () => {
         {/* Header */}
         <div className={layout.header}>
           <div>
-            <h1 className={getTypographyClasses('h1')}>Banners Management</h1>
+            <h1 className={getTypographyClasses('h1')}>{t('banners.title')}</h1>
             <p className={cn(getTypographyClasses('description'), 'mt-2')}>
-              Create and manage your promotional banners
+              {t('banners.description')}
             </p>
           </div>
           <div className="mt-4 sm:mt-0 flex items-center space-x-3">
@@ -311,7 +310,7 @@ const Banners: React.FC = () => {
               className={getButtonClasses('primary', 'md')}
             >
               <Plus className="w-4 h-4 mr-2" />
-              Create Banner
+              {t('banners.createBanner')}
             </button>
           </div>
         </div>
@@ -325,7 +324,7 @@ const Banners: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={totalBannersProps.valueClasses}>{banners.length}</div>
-                <div className={totalBannersProps.labelClasses}>Total Banners</div>
+                <div className={totalBannersProps.labelClasses}>{t('banners.totalBanners')}</div>
               </div>
             </div>
           </div>
@@ -337,7 +336,7 @@ const Banners: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={activeProps.valueClasses}>{activeBanners}</div>
-                <div className={activeProps.labelClasses}>Active</div>
+                <div className={activeProps.labelClasses}>{t('banners.active')}</div>
               </div>
             </div>
           </div>
@@ -349,7 +348,7 @@ const Banners: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={inactiveProps.valueClasses}>{inactiveBanners}</div>
-                <div className={inactiveProps.labelClasses}>Inactive</div>
+                <div className={inactiveProps.labelClasses}>{t('banners.inactive')}</div>
               </div>
             </div>
           </div>
@@ -361,7 +360,7 @@ const Banners: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className={rateProps.valueClasses}>{activeRate.toFixed(0)}%</div>
-                <div className={rateProps.labelClasses}>Active Rate</div>
+                <div className={rateProps.labelClasses}>{t('banners.activeRate')}</div>
               </div>
             </div>
           </div>
@@ -378,7 +377,7 @@ const Banners: React.FC = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search banners by URL..."
+                    placeholder={t('banners.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className={cn(INPUT_VARIANTS.withIcon, 'py-2')}
@@ -394,7 +393,7 @@ const Banners: React.FC = () => {
                     setFilterStatus(value)
                     setCurrentPage(1)
                   }}
-                  label="Status"
+                  label={t('banners.status')}
                 />
                 <PaginationSelector
                   value={itemsPerPage}
@@ -404,12 +403,7 @@ const Banners: React.FC = () => {
                   }}
                   totalItems={filteredAndSortedBanners.length}
                 />
-                <div className={cn('flex items-center space-x-2', getTypographyClasses('small'))}>
-                  <Calendar className="w-4 h-4" />
-                  <span>
-                    Showing {startItem}-{endItem} of {filteredAndSortedBanners.length} banners
-                  </span>
-                </div>
+
               </div>
             </div>
           </div>
@@ -434,25 +428,19 @@ const Banners: React.FC = () => {
                   disabled={currentPage === 1}
                   className={getButtonClasses('secondary', 'md')}
                 >
-                  Previous
+                  {t('banners.previous')}
                 </button>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className={cn(getButtonClasses('secondary', 'md'), 'ml-3')}
                 >
-                  Next
+                  {t('banners.next')}
                 </button>
               </div>
 
               <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                  <p className={getTypographyClasses('small')}>
-                    Showing <span className="font-medium">{startItem}</span> to{' '}
-                    <span className="font-medium">{endItem}</span> of{' '}
-                    <span className="font-medium">{filteredAndSortedBanners.length}</span> results
-                  </p>
-                </div>
+                <div></div>
 
                 <div>
                   <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
@@ -499,7 +487,7 @@ const Banners: React.FC = () => {
         <Modal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          title={editingBanner ? 'Edit Banner' : 'Create New Banner'}
+          title={editingBanner ? t('banners.editBanner') : t('banners.createNewBanner')}
         >
           <BannerForm
             banner={editingBanner}
