@@ -69,7 +69,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
   const checkboxBaseStyles = `
     relative inline-flex items-center justify-center
     border-2 transition-all duration-200 ease-in-out
-    focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2
+    focus:outline-none focus:border-black
     cursor-pointer group
     ${config.checkbox}
     ${variant === 'rounded' ? 'rounded-full' : 'rounded-md'}

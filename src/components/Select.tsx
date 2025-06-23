@@ -136,8 +136,8 @@ const Select: React.FC<SelectProps> = ({
     const baseStyles = `
       relative w-full bg-white border rounded-lg
       flex items-center justify-between
-      transition-all duration-200 ease-in-out
-      focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent
+      transition-colors duration-200 ease-in-out
+      focus:outline-none focus:border-black
       ${config.button}
     `
 
@@ -146,14 +146,14 @@ const Select: React.FC<SelectProps> = ({
     }
 
     if (error) {
-      return `${baseStyles} border-red-300 hover:border-red-400 text-gray-900`
+      return `${baseStyles} border-red-300 hover:border-red-400 text-gray-900 focus:border-red-500`
     }
 
     if (variant === 'minimal') {
-      return `${baseStyles} border-transparent hover:bg-gray-50 text-gray-900`
+      return `${baseStyles} border-transparent hover:bg-gray-50 text-gray-900 focus:border-black`
     }
 
-    return `${baseStyles} border-gray-300 hover:border-gray-900 text-gray-900 hover:shadow-md`
+    return `${baseStyles} border-gray-300 hover:border-gray-400 text-gray-900 focus:border-black`
   }
 
   const getDropdownStyles = () => {

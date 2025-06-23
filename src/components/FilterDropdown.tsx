@@ -74,14 +74,13 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
         className={cn(
-          'inline-flex items-center space-x-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-all duration-200',
-          'focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-1',
+          'inline-flex items-center space-x-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors duration-200',
+          'focus:outline-none focus:border-black',
           disabled
             ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
             : isActive
               ? 'bg-gray-900 text-white border-gray-900 shadow-md hover:shadow-lg'
-              : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400 hover:bg-gray-50',
-          isOpen && 'ring-2 ring-gray-900 ring-offset-1'
+              : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400 hover:bg-gray-50'
         )}
       >
         {/* Filter Icon */}

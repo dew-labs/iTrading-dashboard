@@ -69,14 +69,14 @@ const FormInput: React.FC<FormInputProps> = ({
           onBlur={onBlur}
           disabled={disabled}
           className={`
-            w-full ${showIcon ? 'pl-12' : 'pl-4'} pr-4 py-3.5 border-2 rounded-xl shadow-sm
-            transition-all duration-200 ease-in-out
-            focus:outline-none focus:ring-4 focus:ring-gray-900/10
+            w-full ${showIcon ? 'pl-12' : 'pl-4'} pr-4 py-3.5 border-2 rounded-xl
+            transition-colors duration-200 ease-in-out
+            focus:outline-none
             ${hasError
       ? 'border-red-300 bg-red-50 focus:border-red-500'
       : hasValue
         ? 'border-green-300 bg-green-50 focus:border-green-500'
-        : 'border-gray-200 bg-white focus:border-gray-900 hover:border-gray-300'
+        : 'border-gray-200 bg-white focus:border-black hover:border-gray-300'
     }
             ${disabled ? 'bg-gray-50 cursor-not-allowed opacity-75' : ''}
             placeholder:text-gray-400

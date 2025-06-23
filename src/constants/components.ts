@@ -9,7 +9,7 @@ import { COMPONENT_SPACING } from './spacing'
 export const BASE_STYLES = {
   // Reset and base
   reset: 'box-border',
-  focus: 'focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2',
+  focus: 'focus:outline-none focus:border-black',
 
   // Common transitions
   transition: {
@@ -68,11 +68,11 @@ export const BUTTON_SIZES = {
 
 // Input variants
 export const INPUT_VARIANTS = {
-  base: 'w-full border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-colors duration-200',
+  base: 'w-full border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-black transition-colors duration-200',
 
-  withIcon: 'w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-colors duration-200',
+  withIcon: 'w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-black transition-colors duration-200',
 
-  error: 'w-full border border-red-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors duration-200',
+  error: 'w-full border border-red-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors duration-200',
 
   disabled: 'w-full border border-gray-200 rounded-lg bg-gray-50 text-gray-500 placeholder-gray-400 cursor-not-allowed'
 } as const

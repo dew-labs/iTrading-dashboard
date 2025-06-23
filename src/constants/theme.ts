@@ -173,7 +173,7 @@ export const COMPONENTS = {
 
   // Form elements
   input: {
-    base: 'w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent',
+    base: 'w-full border border-gray-300 rounded-lg focus:outline-none focus:border-black transition-colors duration-200',
     withIcon: 'pl-10 pr-4 py-2'
   },
 
