@@ -21,6 +21,7 @@ import PageLoadingSpinner from '../components/PageLoadingSpinner'
 import RecordImage from '../components/RecordImage'
 import DetailViewModal from '../components/DetailViewModal'
 import Badge from '../components/Badge'
+import RichTextRenderer, { stripHtmlAndTruncate } from '../components/RichTextRenderer'
 import { PRODUCT_TYPES } from '../constants/general'
 
 import FilterDropdown from '../components/FilterDropdown'
@@ -227,8 +228,8 @@ const Products: React.FC = () => {
             </div>
             <div className="flex-1 min-w-0">
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>{value as string}</div>
-              <div className={cn(getTypographyClasses('small'), 'truncate')}>
-                {row.description || t('products.noDescription')}
+              <div className={cn(getTypographyClasses('small'), 'text-gray-600 truncate')}>
+                {row.description ? stripHtmlAndTruncate(row.description, 80) : t('products.noDescription')}
               </div>
               <div className="flex items-center space-x-2 mt-1">
                 <Badge variant={row.subscription ? PRODUCT_TYPES.SUBSCRIPTION : PRODUCT_TYPES.ONE_TIME} size="sm" showIcon>
@@ -555,8 +556,8 @@ const Products: React.FC = () => {
               </div>
               {viewingProduct.description && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('products.description')}</label>
-                  <p className="text-gray-900">{viewingProduct.description}</p>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('products.description')}</label>
+                  <RichTextRenderer content={viewingProduct.description} />
                 </div>
               )}
             </div>

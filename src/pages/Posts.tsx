@@ -25,6 +25,7 @@ import FilterDropdown from '../components/FilterDropdown'
 import PaginationSelector from '../components/PaginationSelector'
 import RecordImage from '../components/RecordImage'
 import Badge from '../components/Badge'
+import RichTextRenderer from '../components/RichTextRenderer'
 import { POST_STATUSES, POST_TYPES } from '../constants/general'
 import type { Post, PostInsert } from '../types'
 
@@ -618,11 +619,12 @@ const Posts: React.FC = () => {
                 </Badge>
               </div>
 
-              <div className="prose max-w-none">
+              <div className="space-y-4">
                 <div className={getTypographyClasses('h2')}>{viewingPost.title}</div>
                 {viewingPost.content && (
-                  <div className={cn(getTypographyClasses('base'), 'mt-4')}>
-                    {viewingPost.content}
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                    <RichTextRenderer content={viewingPost.content} />
                   </div>
                 )}
               </div>

@@ -17,6 +17,7 @@ import BrokerForm from '../components/BrokerForm'
 import ConfirmDialog from '../components/ConfirmDialog'
 import PageLoadingSpinner from '../components/PageLoadingSpinner'
 import RecordImage from '../components/RecordImage'
+import { stripHtmlAndTruncate } from '../components/RichTextRenderer'
 
 import PaginationSelector from '../components/PaginationSelector'
 import type { Broker, BrokerInsert } from '../types'
@@ -204,8 +205,8 @@ const Brokers: React.FC = () => {
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>
                 {value as string || t('brokers.noHeadquarterInfo')}
               </div>
-              <div className={cn(getTypographyClasses('small'), 'line-clamp-2')}>
-                {row.description || t('brokers.noDescription')}
+              <div className={cn(getTypographyClasses('small'), 'text-gray-600')}>
+                {row.description ? stripHtmlAndTruncate(row.description, 80) : t('brokers.noDescription')}
               </div>
             </div>
           </div>

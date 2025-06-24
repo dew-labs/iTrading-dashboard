@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { FileText, AlertCircle } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 import type { Post, PostInsert } from '../types'
 import Select from './Select'
+import RichTextEditor from './RichTextEditor'
 import { useTranslation } from '../hooks/useTranslation'
 
 interface PostFormProps {
@@ -167,29 +168,23 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
 
       {/* Content */}
       <div>
-        <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
-          <FileText className="w-4 h-4 inline mr-1" />
-          Content *
-        </label>
-        <textarea
-          id="content"
-          name="content"
-          value={formData.content || ''}
-          onChange={handleChange}
-          rows={10}
-          className={`w-full px-3 py-2 border ${
-            errors.content ? 'border-red-300' : 'border-gray-300'
-          } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent`}
+        <RichTextEditor
+          label="Content"
+          required
+          content={formData.content || ''}
+          onChange={(content) => {
+            setFormData({ ...formData, content })
+            // Clear errors when user starts typing
+            if (errors.content) {
+              const newErrors = { ...errors }
+              delete newErrors.content
+              setErrors(newErrors)
+            }
+          }}
           placeholder="Write your post content here..."
+          error={errors.content}
           disabled={isSubmitting}
         />
-        {errors.content && (
-          <div className="flex items-center mt-1 text-sm text-red-600">
-            <AlertCircle className="w-4 h-4 mr-1" />
-            {errors.content}
-          </div>
-        )}
-        <div className="mt-1 text-sm text-gray-500">{formData.content?.length || 0} characters</div>
       </div>
 
       {/* Action buttons */}

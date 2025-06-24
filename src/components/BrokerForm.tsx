@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import type { Broker, BrokerInsert } from '../types'
+import RichTextEditor from './RichTextEditor'
+import DatePicker from './DatePicker'
 
 interface BrokerFormProps {
   broker?: Broker | null;
@@ -46,16 +48,13 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="established_at" className="block text-sm font-medium text-gray-700 mb-1">
-          Established Date
-        </label>
-        <input
-          type="date"
+        <DatePicker
+          label="Established Date"
+          value={formData.established_at || ''}
+          onChange={(date) => setFormData({ ...formData, established_at: date })}
+          placeholder="Select establishment date"
           id="established_at"
           name="established_at"
-          value={formData.established_at || ''}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
         />
       </div>
 
@@ -75,16 +74,10 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
       </div>
 
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-          Description
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          value={formData.description || ''}
-          onChange={handleChange}
-          rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+        <RichTextEditor
+          label="Description"
+          content={formData.description || ''}
+          onChange={(description) => setFormData({ ...formData, description })}
           placeholder="Broker description and services..."
         />
       </div>
