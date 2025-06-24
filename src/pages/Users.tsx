@@ -20,6 +20,7 @@ import Table from '../components/Table'
 import Modal from '../components/Modal'
 import UserForm from '../components/UserForm'
 import PermissionManager from '../components/PermissionManager'
+import ConfirmDialog from '../components/ConfirmDialog'
 import PageLoadingSpinner from '../components/PageLoadingSpinner'
 import TabNavigation from '../components/TabNavigation'
 import FilterDropdown from '../components/FilterDropdown'
@@ -43,7 +44,7 @@ import { INPUT_VARIANTS, FILTER_OPTIONS } from '../constants/components'
 
 const Users: React.FC = () => {
   const { t } = useTranslation()
-  const { users, loading, createUser, updateUser, deleteUser } = useUsers()
+  const { users, loading, createUser, updateUser, deleteUser, isDeleting } = useUsers()
   const { isSuperAdmin } = usePermissions()
 
   const [searchTerm, setSearchTerm] = useState('')
@@ -57,6 +58,17 @@ const Users: React.FC = () => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
+
+  // Confirm dialog state
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    userId: string | null;
+    userName: string | null;
+  }>({
+    isOpen: false,
+    userId: null,
+    userName: null
+  })
 
   // Theme classes
   const layout = getPageLayoutClasses()
@@ -169,14 +181,38 @@ const Users: React.FC = () => {
     setIsModalOpen(true)
   }
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm(t('deleteUserConfirm'))) {
-      await deleteUser(id)
+  const handleDelete = (user: DatabaseUser) => {
+    setConfirmDialog({
+      isOpen: true,
+      userId: user.id,
+      userName: user.full_name || user.email
+    })
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!confirmDialog.userId) return
+
+    try {
+      await deleteUser(confirmDialog.userId)
       // Reset to first page if current page becomes empty
       if (paginatedUsers.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1)
       }
+    } finally {
+      setConfirmDialog({
+        isOpen: false,
+        userId: null,
+        userName: null
+      })
     }
+  }
+
+  const handleCancelDelete = () => {
+    setConfirmDialog({
+      isOpen: false,
+      userId: null,
+      userName: null
+    })
   }
 
   const handleCloseModal = () => {
@@ -324,7 +360,7 @@ const Users: React.FC = () => {
             </button>
           )}
           <button
-            onClick={() => handleDelete(value as string)}
+            onClick={() => handleDelete(row)}
             className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
             title={t('deleteUser')}
           >
@@ -591,6 +627,22 @@ const Users: React.FC = () => {
             />
           </Modal>
         )}
+
+        {/* Delete Confirmation Dialog */}
+        <ConfirmDialog
+          isOpen={confirmDialog.isOpen}
+          onClose={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+          title={t('deleteUserTitle')}
+          message={t('deleteUserMessage', {
+            userName: confirmDialog.userName || t('thisUser')
+          })}
+          confirmLabel={t('deleteUser')}
+          cancelLabel={t('cancel')}
+          isDestructive={true}
+          isLoading={isDeleting}
+          variant="danger"
+        />
       </div>
     </div>
   )

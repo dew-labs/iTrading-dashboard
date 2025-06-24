@@ -14,6 +14,7 @@ import { useTranslation } from '../hooks/useTranslation'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import BrokerForm from '../components/BrokerForm'
+import ConfirmDialog from '../components/ConfirmDialog'
 import PageLoadingSpinner from '../components/PageLoadingSpinner'
 import RecordImage from '../components/RecordImage'
 
@@ -33,7 +34,7 @@ import { formatDateDisplay } from '../utils/format'
 import { INPUT_VARIANTS } from '../constants/components'
 
 const Brokers: React.FC = () => {
-  const { brokers, loading, createBroker, updateBroker, deleteBroker } = useBrokers()
+  const { brokers, loading, createBroker, updateBroker, deleteBroker, isDeleting } = useBrokers()
   const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -43,6 +44,17 @@ const Brokers: React.FC = () => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
+
+  // Confirm dialog state
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    brokerId: number | null;
+    brokerName: string | null;
+  }>({
+    isOpen: false,
+    brokerId: null,
+    brokerName: null
+  })
 
   // Theme classes
   const layout = getPageLayoutClasses()
@@ -103,14 +115,38 @@ const Brokers: React.FC = () => {
     setIsModalOpen(true)
   }
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm(t('brokers.deleteConfirm'))) {
-      await deleteBroker(id)
+  const handleDelete = (broker: Broker) => {
+    setConfirmDialog({
+      isOpen: true,
+      brokerId: broker.id,
+      brokerName: broker.headquarter
+    })
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!confirmDialog.brokerId) return
+
+    try {
+      await deleteBroker(confirmDialog.brokerId)
       // Reset to first page if current page becomes empty
       if (paginatedBrokers.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1)
       }
+    } finally {
+      setConfirmDialog({
+        isOpen: false,
+        brokerId: null,
+        brokerName: null
+      })
     }
+  }
+
+  const handleCancelDelete = () => {
+    setConfirmDialog({
+      isOpen: false,
+      brokerId: null,
+      brokerName: null
+    })
   }
 
   const handleCloseModal = () => {
@@ -223,7 +259,7 @@ const Brokers: React.FC = () => {
             <Edit2 className={getIconClasses('action')} />
           </button>
           <button
-            onClick={() => handleDelete(value as number)}
+            onClick={() => handleDelete(row)}
             className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
             title={t('brokers.tooltips.deleteBroker')}
           >
@@ -448,6 +484,22 @@ const Brokers: React.FC = () => {
             onCancel={handleCloseModal}
           />
         </Modal>
+
+        {/* Delete Confirmation Dialog */}
+        <ConfirmDialog
+          isOpen={confirmDialog.isOpen}
+          onClose={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+          title={t('brokers.deleteBrokerTitle')}
+          message={t('brokers.deleteBrokerMessage', {
+            brokerName: confirmDialog.brokerName || t('thisBroker')
+          })}
+          confirmLabel={t('delete')}
+          cancelLabel={t('cancel')}
+          isDestructive={true}
+          isLoading={isDeleting}
+          variant="danger"
+        />
       </div>
     </div>
   )

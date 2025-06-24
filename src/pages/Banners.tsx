@@ -18,6 +18,7 @@ import { useTranslation } from '../hooks/useTranslation'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import BannerForm from '../components/BannerForm'
+import ConfirmDialog from '../components/ConfirmDialog'
 import PageLoadingSpinner from '../components/PageLoadingSpinner'
 import RecordImage from '../components/RecordImage'
 import Badge from '../components/Badge'
@@ -39,7 +40,7 @@ import { formatDateDisplay } from '../utils/format'
 import { INPUT_VARIANTS, FILTER_OPTIONS } from '../constants/components'
 
 const Banners: React.FC = () => {
-  const { banners, loading, createBanner, updateBanner, deleteBanner } = useBanners()
+  const { banners, loading, createBanner, updateBanner, deleteBanner, isDeleting } = useBanners()
   const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState<string>('all')
@@ -49,6 +50,17 @@ const Banners: React.FC = () => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
+
+  // Confirm dialog state
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    bannerId: string | null;
+    bannerUrl: string | null;
+  }>({
+    isOpen: false,
+    bannerId: null,
+    bannerUrl: null
+  })
 
   // Theme classes
   const layout = getPageLayoutClasses()
@@ -114,14 +126,38 @@ const Banners: React.FC = () => {
     setIsModalOpen(true)
   }
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm(t('banners.deleteConfirm'))) {
-      await deleteBanner(id)
+  const handleDelete = (banner: Banner) => {
+    setConfirmDialog({
+      isOpen: true,
+      bannerId: banner.id,
+      bannerUrl: banner.target_url
+    })
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!confirmDialog.bannerId) return
+
+    try {
+      await deleteBanner(confirmDialog.bannerId)
       // Reset to first page if current page becomes empty
       if (paginatedBanners.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1)
       }
+    } finally {
+      setConfirmDialog({
+        isOpen: false,
+        bannerId: null,
+        bannerUrl: null
+      })
     }
+  }
+
+  const handleCancelDelete = () => {
+    setConfirmDialog({
+      isOpen: false,
+      bannerId: null,
+      bannerUrl: null
+    })
   }
 
   const handleToggleStatus = async (banner: Banner) => {
@@ -264,7 +300,7 @@ const Banners: React.FC = () => {
             <Edit2 className={getIconClasses('action')} />
           </button>
           <button
-            onClick={() => handleDelete(value as string)}
+            onClick={() => handleDelete(row)}
             className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
             title={t('banners.tooltips.deleteBanner')}
           >
@@ -495,6 +531,22 @@ const Banners: React.FC = () => {
             onCancel={handleCloseModal}
           />
         </Modal>
+
+        {/* Delete Confirmation Dialog */}
+        <ConfirmDialog
+          isOpen={confirmDialog.isOpen}
+          onClose={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+          title={t('banners.deleteBannerTitle')}
+          message={t('banners.deleteBannerMessage', {
+            bannerUrl: confirmDialog.bannerUrl || t('thisBanner')
+          })}
+          confirmLabel={t('delete')}
+          cancelLabel={t('cancel')}
+          isDestructive={true}
+          isLoading={isDeleting}
+          variant="danger"
+        />
       </div>
     </div>
   )

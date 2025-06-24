@@ -5,7 +5,6 @@ import {
   Edit2,
   Trash2,
   Eye,
-  AlertTriangle,
   Clock,
   User,
   Tag,
@@ -19,8 +18,8 @@ import { useTranslation } from '../hooks/useTranslation'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import PostForm from '../components/PostForm'
+import ConfirmDialog from '../components/ConfirmDialog'
 import PageLoadingSpinner from '../components/PageLoadingSpinner'
-import LoadingSpinner from '../components/LoadingSpinner'
 import TabNavigation from '../components/TabNavigation'
 import FilterDropdown from '../components/FilterDropdown'
 import PaginationSelector from '../components/PaginationSelector'
@@ -586,52 +585,21 @@ const Posts: React.FC = () => {
           />
         </Modal>
 
-        {/* Delete Confirmation Modal */}
-        {deleteConfirm.isOpen && (
-          <Modal
-            isOpen={deleteConfirm.isOpen}
-            onClose={() => setDeleteConfirm({ isOpen: false, post: null, isDeleting: false })}
-            title={t('posts.confirmDelete')}
-          >
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="flex-shrink-0">
-                  <AlertTriangle className="w-8 h-8 text-red-500" />
-                </div>
-                <div>
-                  <h3 className={getTypographyClasses('h4')}>{t('posts.deletePostTitle')}</h3>
-                  <p className={getTypographyClasses('small')}>
-                    {t('posts.deleteConfirmText', { title: deleteConfirm.post?.title })}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-3 pt-4 border-t">
-                <button
-                  onClick={() => setDeleteConfirm({ isOpen: false, post: null, isDeleting: false })}
-                  disabled={deleteConfirm.isDeleting}
-                  className={getButtonClasses('secondary', 'md')}
-                >
-                  {t('cancel')}
-                </button>
-                <button
-                  onClick={confirmDelete}
-                  disabled={deleteConfirm.isDeleting}
-                  className={getButtonClasses('danger', 'md')}
-                >
-                  {deleteConfirm.isDeleting ? (
-                    <div className="flex items-center">
-                      <LoadingSpinner size="sm" variant="gradient" className="mr-2" />
-                      {t('posts.deleting')}
-                    </div>
-                  ) : (
-                    t('delete')
-                  )}
-                </button>
-              </div>
-            </div>
-          </Modal>
-        )}
+        {/* Delete Confirmation Dialog */}
+        <ConfirmDialog
+          isOpen={deleteConfirm.isOpen}
+          onClose={() => setDeleteConfirm({ isOpen: false, post: null, isDeleting: false })}
+          onConfirm={confirmDelete}
+          title={t('posts.deletePostTitle')}
+          message={t('posts.deleteConfirmText', {
+            title: deleteConfirm.post?.title || t('thisPost')
+          })}
+          confirmLabel={t('delete')}
+          cancelLabel={t('cancel')}
+          isDestructive={true}
+          isLoading={deleteConfirm.isDeleting}
+          variant="danger"
+        />
 
         {/* Post Viewer Modal */}
         {viewingPost && (

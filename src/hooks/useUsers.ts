@@ -26,19 +26,39 @@ const updateUserMutation = async ({ id, updates }: { id: string; updates: UserUp
   )
 }
 
+/**
+ * Delete user mutation
+ *
+ * This function deletes a user from the public.users table.
+ * A database trigger automatically handles deleting the corresponding
+ * record from auth.users to maintain data consistency.
+ *
+ * @param id - The user ID to delete
+ * @returns Promise<void>
+ */
 const deleteUserMutation = async (id: string): Promise<void> => {
-  return supabaseHelpers.deleteData(
-    supabase.from('users').delete().eq('id', id)
-  )
+  try {
+    const result = await supabase.from('users').delete().eq('id', id)
+    if (result.error) {
+      console.error('Delete user error:', result.error)
+      throw new Error(`Failed to delete user: ${result.error.message}`)
+    }
+    console.warn('User deleted successfully (both public.users and auth.users):', id)
+  } catch (error) {
+    console.error('Delete user mutation failed:', error)
+    throw error
+  }
 }
 
 const updateLastLoginMutation = async (id: string): Promise<void> => {
-  return supabaseHelpers.deleteData(
+  return supabaseHelpers.updateData(
     supabase
       .from('users')
       .update({ last_login: new Date().toISOString() })
       .eq('id', id)
-  )
+      .select()
+      .single()
+  ).then(() => {}) // Convert to void
 }
 
 export const useUsers = () => {

@@ -16,6 +16,7 @@ import { useTranslation } from '../hooks/useTranslation'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import ProductForm from '../components/ProductForm'
+import ConfirmDialog from '../components/ConfirmDialog'
 import PageLoadingSpinner from '../components/PageLoadingSpinner'
 import RecordImage from '../components/RecordImage'
 import DetailViewModal from '../components/DetailViewModal'
@@ -39,7 +40,7 @@ import { formatDateDisplay } from '../utils/format'
 import { INPUT_VARIANTS, FILTER_OPTIONS } from '../constants/components'
 
 const Products: React.FC = () => {
-  const { products, loading, createProduct, updateProduct, deleteProduct } = useProducts()
+  const { products, loading, createProduct, updateProduct, deleteProduct, isDeleting } = useProducts()
   const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -51,6 +52,17 @@ const Products: React.FC = () => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
+
+  // Confirm dialog state
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    productId: number | null;
+    productName: string | null;
+  }>({
+    isOpen: false,
+    productId: null,
+    productName: null
+  })
 
   // Theme classes
   const layout = getPageLayoutClasses()
@@ -125,14 +137,38 @@ const Products: React.FC = () => {
     setViewingProduct(product)
   }
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm(t('products.deleteConfirm'))) {
-      await deleteProduct(id)
+  const handleDelete = (product: Product) => {
+    setConfirmDialog({
+      isOpen: true,
+      productId: product.id,
+      productName: product.name
+    })
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!confirmDialog.productId) return
+
+    try {
+      await deleteProduct(confirmDialog.productId)
       // Reset to first page if current page becomes empty
       if (paginatedProducts.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1)
       }
+    } finally {
+      setConfirmDialog({
+        isOpen: false,
+        productId: null,
+        productName: null
+      })
     }
+  }
+
+  const handleCancelDelete = () => {
+    setConfirmDialog({
+      isOpen: false,
+      productId: null,
+      productName: null
+    })
   }
 
   const handleCloseModal = () => {
@@ -257,7 +293,7 @@ const Products: React.FC = () => {
             <Edit2 className={getIconClasses('action')} />
           </button>
           <button
-            onClick={() => handleDelete(value as number)}
+            onClick={() => handleDelete(row)}
             className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
             title={t('products.tooltips.deleteProduct')}
           >
@@ -526,6 +562,22 @@ const Products: React.FC = () => {
             </div>
           </DetailViewModal>
         )}
+
+        {/* Delete Confirmation Dialog */}
+        <ConfirmDialog
+          isOpen={confirmDialog.isOpen}
+          onClose={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+          title={t('products.deleteProductTitle')}
+          message={t('products.deleteProductMessage', {
+            productName: confirmDialog.productName || t('thisProduct')
+          })}
+          confirmLabel={t('delete')}
+          cancelLabel={t('cancel')}
+          isDestructive={true}
+          isLoading={isDeleting}
+          variant="danger"
+        />
       </div>
     </div>
   )
