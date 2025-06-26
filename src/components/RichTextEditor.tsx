@@ -3,6 +3,7 @@ import { Editor } from '@tinymce/tinymce-react'
 import { AlertCircle } from 'lucide-react'
 import { useFileUpload } from '../hooks/useFileUpload'
 import { toast } from '../utils/toast'
+import { getTinyMCEConfig, type TinyMCEUploadConfig } from '../utils/tinymceConfig'
 
 interface RichTextEditorProps {
   content: string
@@ -14,6 +15,9 @@ interface RichTextEditorProps {
   required?: boolean
   className?: string
   key?: string | number
+  height?: number
+  bucket?: string
+  folder?: string
 }
 
 interface TinyMCEEditor {
@@ -30,7 +34,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   disabled = false,
   label,
   required = false,
-  className = ''
+  className = '',
+  height = 400,
+  bucket = 'posts',
+  folder = 'images'
 }) => {
   const editorRef = useRef<TinyMCEEditor | null>(null)
   const { uploadFile, isUploading } = useFileUpload()
@@ -58,24 +65,24 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           progress(0)
 
           const result = await uploadFile(file, {
-            bucket: 'posts',
-            folder: 'images',
+            bucket,
+            folder,
             allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
             maxSizeInMB: 10
           })
 
           progress(100)
-          toast.success('Image uploaded successfully!')
+          toast.success('Image uploaded to cloud storage!')
           resolve(result.url)
         } catch (error) {
-          console.error('Image upload error:', error)
-          reject('Image upload failed')
+          console.error('Cloud storage upload error:', error)
+          reject('Cloud storage upload failed')
         }
       }
 
       uploadAsync()
     })
-  }, [uploadFile])
+  }, [uploadFile, bucket, folder])
 
   // Custom file picker for images
   const handleFilePicker = useCallback((callback: (url: string, meta?: { alt?: string }) => void, value: string, meta: unknown) => {
@@ -97,27 +104,38 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
         try {
           const result = await uploadFile(file, {
-            bucket: 'posts',
-            folder: 'images',
+            bucket,
+            folder,
             allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
             maxSizeInMB: 10
           })
 
           callback(result.url, { alt: file.name })
-          toast.success('Image uploaded successfully!')
+          toast.success('Image uploaded to cloud storage!')
         } catch (error) {
-          console.error('Image upload error:', error)
-          toast.error('Image upload failed')
+          console.error('Cloud storage upload error:', error)
+          toast.error('Cloud storage upload failed')
         }
       })
 
       input.click()
     }
-  }, [uploadFile, isUploading])
+  }, [uploadFile, isUploading, bucket, folder])
 
   const handleEditorChange = useCallback((content: string) => {
     onChange(content)
   }, [onChange])
+
+  // Create upload configuration
+  const uploadConfig: TinyMCEUploadConfig = {
+    bucket,
+    folder,
+    uploadHandler: handleImageUpload,
+    filePickerCallback: handleFilePicker
+  }
+
+  // Get TinyMCE configuration
+  const editorConfig = getTinyMCEConfig(uploadConfig, height)
 
   return (
     <div className={`space-y-2 ${className}`}>
@@ -137,84 +155,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           onEditorChange={handleEditorChange}
           disabled={disabled}
           init={{
-            height: 300,
-            menubar: false,
-            placeholder,
-            plugins: [
-              'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-              'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-              'insertdatetime', 'media', 'table', 'help', 'wordcount'
-            ],
-            toolbar: 'undo redo | blocks | ' +
-              'bold italic underline strikethrough | alignleft aligncenter ' +
-              'alignright alignjustify | bullist numlist outdent indent | ' +
-              'removeformat | link image | code',
-            content_style: `
-              body {
-                font-family: system-ui, -apple-system, sans-serif;
-                font-size: 14px;
-                line-height: 1.6;
-                color: #374151;
-              }
-              h1 { font-size: 2em; font-weight: 700; margin: 0.67em 0; }
-              h2 { font-size: 1.5em; font-weight: 600; margin: 0.75em 0; }
-              h3 { font-size: 1.25em; font-weight: 600; margin: 0.83em 0; }
-              blockquote {
-                border-left: 4px solid #d1d5db;
-                padding-left: 16px;
-                margin: 16px 0;
-                font-style: italic;
-                color: #6b7280;
-                background-color: #f9fafb;
-                padding: 12px 16px;
-                border-radius: 0 4px 4px 0;
-              }
-              pre {
-                background-color: #f3f4f6;
-                border: 1px solid #e5e7eb;
-                border-radius: 6px;
-                padding: 12px;
-                margin: 12px 0;
-                font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-                font-size: 13px;
-                overflow-x: auto;
-              }
-              img {
-                max-width: 100%;
-                height: auto;
-                border-radius: 8px;
-                margin: 12px 0;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-              }
-              a {
-                color: #3b82f6;
-                text-decoration: underline;
-              }
-              a:hover {
-                color: #1d4ed8;
-              }
-            `,
-            skin: 'oxide',
-            content_css: 'default',
-            branding: false,
-            promotion: false,
-            resize: false,
-            statusbar: false,
-            // Image upload configuration
-            images_upload_handler: handleImageUpload,
-            file_picker_callback: handleFilePicker,
-            file_picker_types: 'image',
-            automatic_uploads: false, // Disable automatic uploads
-            // Paste configuration
-            paste_data_images: true,
-            paste_as_text: false,
-            // Link configuration
-            link_default_target: '_blank',
-            link_default_protocol: 'https',
-            // Other configurations
-            entity_encoding: 'raw',
-            extended_valid_elements: 'img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name]',
-            valid_children: '+body[style],+div[div|p|br|span|img|strong|em|a|ul|ol|li|h1|h2|h3|h4|h5|h6|blockquote|pre|code]'
+            ...editorConfig,
+            placeholder
           }}
         />
       </div>
@@ -228,7 +170,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
       {content && (
         <div className="mt-1 text-sm text-gray-500">
-          {content.replace(/<[^>]*>/g, '').length} characters
+          {content.replace(/<[^>]*>/g, '').length} characters • Cloud storage: {bucket}/{folder}
         </div>
       )}
     </div>

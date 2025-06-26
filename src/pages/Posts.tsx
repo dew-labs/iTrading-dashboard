@@ -342,7 +342,7 @@ const Posts: React.FC = () => {
           </button>
           <button
             onClick={() => handleEdit(row)}
-            className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+            className="p-2 text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded transition-colors"
             title={t('posts.tooltips.editPost')}
           >
             <Edit2 className={getIconClasses('action')} />

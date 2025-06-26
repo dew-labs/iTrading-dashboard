@@ -57,10 +57,10 @@ const DatePicker: React.FC<DatePickerProps> = ({
     }
   }, [value])
 
-  const formatDate = (date: Date): string => {
+  const formatDateForDisplay = (date: Date): string => {
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'long',
+      month: 'short',
       day: 'numeric'
     })
   }
@@ -153,31 +153,41 @@ const DatePicker: React.FC<DatePickerProps> = ({
     year: 'numeric'
   })
 
-  const inputClasses = `
-    w-full pl-10 pr-4 py-3 border-2 rounded-xl
-    transition-colors duration-200 ease-in-out
-    focus:outline-none
-    ${error
-    ? 'border-red-300 bg-red-50 focus:border-red-500'
-    : 'border-gray-200 bg-white focus:border-black hover:border-gray-300'
-}
-    ${disabled ? 'bg-gray-50 cursor-not-allowed opacity-75' : 'cursor-pointer'}
-    placeholder:text-gray-400
-  `
+  const displayValue = selectedDate ? formatDateForDisplay(selectedDate) : ''
 
   return (
     <div className={`space-y-2 ${className}`} ref={containerRef}>
       {label && (
-        <label htmlFor={id} className="block text-sm font-semibold text-gray-800">
+        <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
 
       <div className="relative">
         <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-          <Calendar className={`w-5 h-5 ${error ? 'text-red-500' : 'text-gray-400'}`} />
+          <Calendar className={`w-4 h-4 ${error ? 'text-red-400' : 'text-gray-400'}`} />
         </div>
 
+        {/* Custom display input that shows formatted date */}
+        <div
+          onClick={() => !disabled && setIsOpen(true)}
+          className={`
+            w-full pl-10 pr-4 py-2 border rounded-lg cursor-pointer
+            transition-colors duration-200 ease-in-out
+            focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent
+            ${error
+      ? 'border-red-300 bg-red-50'
+      : 'border-gray-300 bg-white hover:border-gray-400'
+    }
+            ${disabled ? 'bg-gray-50 cursor-not-allowed opacity-75' : ''}
+          `}
+        >
+          <span className={displayValue ? 'text-gray-900' : 'text-gray-400'}>
+            {displayValue || placeholder}
+          </span>
+        </div>
+
+        {/* Hidden native date input for actual form submission */}
         <input
           ref={inputRef}
           type="date"
@@ -185,17 +195,14 @@ const DatePicker: React.FC<DatePickerProps> = ({
           name={name}
           value={value}
           onChange={handleInputChange}
-          onClick={() => !disabled && setIsOpen(true)}
-          onFocus={() => !disabled && setIsOpen(true)}
           disabled={disabled}
-          className={inputClasses}
-          placeholder={placeholder}
-          style={{ colorScheme: 'light' }}
+          className="sr-only"
+          tabIndex={-1}
         />
 
         {/* Custom Calendar Overlay */}
         {isOpen && !disabled && (
-          <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-50 p-4 w-80">
+          <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4 w-80">
             {/* Calendar Header */}
             <div className="flex items-center justify-between mb-4">
               <button
@@ -282,16 +289,10 @@ const DatePicker: React.FC<DatePickerProps> = ({
       </div>
 
       {error && (
-        <div className="flex items-center space-x-2 text-red-600">
-          <AlertCircle className="w-4 h-4" />
-          <p className="text-sm font-medium">{error}</p>
+        <div className="flex items-center mt-1 text-sm text-red-600">
+          <AlertCircle className="w-4 h-4 mr-1" />
+          {error}
         </div>
-      )}
-
-      {selectedDate && !error && (
-        <p className="text-sm text-gray-500">
-          Selected: {formatDate(selectedDate)}
-        </p>
       )}
     </div>
   )

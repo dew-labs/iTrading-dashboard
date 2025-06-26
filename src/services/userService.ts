@@ -136,6 +136,9 @@ export const inviteUser = async (
         .eq('id', authData.user.id)
     }
 
+    // Grant default permissions for regular users
+    await grantDefaultPermissions(authData.user.id, role)
+
     toast.success(`User invited successfully. ${import.meta.env.DEV ? `Temp password: ${tempPassword}` : 'Check email for instructions.'}`)
 
     return {
@@ -169,6 +172,43 @@ export const updateUserRole = async (
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Failed to update user role'
     toast.error(errorMessage)
+    return { success: false, error: errorMessage }
+  }
+}
+
+/**
+ * Grant default read permissions for regular users
+ */
+export const grantDefaultPermissions = async (
+  userId: string,
+  role: UserRole
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    // Only grant default permissions for regular users
+    if (role !== 'user') {
+      return { success: true }
+    }
+
+    // Default read permissions for all resources
+    const defaultPermissions = [
+      { user_id: userId, resource: 'posts', action: 'read' },
+      { user_id: userId, resource: 'products', action: 'read' },
+      { user_id: userId, resource: 'banners', action: 'read' },
+      { user_id: userId, resource: 'users', action: 'read' },
+      { user_id: userId, resource: 'notifications', action: 'read' }
+    ]
+
+    const { error } = await supabase
+      .from('user_permissions')
+      .insert(defaultPermissions)
+
+    if (error) throw error
+
+    console.warn('Default read permissions granted for user:', userId)
+    return { success: true }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to grant default permissions'
+    console.error('Error granting default permissions:', errorMessage)
     return { success: false, error: errorMessage }
   }
 }

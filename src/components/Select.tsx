@@ -4,6 +4,7 @@ import { ChevronDown, Check } from 'lucide-react'
 interface SelectOption {
   value: string;
   label: string;
+  icon?: React.ReactNode;
   disabled?: boolean;
 }
 
@@ -174,7 +175,7 @@ const Select: React.FC<SelectProps> = ({
       {label && (
         <label
           htmlFor={selectId}
-          className={`block text-sm font-medium mb-2 ${
+          className={`block text-sm font-medium mb-1 ${
             disabled ? 'text-gray-400' : error ? 'text-red-700' : 'text-gray-700'
           }`}
         >
@@ -197,9 +198,16 @@ const Select: React.FC<SelectProps> = ({
           aria-required={required}
           className={getButtonStyles()}
         >
-          <span className={selectedOption ? 'text-gray-900' : 'text-gray-500'}>
-            {selectedOption ? selectedOption.label : placeholder}
-          </span>
+          <div className="flex items-center">
+            {selectedOption?.icon && (
+              <span className="mr-2 flex-shrink-0">
+                {selectedOption.icon}
+              </span>
+            )}
+            <span className={selectedOption ? 'text-gray-900' : 'text-gray-500'}>
+              {selectedOption ? selectedOption.label : placeholder}
+            </span>
+          </div>
 
           <ChevronDown
             className={`${config.icon} text-gray-400 transition-transform duration-200 ${
@@ -235,11 +243,20 @@ const Select: React.FC<SelectProps> = ({
                   ${index === options.length - 1 ? 'rounded-b-lg' : ''}
                 `}
               >
-                <span className={option.disabled ? 'opacity-50' : ''}>{option.label}</span>
+                <div className="flex items-center">
+                  {option.icon && (
+                    <span className="mr-2 flex-shrink-0">
+                      {option.icon}
+                    </span>
+                  )}
+                  <span className={option.disabled ? 'opacity-50' : ''}>
+                    {option.label}
+                  </span>
+                </div>
 
                 {option.value === value && (
                   <Check
-                    className={`w-4 h-4 ${
+                    className={`w-4 h-4 flex-shrink-0 ${
                       focusedIndex === index ? 'text-white' : 'text-gray-900'
                     }`}
                   />

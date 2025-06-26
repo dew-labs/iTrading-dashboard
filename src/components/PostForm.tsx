@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, FileText, Calendar, Scale, Lock, Clock, CheckCircle } from 'lucide-react'
 import type { Post, PostInsert } from '../types'
 import Select from './Select'
 import RichTextEditor from './RichTextEditor'
-import { useTranslation } from '../hooks/useTranslation'
 
 interface PostFormProps {
   post?: Post | null;
@@ -18,7 +17,6 @@ interface FormErrors {
 }
 
 const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
-  const { t } = useTranslation()
   const [formData, setFormData] = useState<PostInsert>({
     title: '',
     content: '',
@@ -107,9 +105,47 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
     }
   }
 
+  // Create type options with Badge component icons
+  const typeOptions = [
+    {
+      value: 'news',
+      label: 'News',
+      icon: <FileText className="w-4 h-4" />
+    },
+    {
+      value: 'event',
+      label: 'Event',
+      icon: <Calendar className="w-4 h-4" />
+    },
+    {
+      value: 'terms_of_use',
+      label: 'Terms of Use',
+      icon: <Scale className="w-4 h-4" />
+    },
+    {
+      value: 'privacy_policy',
+      label: 'Privacy Policy',
+      icon: <Lock className="w-4 h-4" />
+    }
+  ]
+
+  // Create status options with Badge component icons
+  const statusOptions = [
+    {
+      value: 'draft',
+      label: 'Draft',
+      icon: <Clock className="w-4 h-4" />
+    },
+    {
+      value: 'published',
+      label: 'Published',
+      icon: <CheckCircle className="w-4 h-4" />
+    }
+  ]
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Title */}
+      {/* Title field - full width for emphasis */}
       <div>
         <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
           Title *
@@ -134,40 +170,33 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
         )}
       </div>
 
-      {/* Type */}
-      <div>
-        <Select
-          label="Type"
-          required
-          value={formData.type}
-          onChange={(value) => setFormData({ ...formData, type: value as Post['type'] })}
-          options={[
-            { value: 'news', label: '📰 News' },
-            { value: 'event', label: '📅 Event' },
-            { value: 'terms_of_use', label: '📋 Terms of Use' },
-            { value: 'privacy_policy', label: '🔒 Privacy Policy' }
-          ]}
-          disabled={isSubmitting}
-        />
+      {/* Compact metadata fields in grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Select
+            label="Type"
+            required
+            value={formData.type}
+            onChange={(value) => setFormData({ ...formData, type: value as Post['type'] })}
+            options={typeOptions}
+            disabled={isSubmitting}
+          />
+        </div>
+
+        <div>
+          <Select
+            label="Status"
+            required
+            value={formData.status || 'draft'}
+            onChange={(value) => setFormData({ ...formData, status: value as Post['status'] })}
+            options={statusOptions}
+            disabled={isSubmitting}
+          />
+        </div>
       </div>
 
-      {/* Status */}
-      <div>
-        <Select
-          label="Status"
-          required
-          value={formData.status || 'draft'}
-          onChange={(value) => setFormData({ ...formData, status: value as Post['status'] })}
-          options={[
-            { value: 'draft', label: `📝 ${t('draft')}` },
-            { value: 'published', label: `✅ ${t('published')}` }
-          ]}
-          disabled={isSubmitting}
-        />
-      </div>
-
-      {/* Content */}
-      <div>
+      {/* Large content editor section */}
+      <div className="border-t border-gray-200 pt-6">
         <RichTextEditor
           label="Content"
           required
@@ -181,9 +210,12 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
               setErrors(newErrors)
             }
           }}
-          placeholder="Write your post content here..."
+          placeholder="Write your post content here - use the rich editor tools to format your text..."
           error={errors.content}
           disabled={isSubmitting}
+          height={450}
+          bucket="posts"
+          folder="images"
         />
       </div>
 
