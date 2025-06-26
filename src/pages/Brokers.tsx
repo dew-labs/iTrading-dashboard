@@ -17,7 +17,7 @@ import BrokerForm from '../components/BrokerForm'
 import ConfirmDialog from '../components/ConfirmDialog'
 import PageLoadingSpinner from '../components/PageLoadingSpinner'
 import RecordImage from '../components/RecordImage'
-import { stripHtmlAndTruncate } from '../components/RichTextRenderer'
+import { stripHtmlAndTruncate } from '../utils'
 
 import PaginationSelector from '../components/PaginationSelector'
 import type { Broker, BrokerInsert } from '../types'

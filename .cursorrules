@@ -34,6 +34,7 @@ Other Rules need to follow:
 - Avoid custom CSS unless absolutely necessary
 - Maintain consistent order of utility classes
 - Use Tailwind's responsive variants for adaptive designs
-- No need to run the application, it's already ran at localhost:5173
+- Do not run the application at the end of action, it's already ran at localhost:5173
 - Supabase running script with the --linked flag to run on cloud
+- Run supabase through npx
 - Use zsh instead of bash

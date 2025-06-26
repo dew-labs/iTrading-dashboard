@@ -148,11 +148,38 @@ export const useImages = (tableName?: string, recordId?: string) => {
     return images.filter(img => img.table_name === tableName && img.record_id === recordId)
   }
 
+  // Helper function to create image record from upload result
+  const createImageFromUpload = async (
+    tableName: string,
+    recordId: string,
+    uploadResult: {
+      url: string
+      path: string
+      id: string
+    },
+    altText?: string,
+    fileSize?: number,
+    mimeType?: string
+  ) => {
+    const imageData: ImageInsert = {
+      table_name: tableName,
+      record_id: recordId,
+      image_url: uploadResult.url,
+      storage_object_id: uploadResult.id,
+      alt_text: altText || null,
+      file_size: fileSize || null,
+      mime_type: mimeType || null
+    }
+
+    return createMutation.mutateAsync(imageData)
+  }
+
   return {
     images,
     loading,
     error: error as Error | null,
     createImage: (image: ImageInsert) => createMutation.mutateAsync(image),
+    createImageFromUpload,
     updateImage: (id: number, updates: ImageUpdate) =>
       updateMutation.mutateAsync({ id, updates }),
     deleteImage: (id: number) => deleteMutation.mutateAsync(id),

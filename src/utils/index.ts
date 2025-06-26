@@ -15,6 +15,9 @@ export { default as formatUtils } from './format'
 export * from './toast'
 export { default as toast } from './toast'
 
+// Text utilities
+export * from './textUtils'
+
 // Re-export commonly used functions for convenience
 export {
   // Theme utilities

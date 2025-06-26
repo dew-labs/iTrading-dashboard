@@ -1,30 +1,8 @@
-import React, { useEffect } from 'react'
-import { useEditor, EditorContent } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
-import Link from '@tiptap/extension-link'
-import Image from '@tiptap/extension-image'
-import Table from '@tiptap/extension-table'
-import TableRow from '@tiptap/extension-table-row'
-import TableHeader from '@tiptap/extension-table-header'
-import TableCell from '@tiptap/extension-table-cell'
-import {
-  Bold,
-  Italic,
-  Strikethrough,
-  Heading1,
-  Heading2,
-  Heading3,
-  List,
-  ListOrdered,
-  Quote,
-  Code,
-  Link as LinkIcon,
-  Image as ImageIcon,
-  Table as TableIcon,
-  Undo,
-  Redo,
-  AlertCircle
-} from 'lucide-react'
+import React, { useRef, useCallback } from 'react'
+import { Editor } from '@tinymce/tinymce-react'
+import { AlertCircle } from 'lucide-react'
+import { useFileUpload } from '../hooks/useFileUpload'
+import { toast } from '../utils/toast'
 
 interface RichTextEditorProps {
   content: string
@@ -35,40 +13,13 @@ interface RichTextEditorProps {
   label?: string
   required?: boolean
   className?: string
+  key?: string | number
 }
 
-interface ToolbarButtonProps {
-  onClick: () => void
-  isActive?: boolean
-  disabled?: boolean
-  children: React.ReactNode
-  title: string
-}
-
-const ToolbarButton: React.FC<ToolbarButtonProps> = ({
-  onClick,
-  isActive = false,
-  disabled = false,
-  children,
-  title
-}) => {
-  const baseClasses = 'p-2 rounded-lg transition-colors duration-200 border'
-  const activeClasses = isActive
-    ? 'bg-gray-900 text-white border-gray-900'
-    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
-  const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      title={title}
-      className={`${baseClasses} ${activeClasses} ${disabledClasses}`}
-    >
-      {children}
-    </button>
-  )
+interface TinyMCEEditor {
+  getContent: () => string
+  setContent: (content: string) => void
+  focus: () => void
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({
@@ -81,69 +32,92 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   required = false,
   className = ''
 }) => {
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-blue-600 underline hover:text-blue-800'
+  const editorRef = useRef<TinyMCEEditor | null>(null)
+  const { uploadFile, isUploading } = useFileUpload()
+
+  // Custom image upload handler
+  const handleImageUpload = useCallback((blobInfo: unknown, progress: (percent: number) => void) => {
+    return new Promise<string>((resolve, reject) => {
+      const uploadAsync = async () => {
+        try {
+          // Type guard for blobInfo
+          if (!blobInfo || typeof blobInfo !== 'object' || !('blob' in blobInfo)) {
+            reject('Invalid blob info')
+            return
+          }
+
+          const blob = (blobInfo as { blob: () => Blob }).blob()
+          const file = blob instanceof File ? blob : new File([blob], 'image.png', { type: blob.type })
+
+          if (!file.type.startsWith('image/')) {
+            reject('Please select an image file')
+            return
+          }
+
+          // Show progress
+          progress(0)
+
+          const result = await uploadFile(file, {
+            bucket: 'posts',
+            folder: 'images',
+            allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+            maxSizeInMB: 10
+          })
+
+          progress(100)
+          toast.success('Image uploaded successfully!')
+          resolve(result.url)
+        } catch (error) {
+          console.error('Image upload error:', error)
+          reject('Image upload failed')
         }
-      }),
-      Image.configure({
-        HTMLAttributes: {
-          class: 'max-w-full h-auto rounded-lg'
-        }
-      }),
-      Table.configure({
-        resizable: true
-      }),
-      TableRow,
-      TableHeader,
-      TableCell
-    ],
-    content,
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML())
-    },
-    editable: !disabled,
-    editorProps: {
-      attributes: {
-        class: `prose prose-sm max-w-none focus:outline-none min-h-[120px] p-4 ${error ? 'border-red-300' : 'border-gray-300'}`
       }
-    }
-  })
 
-  // Update editor content when content prop changes
-  useEffect(() => {
-    if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content, false)
-    }
-  }, [editor, content])
+      uploadAsync()
+    })
+  }, [uploadFile])
 
-  const addLink = () => {
-    const url = window.prompt('Enter URL:')
-    if (url && editor) {
-      editor.chain().focus().setLink({ href: url }).run()
-    }
-  }
+  // Custom file picker for images
+  const handleFilePicker = useCallback((callback: (url: string, meta?: { alt?: string }) => void, value: string, meta: unknown) => {
+    // Type guard for meta
+    if (meta && typeof meta === 'object' && 'filetype' in meta && (meta as { filetype: string }).filetype === 'image') {
+      const input = document.createElement('input')
+      input.setAttribute('type', 'file')
+      input.setAttribute('accept', 'image/*')
 
-  const addImage = () => {
-    const url = window.prompt('Enter Image URL:')
-    if (url && editor) {
-      editor.chain().focus().setImage({ src: url }).run()
-    }
-  }
+      input.addEventListener('change', async (e: Event) => {
+        const target = e.target as HTMLInputElement
+        const file = target.files?.[0]
+        if (!file) return
 
-  const addTable = () => {
-    if (editor) {
-      editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
-    }
-  }
+        if (isUploading) {
+          toast.error('Please wait for current upload to complete')
+          return
+        }
 
-  if (!editor) {
-    return null
-  }
+        try {
+          const result = await uploadFile(file, {
+            bucket: 'posts',
+            folder: 'images',
+            allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+            maxSizeInMB: 10
+          })
+
+          callback(result.url, { alt: file.name })
+          toast.success('Image uploaded successfully!')
+        } catch (error) {
+          console.error('Image upload error:', error)
+          toast.error('Image upload failed')
+        }
+      })
+
+      input.click()
+    }
+  }, [uploadFile, isUploading])
+
+  const handleEditorChange = useCallback((content: string) => {
+    onChange(content)
+  }, [onChange])
 
   return (
     <div className={`space-y-2 ${className}`}>
@@ -153,181 +127,96 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         </label>
       )}
 
-      <div className={`border rounded-lg overflow-hidden ${error ? 'border-red-300' : 'border-gray-300'} ${disabled ? 'bg-gray-50 opacity-75' : 'bg-white'}`}>
-        {/* Toolbar */}
-        <div className="flex items-center space-x-1 p-3 border-b border-gray-200 bg-gray-50 flex-wrap gap-2">
-          {/* Text Formatting */}
-          <div className="flex items-center space-x-1">
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleBold().run()}
-              isActive={editor.isActive('bold')}
-              disabled={disabled}
-              title="Bold"
-            >
-              <Bold className="w-4 h-4" />
-            </ToolbarButton>
-
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleItalic().run()}
-              isActive={editor.isActive('italic')}
-              disabled={disabled}
-              title="Italic"
-            >
-              <Italic className="w-4 h-4" />
-            </ToolbarButton>
-
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleStrike().run()}
-              isActive={editor.isActive('strike')}
-              disabled={disabled}
-              title="Strikethrough"
-            >
-              <Strikethrough className="w-4 h-4" />
-            </ToolbarButton>
-          </div>
-
-          <div className="w-px h-6 bg-gray-300" />
-
-          {/* Headings */}
-          <div className="flex items-center space-x-1">
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-              isActive={editor.isActive('heading', { level: 1 })}
-              disabled={disabled}
-              title="Heading 1"
-            >
-              <Heading1 className="w-4 h-4" />
-            </ToolbarButton>
-
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-              isActive={editor.isActive('heading', { level: 2 })}
-              disabled={disabled}
-              title="Heading 2"
-            >
-              <Heading2 className="w-4 h-4" />
-            </ToolbarButton>
-
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-              isActive={editor.isActive('heading', { level: 3 })}
-              disabled={disabled}
-              title="Heading 3"
-            >
-              <Heading3 className="w-4 h-4" />
-            </ToolbarButton>
-          </div>
-
-          <div className="w-px h-6 bg-gray-300" />
-
-          {/* Lists */}
-          <div className="flex items-center space-x-1">
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleBulletList().run()}
-              isActive={editor.isActive('bulletList')}
-              disabled={disabled}
-              title="Bullet List"
-            >
-              <List className="w-4 h-4" />
-            </ToolbarButton>
-
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleOrderedList().run()}
-              isActive={editor.isActive('orderedList')}
-              disabled={disabled}
-              title="Numbered List"
-            >
-              <ListOrdered className="w-4 h-4" />
-            </ToolbarButton>
-          </div>
-
-          <div className="w-px h-6 bg-gray-300" />
-
-          {/* Other Elements */}
-          <div className="flex items-center space-x-1">
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleBlockquote().run()}
-              isActive={editor.isActive('blockquote')}
-              disabled={disabled}
-              title="Quote"
-            >
-              <Quote className="w-4 h-4" />
-            </ToolbarButton>
-
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-              isActive={editor.isActive('codeBlock')}
-              disabled={disabled}
-              title="Code Block"
-            >
-              <Code className="w-4 h-4" />
-            </ToolbarButton>
-          </div>
-
-          <div className="w-px h-6 bg-gray-300" />
-
-          {/* Links & Media */}
-          <div className="flex items-center space-x-1">
-            <ToolbarButton
-              onClick={addLink}
-              isActive={editor.isActive('link')}
-              disabled={disabled}
-              title="Add Link"
-            >
-              <LinkIcon className="w-4 h-4" />
-            </ToolbarButton>
-
-            <ToolbarButton
-              onClick={addImage}
-              disabled={disabled}
-              title="Add Image"
-            >
-              <ImageIcon className="w-4 h-4" />
-            </ToolbarButton>
-
-            <ToolbarButton
-              onClick={addTable}
-              disabled={disabled}
-              title="Add Table"
-            >
-              <TableIcon className="w-4 h-4" />
-            </ToolbarButton>
-          </div>
-
-          <div className="w-px h-6 bg-gray-300" />
-
-          {/* History */}
-          <div className="flex items-center space-x-1">
-            <ToolbarButton
-              onClick={() => editor.chain().focus().undo().run()}
-              disabled={disabled || !editor.can().undo()}
-              title="Undo"
-            >
-              <Undo className="w-4 h-4" />
-            </ToolbarButton>
-
-            <ToolbarButton
-              onClick={() => editor.chain().focus().redo().run()}
-              disabled={disabled || !editor.can().redo()}
-              title="Redo"
-            >
-              <Redo className="w-4 h-4" />
-            </ToolbarButton>
-          </div>
-        </div>
-
-        {/* Editor Content */}
-        <div className="relative">
-          <EditorContent
-            editor={editor}
-            className={`min-h-[120px] ${disabled ? 'cursor-not-allowed' : ''}`}
-          />
-          {!content && !disabled && (
-            <div className="absolute top-4 left-4 text-gray-400 pointer-events-none">
-              {placeholder}
-            </div>
-          )}
-        </div>
+      <div className={`rounded-lg overflow-hidden ${error ? 'ring-2 ring-red-300' : ''} ${disabled ? 'opacity-75' : ''}`}>
+        <Editor
+          apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
+          onInit={(evt, editor) => {
+            editorRef.current = editor
+          }}
+          value={content}
+          onEditorChange={handleEditorChange}
+          disabled={disabled}
+          init={{
+            height: 300,
+            menubar: false,
+            placeholder,
+            plugins: [
+              'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+              'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+              'insertdatetime', 'media', 'table', 'help', 'wordcount'
+            ],
+            toolbar: 'undo redo | blocks | ' +
+              'bold italic underline strikethrough | alignleft aligncenter ' +
+              'alignright alignjustify | bullist numlist outdent indent | ' +
+              'removeformat | link image | code',
+            content_style: `
+              body {
+                font-family: system-ui, -apple-system, sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+                color: #374151;
+              }
+              h1 { font-size: 2em; font-weight: 700; margin: 0.67em 0; }
+              h2 { font-size: 1.5em; font-weight: 600; margin: 0.75em 0; }
+              h3 { font-size: 1.25em; font-weight: 600; margin: 0.83em 0; }
+              blockquote {
+                border-left: 4px solid #d1d5db;
+                padding-left: 16px;
+                margin: 16px 0;
+                font-style: italic;
+                color: #6b7280;
+                background-color: #f9fafb;
+                padding: 12px 16px;
+                border-radius: 0 4px 4px 0;
+              }
+              pre {
+                background-color: #f3f4f6;
+                border: 1px solid #e5e7eb;
+                border-radius: 6px;
+                padding: 12px;
+                margin: 12px 0;
+                font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+                font-size: 13px;
+                overflow-x: auto;
+              }
+              img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 8px;
+                margin: 12px 0;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+              }
+              a {
+                color: #3b82f6;
+                text-decoration: underline;
+              }
+              a:hover {
+                color: #1d4ed8;
+              }
+            `,
+            skin: 'oxide',
+            content_css: 'default',
+            branding: false,
+            promotion: false,
+            resize: false,
+            statusbar: false,
+            // Image upload configuration
+            images_upload_handler: handleImageUpload,
+            file_picker_callback: handleFilePicker,
+            file_picker_types: 'image',
+            automatic_uploads: false, // Disable automatic uploads
+            // Paste configuration
+            paste_data_images: true,
+            paste_as_text: false,
+            // Link configuration
+            link_default_target: '_blank',
+            link_default_protocol: 'https',
+            // Other configurations
+            entity_encoding: 'raw',
+            extended_valid_elements: 'img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name]',
+            valid_children: '+body[style],+div[div|p|br|span|img|strong|em|a|ul|ol|li|h1|h2|h3|h4|h5|h6|blockquote|pre|code]'
+          }}
+        />
       </div>
 
       {error && (
@@ -339,7 +228,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
       {content && (
         <div className="mt-1 text-sm text-gray-500">
-          {editor.storage.characterCount?.characters() || content.length} characters
+          {content.replace(/<[^>]*>/g, '').length} characters
         </div>
       )}
     </div>
