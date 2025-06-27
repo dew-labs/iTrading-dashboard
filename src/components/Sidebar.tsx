@@ -3,13 +3,9 @@ import { NavLink } from 'react-router-dom'
 import {
   Home,
   FileText,
-  Package,
   Image,
   Users,
   X,
-  BarChart3,
-  Settings,
-  HelpCircle,
   Pin,
   Building2
 } from 'lucide-react'
@@ -45,8 +41,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
     {
       titleKey: 'overview',
       items: [
-        { id: 'dashboard', labelKey: 'dashboard', icon: Home, path: '/' },
-        { id: 'analytics', labelKey: 'analytics', icon: BarChart3, path: '/analytics' }
+        { id: 'dashboard', labelKey: 'dashboard', icon: Home, path: '/' }
       ]
     },
     {
@@ -58,14 +53,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
           icon: FileText,
           path: '/posts',
           resource: 'posts',
-          action: 'read'
-        },
-        {
-          id: 'products',
-          labelKey: 'products',
-          icon: Package,
-          path: '/products',
-          resource: 'products',
           action: 'read'
         },
         {
@@ -92,13 +79,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
           resource: 'users',
           action: 'read'
         }
-      ]
-    },
-    {
-      titleKey: 'settings',
-      items: [
-        { id: 'settings', labelKey: 'settings', icon: Settings, path: '/settings' },
-        { id: 'help', labelKey: 'help', icon: HelpCircle, path: '/help' }
       ]
     }
   ]

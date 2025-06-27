@@ -1,5 +1,18 @@
 import React, { useState, useMemo } from 'react'
-import { Plus, Search, Edit2, Trash2, Eye, Building2, Calendar, MapPin, FileText, Grid3X3, List, X } from 'lucide-react'
+import {
+  Plus,
+  Search,
+  Edit2,
+  Trash2,
+  Eye,
+  Building2,
+  Calendar,
+  MapPin,
+  FileText,
+  Grid3X3,
+  List,
+  X
+} from 'lucide-react'
 import Button from '../components/Button'
 import Input from '../components/Input'
 import { useBrokers } from '../hooks/useBrokers'
@@ -60,7 +73,9 @@ const BrokerCard: React.FC<BrokerCardProps> = ({ broker, onView, onEdit, onDelet
               {broker.established_in && (
                 <div className='flex items-center text-sm text-gray-500 mt-1'>
                   <Calendar className='w-4 h-4 mr-1' />
-                  <span>{t('brokers.est')} {broker.established_in}</span>
+                  <span>
+                    {t('brokers.est')} {broker.established_in}
+                  </span>
                 </div>
               )}
             </div>
@@ -103,11 +118,14 @@ const BrokerCard: React.FC<BrokerCardProps> = ({ broker, onView, onEdit, onDelet
         {/* Description */}
         <div className='text-sm text-gray-600 line-clamp-3'>
           {broker.description ? (
-            <div dangerouslySetInnerHTML={{
-              __html: broker.description.length > 150
-                ? broker.description.substring(0, 150) + '...'
-                : broker.description
-            }} />
+            <div
+              dangerouslySetInnerHTML={{
+                __html:
+                  broker.description.length > 150
+                    ? broker.description.substring(0, 150) + '...'
+                    : broker.description
+              }}
+            />
           ) : (
             <span className='italic text-gray-400'>{t('brokers.noDescriptionAvailable')}</span>
           )}
@@ -119,7 +137,9 @@ const BrokerCard: React.FC<BrokerCardProps> = ({ broker, onView, onEdit, onDelet
         <div className='flex items-center justify-between text-xs text-gray-500'>
           <div className='flex items-center'>
             <FileText className='w-3 h-3 mr-1' />
-            <span>{t('brokers.added')} {formatDateDisplay(broker.created_at)}</span>
+            <span>
+              {t('brokers.added')} {formatDateDisplay(broker.created_at)}
+            </span>
           </div>
         </div>
       </div>
@@ -312,9 +332,7 @@ const Brokers: React.FC = () => {
               )}
             </div>
             <div className='flex-1 min-w-0'>
-              <div className={cn(getTypographyClasses('h4'), 'truncate')}>
-                {row.name}
-              </div>
+              <div className={cn(getTypographyClasses('h4'), 'truncate')}>{row.name}</div>
               <div className={cn(getTypographyClasses('small'), 'text-gray-600 truncate')}>
                 {row.headquarter || t('brokers.noHeadquarterInfo')}
               </div>
@@ -427,8 +445,8 @@ const Brokers: React.FC = () => {
           </div>
           <div className='mt-4 sm:mt-0 flex items-center space-x-3'>
             <Button
-              variant="primary"
-              size="md"
+              variant='primary'
+              size='md'
               leftIcon={Plus}
               onClick={() => setIsModalOpen(true)}
             >
@@ -495,12 +513,12 @@ const Brokers: React.FC = () => {
             <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4'>
               <div className='flex-1 max-w-md'>
                 <Input
-                  type="text"
+                  type='text'
                   placeholder={tCommon('placeholders.searchBrokersPlaceholder')}
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   leftIcon={Search}
-                  variant="search"
+                  variant='search'
                 />
               </div>
 
@@ -546,7 +564,7 @@ const Brokers: React.FC = () => {
               <>
                 {paginatedBrokers.length > 0 ? (
                   <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
-                    {paginatedBrokers.map((broker) => (
+                    {paginatedBrokers.map(broker => (
                       <BrokerCard
                         key={broker.id}
                         broker={broker}
@@ -559,14 +577,16 @@ const Brokers: React.FC = () => {
                 ) : (
                   <div className='text-center py-12'>
                     <Building2 className='mx-auto h-12 w-12 text-gray-400' />
-                    <h3 className='mt-2 text-sm font-medium text-gray-900'>{t('brokers.noBrokersFound')}</h3>
+                    <h3 className='mt-2 text-sm font-medium text-gray-900'>
+                      {t('brokers.noBrokersFound')}
+                    </h3>
                     <p className='mt-1 text-sm text-gray-500'>
                       {t('brokers.getStartedByCreating')}
                     </p>
                     <div className='mt-6'>
                       <Button
-                        variant="primary"
-                        size="md"
+                        variant='primary'
+                        size='md'
                         leftIcon={Plus}
                         onClick={() => setIsModalOpen(true)}
                       >
@@ -592,7 +612,10 @@ const Brokers: React.FC = () => {
                   <span className='text-sm text-gray-700'>
                     {tCommon('pagination.showingRows', {
                       startItem: (currentPage - 1) * itemsPerPage + 1,
-                      endItem: Math.min(currentPage * itemsPerPage, filteredAndSortedBrokers.length),
+                      endItem: Math.min(
+                        currentPage * itemsPerPage,
+                        filteredAndSortedBrokers.length
+                      ),
                       total: filteredAndSortedBrokers.length
                     })}
                   </span>
@@ -607,13 +630,16 @@ const Brokers: React.FC = () => {
                     className='p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                   >
                     <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M15 19l-7-7 7-7'
+                      />
                     </svg>
                   </button>
                   <div className='flex items-center'>
-                    <span className='text-sm text-gray-700'>
-                      {tCommon('pagination.page')}
-                    </span>
+                    <span className='text-sm text-gray-700'>{tCommon('pagination.page')}</span>
                   </div>
                   <div className='flex items-center space-x-1'>
                     <input
@@ -652,7 +678,12 @@ const Brokers: React.FC = () => {
                     className='p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                   >
                     <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M9 5l7 7-7 7'
+                      />
                     </svg>
                   </button>
                 </div>
@@ -665,7 +696,11 @@ const Brokers: React.FC = () => {
         <Modal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          title={editingBroker ? `${tCommon('actions.edit')} ${tCommon('entities.brokers')}` : t('brokers.addNewBroker')}
+          title={
+            editingBroker
+              ? `${tCommon('actions.edit')} ${tCommon('entities.brokers')}`
+              : t('brokers.addNewBroker')
+          }
         >
           <BrokerForm broker={editingBroker} onSubmit={handleSubmit} onCancel={handleCloseModal} />
         </Modal>
@@ -715,7 +750,9 @@ const Brokers: React.FC = () => {
                         {viewingBroker.established_in && (
                           <div className='flex items-center text-gray-600'>
                             <Calendar className='w-5 h-5 mr-2 text-gray-400' />
-                            <span className='text-lg'>{t('brokers.establishedIn')} {viewingBroker.established_in}</span>
+                            <span className='text-lg'>
+                              {t('brokers.establishedIn')} {viewingBroker.established_in}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -766,8 +803,8 @@ const Brokers: React.FC = () => {
               {/* Action Buttons */}
               <div className='flex justify-end space-x-3 pt-6 border-t border-gray-200'>
                 <Button
-                  variant="secondary"
-                  size="md"
+                  variant='secondary'
+                  size='md'
                   leftIcon={Edit2}
                   onClick={() => {
                     setViewingBroker(null)
@@ -777,8 +814,8 @@ const Brokers: React.FC = () => {
                   {tCommon('actions.edit')} {tCommon('entities.brokers')}
                 </Button>
                 <Button
-                  variant="primary"
-                  size="md"
+                  variant='primary'
+                  size='md'
                   leftIcon={X}
                   onClick={() => setViewingBroker(null)}
                 >
@@ -799,14 +836,12 @@ const Brokers: React.FC = () => {
             <div>
               <p>
                 {t('brokers.confirmDeleteMessage')}{' '}
-                <strong className="font-semibold text-gray-900">
+                <strong className='font-semibold text-gray-900'>
                   {confirmDialog.brokerName || t('brokers.thisBroker')}
                 </strong>
                 ?
               </p>
-              <p className="mt-2 text-gray-600">
-                {t('brokers.actionCannotBeUndone')}
-              </p>
+              <p className='mt-2 text-gray-600'>{t('brokers.actionCannotBeUndone')}</p>
             </div>
           }
           confirmLabel={tCommon('actions.delete')}

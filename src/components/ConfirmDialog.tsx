@@ -108,23 +108,23 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             {/* Action buttons */}
             <div className='mt-6 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 space-y-3 space-y-reverse sm:space-y-0'>
               <Button
-                variant="secondary"
-                size="md"
+                variant='secondary'
+                size='md'
                 leftIcon={X}
                 onClick={onClose}
                 disabled={isLoading}
-                className="w-full sm:w-auto"
+                className='w-full sm:w-auto'
               >
                 {cancelLabel}
               </Button>
               <Button
                 variant={isDestructive ? 'danger' : 'primary'}
-                size="md"
+                size='md'
                 leftIcon={isDestructive ? Trash2 : Check}
                 onClick={handleConfirm}
                 loading={isLoading}
-                loadingText="Processing..."
-                className="w-full sm:w-auto"
+                loadingText='Processing...'
+                className='w-full sm:w-auto'
               >
                 {confirmLabel}
               </Button>

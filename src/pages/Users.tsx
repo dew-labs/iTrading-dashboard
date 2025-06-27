@@ -494,12 +494,12 @@ const Users: React.FC = () => {
             <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4'>
               <div className='flex-1 max-w-md'>
                 <Input
-                  type="text"
+                  type='text'
                   placeholder={tCommon('placeholders.searchUsersPlaceholder')}
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   leftIcon={Search}
-                  variant="search"
+                  variant='search'
                 />
               </div>
 
@@ -562,13 +562,16 @@ const Users: React.FC = () => {
                   className='p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                 >
                   <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M15 19l-7-7 7-7'
+                    />
                   </svg>
                 </button>
                 <div className='flex items-center'>
-                  <span className='text-sm text-gray-700'>
-                    {tCommon('pagination.page')}
-                  </span>
+                  <span className='text-sm text-gray-700'>{tCommon('pagination.page')}</span>
                 </div>
                 <div className='flex items-center space-x-1'>
                   <input
@@ -607,7 +610,12 @@ const Users: React.FC = () => {
                   className='p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                 >
                   <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M9 5l7 7-7 7'
+                    />
                   </svg>
                 </button>
               </div>

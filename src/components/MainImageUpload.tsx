@@ -74,54 +74,60 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
   const config = sizeConfig[size]
 
   // Handle file selection
-  const handleFileSelect = useCallback((file: File) => {
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file')
-      return
-    }
+  const handleFileSelect = useCallback(
+    (file: File) => {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file')
+        return
+      }
 
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('Image must be less than 10MB')
-      return
-    }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('Image must be less than 10MB')
+        return
+      }
 
-    // Create preview
-    const reader = new FileReader()
-    reader.onload = e => {
-      setPreview(e.target?.result as string)
-    }
-    reader.readAsDataURL(file)
+      // Create preview
+      const reader = new FileReader()
+      reader.onload = e => {
+        setPreview(e.target?.result as string)
+      }
+      reader.readAsDataURL(file)
 
-    // Upload file
-    uploadFile(file, {
-      bucket,
-      folder,
-      allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
-      maxSizeInMB: 10
-    })
-      .then(result => {
-        onChange(result.url)
-        setPreview(null)
-        toast.success('Main image uploaded successfully!')
+      // Upload file
+      uploadFile(file, {
+        bucket,
+        folder,
+        allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+        maxSizeInMB: 10
       })
-      .catch(error => {
-        console.error('Upload error:', error)
-        setPreview(null)
-      })
-  }, [uploadFile, bucket, folder, onChange])
+        .then(result => {
+          onChange(result.url)
+          setPreview(null)
+          toast.success('Main image uploaded successfully!')
+        })
+        .catch(error => {
+          console.error('Upload error:', error)
+          setPreview(null)
+        })
+    },
+    [uploadFile, bucket, folder, onChange]
+  )
 
   // Handle drag events
-  const handleDrag = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (disabled || isUploading) return
+  const handleDrag = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      if (disabled || isUploading) return
 
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true)
-    } else if (e.type === 'dragleave') {
-      setDragActive(false)
-    }
-  }, [disabled, isUploading])
+      if (e.type === 'dragenter' || e.type === 'dragover') {
+        setDragActive(true)
+      } else if (e.type === 'dragleave') {
+        setDragActive(false)
+      }
+    },
+    [disabled, isUploading]
+  )
 
   // Handle drop
   const handleDrop = useCallback(
@@ -178,9 +184,7 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
       <label className='block text-sm font-medium text-gray-700'>
         {label}
         {isUploading && (
-          <span className='ml-2 text-xs text-blue-600'>
-            Uploading... {progress}%
-          </span>
+          <span className='ml-2 text-xs text-blue-600'>Uploading... {progress}%</span>
         )}
       </label>
 
@@ -225,11 +229,11 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
                   backdropFilter: 'blur(0px)',
                   transition: 'all 0.3s ease'
                 }}
-                onMouseEnter={(e) => {
+                onMouseEnter={e => {
                   e.currentTarget.style.background = 'rgba(0, 0, 0, 0.2)'
                   e.currentTarget.style.backdropFilter = 'blur(4px)'
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={e => {
                   e.currentTarget.style.background = 'rgba(0, 0, 0, 0)'
                   e.currentTarget.style.backdropFilter = 'blur(0px)'
                 }}
@@ -281,27 +285,17 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
                   {size === 'lg' ? 'Click to upload' : 'Upload'}
                 </span>
                 {size === 'lg' && (
-                  <span className={`${config.text} text-gray-500 block`}>
-                    or drag & drop
-                  </span>
+                  <span className={`${config.text} text-gray-500 block`}>or drag & drop</span>
                 )}
               </div>
-              {size === 'lg' && (
-                <span className='text-xs text-gray-500'>
-                  PNG, JPG up to 10MB
-                </span>
-              )}
+              {size === 'lg' && <span className='text-xs text-gray-500'>PNG, JPG up to 10MB</span>}
             </div>
           </div>
         )}
       </div>
 
       {/* Compact hint for large size only */}
-      {size === 'lg' && (
-        <p className='text-xs text-gray-500 mt-2'>
-          {recommendationText}
-        </p>
-      )}
+      {size === 'lg' && <p className='text-xs text-gray-500 mt-2'>{recommendationText}</p>}
     </div>
   )
 }

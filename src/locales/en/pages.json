@@ -179,7 +179,6 @@
     "systemInformation": "System Information",
     "added": "Added:",
     "updated": "Updated:",
-    "description": "Description",
     "close": "Close",
     "confirmDeleteMessage": "Are you sure you want to delete the broker",
     "actionCannotBeUndone": "This action cannot be undone.",

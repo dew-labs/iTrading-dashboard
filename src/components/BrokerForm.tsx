@@ -65,12 +65,12 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
         <div className='md:col-span-1'>
           <MainImageUpload
             imageUrl={formData.logo_url || null}
-            onChange={(url) => setFormData({ ...formData, logo_url: url })}
-            bucket="brokers"
-            folder="logos"
+            onChange={url => setFormData({ ...formData, logo_url: url })}
+            bucket='brokers'
+            folder='logos'
             alt={tForm('labels.logo')}
             label={tForm('labels.logo')}
-            size="lg"
+            size='lg'
             recommendationText={tForm('hints.logoRecommendation')}
           />
         </div>
@@ -79,7 +79,7 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
         <div className='md:col-span-2 space-y-4'>
           <Input
             label={tForm('labels.name')}
-            name="name"
+            name='name'
             value={formData.name}
             onChange={handleChange}
             placeholder={tForm('placeholders.enterBrokerName')}
@@ -89,18 +89,23 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <Input
               label={tForm('labels.establishedYear')}
-              type="number"
-              name="established_in"
+              type='number'
+              name='established_in'
               value={formData.established_in || ''}
-              onChange={e => setFormData({ ...formData, established_in: e.target.value ? parseInt(e.target.value) : null })}
+              onChange={e =>
+                setFormData({
+                  ...formData,
+                  established_in: e.target.value ? parseInt(e.target.value) : null
+                })
+              }
               placeholder={tForm('placeholders.enterEstablishedYear')}
-              min="1900"
+              min='1900'
               max={new Date().getFullYear()}
             />
 
             <Input
               label={tForm('labels.headquarter')}
-              name="headquarter"
+              name='headquarter'
               value={formData.headquarter || ''}
               onChange={handleChange}
               placeholder={tForm('placeholders.enterHeadquarter')}
@@ -124,21 +129,10 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
 
       {/* Action buttons */}
       <div className='flex justify-end space-x-3 pt-6 border-t border-gray-200'>
-        <Button
-          type='button'
-          variant="secondary"
-          size="md"
-          leftIcon={X}
-          onClick={onCancel}
-        >
+        <Button type='button' variant='secondary' size='md' leftIcon={X} onClick={onCancel}>
           {t('actions.cancel')}
         </Button>
-        <Button
-          type='submit'
-          variant="primary"
-          size="md"
-          leftIcon={Save}
-        >
+        <Button type='submit' variant='primary' size='md' leftIcon={Save}>
           {broker ? t('actions.update') : t('actions.add')} {t('entities.brokers')}
         </Button>
       </div>

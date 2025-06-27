@@ -61,11 +61,7 @@ const Button: React.FC<ButtonProps> = ({
   )
 
   return (
-    <button
-      className={buttonClasses}
-      disabled={isDisabled}
-      {...props}
-    >
+    <button className={buttonClasses} disabled={isDisabled} {...props}>
       {loading ? (
         <>
           <Loader2 className='w-4 h-4 mr-2 animate-spin' />

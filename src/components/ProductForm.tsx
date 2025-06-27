@@ -60,12 +60,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
         <div className='md:col-span-1'>
           <MainImageUpload
             imageUrl={formData.featured_image_url || null}
-            onChange={(url) => setFormData({ ...formData, featured_image_url: url })}
-            bucket="products"
-            folder="featured-images"
-            alt="Product featured image"
-            label="Featured Image"
-            size="lg"
+            onChange={url => setFormData({ ...formData, featured_image_url: url })}
+            bucket='products'
+            folder='featured-images'
+            alt='Product featured image'
+            label='Featured Image'
+            size='lg'
           />
         </div>
 

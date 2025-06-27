@@ -4,14 +4,10 @@ import Sidebar from './Sidebar'
 import Header from './Header'
 import ProtectedRoute from './ProtectedRoute'
 import Dashboard from '../pages/Dashboard'
-import Analytics from '../pages/Analytics'
 import Posts from '../pages/Posts'
-import Products from '../pages/Products'
 import Brokers from '../pages/Brokers'
 import Banners from '../pages/Banners'
 import Users from '../pages/Users'
-import Settings from '../pages/Settings'
-import Help from '../pages/Help'
 import Unauthorized from '../pages/Unauthorized'
 
 const DashboardLayout: React.FC = () => {
@@ -35,7 +31,8 @@ const DashboardLayout: React.FC = () => {
         <main className='flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6'>
           <Routes>
             <Route path='/' element={<Dashboard />} />
-            <Route path='/analytics' element={<Analytics />} />
+            {/* Analytics page hidden - route commented out */}
+            {/* <Route path='/analytics' element={<Analytics />} /> */}
             <Route
               path='/posts'
               element={
@@ -44,14 +41,15 @@ const DashboardLayout: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-            <Route
+            {/* Products page hidden - route commented out */}
+            {/* <Route
               path='/products'
               element={
                 <ProtectedRoute requiredPermission={{ resource: 'products', action: 'read' }}>
                   <Products />
                 </ProtectedRoute>
               }
-            />
+            /> */}
             <Route
               path='/brokers'
               element={
@@ -76,8 +74,9 @@ const DashboardLayout: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-            <Route path='/settings' element={<Settings />} />
-            <Route path='/help' element={<Help />} />
+            {/* Settings and Help pages hidden - routes commented out */}
+            {/* <Route path='/settings' element={<Settings />} /> */}
+            {/* <Route path='/help' element={<Help />} /> */}
             <Route path='/unauthorized' element={<Unauthorized />} />
           </Routes>
         </main>
