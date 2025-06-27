@@ -15,6 +15,7 @@
 import React from 'react'
 import { API } from '../constants/theme'
 import { cn } from '../utils/theme'
+import { useTranslation } from '../hooks/useTranslation'
 import Select from './Select'
 
 interface PaginationSelectorProps {
@@ -22,8 +23,6 @@ interface PaginationSelectorProps {
   value: number
   /** Callback when the selection changes */
   onChange: (value: number) => void
-  /** Total number of items in the dataset */
-  totalItems: number
   /** Additional CSS classes */
   className?: string
   /** Label text before the selector */
@@ -33,10 +32,10 @@ interface PaginationSelectorProps {
 const PaginationSelector: React.FC<PaginationSelectorProps> = ({
   value,
   onChange,
-  totalItems,
   className,
-  label = 'Show'
+  label
 }) => {
+  const { t: tCommon } = useTranslation('common')
   // Ensure the current value is valid, fallback to default if not
   const validValue = (API.pagination.options as readonly number[]).includes(value)
     ? value
@@ -55,7 +54,9 @@ const PaginationSelector: React.FC<PaginationSelectorProps> = ({
 
   return (
     <div className={cn('flex items-center space-x-2', className)}>
-      <span className='text-sm text-gray-600 whitespace-nowrap'>{label}</span>
+      <span className='text-sm text-gray-700 whitespace-nowrap'>
+        {label || tCommon('pagination.rowsPerPage')}
+      </span>
       <div className='min-w-[80px]'>
         <Select
           options={selectOptions}
@@ -66,9 +67,6 @@ const PaginationSelector: React.FC<PaginationSelectorProps> = ({
           aria-label='Items per page'
         />
       </div>
-      <span className='text-sm text-gray-600 whitespace-nowrap'>
-        of {totalItems.toLocaleString()} items
-      </span>
     </div>
   )
 }

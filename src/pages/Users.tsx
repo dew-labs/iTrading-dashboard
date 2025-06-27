@@ -59,6 +59,7 @@ const Users: React.FC = () => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [pageInputValue, setPageInputValue] = useState('1')
 
   // Confirm dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -243,6 +244,7 @@ const Users: React.FC = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
+    setPageInputValue(page.toString())
   }
 
   const handleTabChange = (tabId: string) => {
@@ -406,9 +408,6 @@ const Users: React.FC = () => {
     )
   }
 
-  const startItem = (currentPage - 1) * itemsPerPage + 1
-  const endItem = Math.min(currentPage * itemsPerPage, filteredAndSortedUsers.length)
-
   return (
     <div className={layout.container}>
       <div className='space-y-6'>
@@ -524,14 +523,6 @@ const Users: React.FC = () => {
                   }}
                   label={tCommon('general.role')}
                 />
-                <PaginationSelector
-                  value={itemsPerPage}
-                  onChange={value => {
-                    setItemsPerPage(value)
-                    setCurrentPage(1) // Reset to first page when changing items per page
-                  }}
-                  totalItems={filteredAndSortedUsers.length}
-                />
               </div>
             </div>
 
@@ -545,33 +536,81 @@ const Users: React.FC = () => {
             />
 
             {/* Pagination */}
-            <div className='flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0'>
+            <div className='flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 py-3'>
+              <div className='flex items-center space-x-6'>
+                <PaginationSelector
+                  value={itemsPerPage}
+                  onChange={value => {
+                    setItemsPerPage(value)
+                    setCurrentPage(1) // Reset to first page when changing items per page
+                  }}
+                />
+                <div className='flex items-center'>
+                  <span className='text-sm text-gray-700'>
+                    {tCommon('pagination.showingRows', {
+                      startItem: (currentPage - 1) * itemsPerPage + 1,
+                      endItem: Math.min(currentPage * itemsPerPage, filteredAndSortedUsers.length),
+                      total: filteredAndSortedUsers.length
+                    })}
+                  </span>
+                </div>
+              </div>
+
               <div className='flex items-center space-x-2'>
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className='px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                  className='p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                 >
-                  {tCommon('actions.previous')}
+                  <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
+                  </svg>
                 </button>
-                <span className='text-sm text-gray-700'>
-                  {tCommon('pagination.page')} {currentPage} {tCommon('pagination.of')} {totalPages}
-                </span>
+                <div className='flex items-center'>
+                  <span className='text-sm text-gray-700'>
+                    {tCommon('pagination.page')}
+                  </span>
+                </div>
+                <div className='flex items-center space-x-1'>
+                  <input
+                    type='text'
+                    value={pageInputValue}
+                    onChange={e => {
+                      setPageInputValue(e.target.value)
+                    }}
+                    onBlur={e => {
+                      const page = parseInt(e.target.value)
+                      if (!isNaN(page) && page >= 1 && page <= totalPages) {
+                        handlePageChange(page)
+                      } else {
+                        setPageInputValue(currentPage.toString())
+                      }
+                    }}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        const page = parseInt(pageInputValue)
+                        if (!isNaN(page) && page >= 1 && page <= totalPages) {
+                          handlePageChange(page)
+                        } else {
+                          setPageInputValue(currentPage.toString())
+                        }
+                      }
+                    }}
+                    className='w-12 px-2 py-1 text-sm text-center border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+                  />
+                  <span className='text-sm text-gray-700'>
+                    {tCommon('pagination.of')} {totalPages}
+                  </span>
+                </div>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className='px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                  className='p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                 >
-                  {tCommon('actions.next')}
+                  <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
+                  </svg>
                 </button>
-              </div>
-
-              <div className='text-sm text-gray-700'>
-                {tCommon('pagination.showing')} <span className='font-medium'>{startItem}</span>{' '}
-                {tCommon('pagination.to')} <span className='font-medium'>{endItem}</span>{' '}
-                {tCommon('pagination.of')}{' '}
-                <span className='font-medium'>{filteredAndSortedUsers.length}</span>{' '}
-                {tCommon('pagination.results')}
               </div>
             </div>
           </div>

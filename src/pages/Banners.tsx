@@ -51,6 +51,7 @@ const Banners: React.FC = () => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [pageInputValue, setPageInputValue] = useState('1')
 
   // Confirm dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -187,6 +188,7 @@ const Banners: React.FC = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
+    setPageInputValue(page.toString())
   }
 
   // Use predefined filter options from constants
@@ -410,10 +412,7 @@ const Banners: React.FC = () => {
         </div>
 
         {/* Banners Content */}
-        <div
-          className={`bg-white shadow-sm border border-gray-200 ${totalPages > 1 ? 'rounded-t-xl' : 'rounded-xl'}`}
-        >
-          {/* Enhanced Filters */}
+        <div className='bg-white rounded-xl border border-gray-200 shadow-sm'>
           <div className='p-6 space-y-4'>
             {/* Search and filters row */}
             <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4'>
@@ -440,20 +439,10 @@ const Banners: React.FC = () => {
                   }}
                   label={tCommon('general.status')}
                 />
-                <PaginationSelector
-                  value={itemsPerPage}
-                  onChange={value => {
-                    setItemsPerPage(value)
-                    setCurrentPage(1) // Reset to first page when changing items per page
-                  }}
-                  totalItems={filteredAndSortedBanners.length}
-                />
               </div>
             </div>
-          </div>
 
-          {/* Table with padding */}
-          <div className='px-6 pb-6'>
+            {/* Table */}
             <Table
               data={paginatedBanners}
               columns={columns}
@@ -461,70 +450,88 @@ const Banners: React.FC = () => {
               sortDirection={sortDirection}
               onSort={handleSort}
             />
-          </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className='bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 rounded-b-xl'>
-              <div className='flex-1 flex justify-between sm:hidden'>
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className={getButtonClasses('secondary', 'md')}
-                >
-                  {tCommon('actions.previous')}
-                </button>
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className={cn(getButtonClasses('secondary', 'md'), 'ml-3')}
-                >
-                  {tCommon('actions.next')}
-                </button>
-              </div>
-
-              <div className='hidden sm:flex-1 sm:flex sm:items-center sm:justify-between'>
-                <div></div>
-
-                <div>
-                  <nav className='relative z-0 inline-flex rounded-md shadow-sm -space-x-px'>
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className='relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    >
-                      ←
-                    </button>
-
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      const page = i + 1
-                      return (
-                        <button
-                          key={page}
-                          onClick={() => handlePageChange(page)}
-                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                            page === currentPage
-                              ? 'z-10 bg-gray-900 border-gray-900 text-white'
-                              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      )
+            {/* Pagination */}
+            <div className='flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 py-3'>
+              <div className='flex items-center space-x-6'>
+                <PaginationSelector
+                  value={itemsPerPage}
+                  onChange={value => {
+                    setItemsPerPage(value)
+                    setCurrentPage(1) // Reset to first page when changing items per page
+                  }}
+                />
+                <div className='flex items-center'>
+                  <span className='text-sm text-gray-700'>
+                    {tCommon('pagination.showingRows', {
+                      startItem: (currentPage - 1) * itemsPerPage + 1,
+                      endItem: Math.min(currentPage * itemsPerPage, filteredAndSortedBanners.length),
+                      total: filteredAndSortedBanners.length
                     })}
-
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className='relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    >
-                      →
-                    </button>
-                  </nav>
+                  </span>
                 </div>
               </div>
+
+              {totalPages > 1 && (
+                <div className='flex items-center space-x-2'>
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className='p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
+                  >
+                    <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
+                    </svg>
+                  </button>
+                  <div className='flex items-center'>
+                    <span className='text-sm text-gray-700'>
+                      {tCommon('pagination.page')}
+                    </span>
+                  </div>
+                  <div className='flex items-center space-x-1'>
+                    <input
+                      type='text'
+                      value={pageInputValue}
+                      onChange={e => {
+                        setPageInputValue(e.target.value)
+                      }}
+                      onBlur={e => {
+                        const page = parseInt(e.target.value)
+                        if (!isNaN(page) && page >= 1 && page <= totalPages) {
+                          handlePageChange(page)
+                        } else {
+                          setPageInputValue(currentPage.toString())
+                        }
+                      }}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          const page = parseInt(pageInputValue)
+                          if (!isNaN(page) && page >= 1 && page <= totalPages) {
+                            handlePageChange(page)
+                          } else {
+                            setPageInputValue(currentPage.toString())
+                          }
+                        }
+                      }}
+                      className='w-12 px-2 py-1 text-sm text-center border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+                    />
+                    <span className='text-sm text-gray-700'>
+                      {tCommon('pagination.of')} {totalPages}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className='p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
+                  >
+                    <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
 
         {/* Modal */}
