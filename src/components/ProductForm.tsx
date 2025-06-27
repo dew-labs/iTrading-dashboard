@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import type { Product, ProductInsert } from '../types'
 import RichTextEditor from './RichTextEditor'
+import MainImageUpload from './MainImageUpload'
 
 interface ProductFormProps {
   product?: Product | null
@@ -13,7 +14,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
     name: '',
     price: 0,
     description: '',
-    subscription: false
+    subscription: false,
+    featured_image_url: null
   })
 
   useEffect(() => {
@@ -22,7 +24,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
         name: product.name,
         price: product.price,
         description: product.description || '',
-        subscription: product.subscription
+        subscription: product.subscription,
+        featured_image_url: product.featured_image_url || null
       })
     }
   }, [product])
@@ -51,38 +54,54 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
 
   return (
     <form onSubmit={handleSubmit} className='space-y-6'>
-      {/* Compact top fields in grid */}
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-        <div>
-          <label htmlFor='name' className='block text-sm font-medium text-gray-700 mb-1'>
-            Product Name
-          </label>
-          <input
-            type='text'
-            id='name'
-            name='name'
-            value={formData.name}
-            onChange={handleChange}
-            className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent'
-            required
+      {/* Main image and basic info grid */}
+      <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+        {/* Main Image Upload */}
+        <div className='md:col-span-1'>
+          <MainImageUpload
+            imageUrl={formData.featured_image_url || null}
+            onChange={(url) => setFormData({ ...formData, featured_image_url: url })}
+            bucket="products"
+            folder="featured-images"
+            alt="Product featured image"
+            label="Featured Image"
+            size="lg"
           />
         </div>
 
-        <div>
-          <label htmlFor='price' className='block text-sm font-medium text-gray-700 mb-1'>
-            Price ($)
-          </label>
-          <input
-            type='number'
-            id='price'
-            name='price'
-            value={formData.price}
-            onChange={handleChange}
-            step='0.01'
-            min='0'
-            className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent'
-            required
-          />
+        {/* Product Details */}
+        <div className='md:col-span-2 space-y-4'>
+          <div>
+            <label htmlFor='name' className='block text-sm font-medium text-gray-700 mb-1'>
+              Product Name
+            </label>
+            <input
+              type='text'
+              id='name'
+              name='name'
+              value={formData.name}
+              onChange={handleChange}
+              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent'
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor='price' className='block text-sm font-medium text-gray-700 mb-1'>
+              Price ($)
+            </label>
+            <input
+              type='number'
+              id='price'
+              name='price'
+              value={formData.price}
+              onChange={handleChange}
+              step='0.01'
+              min='0'
+              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent'
+              required
+            />
+          </div>
         </div>
       </div>
 

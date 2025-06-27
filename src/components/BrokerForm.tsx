@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react'
+import { X, Save } from 'lucide-react'
 import type { Broker, BrokerInsert } from '../types'
 import RichTextEditor from './RichTextEditor'
-import DatePicker from './DatePicker'
+import MainImageUpload from './MainImageUpload'
+import Button from './Button'
+import Input from './Input'
+import { useFormTranslation, useTranslation } from '../hooks/useTranslation'
 
 interface BrokerFormProps {
   broker?: Broker | null
@@ -10,18 +14,24 @@ interface BrokerFormProps {
 }
 
 const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) => {
+  const { t: tForm } = useFormTranslation()
+  const { t } = useTranslation()
   const [formData, setFormData] = useState<BrokerInsert>({
-    established_at: '',
+    name: '',
+    established_in: null,
     headquarter: '',
-    description: ''
+    description: '',
+    logo_url: null
   })
 
   useEffect(() => {
     if (broker) {
       setFormData({
-        established_at: broker.established_at || '',
+        name: broker.name,
+        established_in: broker.established_in || null,
         headquarter: broker.headquarter || '',
-        description: broker.description || ''
+        description: broker.description || '',
+        logo_url: broker.logo_url || null
       })
     }
   }, [broker])
@@ -30,9 +40,11 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
     e.preventDefault()
     // Convert empty strings to null for optional fields
     const submittedData: BrokerInsert = {
-      established_at: formData.established_at || null,
+      name: formData.name,
+      established_in: formData.established_in || null,
       headquarter: formData.headquarter || null,
-      description: formData.description || null
+      description: formData.description || null,
+      logo_url: formData.logo_url || null
     }
     onSubmit(submittedData)
   }
@@ -47,42 +59,63 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
 
   return (
     <form onSubmit={handleSubmit} className='space-y-6'>
-      {/* Compact top fields in grid */}
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-        <div>
-          <DatePicker
-            label='Established Date'
-            value={formData.established_at || ''}
-            onChange={date => setFormData({ ...formData, established_at: date })}
-            placeholder='Select establishment date'
-            id='established_at'
-            name='established_at'
+      {/* Main image and basic info grid */}
+      <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+        {/* Main Image Upload */}
+        <div className='md:col-span-1'>
+          <MainImageUpload
+            imageUrl={formData.logo_url || null}
+            onChange={(url) => setFormData({ ...formData, logo_url: url })}
+            bucket="brokers"
+            folder="logos"
+            alt={tForm('labels.logo')}
+            label={tForm('labels.logo')}
+            size="lg"
+            recommendationText={tForm('hints.logoRecommendation')}
           />
         </div>
 
-        <div>
-          <label htmlFor='headquarter' className='block text-sm font-medium text-gray-700 mb-1'>
-            Headquarter
-          </label>
-          <input
-            type='text'
-            id='headquarter'
-            name='headquarter'
-            value={formData.headquarter || ''}
+        {/* Broker Details */}
+        <div className='md:col-span-2 space-y-4'>
+          <Input
+            label={tForm('labels.name')}
+            name="name"
+            value={formData.name}
             onChange={handleChange}
-            className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent'
-            placeholder='e.g., New York, USA'
+            placeholder={tForm('placeholders.enterBrokerName')}
+            required
           />
+
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <Input
+              label={tForm('labels.establishedYear')}
+              type="number"
+              name="established_in"
+              value={formData.established_in || ''}
+              onChange={e => setFormData({ ...formData, established_in: e.target.value ? parseInt(e.target.value) : null })}
+              placeholder={tForm('placeholders.enterEstablishedYear')}
+              min="1900"
+              max={new Date().getFullYear()}
+            />
+
+            <Input
+              label={tForm('labels.headquarter')}
+              name="headquarter"
+              value={formData.headquarter || ''}
+              onChange={handleChange}
+              placeholder={tForm('placeholders.enterHeadquarter')}
+            />
+          </div>
         </div>
       </div>
 
       {/* Large editor section */}
       <div className='border-t border-gray-200 pt-6'>
         <RichTextEditor
-          label='Broker Description'
+          label={tForm('labels.description')}
           content={formData.description || ''}
           onChange={description => setFormData({ ...formData, description })}
-          placeholder="Describe the broker's services, history, regulations, trading platforms, and key features..."
+          placeholder={tForm('placeholders.brokerDescriptionPlaceholder')}
           height={450}
           bucket='brokers'
           folder='images'
@@ -91,19 +124,23 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
 
       {/* Action buttons */}
       <div className='flex justify-end space-x-3 pt-6 border-t border-gray-200'>
-        <button
+        <Button
           type='button'
+          variant="secondary"
+          size="md"
+          leftIcon={X}
           onClick={onCancel}
-          className='px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors'
         >
-          Cancel
-        </button>
-        <button
+          {t('actions.cancel')}
+        </Button>
+        <Button
           type='submit'
-          className='px-6 py-2 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-black hover:to-gray-900 transition-colors'
+          variant="primary"
+          size="md"
+          leftIcon={Save}
         >
-          {broker ? 'Update' : 'Add'} Broker
-        </button>
+          {broker ? t('actions.update') : t('actions.add')} {t('entities.brokers')}
+        </Button>
       </div>
     </form>
   )

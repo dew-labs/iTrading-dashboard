@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react'
-import { Plus, Search, Edit2, Trash2, Building2, Calendar, MapPin, FileText } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Eye, Building2, Calendar, MapPin, FileText, Grid3X3, List, X } from 'lucide-react'
+import Button from '../components/Button'
+import Input from '../components/Input'
 import { useBrokers } from '../hooks/useBrokers'
 import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
 import Table from '../components/Table'
@@ -7,7 +9,6 @@ import Modal from '../components/Modal'
 import BrokerForm from '../components/BrokerForm'
 import ConfirmDialog from '../components/ConfirmDialog'
 import PageLoadingSpinner from '../components/PageLoadingSpinner'
-import RecordImage from '../components/RecordImage'
 import { stripHtmlAndTruncate } from '../utils'
 
 import PaginationSelector from '../components/PaginationSelector'
@@ -16,14 +17,115 @@ import type { Broker, BrokerInsert } from '../types'
 // Theme imports
 import {
   getPageLayoutClasses,
-  getButtonClasses,
   getStatsCardProps,
   getIconClasses,
   getTypographyClasses,
   cn
 } from '../utils/theme'
 import { formatDateDisplay } from '../utils/format'
-import { INPUT_VARIANTS } from '../constants/components'
+
+// BrokerCard component for card view
+interface BrokerCardProps {
+  broker: Broker
+  onView: (broker: Broker) => void
+  onEdit: (broker: Broker) => void
+  onDelete: (broker: Broker) => void
+}
+
+const BrokerCard: React.FC<BrokerCardProps> = ({ broker, onView, onEdit, onDelete }) => {
+  const { t } = usePageTranslation()
+  return (
+    <div className='bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden'>
+      {/* Header with logo and actions */}
+      <div className='p-6 pb-4'>
+        <div className='flex items-start justify-between mb-4'>
+          <div className='flex items-center space-x-3'>
+            <div className='flex-shrink-0'>
+              {broker.logo_url ? (
+                <img
+                  src={broker.logo_url}
+                  alt={`${broker.headquarter || t('brokers.broker')} logo`}
+                  className='w-12 h-12 rounded-lg object-cover border border-gray-200'
+                />
+              ) : (
+                <div className='w-12 h-12 rounded-lg bg-gradient-to-br from-gray-900 to-black flex items-center justify-center'>
+                  <Building2 className='w-6 h-6 text-white' />
+                </div>
+              )}
+            </div>
+            <div className='flex-1 min-w-0'>
+              <h3 className='text-lg font-semibold text-gray-900 truncate'>
+                {broker.name || broker.headquarter || t('brokers.unknownBroker')}
+              </h3>
+              {broker.established_in && (
+                <div className='flex items-center text-sm text-gray-500 mt-1'>
+                  <Calendar className='w-4 h-4 mr-1' />
+                  <span>{t('brokers.est')} {broker.established_in}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className='flex space-x-1'>
+            <button
+              onClick={() => onView(broker)}
+              className='p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors'
+              title={t('brokers.tooltips.viewBroker')}
+            >
+              <Eye className='w-4 h-4' />
+            </button>
+            <button
+              onClick={() => onEdit(broker)}
+              className='p-2 text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors'
+              title={t('brokers.tooltips.editBroker')}
+            >
+              <Edit2 className='w-4 h-4' />
+            </button>
+            <button
+              onClick={() => onDelete(broker)}
+              className='p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors'
+              title={t('brokers.tooltips.deleteBroker')}
+            >
+              <Trash2 className='w-4 h-4' />
+            </button>
+          </div>
+        </div>
+
+        {/* Headquarter info */}
+        {broker.headquarter && (
+          <div className='flex items-center text-sm text-gray-600 mb-3'>
+            <MapPin className='w-4 h-4 mr-1 text-gray-400' />
+            <span>{broker.headquarter}</span>
+          </div>
+        )}
+
+        {/* Description */}
+        <div className='text-sm text-gray-600 line-clamp-3'>
+          {broker.description ? (
+            <div dangerouslySetInnerHTML={{
+              __html: broker.description.length > 150
+                ? broker.description.substring(0, 150) + '...'
+                : broker.description
+            }} />
+          ) : (
+            <span className='italic text-gray-400'>{t('brokers.noDescriptionAvailable')}</span>
+          )}
+        </div>
+      </div>
+
+      {/* Footer with metadata */}
+      <div className='px-6 py-3 bg-gray-50 border-t border-gray-100'>
+        <div className='flex items-center justify-between text-xs text-gray-500'>
+          <div className='flex items-center'>
+            <FileText className='w-3 h-3 mr-1' />
+            <span>{t('brokers.added')} {formatDateDisplay(broker.created_at)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const Brokers: React.FC = () => {
   const { brokers, loading, createBroker, updateBroker, deleteBroker, isDeleting } = useBrokers()
@@ -33,10 +135,12 @@ const Brokers: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingBroker, setEditingBroker] = useState<Broker | null>(null)
+  const [viewingBroker, setViewingBroker] = useState<Broker | null>(null)
+  const [viewMode, setViewMode] = useState<'list' | 'card'>('list')
   const [sortColumn, setSortColumn] = useState<keyof Broker | null>('created_at')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [itemsPerPage, setItemsPerPage] = useState(12)
   const [pageInputValue, setPageInputValue] = useState('1')
 
   // Confirm dialog state
@@ -72,13 +176,17 @@ const Brokers: React.FC = () => {
       let bValue: string | number
 
       switch (sortColumn) {
+      case 'name':
+        aValue = a.name.toLowerCase()
+        bValue = b.name.toLowerCase()
+        break
       case 'headquarter':
         aValue = (a.headquarter || '').toLowerCase()
         bValue = (b.headquarter || '').toLowerCase()
         break
-      case 'established_at':
-        aValue = a.established_at ? new Date(a.established_at).getTime() : 0
-        bValue = b.established_at ? new Date(b.established_at).getTime() : 0
+      case 'established_in':
+        aValue = a.established_in || 0
+        bValue = b.established_in || 0
         break
       case 'created_at':
         aValue = new Date(a.created_at).getTime()
@@ -105,6 +213,10 @@ const Brokers: React.FC = () => {
     currentPage * itemsPerPage
   )
 
+  const handleView = (broker: Broker) => {
+    setViewingBroker(broker)
+  }
+
   const handleEdit = (broker: Broker) => {
     setEditingBroker(broker)
     setIsModalOpen(true)
@@ -114,7 +226,7 @@ const Brokers: React.FC = () => {
     setConfirmDialog({
       isOpen: true,
       brokerId: broker.id,
-      brokerName: broker.headquarter
+      brokerName: broker.name
     })
   }
 
@@ -181,28 +293,34 @@ const Brokers: React.FC = () => {
   const columns = [
     {
       header: t('brokers.brokerInformation'),
-      accessor: 'headquarter' as keyof Broker,
+      accessor: 'name' as keyof Broker,
       sortable: true,
       render: (value: unknown, row: Broker) => {
         return (
           <div className='flex items-center space-x-3'>
             <div className='flex-shrink-0'>
-              <RecordImage
-                tableName='brokers'
-                recordId={row.id.toString()}
-                className='w-12 h-12 rounded-lg object-cover border border-gray-200'
-                fallbackClassName='w-12 h-12 rounded-lg bg-gradient-to-br from-gray-900 to-black flex items-center justify-center'
-                alt={`${(value as string) || 'Broker'} logo`}
-                fallbackIcon={<Building2 className='w-4 h-4 text-white' />}
-              />
+              {row.logo_url ? (
+                <img
+                  src={row.logo_url}
+                  alt={`${row.name} logo`}
+                  className='w-12 h-12 rounded-lg object-cover border border-gray-200'
+                />
+              ) : (
+                <div className='w-12 h-12 rounded-lg bg-gradient-to-br from-gray-900 to-black flex items-center justify-center'>
+                  <Building2 className='w-4 h-4 text-white' />
+                </div>
+              )}
             </div>
             <div className='flex-1 min-w-0'>
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>
-                {(value as string) || t('brokers.noHeadquarterInfo')}
+                {row.name}
               </div>
-              <div className={cn(getTypographyClasses('small'), 'text-gray-600')}>
+              <div className={cn(getTypographyClasses('small'), 'text-gray-600 truncate')}>
+                {row.headquarter || t('brokers.noHeadquarterInfo')}
+              </div>
+              <div className={cn(getTypographyClasses('small'), 'text-gray-500 truncate')}>
                 {row.description
-                  ? stripHtmlAndTruncate(row.description, 80)
+                  ? stripHtmlAndTruncate(row.description, 60)
                   : t('brokers.noDescription')}
               </div>
             </div>
@@ -212,7 +330,7 @@ const Brokers: React.FC = () => {
     },
     {
       header: t('brokers.established'),
-      accessor: 'established_at' as keyof Broker,
+      accessor: 'established_in' as keyof Broker,
       sortable: true,
       render: (value: unknown) => {
         return (
@@ -220,7 +338,7 @@ const Brokers: React.FC = () => {
             {value ? (
               <div className='flex items-center'>
                 <Calendar className='w-4 h-4 mr-1 text-gray-400' />
-                <span>{formatDateDisplay(value as string)}</span>
+                <span>{value as number}</span>
               </div>
             ) : (
               <span className='text-gray-400'>{t('brokers.notSpecified')}</span>
@@ -250,6 +368,13 @@ const Brokers: React.FC = () => {
       render: (value: unknown, row: Broker) => (
         <div className='flex space-x-1'>
           <button
+            onClick={() => handleView(row)}
+            className='p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors'
+            title={t('brokers.tooltips.viewBroker')}
+          >
+            <Eye className={getIconClasses('action')} />
+          </button>
+          <button
             onClick={() => handleEdit(row)}
             className='p-2 text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded transition-colors'
             title={t('brokers.tooltips.editBroker')}
@@ -271,7 +396,7 @@ const Brokers: React.FC = () => {
   // Stats calculations
   const totalBrokers = brokers.length
   const brokersWithHQ = brokers.filter(b => b.headquarter).length
-  const brokersWithEstDate = brokers.filter(b => b.established_at).length
+  const brokersWithEstDate = brokers.filter(b => b.established_in).length
   const recentBrokers = brokers.filter(
     b => new Date(b.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
   ).length
@@ -301,13 +426,14 @@ const Brokers: React.FC = () => {
             </p>
           </div>
           <div className='mt-4 sm:mt-0 flex items-center space-x-3'>
-            <button
+            <Button
+              variant="primary"
+              size="md"
+              leftIcon={Plus}
               onClick={() => setIsModalOpen(true)}
-              className={getButtonClasses('primary', 'md')}
             >
-              <Plus className='w-4 h-4 mr-2' />
               {t('brokers.addBroker')}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -368,30 +494,89 @@ const Brokers: React.FC = () => {
             {/* Search and filters row */}
             <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4'>
               <div className='flex-1 max-w-md'>
-                <div className='relative'>
-                  <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-                  <input
-                    type='text'
-                    placeholder={tCommon('placeholders.searchBrokersPlaceholder')}
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    className={cn(INPUT_VARIANTS.withIcon, 'py-2')}
-                  />
-                </div>
+                <Input
+                  type="text"
+                  placeholder={tCommon('placeholders.searchBrokersPlaceholder')}
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  leftIcon={Search}
+                  variant="search"
+                />
               </div>
 
               <div className='flex items-center space-x-3'>
+                {/* View Toggle */}
+                <div className='flex items-center bg-gray-100 rounded-lg p-1'>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-2 rounded-md transition-colors ${
+                      viewMode === 'list'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                    title={t('brokers.listView')}
+                  >
+                    <List className='w-4 h-4' />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('card')}
+                    className={`p-2 rounded-md transition-colors ${
+                      viewMode === 'card'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                    title={t('brokers.cardView')}
+                  >
+                    <Grid3X3 className='w-4 h-4' />
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Table */}
-            <Table
-              data={paginatedBrokers}
-              columns={columns}
-              sortColumn={sortColumn}
-              sortDirection={sortDirection}
-              onSort={handleSort}
-            />
+            {/* Content - Table or Cards */}
+            {viewMode === 'list' ? (
+              <Table
+                data={paginatedBrokers}
+                columns={columns}
+                sortColumn={sortColumn}
+                sortDirection={sortDirection}
+                onSort={handleSort}
+              />
+            ) : (
+              <>
+                {paginatedBrokers.length > 0 ? (
+                  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+                    {paginatedBrokers.map((broker) => (
+                      <BrokerCard
+                        key={broker.id}
+                        broker={broker}
+                        onView={handleView}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className='text-center py-12'>
+                    <Building2 className='mx-auto h-12 w-12 text-gray-400' />
+                    <h3 className='mt-2 text-sm font-medium text-gray-900'>{t('brokers.noBrokersFound')}</h3>
+                    <p className='mt-1 text-sm text-gray-500'>
+                      {t('brokers.getStartedByCreating')}
+                    </p>
+                    <div className='mt-6'>
+                      <Button
+                        variant="primary"
+                        size="md"
+                        leftIcon={Plus}
+                        onClick={() => setIsModalOpen(true)}
+                      >
+                        {t('brokers.addBroker')}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
 
             {/* Pagination */}
             <div className='flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 py-3'>
@@ -476,14 +661,133 @@ const Brokers: React.FC = () => {
           </div>
         </div>
 
-        {/* Modal */}
+        {/* Modal for creating/editing brokers */}
         <Modal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          title={editingBroker ? t('brokers.editBroker') : t('brokers.addNewBroker')}
+          title={editingBroker ? `${tCommon('actions.edit')} ${tCommon('entities.brokers')}` : t('brokers.addNewBroker')}
         >
           <BrokerForm broker={editingBroker} onSubmit={handleSubmit} onCancel={handleCloseModal} />
         </Modal>
+
+        {/* Modal for viewing broker details */}
+        {viewingBroker && (
+          <Modal
+            isOpen={!!viewingBroker}
+            onClose={() => setViewingBroker(null)}
+            title={`${t('brokers.brokerDetails')}: ${viewingBroker.name}`}
+          >
+            <div className='space-y-6'>
+              {/* Header Section with Logo, Company Info, and System Info */}
+              <div className='bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6'>
+                <div className='flex flex-col xl:flex-row items-start xl:items-center space-y-6 xl:space-y-0 xl:space-x-8'>
+                  {/* Left side: Logo and Company Information */}
+                  <div className='flex flex-col lg:flex-row items-start lg:items-center space-y-4 lg:space-y-0 lg:space-x-6 flex-1'>
+                    {/* Logo */}
+                    <div className='flex-shrink-0'>
+                      {viewingBroker.logo_url ? (
+                        <img
+                          src={viewingBroker.logo_url}
+                          alt={`${viewingBroker.name} logo`}
+                          className='w-24 h-24 lg:w-32 lg:h-32 object-contain rounded-xl border border-gray-200 bg-white shadow-sm'
+                        />
+                      ) : (
+                        <div className='w-24 h-24 lg:w-32 lg:h-32 rounded-xl bg-gradient-to-br from-gray-900 to-black flex items-center justify-center shadow-sm'>
+                          <Building2 className='w-12 h-12 lg:w-16 lg:h-16 text-white' />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Company Information */}
+                    <div className='flex-1 min-w-0'>
+                      <h2 className='text-2xl lg:text-3xl font-bold text-gray-900 mb-2'>
+                        {viewingBroker.name}
+                      </h2>
+
+                      <div className='space-y-2'>
+                        {viewingBroker.headquarter && (
+                          <div className='flex items-center text-gray-600'>
+                            <MapPin className='w-5 h-5 mr-2 text-gray-400' />
+                            <span className='text-lg'>{viewingBroker.headquarter}</span>
+                          </div>
+                        )}
+
+                        {viewingBroker.established_in && (
+                          <div className='flex items-center text-gray-600'>
+                            <Calendar className='w-5 h-5 mr-2 text-gray-400' />
+                            <span className='text-lg'>{t('brokers.establishedIn')} {viewingBroker.established_in}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right side: System Information */}
+                  <div className='flex-shrink-0 w-full xl:w-60'>
+                    <div className='space-y-3'>
+                      <h3 className='text-sm font-medium text-gray-500 uppercase tracking-wide'>
+                        {t('brokers.systemInformation')}
+                      </h3>
+
+                      <div className='space-y-2'>
+                        <div className='flex justify-between items-center'>
+                          <span className='text-xs text-gray-400'>{t('brokers.added')}</span>
+                          <span className='text-xs text-gray-600'>
+                            {formatDateDisplay(viewingBroker.created_at)}
+                          </span>
+                        </div>
+
+                        <div className='flex justify-between items-center'>
+                          <span className='text-xs text-gray-400'>{t('brokers.updated')}</span>
+                          <span className='text-xs text-gray-600'>
+                            {formatDateDisplay(viewingBroker.created_at)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description Section */}
+              {viewingBroker.description && (
+                <div className='space-y-4'>
+                  <h3 className='text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2'>
+                    {t('brokers.description')}
+                  </h3>
+                  <div className='bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6'>
+                    <div className='prose prose-sm max-w-none text-gray-700'>
+                      <div dangerouslySetInnerHTML={{ __html: viewingBroker.description }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className='flex justify-end space-x-3 pt-6 border-t border-gray-200'>
+                <Button
+                  variant="secondary"
+                  size="md"
+                  leftIcon={Edit2}
+                  onClick={() => {
+                    setViewingBroker(null)
+                    handleEdit(viewingBroker)
+                  }}
+                >
+                  {tCommon('actions.edit')} {tCommon('entities.brokers')}
+                </Button>
+                <Button
+                  variant="primary"
+                  size="md"
+                  leftIcon={X}
+                  onClick={() => setViewingBroker(null)}
+                >
+                  {t('brokers.close')}
+                </Button>
+              </div>
+            </div>
+          </Modal>
+        )}
 
         {/* Delete Confirmation Dialog */}
         <ConfirmDialog
@@ -491,9 +795,20 @@ const Brokers: React.FC = () => {
           onClose={handleCancelDelete}
           onConfirm={handleConfirmDelete}
           title={t('brokers.deleteBrokerTitle')}
-          message={t('brokers.deleteBrokerMessage', {
-            brokerName: confirmDialog.brokerName || t('brokers.thisBroker')
-          })}
+          message={
+            <div>
+              <p>
+                {t('brokers.confirmDeleteMessage')}{' '}
+                <strong className="font-semibold text-gray-900">
+                  {confirmDialog.brokerName || t('brokers.thisBroker')}
+                </strong>
+                ?
+              </p>
+              <p className="mt-2 text-gray-600">
+                {t('brokers.actionCannotBeUndone')}
+              </p>
+            </div>
+          }
           confirmLabel={tCommon('actions.delete')}
           cancelLabel={tCommon('actions.cancel')}
           isDestructive={true}

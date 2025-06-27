@@ -39,8 +39,9 @@ import {
   getTypographyClasses,
   cn
 } from '../utils/theme'
+import Input from '../components/Input'
 import { formatDateDisplay } from '../utils/format'
-import { INPUT_VARIANTS, FILTER_OPTIONS } from '../constants/components'
+import { FILTER_OPTIONS } from '../constants/components'
 
 const Users: React.FC = () => {
   const { t } = usePageTranslation() // Page-specific content
@@ -492,16 +493,14 @@ const Users: React.FC = () => {
             {/* Search and filters row */}
             <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4'>
               <div className='flex-1 max-w-md'>
-                <div className='relative'>
-                  <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-                  <input
-                    type='text'
-                    placeholder={tCommon('placeholders.searchUsersPlaceholder')}
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    className={cn(INPUT_VARIANTS.withIcon, 'py-2')}
-                  />
-                </div>
+                <Input
+                  type="text"
+                  placeholder={tCommon('placeholders.searchUsersPlaceholder')}
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  leftIcon={Search}
+                  variant="search"
+                />
               </div>
 
               <div className='flex items-center space-x-3'>

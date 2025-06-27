@@ -34,7 +34,10 @@
     "isPublished": "Published",
     "targetUrl": "Target URL",
     "headquarter": "Headquarter",
-    "establishedDate": "Established Date"
+    "establishedDate": "Established Date",
+    "name": "Name",
+    "logo": "Logo",
+    "establishedYear": "Established Year"
   },
   "placeholders": {
     "enterFirstName": "Enter first name",
@@ -69,7 +72,11 @@
     "search": "Search...",
     "enterTargetUrl": "Enter target URL",
     "enterHeadquarter": "Enter headquarter location",
-    "selectEstablishedDate": "Select established date"
+    "selectEstablishedDate": "Select established date",
+    "enterName": "Enter name",
+    "enterBrokerName": "e.g., Interactive Brokers",
+    "enterEstablishedYear": "e.g., 1999",
+    "brokerDescriptionPlaceholder": "Describe the broker's services, history, regulations, trading platforms, and key features..."
   },
   "validation": {
     "required": "This field is required",
@@ -84,5 +91,8 @@
     "url": "Please enter a valid URL",
     "file": "Please select a valid file",
     "image": "Please select a valid image file"
+  },
+  "hints": {
+    "logoRecommendation": "Recommended: Square images work best"
   }
 }

@@ -22,9 +22,10 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
       {/* Modal container */}
       <div className='flex min-h-full items-center justify-center p-4'>
         {/* Modal with enhanced styling - increased to max-w-5xl for better editor space */}
-        <div className='relative bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-white/20 w-full max-w-5xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 ease-out scale-100'>
-          <div className='p-6'>
-            <div className='flex items-center justify-between mb-6'>
+        <div className='relative bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-white/20 w-full max-w-5xl max-h-[90vh] overflow-hidden transform transition-all duration-300 ease-out scale-100'>
+          {/* Sticky Header */}
+          <div className='sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-6 py-4'>
+            <div className='flex items-center justify-between'>
               <h3 className='text-xl font-semibold text-gray-900'>{title}</h3>
               <button
                 onClick={onClose}
@@ -33,6 +34,10 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
                 <X className='w-5 h-5' />
               </button>
             </div>
+          </div>
+
+          {/* Scrollable Content */}
+          <div className='overflow-y-auto max-h-[calc(90vh-5rem)] p-6'>
             {children}
           </div>
         </div>

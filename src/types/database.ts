@@ -37,6 +37,7 @@ export interface Database {
           description: string | null
           price: number
           subscription: boolean
+          featured_image_url: string | null
           created_at: string
         }
         Insert: {
@@ -45,6 +46,7 @@ export interface Database {
           description?: string | null
           price: number
           subscription?: boolean
+          featured_image_url?: string | null
           created_at?: string
         }
         Update: {
@@ -53,6 +55,7 @@ export interface Database {
           description?: string | null
           price?: number
           subscription?: boolean
+          featured_image_url?: string | null
           created_at?: string
         }
       }
@@ -258,23 +261,29 @@ export interface Database {
       brokers: {
         Row: {
           id: number
-          established_at: string | null
+          name: string
+          established_in: number | null
           headquarter: string | null
           description: string | null
+          logo_url: string | null
           created_at: string
         }
         Insert: {
           id?: number
-          established_at?: string | null
+          name: string
+          established_in?: number | null
           headquarter?: string | null
           description?: string | null
+          logo_url?: string | null
           created_at?: string
         }
         Update: {
           id?: number
-          established_at?: string | null
+          name?: string
+          established_in?: number | null
           headquarter?: string | null
           description?: string | null
+          logo_url?: string | null
           created_at?: string
         }
       }

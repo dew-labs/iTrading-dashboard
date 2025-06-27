@@ -30,14 +30,15 @@ import type { Banner, BannerInsert } from '../types'
 // Theme imports
 import {
   getPageLayoutClasses,
-  getButtonClasses,
   getStatsCardProps,
   getIconClasses,
   getTypographyClasses,
   cn
 } from '../utils/theme'
+import Button from '../components/Button'
+import Input from '../components/Input'
 import { formatDateDisplay } from '../utils/format'
-import { INPUT_VARIANTS, FILTER_OPTIONS } from '../constants/components'
+import { FILTER_OPTIONS } from '../constants/components'
 
 const Banners: React.FC = () => {
   const { banners, loading, createBanner, updateBanner, deleteBanner, isDeleting } = useBanners()
@@ -350,13 +351,14 @@ const Banners: React.FC = () => {
             </p>
           </div>
           <div className='mt-4 sm:mt-0 flex items-center space-x-3'>
-            <button
+            <Button
+              variant="primary"
+              size="md"
+              leftIcon={Plus}
               onClick={() => setIsModalOpen(true)}
-              className={getButtonClasses('primary', 'md')}
             >
-              <Plus className='w-4 h-4 mr-2' />
               {t('banners.createBanner')}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -417,16 +419,14 @@ const Banners: React.FC = () => {
             {/* Search and filters row */}
             <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4'>
               <div className='flex-1 max-w-md'>
-                <div className='relative'>
-                  <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-                  <input
-                    type='text'
-                    placeholder={tCommon('placeholders.searchBannersPlaceholder')}
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    className={cn(INPUT_VARIANTS.withIcon, 'py-2')}
-                  />
-                </div>
+                <Input
+                  type="text"
+                  placeholder={tCommon('placeholders.searchBannersPlaceholder')}
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  leftIcon={Search}
+                  variant="search"
+                />
               </div>
 
               <div className='flex items-center space-x-3'>

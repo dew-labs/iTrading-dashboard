@@ -10,7 +10,8 @@ import {
   Tag,
   FileText,
   Bookmark,
-  TrendingUp
+  TrendingUp,
+  X
 } from 'lucide-react'
 import { usePosts } from '../hooks/usePosts'
 import { useAuthStore } from '../store/authStore'
@@ -32,14 +33,15 @@ import type { Post, PostInsert } from '../types'
 // Theme imports
 import {
   getPageLayoutClasses,
-  getButtonClasses,
   getStatsCardProps,
   getIconClasses,
   getTypographyClasses,
   cn
 } from '../utils/theme'
+import Button from '../components/Button'
+import Input from '../components/Input'
 import { formatDateDisplay } from '../utils/format'
-import { INPUT_VARIANTS, FILTER_OPTIONS } from '../constants/components'
+import { FILTER_OPTIONS } from '../constants/components'
 
 // Extended Post type to include additional fields that might exist
 interface ExtendedPost extends Post {
@@ -402,7 +404,10 @@ const Posts: React.FC = () => {
             </p>
           </div>
           <div className='mt-4 sm:mt-0 flex items-center space-x-3'>
-            <button
+            <Button
+              variant="primary"
+              size="md"
+              leftIcon={Plus}
               onClick={() => {
                 if (!user) {
                   alert(t('posts.loginRequired', { action: tCommon('actions.create').toLowerCase() }))
@@ -410,11 +415,9 @@ const Posts: React.FC = () => {
                 }
                 setIsModalOpen(true)
               }}
-              className={getButtonClasses('primary', 'md')}
             >
-              <Plus className='w-4 h-4 mr-2' />
               {t('posts.createPost')}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -476,16 +479,14 @@ const Posts: React.FC = () => {
             {/* Search and filters row */}
             <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4'>
               <div className='flex-1 max-w-md'>
-                <div className='relative'>
-                  <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-                  <input
-                    type='text'
-                    placeholder={tCommon('placeholders.searchPostsPlaceholder')}
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    className={cn(INPUT_VARIANTS.withIcon, 'py-2')}
-                  />
-                </div>
+                <Input
+                  type="text"
+                  placeholder={tCommon('placeholders.searchPostsPlaceholder')}
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  leftIcon={Search}
+                  variant="search"
+                />
               </div>
 
               <div className='flex items-center space-x-3'>
@@ -671,12 +672,14 @@ const Posts: React.FC = () => {
               </div>
 
               <div className='flex justify-end'>
-                <button
+                <Button
+                  variant="secondary"
+                  size="md"
+                  leftIcon={X}
                   onClick={() => setViewingPost(null)}
-                  className={getButtonClasses('secondary', 'md')}
                 >
                   {tCommon('actions.close')}
-                </button>
+                </Button>
               </div>
             </div>
           </Modal>

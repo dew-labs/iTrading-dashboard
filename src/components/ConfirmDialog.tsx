@@ -1,13 +1,14 @@
 import React from 'react'
-import { AlertTriangle, Trash2, AlertCircle } from 'lucide-react'
-import { getButtonClasses, getTypographyClasses, cn } from '../utils/theme'
+import { AlertTriangle, Trash2, AlertCircle, X, Check } from 'lucide-react'
+import { getTypographyClasses, cn } from '../utils/theme'
+import Button from './Button'
 
 interface ConfirmDialogProps {
   isOpen: boolean
   onClose: () => void
   onConfirm: () => void
   title: string
-  message: string
+  message: string | React.ReactNode
   confirmLabel?: string
   cancelLabel?: string
   isDestructive?: boolean
@@ -97,40 +98,36 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
               <div className='mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex-1'>
                 <h3 className={cn(getTypographyClasses('h3'), 'mb-2')}>{title}</h3>
                 <div className='mt-2'>
-                  <p className={getTypographyClasses('small')}>{message}</p>
+                  <div className={getTypographyClasses('small')}>
+                    {typeof message === 'string' ? <p>{message}</p> : message}
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Action buttons */}
             <div className='mt-6 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 space-y-3 space-y-reverse sm:space-y-0'>
-              <button
-                type='button'
-                className={cn(getButtonClasses('secondary', 'md'), 'w-full sm:w-auto')}
+              <Button
+                variant="secondary"
+                size="md"
+                leftIcon={X}
                 onClick={onClose}
                 disabled={isLoading}
+                className="w-full sm:w-auto"
               >
                 {cancelLabel}
-              </button>
-              <button
-                type='button'
-                className={cn(
-                  getButtonClasses(isDestructive ? 'danger' : 'primary', 'md'),
-                  'w-full sm:w-auto',
-                  isLoading && 'opacity-50 cursor-not-allowed'
-                )}
+              </Button>
+              <Button
+                variant={isDestructive ? 'danger' : 'primary'}
+                size="md"
+                leftIcon={isDestructive ? Trash2 : Check}
                 onClick={handleConfirm}
-                disabled={isLoading}
+                loading={isLoading}
+                loadingText="Processing..."
+                className="w-full sm:w-auto"
               >
-                {isLoading ? (
-                  <div className='flex items-center justify-center'>
-                    <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2'></div>
-                    Processing...
-                  </div>
-                ) : (
-                  confirmLabel
-                )}
-              </button>
+                {confirmLabel}
+              </Button>
             </div>
           </div>
         </div>

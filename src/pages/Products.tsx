@@ -10,7 +10,6 @@ import ConfirmDialog from '../components/ConfirmDialog'
 import PageLoadingSpinner from '../components/PageLoadingSpinner'
 import FilterDropdown from '../components/FilterDropdown'
 import PaginationSelector from '../components/PaginationSelector'
-import RecordImage from '../components/RecordImage'
 import Badge from '../components/Badge'
 import { stripHtmlAndTruncate } from '../utils/textUtils'
 import type { Product, ProductInsert } from '../types'
@@ -18,14 +17,15 @@ import type { Product, ProductInsert } from '../types'
 // Theme imports
 import {
   getPageLayoutClasses,
-  getButtonClasses,
   getStatsCardProps,
   getIconClasses,
   getTypographyClasses,
   cn
 } from '../utils/theme'
+import Button from '../components/Button'
+import Input from '../components/Input'
 import { formatDateDisplay } from '../utils/format'
-import { INPUT_VARIANTS, FILTER_OPTIONS } from '../constants/components'
+import { FILTER_OPTIONS } from '../constants/components'
 
 const Products: React.FC = () => {
   const { products, loading, createProduct, updateProduct, deleteProduct } = useProducts()
@@ -187,14 +187,17 @@ const Products: React.FC = () => {
         return (
           <div className='flex items-center space-x-3'>
             <div className='flex-shrink-0'>
-              <RecordImage
-                tableName='products'
-                recordId={row.id.toString()}
-                className='w-12 h-12 rounded-lg object-cover border border-gray-200'
-                fallbackClassName='w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center'
-                alt={`${value as string} product image`}
-                fallbackIcon={<Package className='w-4 h-4 text-white' />}
-              />
+              {row.featured_image_url ? (
+                <img
+                  src={row.featured_image_url}
+                  alt={`${value as string} product image`}
+                  className='w-12 h-12 rounded-lg object-cover border border-gray-200'
+                />
+              ) : (
+                <div className='w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center'>
+                  <Package className='w-4 h-4 text-white' />
+                </div>
+              )}
             </div>
             <div className='flex-1 min-w-0'>
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>{value as string}</div>
@@ -305,13 +308,14 @@ const Products: React.FC = () => {
             </p>
           </div>
           <div className='mt-4 sm:mt-0 flex items-center space-x-3'>
-            <button
+            <Button
+              variant="primary"
+              size="md"
+              leftIcon={Plus}
               onClick={() => setIsModalOpen(true)}
-              className={getButtonClasses('primary', 'md')}
             >
-              <Plus className='w-4 h-4 mr-2' />
               {t('products.createProduct')}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -372,16 +376,14 @@ const Products: React.FC = () => {
             {/* Search and filters row */}
             <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4'>
               <div className='flex-1 max-w-md'>
-                <div className='relative'>
-                  <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-                  <input
-                    type='text'
-                    placeholder={tCommon('placeholders.searchProductsPlaceholder')}
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    className={cn(INPUT_VARIANTS.withIcon, 'py-2')}
-                  />
-                </div>
+                <Input
+                  type="text"
+                  placeholder={tCommon('placeholders.searchProductsPlaceholder')}
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  leftIcon={Search}
+                  variant="search"
+                />
               </div>
 
               <div className='flex items-center space-x-3'>
@@ -508,6 +510,20 @@ const Products: React.FC = () => {
             title={`${t('products.productDetails')}: ${viewingProduct.name}`}
           >
             <div className='space-y-4'>
+              {/* Featured Image */}
+              {viewingProduct.featured_image_url && (
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>
+                    Featured Image
+                  </label>
+                  <img
+                    src={viewingProduct.featured_image_url}
+                    alt={`${viewingProduct.name} featured image`}
+                    className='w-full max-w-md h-48 object-cover rounded-lg border border-gray-200'
+                  />
+                </div>
+              )}
+
               <div>
                 <label className='block text-sm font-medium text-gray-700 mb-1'>
                   {tCommon('general.name')}

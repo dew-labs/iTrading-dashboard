@@ -34,7 +34,10 @@
     "isPublished": "Publicado",
     "targetUrl": "URL de Destino",
     "headquarter": "Sede",
-    "establishedDate": "Data de Fundação"
+    "establishedDate": "Data de Fundação",
+    "name": "Nome",
+    "logo": "Logo",
+    "establishedYear": "Ano de Fundação"
   },
   "placeholders": {
     "enterFirstName": "Digite o nome",
@@ -68,7 +71,11 @@
     "selectResource": "Selecionar recurso",
     "enterTargetUrl": "Digite a URL de destino",
     "enterHeadquarter": "Digite a localização da sede",
-    "selectEstablishedDate": "Selecione a data de fundação"
+    "selectEstablishedDate": "Selecione a data de fundação",
+    "enterName": "Digite o nome",
+    "enterBrokerName": "ex: Interactive Brokers",
+    "enterEstablishedYear": "ex: 1999",
+    "brokerDescriptionPlaceholder": "Descreva os serviços da corretora, histórico, regulamentações, plataformas de negociação e recursos principais..."
   },
   "validation": {
     "required": "Este campo é obrigatório",
@@ -83,5 +90,8 @@
     "url": "Por favor, digite uma URL válida",
     "file": "Por favor, selecione um arquivo válido",
     "image": "Por favor, selecione um arquivo de imagem válido"
+  },
+  "hints": {
+    "logoRecommendation": "Recomendado: Imagens quadradas funcionam melhor"
   }
 }
