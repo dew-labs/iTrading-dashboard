@@ -6,34 +6,28 @@ import { toast } from '../utils/toast'
 // Fetch functions
 const fetchBrokers = async (): Promise<Broker[]> => {
   return supabaseHelpers.fetchData(
-    supabase
-      .from('brokers')
-      .select('*')
-      .order('created_at', { ascending: false })
+    supabase.from('brokers').select('*').order('created_at', { ascending: false })
   )
 }
 
 const createBrokerMutation = async (broker: BrokerInsert): Promise<Broker> => {
-  return supabaseHelpers.insertData(
-    supabase.from('brokers').insert([broker]).select().single()
-  )
+  return supabaseHelpers.insertData(supabase.from('brokers').insert([broker]).select().single())
 }
 
-const updateBrokerMutation = async ({ id, updates }: { id: number; updates: BrokerUpdate }): Promise<Broker> => {
+const updateBrokerMutation = async ({
+  id,
+  updates
+}: {
+  id: number
+  updates: BrokerUpdate
+}): Promise<Broker> => {
   return supabaseHelpers.updateData(
-    supabase
-      .from('brokers')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single()
+    supabase.from('brokers').update(updates).eq('id', id).select().single()
   )
 }
 
 const deleteBrokerMutation = async (id: number): Promise<void> => {
-  return supabaseHelpers.deleteData(
-    supabase.from('brokers').delete().eq('id', id)
-  )
+  return supabaseHelpers.deleteData(supabase.from('brokers').delete().eq('id', id))
 }
 
 export const useBrokers = () => {
@@ -55,7 +49,7 @@ export const useBrokers = () => {
   // Create broker mutation
   const createMutation = useMutation({
     mutationFn: createBrokerMutation,
-    onMutate: async (newBroker) => {
+    onMutate: async newBroker => {
       // Cancel outgoing refetches (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({ queryKey: queryKeys.brokers() })
 
@@ -87,7 +81,7 @@ export const useBrokers = () => {
       const errorMessage = error instanceof Error ? error.message : 'Failed to create broker'
       toast.error(errorMessage)
     },
-    onSuccess: (_data) => {
+    onSuccess: _data => {
       // Invalidate and refetch brokers to get the real data
       queryClient.invalidateQueries({ queryKey: queryKeys.brokers() })
       toast.success('Broker created successfully')
@@ -104,11 +98,7 @@ export const useBrokers = () => {
 
       // Optimistically update
       queryClient.setQueryData<Broker[]>(queryKeys.brokers(), (old = []) =>
-        old.map((broker) =>
-          broker.id === id
-            ? { ...broker, ...updates }
-            : broker
-        )
+        old.map(broker => (broker.id === id ? { ...broker, ...updates } : broker))
       )
 
       return { previousBrokers }
@@ -129,14 +119,14 @@ export const useBrokers = () => {
   // Delete broker mutation
   const deleteMutation = useMutation({
     mutationFn: deleteBrokerMutation,
-    onMutate: async (deletedId) => {
+    onMutate: async deletedId => {
       await queryClient.cancelQueries({ queryKey: queryKeys.brokers() })
 
       const previousBrokers = queryClient.getQueryData<Broker[]>(queryKeys.brokers())
 
       // Optimistically remove the broker
       queryClient.setQueryData<Broker[]>(queryKeys.brokers(), (old = []) =>
-        old.filter((broker) => broker.id !== deletedId)
+        old.filter(broker => broker.id !== deletedId)
       )
 
       return { previousBrokers }
@@ -159,8 +149,7 @@ export const useBrokers = () => {
     loading,
     error: error as Error | null,
     createBroker: (broker: BrokerInsert) => createMutation.mutateAsync(broker),
-    updateBroker: (id: number, updates: BrokerUpdate) =>
-      updateMutation.mutateAsync({ id, updates }),
+    updateBroker: (id: number, updates: BrokerUpdate) => updateMutation.mutateAsync({ id, updates }),
     deleteBroker: (id: number) => deleteMutation.mutateAsync(id),
     refetch,
     // Additional states for UI feedback

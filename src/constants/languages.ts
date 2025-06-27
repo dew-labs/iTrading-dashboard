@@ -20,7 +20,7 @@ export const LANGUAGE_CODES = {
   PORTUGUESE: 'pt'
 } as const
 
-export type LanguageCode = typeof LANGUAGE_CODES[keyof typeof LANGUAGE_CODES]
+export type LanguageCode = (typeof LANGUAGE_CODES)[keyof typeof LANGUAGE_CODES]
 
 // Default language
 export const DEFAULT_LANGUAGE: LanguageCode = LANGUAGE_CODES.ENGLISH
@@ -49,12 +49,10 @@ export const LANGUAGE_INFO = {
   }
 } as const
 
-export type LanguageInfo = typeof LANGUAGE_INFO[keyof typeof LANGUAGE_INFO]
+export type LanguageInfo = (typeof LANGUAGE_INFO)[keyof typeof LANGUAGE_INFO]
 
 // Convenience array for language options in UI components
-export const LANGUAGES: LanguageInfo[] = SUPPORTED_LANGUAGE_CODES.map(
-  code => LANGUAGE_INFO[code]
-)
+export const LANGUAGES: LanguageInfo[] = SUPPORTED_LANGUAGE_CODES.map(code => LANGUAGE_INFO[code])
 
 // Helper functions
 export const getLanguageInfo = (code: LanguageCode): LanguageInfo => {
@@ -79,7 +77,8 @@ export const I18N_NAMESPACES = {
   NAVIGATION: 'navigation',
   FORMS: 'forms',
   NOTIFICATIONS: 'notifications',
-  ERRORS: 'errors'
+  ERRORS: 'errors',
+  PAGES: 'pages'
 } as const
 
-export type I18nNamespace = typeof I18N_NAMESPACES[keyof typeof I18N_NAMESPACES]
+export type I18nNamespace = (typeof I18N_NAMESPACES)[keyof typeof I18N_NAMESPACES]

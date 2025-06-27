@@ -38,7 +38,9 @@ const PaginationSelector: React.FC<PaginationSelectorProps> = ({
   label = 'Show'
 }) => {
   // Ensure the current value is valid, fallback to default if not
-  const validValue = (API.pagination.options as readonly number[]).includes(value) ? value : API.pagination.defaultLimit
+  const validValue = (API.pagination.options as readonly number[]).includes(value)
+    ? value
+    : API.pagination.defaultLimit
 
   // Convert pagination options to Select component format
   const selectOptions = API.pagination.options.map(option => ({
@@ -53,18 +55,18 @@ const PaginationSelector: React.FC<PaginationSelectorProps> = ({
 
   return (
     <div className={cn('flex items-center space-x-2', className)}>
-      <span className="text-sm text-gray-600 whitespace-nowrap">{label}</span>
-      <div className="min-w-[80px]">
+      <span className='text-sm text-gray-600 whitespace-nowrap'>{label}</span>
+      <div className='min-w-[80px]'>
         <Select
           options={selectOptions}
           value={validValue.toString()}
           onChange={handleSelectChange}
-          size="sm"
-          variant="default"
-          aria-label="Items per page"
+          size='sm'
+          variant='default'
+          aria-label='Items per page'
         />
       </div>
-      <span className="text-sm text-gray-600 whitespace-nowrap">
+      <span className='text-sm text-gray-600 whitespace-nowrap'>
         of {totalItems.toLocaleString()} items
       </span>
     </div>

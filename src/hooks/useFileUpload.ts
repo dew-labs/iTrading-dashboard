@@ -19,10 +19,7 @@ export const useFileUpload = () => {
   const [isUploading, setIsUploading] = useState(false)
   const [progress, setProgress] = useState(0)
 
-  const uploadFile = async (
-    file: File,
-    options: UploadOptions
-  ): Promise<UploadResult> => {
+  const uploadFile = async (file: File, options: UploadOptions): Promise<UploadResult> => {
     const {
       bucket = 'posts',
       folder = 'images',
@@ -32,7 +29,9 @@ export const useFileUpload = () => {
 
     // Validate file type
     if (!allowedTypes.includes(file.type)) {
-      throw new Error(`File type ${file.type} is not allowed. Allowed types: ${allowedTypes.join(', ')}`)
+      throw new Error(
+        `File type ${file.type} is not allowed. Allowed types: ${allowedTypes.join(', ')}`
+      )
     }
 
     // Validate file size
@@ -63,9 +62,7 @@ export const useFileUpload = () => {
       }
 
       // Get public URL
-      const { data: urlData } = supabase.storage
-        .from(bucket)
-        .getPublicUrl(filePath)
+      const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(filePath)
 
       setProgress(100)
 
@@ -84,14 +81,9 @@ export const useFileUpload = () => {
     }
   }
 
-  const deleteFile = async (
-    bucket: string,
-    path: string
-  ): Promise<void> => {
+  const deleteFile = async (bucket: string, path: string): Promise<void> => {
     try {
-      const { error } = await supabase.storage
-        .from(bucket)
-        .remove([path])
+      const { error } = await supabase.storage.from(bucket).remove([path])
 
       if (error) {
         throw new Error(`Delete failed: ${error.message}`)

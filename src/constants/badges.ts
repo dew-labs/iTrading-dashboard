@@ -137,14 +137,14 @@ export const getBadgeVariant = {
 }
 
 // Type exports for TypeScript
-export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES]
-export type UserStatus = typeof USER_STATUSES[keyof typeof USER_STATUSES]
-export type PostStatus = typeof POST_STATUSES[keyof typeof POST_STATUSES]
-export type PostType = typeof POST_TYPES[keyof typeof POST_TYPES]
-export type ProductType = typeof PRODUCT_TYPES[keyof typeof PRODUCT_TYPES]
-export type BannerStatus = typeof BANNER_STATUSES[keyof typeof BANNER_STATUSES]
-export type BadgeVariant = typeof BADGE_VARIANTS[keyof typeof BADGE_VARIANTS]
-export type BadgeSize = typeof BADGE_SIZES[keyof typeof BADGE_SIZES]
+export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES]
+export type UserStatus = (typeof USER_STATUSES)[keyof typeof USER_STATUSES]
+export type PostStatus = (typeof POST_STATUSES)[keyof typeof POST_STATUSES]
+export type PostType = (typeof POST_TYPES)[keyof typeof POST_TYPES]
+export type ProductType = (typeof PRODUCT_TYPES)[keyof typeof PRODUCT_TYPES]
+export type BannerStatus = (typeof BANNER_STATUSES)[keyof typeof BANNER_STATUSES]
+export type BadgeVariant = (typeof BADGE_VARIANTS)[keyof typeof BADGE_VARIANTS]
+export type BadgeSize = (typeof BADGE_SIZES)[keyof typeof BADGE_SIZES]
 
 // Export everything as default for convenience
 export default {

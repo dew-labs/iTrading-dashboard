@@ -31,8 +31,8 @@ function App () {
   if (!initialized) {
     return (
       <EnhancedLoadingScreen
-        message="Initializing Application"
-        subtitle="Setting up your dashboard experience..."
+        message='Initializing Application'
+        subtitle='Setting up your dashboard experience...'
       />
     )
   }
@@ -40,12 +40,12 @@ function App () {
   return (
     <ErrorBoundary>
       <Router>
-        <div className="App">
+        <div className='App'>
           <Routes>
-            <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
-            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path='/login' element={user ? <Navigate to='/' replace /> : <Login />} />
+            <Route path='/unauthorized' element={<Unauthorized />} />
             <Route
-              path="/*"
+              path='/*'
               element={
                 <ProtectedRoute>
                   <DashboardLayout />
@@ -54,8 +54,8 @@ function App () {
             />
           </Routes>
           <Toaster
-            position="bottom-right"
-            theme="light"
+            position='bottom-right'
+            theme='light'
             expand={true}
             visibleToasts={4}
             closeButton={true}

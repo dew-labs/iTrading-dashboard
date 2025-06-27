@@ -160,13 +160,16 @@ export const COMPONENTS = {
   card: {
     base: 'bg-white rounded-xl shadow-sm border border-gray-200',
     hover: 'hover:shadow-md transition-all duration-200',
-    interactive: 'bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200'
+    interactive:
+      'bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200'
   },
 
   // Buttons
   button: {
-    primary: 'bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-black hover:to-gray-900 transition-colors shadow-sm font-medium',
-    secondary: 'border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium',
+    primary:
+      'bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-black hover:to-gray-900 transition-colors shadow-sm font-medium',
+    secondary:
+      'border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium',
     danger: 'bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium',
     ghost: 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded transition-colors'
   },
@@ -235,18 +238,18 @@ export const TIME = {
 
   // Auto-refresh intervals (in milliseconds)
   refresh: {
-    realtime: 1000,    // 1 second
-    frequent: 5000,    // 5 seconds
-    normal: 30000,     // 30 seconds
-    slow: 60000,       // 1 minute
+    realtime: 1000, // 1 second
+    frequent: 5000, // 5 seconds
+    normal: 30000, // 30 seconds
+    slow: 60000, // 1 minute
     background: 300000 // 5 minutes
   },
 
   // Timeout durations
   timeout: {
-    notification: 5000,  // 5 seconds
-    loading: 30000,      // 30 seconds
-    idle: 900000         // 15 minutes
+    notification: 5000, // 5 seconds
+    loading: 30000, // 30 seconds
+    idle: 900000 // 15 minutes
   },
 
   // Animation durations (in milliseconds)
@@ -261,10 +264,10 @@ export const TIME = {
 
 // Layout Breakpoints (matching Tailwind)
 export const BREAKPOINTS = {
-  sm: '640px',
-  md: '768px',
-  lg: '1024px',
-  xl: '1280px',
+  'sm': '640px',
+  'md': '768px',
+  'lg': '1024px',
+  'xl': '1280px',
   '2xl': '1536px'
 } as const
 
@@ -315,10 +318,10 @@ export const PATTERNS = {
 export const FORMAT = {
   // Date formats
   date: {
-    display: 'dd-MM-yyyy',    // 01-12-2024
+    display: 'dd-MM-yyyy', // 01-12-2024
     displayLong: 'dd-MM-yyyy HH:mm', // 01-12-2024 14:30
-    iso: 'yyyy-MM-dd',        // 2024-12-01
-    fileName: 'yyyyMMdd'     // 20241201
+    iso: 'yyyy-MM-dd', // 2024-12-01
+    fileName: 'yyyyMMdd' // 20241201
   },
 
   // Number formats
@@ -340,9 +343,9 @@ export const API = {
 
   // Request timeouts
   timeout: {
-    default: 30000,  // 30 seconds
-    upload: 120000,  // 2 minutes
-    download: 60000  // 1 minute
+    default: 30000, // 30 seconds
+    upload: 120000, // 2 minutes
+    download: 60000 // 1 minute
   }
 } as const
 

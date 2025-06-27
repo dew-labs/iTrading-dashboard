@@ -6,34 +6,28 @@ import { toast } from '../utils/toast'
 // Fetch functions
 const fetchBanners = async (): Promise<Banner[]> => {
   return supabaseHelpers.fetchData(
-    supabase
-      .from('banners')
-      .select('*')
-      .order('created_at', { ascending: false })
+    supabase.from('banners').select('*').order('created_at', { ascending: false })
   )
 }
 
 const createBannerMutation = async (banner: BannerInsert): Promise<Banner> => {
-  return supabaseHelpers.insertData(
-    supabase.from('banners').insert([banner]).select().single()
-  )
+  return supabaseHelpers.insertData(supabase.from('banners').insert([banner]).select().single())
 }
 
-const updateBannerMutation = async ({ id, updates }: { id: string; updates: BannerUpdate }): Promise<Banner> => {
+const updateBannerMutation = async ({
+  id,
+  updates
+}: {
+  id: string
+  updates: BannerUpdate
+}): Promise<Banner> => {
   return supabaseHelpers.updateData(
-    supabase
-      .from('banners')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single()
+    supabase.from('banners').update(updates).eq('id', id).select().single()
   )
 }
 
 const deleteBannerMutation = async (id: string): Promise<void> => {
-  return supabaseHelpers.deleteData(
-    supabase.from('banners').delete().eq('id', id)
-  )
+  return supabaseHelpers.deleteData(supabase.from('banners').delete().eq('id', id))
 }
 
 export const useBanners = () => {
@@ -55,7 +49,7 @@ export const useBanners = () => {
   // Create banner mutation
   const createMutation = useMutation({
     mutationFn: createBannerMutation,
-    onMutate: async (newBanner) => {
+    onMutate: async newBanner => {
       await queryClient.cancelQueries({ queryKey: queryKeys.banners() })
 
       const previousBanners = queryClient.getQueryData<Banner[]>(queryKeys.banners())
@@ -98,11 +92,7 @@ export const useBanners = () => {
 
       // Optimistically update
       queryClient.setQueryData<Banner[]>(queryKeys.banners(), (old = []) =>
-        old.map((banner) =>
-          banner.id === id
-            ? { ...banner, ...updates }
-            : banner
-        )
+        old.map(banner => (banner.id === id ? { ...banner, ...updates } : banner))
       )
 
       return { previousBanners }
@@ -123,14 +113,14 @@ export const useBanners = () => {
   // Delete banner mutation
   const deleteMutation = useMutation({
     mutationFn: deleteBannerMutation,
-    onMutate: async (deletedId) => {
+    onMutate: async deletedId => {
       await queryClient.cancelQueries({ queryKey: queryKeys.banners() })
 
       const previousBanners = queryClient.getQueryData<Banner[]>(queryKeys.banners())
 
       // Optimistically remove the banner
       queryClient.setQueryData<Banner[]>(queryKeys.banners(), (old = []) =>
-        old.filter((banner) => banner.id !== deletedId)
+        old.filter(banner => banner.id !== deletedId)
       )
 
       return { previousBanners }
@@ -153,8 +143,7 @@ export const useBanners = () => {
     loading,
     error: error as Error | null,
     createBanner: (banner: BannerInsert) => createMutation.mutateAsync(banner),
-    updateBanner: (id: string, updates: BannerUpdate) =>
-      updateMutation.mutateAsync({ id, updates }),
+    updateBanner: (id: string, updates: BannerUpdate) => updateMutation.mutateAsync({ id, updates }),
     deleteBanner: (id: string) => deleteMutation.mutateAsync(id),
     refetch,
     // Additional states for UI feedback

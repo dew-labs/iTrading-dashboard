@@ -2,7 +2,7 @@
  * Test script to verify storage buckets are properly configured
  */
 
-const { createClient } = require('@supabase/supabase-js')
+const {createClient} = require('@supabase/supabase-js')
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL
 const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
@@ -20,7 +20,7 @@ async function testStorageBuckets() {
   try {
     console.log('🔍 Testing storage buckets...')
 
-    const { data: buckets, error } = await supabase.storage.listBuckets()
+    const {data: buckets, error} = await supabase.storage.listBuckets()
 
     if (error) {
       console.error('❌ Error listing buckets:', error.message)
@@ -43,10 +43,13 @@ async function testStorageBuckets() {
     buckets.forEach(bucket => {
       console.log(`📊 Bucket: ${bucket.id}`)
       console.log(`   - Public: ${bucket.public}`)
-      console.log(`   - File size limit: ${bucket.file_size_limit ? (bucket.file_size_limit / 1024 / 1024).toFixed(1) + 'MB' : 'No limit'}`)
-      console.log(`   - Allowed MIME types: ${bucket.allowed_mime_types?.join(', ') || 'All types'}`)
+      console.log(
+        `   - File size limit: ${bucket.file_size_limit ? (bucket.file_size_limit / 1024 / 1024).toFixed(1) + 'MB' : 'No limit'}`,
+      )
+      console.log(
+        `   - Allowed MIME types: ${bucket.allowed_mime_types?.join(', ') || 'All types'}`,
+      )
     })
-
   } catch (error) {
     console.error('❌ Test failed:', error.message)
   }

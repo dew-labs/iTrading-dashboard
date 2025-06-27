@@ -1,28 +1,40 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { Home, FileText, Package, Image, Users, X, BarChart3, Settings, HelpCircle, Pin, Building2 } from 'lucide-react'
+import {
+  Home,
+  FileText,
+  Package,
+  Image,
+  Users,
+  X,
+  BarChart3,
+  Settings,
+  HelpCircle,
+  Pin,
+  Building2
+} from 'lucide-react'
 import { usePermissions } from '../hooks/usePermissions'
 import { useNavigationTranslation } from '../hooks/useTranslation'
 
 interface SidebarProps {
-  isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
-  isCollapsed: boolean;
-  setIsCollapsed: (collapsed: boolean) => void;
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
+  isCollapsed: boolean
+  setIsCollapsed: (collapsed: boolean) => void
 }
 
 interface MenuItem {
-  id: string;
-  labelKey: string;
-  icon: React.ComponentType<{ className?: string }>;
-  path: string;
-  resource?: string;
-  action?: string;
+  id: string
+  labelKey: string
+  icon: React.ComponentType<{className?: string}>
+  path: string
+  resource?: string
+  action?: string
 }
 
 interface MenuSection {
-  titleKey: string;
-  items: MenuItem[];
+  titleKey: string
+  items: MenuItem[]
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIsCollapsed }) => {
@@ -40,11 +52,46 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
     {
       titleKey: 'management',
       items: [
-        { id: 'posts', labelKey: 'posts', icon: FileText, path: '/posts', resource: 'posts', action: 'read' },
-        { id: 'products', labelKey: 'products', icon: Package, path: '/products', resource: 'products', action: 'read' },
-        { id: 'brokers', labelKey: 'brokers', icon: Building2, path: '/brokers', resource: 'brokers', action: 'read' },
-        { id: 'banners', labelKey: 'banners', icon: Image, path: '/banners', resource: 'banners', action: 'read' },
-        { id: 'users', labelKey: 'users', icon: Users, path: '/users', resource: 'users', action: 'read' }
+        {
+          id: 'posts',
+          labelKey: 'posts',
+          icon: FileText,
+          path: '/posts',
+          resource: 'posts',
+          action: 'read'
+        },
+        {
+          id: 'products',
+          labelKey: 'products',
+          icon: Package,
+          path: '/products',
+          resource: 'products',
+          action: 'read'
+        },
+        {
+          id: 'brokers',
+          labelKey: 'brokers',
+          icon: Building2,
+          path: '/brokers',
+          resource: 'brokers',
+          action: 'read'
+        },
+        {
+          id: 'banners',
+          labelKey: 'banners',
+          icon: Image,
+          path: '/banners',
+          resource: 'banners',
+          action: 'read'
+        },
+        {
+          id: 'users',
+          labelKey: 'users',
+          icon: Users,
+          path: '/users',
+          resource: 'users',
+          action: 'read'
+        }
       ]
     },
     {
@@ -57,15 +104,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
   ]
 
   // Filter menu items based on permissions
-  const filteredSections = menuSections.map(section => ({
-    ...section,
-    items: section.items.filter(item => {
-      // Items without resource are always visible
-      if (!item.resource) return true
-      // Check if user has permission to view this resource
-      return can(item.resource, item.action || 'read')
-    })
-  })).filter(section => section.items.length > 0)
+  const filteredSections = menuSections
+    .map(section => ({
+      ...section,
+      items: section.items.filter(item => {
+        // Items without resource are always visible
+        if (!item.resource) return true
+        // Check if user has permission to view this resource
+        return can(item.resource, item.action || 'read')
+      })
+    }))
+    .filter(section => section.items.length > 0)
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed)
@@ -80,7 +129,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
       {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-20 backdrop-blur-sm backdrop-opacity-75 bg-black/20 lg:hidden"
+          className='fixed inset-0 z-20 backdrop-blur-sm backdrop-opacity-75 bg-black/20 lg:hidden'
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -92,33 +141,31 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
         } ${isCollapsed ? 'lg:w-20' : 'lg:w-72'} w-72`}
       >
         {/* Mobile close button */}
-        <div className="lg:hidden flex justify-end p-4 border-b border-gray-100">
+        <div className='lg:hidden flex justify-end p-4 border-b border-gray-100'>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className='p-2 rounded-lg hover:bg-gray-100 transition-colors'
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className='w-5 h-5 text-gray-500' />
           </button>
         </div>
 
         {/* Navigation - flex-1 to take remaining space */}
-        <nav className={`flex-1 py-6 overflow-y-auto overflow-x-hidden ${isCollapsed ? 'lg:px-3' : 'px-6'}`}>
+        <nav
+          className={`flex-1 py-6 overflow-y-auto overflow-x-hidden ${isCollapsed ? 'lg:px-3' : 'px-6'}`}
+        >
           {filteredSections.map((section, sectionIndex) => (
             <div key={section.titleKey} className={sectionIndex > 0 ? 'mt-8' : ''}>
               {/* Section Title */}
-              <div
-                className={`mb-4 transition-all duration-300 ${
-                  isCollapsed ? 'lg:hidden' : ''
-                }`}
-              >
-                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+              <div className={`mb-4 transition-all duration-300 ${isCollapsed ? 'lg:hidden' : ''}`}>
+                <h3 className='text-xs font-semibold text-gray-400 uppercase tracking-wider px-3'>
                   {t(section.titleKey).toUpperCase()}
                 </h3>
               </div>
 
               {/* Section Items */}
-              <div className="space-y-1">
-                {section.items.map((item) => {
+              <div className='space-y-1'>
+                {section.items.map(item => {
                   const Icon = item.icon
 
                   return (
@@ -154,14 +201,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
 
                           {/* Active indicator */}
                           {isActive && !isCollapsed && (
-                            <div className="ml-auto w-2 h-2 bg-white rounded-full"></div>
+                            <div className='ml-auto w-2 h-2 bg-white rounded-full'></div>
                           )}
 
                           {/* Tooltip for collapsed state */}
                           {isCollapsed && (
-                            <div className="absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 hidden lg:block">
+                            <div className='absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 hidden lg:block'>
                               {t(item.labelKey)}
-                              <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                              <div className='absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45'></div>
                             </div>
                           )}
                         </>
@@ -175,14 +222,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
         </nav>
 
         {/* Pin Button at Bottom */}
-        <div className="flex-shrink-0 p-4 border-t border-gray-100">
-          <div className={`flex transition-all duration-300 ease-in-out ${isCollapsed ? 'justify-center' : 'justify-end'}`}>
+        <div className='flex-shrink-0 p-4 border-t border-gray-100'>
+          <div
+            className={`flex transition-all duration-300 ease-in-out ${isCollapsed ? 'justify-center' : 'justify-end'}`}
+          >
             <button
               onClick={toggleCollapse}
-              className="hidden lg:flex p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 bg-gray-50 border border-gray-200"
+              className='hidden lg:flex p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 bg-gray-50 border border-gray-200'
               title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
-              <Pin className={`w-4 h-4 text-gray-500 transition-transform duration-300 ease-in-out ${isCollapsed ? 'rotate-45' : ''}`} />
+              <Pin
+                className={`w-4 h-4 text-gray-500 transition-transform duration-300 ease-in-out ${isCollapsed ? 'rotate-45' : ''}`}
+              />
             </button>
           </div>
         </div>

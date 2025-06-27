@@ -4,9 +4,11 @@
     "lastName": "Last Name",
     "fullName": "Full Name",
     "email": "Email Address",
+    "emailAddress": "Email Address",
     "password": "Password",
     "confirmPassword": "Confirm Password",
     "phone": "Phone Number",
+    "phoneNumber": "Phone Number",
     "address": "Address",
     "city": "City",
     "state": "State",
@@ -29,7 +31,10 @@
     "startDate": "Start Date",
     "endDate": "End Date",
     "isActive": "Active",
-    "isPublished": "Published"
+    "isPublished": "Published",
+    "targetUrl": "Target URL",
+    "headquarter": "Headquarter",
+    "establishedDate": "Established Date"
   },
   "placeholders": {
     "enterFirstName": "Enter first name",
@@ -61,7 +66,10 @@
     "selectStartDate": "Select start date",
     "selectEndDate": "Select end date",
     "selectResource": "Select resource",
-    "search": "Search..."
+    "search": "Search...",
+    "enterTargetUrl": "Enter target URL",
+    "enterHeadquarter": "Enter headquarter location",
+    "selectEstablishedDate": "Select established date"
   },
   "validation": {
     "required": "This field is required",
@@ -76,20 +84,5 @@
     "url": "Please enter a valid URL",
     "file": "Please select a valid file",
     "image": "Please select a valid image file"
-  },
-  "buttons": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "submit": "Submit",
-    "reset": "Reset",
-    "clear": "Clear",
-    "upload": "Upload",
-    "browse": "Browse",
-    "remove": "Remove",
-    "add": "Add",
-    "edit": "Edit",
-    "delete": "Delete",
-    "create": "Create",
-    "update": "Update"
   }
 }

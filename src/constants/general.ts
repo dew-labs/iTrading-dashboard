@@ -24,7 +24,7 @@ export const USER_ROLES = {
   USER: 'user'
 } as const
 
-export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES]
+export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES]
 
 // User Statuses
 export const USER_STATUSES = {
@@ -34,7 +34,7 @@ export const USER_STATUSES = {
   INVITED: 'invited'
 } as const
 
-export type UserStatus = typeof USER_STATUSES[keyof typeof USER_STATUSES]
+export type UserStatus = (typeof USER_STATUSES)[keyof typeof USER_STATUSES]
 
 // Post Statuses
 export const POST_STATUSES = {
@@ -42,7 +42,7 @@ export const POST_STATUSES = {
   DRAFT: 'draft'
 } as const
 
-export type PostStatus = typeof POST_STATUSES[keyof typeof POST_STATUSES]
+export type PostStatus = (typeof POST_STATUSES)[keyof typeof POST_STATUSES]
 
 // Post Types
 export const POST_TYPES = {
@@ -52,7 +52,7 @@ export const POST_TYPES = {
   PRIVACY_POLICY: 'privacy_policy'
 } as const
 
-export type PostType = typeof POST_TYPES[keyof typeof POST_TYPES]
+export type PostType = (typeof POST_TYPES)[keyof typeof POST_TYPES]
 
 // Product Types
 export const PRODUCT_TYPES = {
@@ -60,7 +60,7 @@ export const PRODUCT_TYPES = {
   ONE_TIME: 'one-time'
 } as const
 
-export type ProductType = typeof PRODUCT_TYPES[keyof typeof PRODUCT_TYPES]
+export type ProductType = (typeof PRODUCT_TYPES)[keyof typeof PRODUCT_TYPES]
 
 // Banner Statuses
 export const BANNER_STATUSES = {
@@ -68,7 +68,7 @@ export const BANNER_STATUSES = {
   INACTIVE: 'inactive'
 } as const
 
-export type BannerStatus = typeof BANNER_STATUSES[keyof typeof BANNER_STATUSES]
+export type BannerStatus = (typeof BANNER_STATUSES)[keyof typeof BANNER_STATUSES]
 
 // Combined for Badge component usage
 export const ALL_BADGE_VARIANTS = {
@@ -84,7 +84,7 @@ export const ALL_BADGE_VARIANTS = {
   ...PRODUCT_TYPES
 } as const
 
-export type BadgeVariant = typeof ALL_BADGE_VARIANTS[keyof typeof ALL_BADGE_VARIANTS]
+export type BadgeVariant = (typeof ALL_BADGE_VARIANTS)[keyof typeof ALL_BADGE_VARIANTS]
 
 // Labels mapping for display
 export const LABELS = {

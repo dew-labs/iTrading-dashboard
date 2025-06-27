@@ -2,25 +2,25 @@ import React from 'react'
 import Checkbox from './Checkbox'
 
 interface CheckboxOption {
-  id: string;
-  label: string;
-  description?: string;
-  disabled?: boolean;
-  value: string;
+  id: string
+  label: string
+  description?: string
+  disabled?: boolean
+  value: string
 }
 
 interface CheckboxGroupProps {
-  options: CheckboxOption[];
-  selectedValues: string[];
-  onChange: (selectedValues: string[]) => void;
-  label?: string;
-  description?: string;
-  size?: 'sm' | 'md' | 'lg';
-  variant?: 'default' | 'rounded';
-  disabled?: boolean;
-  className?: string;
-  orientation?: 'vertical' | 'horizontal';
-  'aria-label'?: string;
+  'options': CheckboxOption[]
+  'selectedValues': string[]
+  'onChange': (selectedValues: string[]) => void
+  'label'?: string
+  'description'?: string
+  'size'?: 'sm' | 'md' | 'lg'
+  'variant'?: 'default' | 'rounded'
+  'disabled'?: boolean
+  'className'?: string
+  'orientation'?: 'vertical' | 'horizontal'
+  'aria-label'?: string
 }
 
 const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
@@ -51,12 +51,12 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
     <div className={className}>
       {/* Group label */}
       {label && (
-        <div className="mb-3">
-          <div className="text-sm font-medium text-gray-900" id={groupId}>
+        <div className='mb-3'>
+          <div className='text-sm font-medium text-gray-900' id={groupId}>
             {label}
           </div>
           {description && (
-            <div className="mt-1 text-xs text-gray-600" id={descriptionId}>
+            <div className='mt-1 text-xs text-gray-600' id={descriptionId}>
               {description}
             </div>
           )}
@@ -65,18 +65,15 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
 
       {/* Checkbox options */}
       <div
-        role="group"
+        role='group'
         aria-labelledby={label ? groupId : undefined}
         aria-label={!label ? ariaLabel : undefined}
         aria-describedby={descriptionId}
         className={`
-          ${orientation === 'horizontal'
-      ? 'flex flex-wrap gap-6'
-      : 'space-y-3'
-    }
+          ${orientation === 'horizontal' ? 'flex flex-wrap gap-6' : 'space-y-3'}
         `}
       >
-        {options.map((option) => (
+        {options.map(option => (
           <Checkbox
             key={option.id}
             id={option.id}
@@ -86,7 +83,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
             disabled={disabled || (option.disabled ?? false)}
             size={size}
             variant={variant}
-            onChange={(checked) => handleCheckboxChange(option.value, checked)}
+            onChange={checked => handleCheckboxChange(option.value, checked)}
           />
         ))}
       </div>

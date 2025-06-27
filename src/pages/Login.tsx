@@ -4,7 +4,7 @@ import AuthForm from '../components/AuthForm'
 const Login: React.FC = () => {
   return (
     <AuthForm
-      mode="login"
+      mode='login'
       onToggleMode={() => {}} // No-op since we're removing signup
     />
   )

@@ -28,7 +28,7 @@ export const toast = {
   /**
    * Show an error toast with red styling and X icon
    */
-  error: (message: string, options?: { duration?: number }) => {
+  error: (message: string, options?: {duration?: number}) => {
     sonnerToast.error(message, {
       icon: React.createElement(XCircle, {
         className: 'w-5 h-5 text-red-500'

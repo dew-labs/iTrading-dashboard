@@ -8,14 +8,17 @@ import { toast } from '../utils/toast'
 // Fetch functions
 const fetchUsers = async (): Promise<DatabaseUser[]> => {
   return supabaseHelpers.fetchData(
-    supabase
-      .from('users')
-      .select('*')
-      .order('created_at', { ascending: false })
+    supabase.from('users').select('*').order('created_at', { ascending: false })
   )
 }
 
-const updateUserMutation = async ({ id, updates }: { id: string; updates: UserUpdate }): Promise<DatabaseUser> => {
+const updateUserMutation = async ({
+  id,
+  updates
+}: {
+  id: string
+  updates: UserUpdate
+}): Promise<DatabaseUser> => {
   return supabaseHelpers.updateData(
     supabase
       .from('users')
@@ -51,14 +54,16 @@ const deleteUserMutation = async (id: string): Promise<void> => {
 }
 
 const updateLastLoginMutation = async (id: string): Promise<void> => {
-  return supabaseHelpers.updateData(
-    supabase
-      .from('users')
-      .update({ last_login: new Date().toISOString() })
-      .eq('id', id)
-      .select()
-      .single()
-  ).then(() => {}) // Convert to void
+  return supabaseHelpers
+    .updateData(
+      supabase
+        .from('users')
+        .update({ last_login: new Date().toISOString() })
+        .eq('id', id)
+        .select()
+        .single()
+    )
+    .then(() => {}) // Convert to void
 }
 
 export const useUsers = () => {
@@ -77,7 +82,7 @@ export const useUsers = () => {
     staleTime: 3 * 60 * 1000, // 3 minutes - user data changes less frequently
     gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
     enabled: can('users', 'read'), // Only fetch if user has permission
-    select: (data) => {
+    select: data => {
       // Additional permission check at data level
       if (!can('users', 'read')) {
         return []
@@ -93,11 +98,11 @@ export const useUsers = () => {
         throw new Error('Only super admins can create users')
       }
 
-      const { success, error: inviteError, tempPassword } = await inviteUser(
-        user.email,
-        user.role,
-        user.full_name || undefined
-      )
+      const {
+        success,
+        error: inviteError,
+        tempPassword
+      } = await inviteUser(user.email, user.role, user.full_name || undefined)
 
       if (!success) {
         throw new Error(inviteError || 'Failed to create user')
@@ -105,7 +110,7 @@ export const useUsers = () => {
 
       return { email: user.email, tempPassword }
     },
-    onError: (error) => {
+    onError: error => {
       const errorMessage = error instanceof Error ? error.message : 'Failed to create user'
       toast.error(errorMessage)
     },
@@ -130,10 +135,8 @@ export const useUsers = () => {
 
       // Optimistically update
       queryClient.setQueryData<DatabaseUser[]>(queryKeys.users(), (old = []) =>
-        old.map((user) =>
-          user.id === id
-            ? { ...user, ...updates, updated_at: new Date().toISOString() }
-            : user
+        old.map(user =>
+          user.id === id ? { ...user, ...updates, updated_at: new Date().toISOString() } : user
         )
       )
 
@@ -155,7 +158,7 @@ export const useUsers = () => {
   // Delete user mutation
   const deleteMutation = useMutation({
     mutationFn: deleteUserMutation,
-    onMutate: async (deletedId) => {
+    onMutate: async deletedId => {
       if (!can('users', 'delete')) {
         throw new Error('You do not have permission to delete users')
       }
@@ -166,7 +169,7 @@ export const useUsers = () => {
 
       // Optimistically remove the user
       queryClient.setQueryData<DatabaseUser[]>(queryKeys.users(), (old = []) =>
-        old.filter((user) => user.id !== deletedId)
+        old.filter(user => user.id !== deletedId)
       )
 
       return { previousUsers }
@@ -187,7 +190,7 @@ export const useUsers = () => {
   // Update last login mutation (silent operation)
   const updateLastLoginMutationHook = useMutation({
     mutationFn: updateLastLoginMutation,
-    onError: (error) => {
+    onError: error => {
       console.error('Failed to update last login:', error)
     },
     onSuccess: () => {
@@ -204,8 +207,7 @@ export const useUsers = () => {
     loading,
     error: permissionError ? new Error(permissionError) : (error as Error | null),
     createUser: (user: UserInsert) => createMutation.mutateAsync(user),
-    updateUser: (id: string, updates: UserUpdate) =>
-      updateMutation.mutateAsync({ id, updates }),
+    updateUser: (id: string, updates: UserUpdate) => updateMutation.mutateAsync({ id, updates }),
     deleteUser: (id: string) => deleteMutation.mutateAsync(id),
     updateLastLogin: (id: string) => updateLastLoginMutationHook.mutate(id),
     refetch,

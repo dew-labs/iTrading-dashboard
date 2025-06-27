@@ -7,7 +7,11 @@ export interface TinyMCEUploadConfig {
   bucket: string
   folder: string
   uploadHandler: (blobInfo: unknown, progress: (percent: number) => void) => Promise<string>
-  filePickerCallback: (callback: (url: string, meta?: { alt?: string }) => void, value: string, meta: unknown) => void
+  filePickerCallback: (
+    callback: (url: string, meta?: {alt?: string}) => void,
+    value: string,
+    meta: unknown,
+  ) => void
 }
 
 export const getTinyMCEConfig = (uploadConfig: TinyMCEUploadConfig, height: number = 400) => {
@@ -15,11 +19,26 @@ export const getTinyMCEConfig = (uploadConfig: TinyMCEUploadConfig, height: numb
     height,
     menubar: false,
     plugins: [
-      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-      'insertdatetime', 'media', 'table', 'help', 'wordcount'
+      'advlist',
+      'autolink',
+      'lists',
+      'link',
+      'image',
+      'charmap',
+      'preview',
+      'anchor',
+      'searchreplace',
+      'visualblocks',
+      'code',
+      'fullscreen',
+      'insertdatetime',
+      'media',
+      'table',
+      'help',
+      'wordcount'
     ],
-    toolbar: 'undo redo | blocks | ' +
+    toolbar:
+      'undo redo | blocks | ' +
       'bold italic underline strikethrough | alignleft aligncenter ' +
       'alignright alignjustify | bullist numlist outdent indent | ' +
       'removeformat | link image | code',
@@ -83,7 +102,7 @@ export const getTinyMCEConfig = (uploadConfig: TinyMCEUploadConfig, height: numb
     // Paste configuration - ensure images are uploaded, not embedded as base64
     paste_data_images: true,
     paste_as_text: false,
-    paste_preprocess: (plugin: unknown, args: { content: string }) => {
+    paste_preprocess: (plugin: unknown, args: {content: string}) => {
       // Remove any base64 images that might slip through
       args.content = args.content.replace(/<img[^>]*src="data:image[^"]*"[^>]*>/gi, '')
     },
@@ -92,8 +111,10 @@ export const getTinyMCEConfig = (uploadConfig: TinyMCEUploadConfig, height: numb
     link_default_protocol: 'https',
     // Other configurations to prevent local storage
     entity_encoding: 'raw' as const,
-    extended_valid_elements: 'img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name]',
-    valid_children: '+body[style],+div[div|p|br|span|img|strong|em|a|ul|ol|li|h1|h2|h3|h4|h5|h6|blockquote|pre|code]',
+    extended_valid_elements:
+      'img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name]',
+    valid_children:
+      '+body[style],+div[div|p|br|span|img|strong|em|a|ul|ol|li|h1|h2|h3|h4|h5|h6|blockquote|pre|code]',
     // Cache settings
     cache_suffix: '?v=' + new Date().getTime(), // Prevent caching issues
     // Force cloud storage for all images
@@ -110,4 +131,4 @@ export const STORAGE_BUCKETS = {
   IMAGES: 'images'
 } as const
 
-export type StorageBucket = typeof STORAGE_BUCKETS[keyof typeof STORAGE_BUCKETS]
+export type StorageBucket = (typeof STORAGE_BUCKETS)[keyof typeof STORAGE_BUCKETS]

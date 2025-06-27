@@ -14,12 +14,14 @@ import enNavigation from '../locales/en/navigation.json'
 import enForms from '../locales/en/forms.json'
 import enNotifications from '../locales/en/notifications.json'
 import enErrors from '../locales/en/errors.json'
+import enPages from '../locales/en/pages.json'
 
 import ptCommon from '../locales/pt/common.json'
 import ptNavigation from '../locales/pt/navigation.json'
 import ptForms from '../locales/pt/forms.json'
 import ptNotifications from '../locales/pt/notifications.json'
 import ptErrors from '../locales/pt/errors.json'
+import ptPages from '../locales/pt/pages.json'
 
 // Get saved language from localStorage or use browser language
 const getSavedLanguage = (): string => {
@@ -41,14 +43,16 @@ const resources = {
     [I18N_NAMESPACES.NAVIGATION]: enNavigation,
     [I18N_NAMESPACES.FORMS]: enForms,
     [I18N_NAMESPACES.NOTIFICATIONS]: enNotifications,
-    [I18N_NAMESPACES.ERRORS]: enErrors
+    [I18N_NAMESPACES.ERRORS]: enErrors,
+    [I18N_NAMESPACES.PAGES]: enPages
   },
   pt: {
     [I18N_NAMESPACES.COMMON]: ptCommon,
     [I18N_NAMESPACES.NAVIGATION]: ptNavigation,
     [I18N_NAMESPACES.FORMS]: ptForms,
     [I18N_NAMESPACES.NOTIFICATIONS]: ptNotifications,
-    [I18N_NAMESPACES.ERRORS]: ptErrors
+    [I18N_NAMESPACES.ERRORS]: ptErrors,
+    [I18N_NAMESPACES.PAGES]: ptPages
   }
 }
 
@@ -78,7 +82,7 @@ i18n
   })
 
 // Save language preference to localStorage when language changes
-i18n.on('languageChanged', (lng) => {
+i18n.on('languageChanged', lng => {
   try {
     localStorage.setItem(I18N_STORAGE_KEY, lng)
   } catch (error) {

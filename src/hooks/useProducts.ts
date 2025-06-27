@@ -6,34 +6,28 @@ import { toast } from '../utils/toast'
 // Fetch functions
 const fetchProducts = async (): Promise<Product[]> => {
   return supabaseHelpers.fetchData(
-    supabase
-      .from('products')
-      .select('*')
-      .order('created_at', { ascending: false })
+    supabase.from('products').select('*').order('created_at', { ascending: false })
   )
 }
 
 const createProductMutation = async (product: ProductInsert): Promise<Product> => {
-  return supabaseHelpers.insertData(
-    supabase.from('products').insert([product]).select().single()
-  )
+  return supabaseHelpers.insertData(supabase.from('products').insert([product]).select().single())
 }
 
-const updateProductMutation = async ({ id, updates }: { id: number; updates: ProductUpdate }): Promise<Product> => {
+const updateProductMutation = async ({
+  id,
+  updates
+}: {
+  id: number
+  updates: ProductUpdate
+}): Promise<Product> => {
   return supabaseHelpers.updateData(
-    supabase
-      .from('products')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single()
+    supabase.from('products').update(updates).eq('id', id).select().single()
   )
 }
 
 const deleteProductMutation = async (id: number): Promise<void> => {
-  return supabaseHelpers.deleteData(
-    supabase.from('products').delete().eq('id', id)
-  )
+  return supabaseHelpers.deleteData(supabase.from('products').delete().eq('id', id))
 }
 
 export const useProducts = () => {
@@ -55,7 +49,7 @@ export const useProducts = () => {
   // Create product mutation
   const createMutation = useMutation({
     mutationFn: createProductMutation,
-    onMutate: async (newProduct) => {
+    onMutate: async newProduct => {
       // Cancel outgoing refetches (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({ queryKey: queryKeys.products() })
 
@@ -88,7 +82,7 @@ export const useProducts = () => {
       const errorMessage = error instanceof Error ? error.message : 'Failed to create product'
       toast.error(errorMessage)
     },
-    onSuccess: (_data) => {
+    onSuccess: _data => {
       // Invalidate and refetch products to get the real data
       queryClient.invalidateQueries({ queryKey: queryKeys.products() })
       toast.success('Product created successfully')
@@ -105,11 +99,7 @@ export const useProducts = () => {
 
       // Optimistically update
       queryClient.setQueryData<Product[]>(queryKeys.products(), (old = []) =>
-        old.map((product) =>
-          product.id === id
-            ? { ...product, ...updates }
-            : product
-        )
+        old.map(product => (product.id === id ? { ...product, ...updates } : product))
       )
 
       return { previousProducts }
@@ -130,14 +120,14 @@ export const useProducts = () => {
   // Delete product mutation
   const deleteMutation = useMutation({
     mutationFn: deleteProductMutation,
-    onMutate: async (deletedId) => {
+    onMutate: async deletedId => {
       await queryClient.cancelQueries({ queryKey: queryKeys.products() })
 
       const previousProducts = queryClient.getQueryData<Product[]>(queryKeys.products())
 
       // Optimistically remove the product
       queryClient.setQueryData<Product[]>(queryKeys.products(), (old = []) =>
-        old.filter((product) => product.id !== deletedId)
+        old.filter(product => product.id !== deletedId)
       )
 
       return { previousProducts }

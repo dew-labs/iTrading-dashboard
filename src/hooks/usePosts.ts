@@ -26,10 +26,7 @@ const validatePost = (post: PostInsert): string | null => {
 // Fetch functions
 const fetchPosts = async (): Promise<Post[]> => {
   return supabaseHelpers.fetchData(
-    supabase
-      .from('posts')
-      .select('*')
-      .order('created_at', { ascending: false })
+    supabase.from('posts').select('*').order('created_at', { ascending: false })
   )
 }
 
@@ -54,21 +51,20 @@ const createPostMutation = async (post: PostInsert): Promise<Post> => {
   )
 }
 
-const updatePostMutation = async ({ id, updates }: { id: number; updates: PostUpdate }): Promise<Post> => {
+const updatePostMutation = async ({
+  id,
+  updates
+}: {
+  id: number
+  updates: PostUpdate
+}): Promise<Post> => {
   return supabaseHelpers.updateData(
-    supabase
-      .from('posts')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single()
+    supabase.from('posts').update(updates).eq('id', id).select().single()
   )
 }
 
 const deletePostMutation = async (id: number): Promise<void> => {
-  return supabaseHelpers.deleteData(
-    supabase.from('posts').delete().eq('id', id)
-  )
+  return supabaseHelpers.deleteData(supabase.from('posts').delete().eq('id', id))
 }
 
 const incrementPostViews = async (id: number): Promise<void> => {
@@ -95,7 +91,7 @@ export const usePosts = () => {
   // Create post mutation
   const createMutation = useMutation({
     mutationFn: createPostMutation,
-    onMutate: async (newPost) => {
+    onMutate: async newPost => {
       await queryClient.cancelQueries({ queryKey: queryKeys.posts() })
 
       const previousPosts = queryClient.getQueryData<Post[]>(queryKeys.posts())
@@ -111,10 +107,7 @@ export const usePosts = () => {
         created_at: new Date().toISOString()
       }
 
-      queryClient.setQueryData<Post[]>(queryKeys.posts(), (old = []) => [
-        optimisticPost,
-        ...old
-      ])
+      queryClient.setQueryData<Post[]>(queryKeys.posts(), (old = []) => [optimisticPost, ...old])
 
       return { previousPosts }
     },
@@ -140,11 +133,7 @@ export const usePosts = () => {
       const previousPosts = queryClient.getQueryData<Post[]>(queryKeys.posts())
 
       queryClient.setQueryData<Post[]>(queryKeys.posts(), (old = []) =>
-        old.map((post) =>
-          post.id === id
-            ? { ...post, ...updates }
-            : post
-        )
+        old.map(post => (post.id === id ? { ...post, ...updates } : post))
       )
 
       return { previousPosts }
@@ -165,14 +154,14 @@ export const usePosts = () => {
   // Delete post mutation
   const deleteMutation = useMutation({
     mutationFn: deletePostMutation,
-    onMutate: async (deletedId) => {
+    onMutate: async deletedId => {
       await queryClient.cancelQueries({ queryKey: queryKeys.posts() })
 
       const previousPosts = queryClient.getQueryData<Post[]>(queryKeys.posts())
-      const deletedPost = previousPosts?.find((p) => p.id === deletedId)
+      const deletedPost = previousPosts?.find(p => p.id === deletedId)
 
       queryClient.setQueryData<Post[]>(queryKeys.posts(), (old = []) =>
-        old.filter((post) => post.id !== deletedId)
+        old.filter(post => post.id !== deletedId)
       )
 
       return { previousPosts, deletedPost }
@@ -195,7 +184,7 @@ export const usePosts = () => {
   const duplicateMutation = useMutation({
     mutationFn: async (id: number) => {
       const posts = queryClient.getQueryData<Post[]>(queryKeys.posts()) || []
-      const postToDuplicate = posts.find((p) => p.id === id)
+      const postToDuplicate = posts.find(p => p.id === id)
 
       if (!postToDuplicate) {
         throw new Error('Post not found')
@@ -209,7 +198,7 @@ export const usePosts = () => {
 
       return createPostMutation(duplicatedPostData)
     },
-    onError: (error) => {
+    onError: error => {
       const errorMessage = error instanceof Error ? error.message : 'Failed to duplicate post'
       toast.error(`Duplication failed: ${errorMessage}`)
     },
@@ -221,28 +210,28 @@ export const usePosts = () => {
   // Increment views mutation
   const incrementViewsMutation = useMutation({
     mutationFn: incrementPostViews,
-    onError: (error) => {
+    onError: error => {
       console.error('Failed to increment views:', error)
     }
   })
 
   // Helper functions that work with cached data
   const getPostsByType = (type: string) => {
-    return posts.filter((post) => post.type === type)
+    return posts.filter(post => post.type === type)
   }
 
   const getPublishedPosts = () => {
-    return posts.filter((post) => post.status === 'published')
+    return posts.filter(post => post.status === 'published')
   }
 
   const getDraftPosts = () => {
-    return posts.filter((post) => post.status === 'draft')
+    return posts.filter(post => post.status === 'draft')
   }
 
   const searchPosts = (query: string) => {
     const lowercaseQuery = query.toLowerCase()
     return posts.filter(
-      (post) =>
+      post =>
         post.title.toLowerCase().includes(lowercaseQuery) ||
         (post.content && post.content.toLowerCase().includes(lowercaseQuery))
     )
@@ -253,8 +242,7 @@ export const usePosts = () => {
     loading,
     error: error as Error | null,
     createPost: (post: PostInsert) => createMutation.mutateAsync(post),
-    updatePost: (id: number, updates: PostUpdate) =>
-      updateMutation.mutateAsync({ id, updates }),
+    updatePost: (id: number, updates: PostUpdate) => updateMutation.mutateAsync({ id, updates }),
     deletePost: (id: number) => deleteMutation.mutateAsync(id),
     duplicatePost: (id: number) => duplicateMutation.mutateAsync(id),
     incrementViews: (id: number) => incrementViewsMutation.mutate(id),

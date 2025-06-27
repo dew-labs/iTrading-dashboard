@@ -1,32 +1,18 @@
 import React, { useState, useMemo } from 'react'
-import {
-  Plus,
-  Search,
-  Edit2,
-  Trash2,
-  Package,
-  DollarSign,
-  Calendar,
-  TrendingUp,
-  CheckCircle,
-  Eye
-} from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Eye, Package, Calendar, Tag, TrendingUp } from 'lucide-react'
 import { useProducts } from '../hooks/useProducts'
-import { useTranslation } from '../hooks/useTranslation'
+
+import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import ProductForm from '../components/ProductForm'
 import ConfirmDialog from '../components/ConfirmDialog'
 import PageLoadingSpinner from '../components/PageLoadingSpinner'
-import RecordImage from '../components/RecordImage'
-import DetailViewModal from '../components/DetailViewModal'
-import Badge from '../components/Badge'
-import RichTextRenderer from '../components/RichTextRenderer'
-import { stripHtmlAndTruncate } from '../utils'
-import { PRODUCT_TYPES } from '../constants/general'
-
 import FilterDropdown from '../components/FilterDropdown'
 import PaginationSelector from '../components/PaginationSelector'
+import RecordImage from '../components/RecordImage'
+import Badge from '../components/Badge'
+import { stripHtmlAndTruncate } from '../utils/textUtils'
 import type { Product, ProductInsert } from '../types'
 
 // Theme imports
@@ -42,24 +28,24 @@ import { formatDateDisplay } from '../utils/format'
 import { INPUT_VARIANTS, FILTER_OPTIONS } from '../constants/components'
 
 const Products: React.FC = () => {
-  const { products, loading, createProduct, updateProduct, deleteProduct, isDeleting } = useProducts()
-  const { t } = useTranslation()
+  const { products, loading, createProduct, updateProduct, deleteProduct } = useProducts()
+  const { t } = usePageTranslation() // Page-specific content
+  const { t: tCommon } = useTranslation() // Common actions and terms
   const [searchTerm, setSearchTerm] = useState('')
-
-  const [filterSubscription, setFilterSubscription] = useState<string>('all')
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
-  const [viewingProduct, setViewingProduct] = useState<Product | null>(null)
+  const [filterType, setFilterType] = useState<'all' | 'subscription' | 'oneTime'>('all')
   const [sortColumn, setSortColumn] = useState<keyof Product | null>('created_at')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [viewingProduct, setViewingProduct] = useState<Product | null>(null)
 
   // Confirm dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
-    isOpen: boolean;
-    productId: number | null;
-    productName: string | null;
+    isOpen: boolean
+    productId: string | null
+    productName: string | null
   }>({
     isOpen: false,
     productId: null,
@@ -71,24 +57,22 @@ const Products: React.FC = () => {
 
   // Enhanced filtering and sorting
   const filteredAndSortedProducts = useMemo(() => {
-    const filtered = products.filter((product) => {
+    const filtered = products.filter(product => {
       const matchesSearch =
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (product.description &&
           product.description.toLowerCase().includes(searchTerm.toLowerCase()))
 
-      const matchesSubscription =
-        filterSubscription === 'all' ||
-        (filterSubscription === PRODUCT_TYPES.SUBSCRIPTION && product.subscription) ||
-        (filterSubscription === PRODUCT_TYPES.ONE_TIME && !product.subscription)
+      const matchesType =
+        filterType === 'all' ||
+        (filterType === 'subscription' && product.subscription) ||
+        (filterType === 'oneTime' && !product.subscription)
 
-      return matchesSearch && matchesSubscription
+      return matchesSearch && matchesType
     })
 
     // Sort products
     filtered.sort((a, b) => {
-      if (!sortColumn) return 0
-
       let aValue: string | number
       let bValue: string | number
 
@@ -101,16 +85,10 @@ const Products: React.FC = () => {
         aValue = a.price
         bValue = b.price
         break
-      case 'subscription':
-        aValue = a.subscription ? 1 : 0
-        bValue = b.subscription ? 1 : 0
-        break
       case 'created_at':
+      default:
         aValue = new Date(a.created_at).getTime()
         bValue = new Date(b.created_at).getTime()
-        break
-      default:
-        return 0
       }
 
       if (sortDirection === 'asc') {
@@ -121,7 +99,7 @@ const Products: React.FC = () => {
     })
 
     return filtered
-  }, [products, searchTerm, filterSubscription, sortColumn, sortDirection])
+  }, [products, searchTerm, filterType, sortColumn, sortDirection])
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedProducts.length / itemsPerPage)
@@ -130,47 +108,36 @@ const Products: React.FC = () => {
     currentPage * itemsPerPage
   )
 
+  const handleView = (product: Product) => {
+    setViewingProduct(product)
+  }
+
   const handleEdit = (product: Product) => {
     setEditingProduct(product)
     setIsModalOpen(true)
   }
 
-  const handleView = (product: Product) => {
-    setViewingProduct(product)
-  }
-
   const handleDelete = (product: Product) => {
     setConfirmDialog({
       isOpen: true,
-      productId: product.id,
+      productId: product.id.toString(),
       productName: product.name
     })
   }
 
-  const handleConfirmDelete = async () => {
+  const confirmDelete = async () => {
     if (!confirmDialog.productId) return
 
     try {
-      await deleteProduct(confirmDialog.productId)
+      await deleteProduct(parseInt(confirmDialog.productId))
+      setConfirmDialog({ isOpen: false, productId: null, productName: null })
       // Reset to first page if current page becomes empty
       if (paginatedProducts.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1)
       }
-    } finally {
-      setConfirmDialog({
-        isOpen: false,
-        productId: null,
-        productName: null
-      })
+    } catch (error) {
+      console.error('Failed to delete product:', error)
     }
-  }
-
-  const handleCancelDelete = () => {
-    setConfirmDialog({
-      isOpen: false,
-      productId: null,
-      productName: null
-    })
   }
 
   const handleCloseModal = () => {
@@ -198,7 +165,7 @@ const Products: React.FC = () => {
   }
 
   // Use predefined filter options from constants
-  const subscriptionOptions = [...FILTER_OPTIONS.productType]
+  const typeOptions = [...FILTER_OPTIONS.productType]
 
   const handleSort = (column: keyof Product) => {
     if (column === sortColumn) {
@@ -216,25 +183,27 @@ const Products: React.FC = () => {
       sortable: true,
       render: (value: unknown, row: Product) => {
         return (
-          <div className="flex items-center space-x-3">
-            <div className="flex-shrink-0">
+          <div className='flex items-center space-x-3'>
+            <div className='flex-shrink-0'>
               <RecordImage
-                tableName="products"
+                tableName='products'
                 recordId={row.id.toString()}
-                className="w-12 h-12 rounded-lg object-cover border border-gray-200"
-                fallbackClassName="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center"
+                className='w-12 h-12 rounded-lg object-cover border border-gray-200'
+                fallbackClassName='w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center'
                 alt={`${value as string} product image`}
-                fallbackIcon={<Package className="w-4 h-4 text-white" />}
+                fallbackIcon={<Package className='w-4 h-4 text-white' />}
               />
             </div>
-            <div className="flex-1 min-w-0">
+            <div className='flex-1 min-w-0'>
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>{value as string}</div>
               <div className={cn(getTypographyClasses('small'), 'text-gray-600 truncate')}>
-                {row.description ? stripHtmlAndTruncate(row.description, 80) : t('products.noDescription')}
+                {row.description
+                  ? stripHtmlAndTruncate(row.description, 80)
+                  : t('products.noDescription')}
               </div>
-              <div className="flex items-center space-x-2 mt-1">
-                <Badge variant={row.subscription ? PRODUCT_TYPES.SUBSCRIPTION : PRODUCT_TYPES.ONE_TIME} size="sm" showIcon>
-                  {row.subscription ? t('products.subscription') : t('products.oneTime')}
+              <div className='flex items-center space-x-2 mt-1'>
+                <Badge variant={row.subscription ? 'subscription' : 'one-time'} size='sm' showIcon>
+                  {tCommon(row.subscription ? 'content.subscription' : 'content.oneTime')}
                 </Badge>
               </div>
             </div>
@@ -247,14 +216,12 @@ const Products: React.FC = () => {
       accessor: 'price' as keyof Product,
       sortable: true,
       render: (value: unknown, row: Product) => {
+        const price = value as number
         return (
           <div className={getTypographyClasses('small')}>
-            <div className="flex items-center text-gray-900 mb-1">
-              <DollarSign className="w-4 h-4 mr-1 text-gray-400" />
-              <span className="font-medium text-lg">${(value as number).toFixed(2)}</span>
-            </div>
-            <div className="text-xs text-gray-500">
-              {row.subscription ? t('products.perMonth') : t('products.oneTimePayment')}
+            <div className='font-bold text-lg text-gray-900'>${price.toFixed(2)}</div>
+            <div className='text-xs text-gray-500'>
+              {tCommon(row.subscription ? 'content.perMonth' : 'content.oneTimePayment')}
             </div>
           </div>
         )
@@ -266,9 +233,9 @@ const Products: React.FC = () => {
       sortable: true,
       render: (value: unknown) => {
         return (
-          <div className={cn(getTypographyClasses('small'), 'text-gray-900')}>
-            <div className="flex items-center">
-              <Calendar className="w-4 h-4 mr-1 text-gray-400" />
+          <div className={getTypographyClasses('small')}>
+            <div className='flex items-center text-gray-900'>
+              <Calendar className='w-4 h-4 mr-1 text-gray-400' />
               <span>{formatDateDisplay(value as string)}</span>
             </div>
           </div>
@@ -279,24 +246,24 @@ const Products: React.FC = () => {
       header: t('products.actions'),
       accessor: 'id' as keyof Product,
       render: (value: unknown, row: Product) => (
-        <div className="flex space-x-1">
+        <div className='flex space-x-1'>
           <button
             onClick={() => handleView(row)}
-            className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+            className='p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors'
             title={t('products.tooltips.viewProduct')}
           >
             <Eye className={getIconClasses('action')} />
           </button>
           <button
             onClick={() => handleEdit(row)}
-            className="p-2 text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded transition-colors"
+            className='p-2 text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded transition-colors'
             title={t('products.tooltips.editProduct')}
           >
             <Edit2 className={getIconClasses('action')} />
           </button>
           <button
             onClick={() => handleDelete(row)}
-            className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+            className='p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors'
             title={t('products.tooltips.deleteProduct')}
           >
             <Trash2 className={getIconClasses('action')} />
@@ -307,9 +274,9 @@ const Products: React.FC = () => {
   ]
 
   // Stats calculations
-  const subscriptionProducts = products.filter((p) => p.subscription).length
-  const oneTimeProducts = products.filter((p) => !p.subscription).length
-  const totalRevenue = products.reduce((sum, p) => sum + p.price, 0)
+  const subscriptionProducts = products.filter(p => p.subscription).length
+  const oneTimeProducts = products.filter(p => !p.subscription).length
+  const totalValue = products.reduce((sum, p) => sum + p.price, 0)
 
   const totalProductsProps = getStatsCardProps('products')
   const subscriptionProps = getStatsCardProps('products')
@@ -326,7 +293,7 @@ const Products: React.FC = () => {
 
   return (
     <div className={layout.container}>
-      <div className="space-y-6">
+      <div className='space-y-6'>
         {/* Header */}
         <div className={layout.header}>
           <div>
@@ -335,12 +302,12 @@ const Products: React.FC = () => {
               {t('products.description')}
             </p>
           </div>
-          <div className="mt-4 sm:mt-0 flex items-center space-x-3">
+          <div className='mt-4 sm:mt-0 flex items-center space-x-3'>
             <button
               onClick={() => setIsModalOpen(true)}
               className={getButtonClasses('primary', 'md')}
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className='w-4 h-4 mr-2' />
               {t('products.createProduct')}
             </button>
           </div>
@@ -349,11 +316,11 @@ const Products: React.FC = () => {
         {/* Stats Cards */}
         <div className={layout.grid}>
           <div className={totalProductsProps.cardClasses}>
-            <div className="flex items-center">
+            <div className='flex items-center'>
               <div className={getIconClasses('stats', 'products')}>
-                <Package className="w-6 h-6 text-white" />
+                <Package className='w-6 h-6 text-white' />
               </div>
-              <div className="ml-4">
+              <div className='ml-4'>
                 <div className={totalProductsProps.valueClasses}>{products.length}</div>
                 <div className={totalProductsProps.labelClasses}>{t('products.totalProducts')}</div>
               </div>
@@ -361,11 +328,11 @@ const Products: React.FC = () => {
           </div>
 
           <div className={subscriptionProps.cardClasses}>
-            <div className="flex items-center">
-              <div className={getIconClasses('stats', 'users')}>
-                <TrendingUp className="w-6 h-6 text-white" />
+            <div className='flex items-center'>
+              <div className={getIconClasses('stats', 'posts')}>
+                <Calendar className='w-6 h-6 text-white' />
               </div>
-              <div className="ml-4">
+              <div className='ml-4'>
                 <div className={subscriptionProps.valueClasses}>{subscriptionProducts}</div>
                 <div className={subscriptionProps.labelClasses}>{t('products.subscriptions')}</div>
               </div>
@@ -373,11 +340,11 @@ const Products: React.FC = () => {
           </div>
 
           <div className={oneTimeProps.cardClasses}>
-            <div className="flex items-center">
-              <div className={getIconClasses('stats', 'posts')}>
-                <CheckCircle className="w-6 h-6 text-white" />
+            <div className='flex items-center'>
+              <div className={getIconClasses('stats', 'banners')}>
+                <Tag className='w-6 h-6 text-white' />
               </div>
-              <div className="ml-4">
+              <div className='ml-4'>
                 <div className={oneTimeProps.valueClasses}>{oneTimeProducts}</div>
                 <div className={oneTimeProps.labelClasses}>{t('products.oneTimeProducts')}</div>
               </div>
@@ -385,136 +352,104 @@ const Products: React.FC = () => {
           </div>
 
           <div className={revenueProps.cardClasses}>
-            <div className="flex items-center">
-              <div className={getIconClasses('stats', 'banners')}>
-                <DollarSign className="w-6 h-6 text-white" />
+            <div className='flex items-center'>
+              <div className={getIconClasses('stats', 'users')}>
+                <TrendingUp className='w-6 h-6 text-white' />
               </div>
-              <div className="ml-4">
-                <div className={revenueProps.valueClasses}>${totalRevenue.toFixed(0)}</div>
+              <div className='ml-4'>
+                <div className={revenueProps.valueClasses}>${totalValue.toLocaleString()}</div>
                 <div className={revenueProps.labelClasses}>{t('products.totalValue')}</div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Products Content */}
-        <div className={`bg-white shadow-sm border border-gray-200 ${totalPages > 1 ? 'rounded-t-xl' : 'rounded-xl'}`}>
-          {/* Enhanced Filters */}
-          <div className="p-6 space-y-4">
+        {/* Enhanced Filters */}
+        <div className='bg-white rounded-xl border border-gray-200 shadow-sm'>
+          <div className='p-6 space-y-4'>
             {/* Search and filters row */}
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4">
-              <div className="flex-1 max-w-md">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4'>
+              <div className='flex-1 max-w-md'>
+                <div className='relative'>
+                  <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
                   <input
-                    type="text"
-                    placeholder={t('products.searchPlaceholder')}
+                    type='text'
+                    placeholder={tCommon('placeholders.searchProductsPlaceholder')}
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={e => setSearchTerm(e.target.value)}
                     className={cn(INPUT_VARIANTS.withIcon, 'py-2')}
                   />
                 </div>
               </div>
 
-              <div className="flex items-center space-x-3">
+              <div className='flex items-center space-x-3'>
                 <FilterDropdown
-                  options={subscriptionOptions}
-                  value={filterSubscription}
-                  onChange={(value) => {
-                    setFilterSubscription(value)
+                  options={typeOptions}
+                  value={filterType}
+                  onChange={value => {
+                    setFilterType(value as 'all' | 'subscription' | 'oneTime')
                     setCurrentPage(1)
                   }}
-                  label={t('products.type')}
+                  label={tCommon('general.type')}
                 />
                 <PaginationSelector
                   value={itemsPerPage}
-                  onChange={(value) => {
+                  onChange={value => {
                     setItemsPerPage(value)
                     setCurrentPage(1) // Reset to first page when changing items per page
                   }}
                   totalItems={filteredAndSortedProducts.length}
                 />
-
               </div>
             </div>
-          </div>
 
-          {/* Table with padding */}
-          <div className="px-6 pb-6">
+            {/* Table */}
             <Table
-              data={paginatedProducts}
               columns={columns}
+              data={paginatedProducts}
+              onSort={handleSort}
               sortColumn={sortColumn}
               sortDirection={sortDirection}
-              onSort={handleSort}
             />
-          </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 rounded-b-xl">
-              <div className="flex-1 flex justify-between sm:hidden">
+            {/* Pagination */}
+            <div className='flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0'>
+              <div className='flex items-center space-x-2'>
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={getButtonClasses('secondary', 'md')}
+                  className='px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
                 >
-                  {t('products.previous')}
+                  {tCommon('actions.previous')}
                 </button>
+                <span className='text-sm text-gray-700'>
+                  {tCommon('pagination.page')} {currentPage} {tCommon('pagination.of')} {totalPages}
+                </span>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className={cn(getButtonClasses('secondary', 'md'), 'ml-3')}
+                  className='px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
                 >
-                  {t('products.next')}
+                  {tCommon('actions.next')}
                 </button>
               </div>
 
-              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div></div>
-
-                <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      ←
-                    </button>
-
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      const page = i + 1
-                      return (
-                        <button
-                          key={page}
-                          onClick={() => handlePageChange(page)}
-                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                            page === currentPage
-                              ? 'z-10 bg-gray-900 border-gray-900 text-white'
-                              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      )
-                    })}
-
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      →
-                    </button>
-                  </nav>
-                </div>
+              <div className='text-sm text-gray-700'>
+                {tCommon('pagination.showing')}{' '}
+                <span className='font-medium'>{(currentPage - 1) * itemsPerPage + 1}</span>{' '}
+                {tCommon('pagination.to')}{' '}
+                <span className='font-medium'>
+                  {Math.min(currentPage * itemsPerPage, filteredAndSortedProducts.length)}
+                </span>{' '}
+                {tCommon('pagination.of')}{' '}
+                <span className='font-medium'>{filteredAndSortedProducts.length}</span>{' '}
+                {tCommon('pagination.results')}
               </div>
             </div>
-          )}
+          </div>
         </div>
 
-        {/* Modal */}
+        {/* Modal for creating/editing products */}
         <Modal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
@@ -527,58 +462,68 @@ const Products: React.FC = () => {
           />
         </Modal>
 
-        {/* Detail View Modal */}
+        {/* Modal for viewing product details */}
         {viewingProduct && (
-          <DetailViewModal
+          <Modal
             isOpen={!!viewingProduct}
             onClose={() => setViewingProduct(null)}
             title={`${t('products.productDetails')}: ${viewingProduct.name}`}
-            tableName="products"
-            recordId={viewingProduct.id.toString()}
           >
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('products.name')}</label>
-                  <p className="text-gray-900">{viewingProduct.name}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('products.price')}</label>
-                  <p className="text-gray-900 font-semibold">${viewingProduct.price.toFixed(2)}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('products.type')}</label>
-                  <p className="text-gray-900">{viewingProduct.subscription ? t('products.subscription') : t('products.oneTime')}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('products.created')}</label>
-                  <p className="text-gray-900">{formatDateDisplay(viewingProduct.created_at)}</p>
-                </div>
+            <div className='space-y-4'>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  {tCommon('general.name')}
+                </label>
+                <p className='text-gray-900'>{viewingProduct.name}</p>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  {tCommon('general.price')}
+                </label>
+                <p className='text-gray-900'>${viewingProduct.price}</p>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  {tCommon('general.type')}
+                </label>
+                <p className='text-gray-900'>
+                  {tCommon(
+                    viewingProduct.subscription ? 'content.subscription' : 'content.oneTime'
+                  )}
+                </p>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  {tCommon('general.date')}
+                </label>
+                <p className='text-gray-900'>{formatDateDisplay(viewingProduct.created_at)}</p>
               </div>
               {viewingProduct.description && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('products.description')}</label>
-                  <RichTextRenderer content={viewingProduct.description} />
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>
+                    {tCommon('general.description')}
+                  </label>
+                  <div className='text-gray-900 prose prose-sm max-w-none'>
+                    <div dangerouslySetInnerHTML={{ __html: viewingProduct.description }} />
+                  </div>
                 </div>
               )}
             </div>
-          </DetailViewModal>
+          </Modal>
         )}
 
-        {/* Delete Confirmation Dialog */}
+        {/* Confirm dialog for deleting products */}
         <ConfirmDialog
           isOpen={confirmDialog.isOpen}
-          onClose={handleCancelDelete}
-          onConfirm={handleConfirmDelete}
+          onConfirm={confirmDelete}
+          onClose={() => setConfirmDialog({ isOpen: false, productId: null, productName: null })}
           title={t('products.deleteProductTitle')}
           message={t('products.deleteProductMessage', {
-            productName: confirmDialog.productName || t('thisProduct')
+            productName: confirmDialog.productName || t('products.thisProduct')
           })}
-          confirmLabel={t('delete')}
-          cancelLabel={t('cancel')}
+          confirmLabel={tCommon('actions.delete')}
+          cancelLabel={tCommon('actions.cancel')}
           isDestructive={true}
-          isLoading={isDeleting}
-          variant="danger"
         />
       </div>
     </div>

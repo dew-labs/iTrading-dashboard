@@ -6,10 +6,7 @@ import { toast } from '../utils/toast'
 // Fetch functions
 const fetchImages = async (): Promise<Image[]> => {
   return supabaseHelpers.fetchData(
-    supabase
-      .from('images')
-      .select('*')
-      .order('created_at', { ascending: false })
+    supabase.from('images').select('*').order('created_at', { ascending: false })
   )
 }
 
@@ -35,26 +32,23 @@ const fetchImagesByRecord = async (tableName: string, recordId: string): Promise
 }
 
 const createImageMutation = async (image: ImageInsert): Promise<Image> => {
-  return supabaseHelpers.insertData(
-    supabase.from('images').insert([image]).select().single()
-  )
+  return supabaseHelpers.insertData(supabase.from('images').insert([image]).select().single())
 }
 
-const updateImageMutation = async ({ id, updates }: { id: number; updates: ImageUpdate }): Promise<Image> => {
+const updateImageMutation = async ({
+  id,
+  updates
+}: {
+  id: number
+  updates: ImageUpdate
+}): Promise<Image> => {
   return supabaseHelpers.updateData(
-    supabase
-      .from('images')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single()
+    supabase.from('images').update(updates).eq('id', id).select().single()
   )
 }
 
 const deleteImageMutation = async (id: number): Promise<void> => {
-  return supabaseHelpers.deleteData(
-    supabase.from('images').delete().eq('id', id)
-  )
+  return supabaseHelpers.deleteData(supabase.from('images').delete().eq('id', id))
 }
 
 export const useImages = (tableName?: string, recordId?: string) => {
@@ -67,16 +61,18 @@ export const useImages = (tableName?: string, recordId?: string) => {
     error,
     refetch
   } = useQuery({
-    queryKey: tableName && recordId
-      ? queryKeys.imagesByRecord(tableName, recordId)
-      : tableName
-        ? queryKeys.imagesByTable(tableName)
-        : queryKeys.images(),
-    queryFn: tableName && recordId
-      ? () => fetchImagesByRecord(tableName, recordId)
-      : tableName
-        ? () => fetchImagesByTable(tableName)
-        : fetchImages,
+    queryKey:
+      tableName && recordId
+        ? queryKeys.imagesByRecord(tableName, recordId)
+        : tableName
+          ? queryKeys.imagesByTable(tableName)
+          : queryKeys.images(),
+    queryFn:
+      tableName && recordId
+        ? () => fetchImagesByRecord(tableName, recordId)
+        : tableName
+          ? () => fetchImagesByTable(tableName)
+          : fetchImages,
     staleTime: 5 * 60 * 1000, // 5 minutes - images change infrequently
     gcTime: 15 * 60 * 1000 // Keep in cache for 15 minutes
   })
@@ -84,7 +80,7 @@ export const useImages = (tableName?: string, recordId?: string) => {
   // Create image mutation
   const createMutation = useMutation({
     mutationFn: createImageMutation,
-    onError: (error) => {
+    onError: error => {
       const errorMessage = error instanceof Error ? error.message : 'Failed to create image'
       toast.error(errorMessage)
     },
@@ -103,7 +99,7 @@ export const useImages = (tableName?: string, recordId?: string) => {
   // Update image mutation
   const updateMutation = useMutation({
     mutationFn: updateImageMutation,
-    onError: (error) => {
+    onError: error => {
       const errorMessage = error instanceof Error ? error.message : 'Failed to update image'
       toast.error(errorMessage)
     },
@@ -122,7 +118,7 @@ export const useImages = (tableName?: string, recordId?: string) => {
   // Delete image mutation
   const deleteMutation = useMutation({
     mutationFn: deleteImageMutation,
-    onError: (error) => {
+    onError: error => {
       const errorMessage = error instanceof Error ? error.message : 'Failed to delete image'
       toast.error(errorMessage)
     },
@@ -180,8 +176,7 @@ export const useImages = (tableName?: string, recordId?: string) => {
     error: error as Error | null,
     createImage: (image: ImageInsert) => createMutation.mutateAsync(image),
     createImageFromUpload,
-    updateImage: (id: number, updates: ImageUpdate) =>
-      updateMutation.mutateAsync({ id, updates }),
+    updateImage: (id: number, updates: ImageUpdate) => updateMutation.mutateAsync({ id, updates }),
     deleteImage: (id: number) => deleteMutation.mutateAsync(id),
     refetch,
     getImageForRecord,

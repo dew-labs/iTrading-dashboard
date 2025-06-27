@@ -2,25 +2,25 @@ import React, { useState, useRef, useEffect } from 'react'
 import { ChevronDown, Check } from 'lucide-react'
 
 interface SelectOption {
-  value: string;
-  label: string;
-  icon?: React.ReactNode;
-  disabled?: boolean;
+  value: string
+  label: string
+  icon?: React.ReactNode
+  disabled?: boolean
 }
 
 interface SelectProps {
-  options: SelectOption[];
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  disabled?: boolean;
-  className?: string;
-  size?: 'sm' | 'md' | 'lg';
-  variant?: 'default' | 'minimal';
-  label?: string;
-  error?: string;
-  required?: boolean;
-  'aria-label'?: string;
+  'options': SelectOption[]
+  'value': string
+  'onChange': (value: string) => void
+  'placeholder'?: string
+  'disabled'?: boolean
+  'className'?: string
+  'size'?: 'sm' | 'md' | 'lg'
+  'variant'?: 'default' | 'minimal'
+  'label'?: string
+  'error'?: string
+  'required'?: boolean
+  'aria-label'?: string
 }
 
 const Select: React.FC<SelectProps> = ({
@@ -180,29 +180,27 @@ const Select: React.FC<SelectProps> = ({
           }`}
         >
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className='text-red-500 ml-1'>*</span>}
         </label>
       )}
 
       {/* Select Button */}
-      <div ref={selectRef} className="relative">
+      <div ref={selectRef} className='relative'>
         <button
           id={selectId}
-          type="button"
+          type='button'
           onClick={() => !disabled && setIsOpen(!isOpen)}
           onKeyDown={handleKeyDown}
           disabled={disabled}
           aria-label={ariaLabel}
           aria-expanded={isOpen}
-          aria-haspopup="listbox"
+          aria-haspopup='listbox'
           aria-required={required}
           className={getButtonStyles()}
         >
-          <div className="flex items-center">
+          <div className='flex items-center'>
             {selectedOption?.icon && (
-              <span className="mr-2 flex-shrink-0">
-                {selectedOption.icon}
-              </span>
+              <span className='mr-2 flex-shrink-0'>{selectedOption.icon}</span>
             )}
             <span className={selectedOption ? 'text-gray-900' : 'text-gray-500'}>
               {selectedOption ? selectedOption.label : placeholder}
@@ -218,11 +216,11 @@ const Select: React.FC<SelectProps> = ({
 
         {/* Dropdown */}
         <div ref={optionsRef} className={getDropdownStyles()}>
-          <div role="listbox" aria-labelledby={selectId}>
+          <div role='listbox' aria-labelledby={selectId}>
             {options.map((option, index) => (
               <div
                 key={option.value}
-                role="option"
+                role='option'
                 aria-selected={option.value === value}
                 aria-disabled={option.disabled}
                 onClick={() => handleOptionClick(option)}
@@ -231,7 +229,8 @@ const Select: React.FC<SelectProps> = ({
                   ${config.option}
                   flex items-center justify-between cursor-pointer
                   transition-colors duration-150
-                  ${option.disabled
+                  ${
+              option.disabled
                 ? 'text-gray-400 cursor-not-allowed bg-gray-50'
                 : focusedIndex === index
                   ? 'bg-gray-900 text-white'
@@ -243,15 +242,9 @@ const Select: React.FC<SelectProps> = ({
                   ${index === options.length - 1 ? 'rounded-b-lg' : ''}
                 `}
               >
-                <div className="flex items-center">
-                  {option.icon && (
-                    <span className="mr-2 flex-shrink-0">
-                      {option.icon}
-                    </span>
-                  )}
-                  <span className={option.disabled ? 'opacity-50' : ''}>
-                    {option.label}
-                  </span>
+                <div className='flex items-center'>
+                  {option.icon && <span className='mr-2 flex-shrink-0'>{option.icon}</span>}
+                  <span className={option.disabled ? 'opacity-50' : ''}>{option.label}</span>
                 </div>
 
                 {option.value === value && (
@@ -269,7 +262,7 @@ const Select: React.FC<SelectProps> = ({
 
       {/* Error Message */}
       {error && (
-        <p className="mt-1 text-sm text-red-600" role="alert">
+        <p className='mt-1 text-sm text-red-600' role='alert'>
           {error}
         </p>
       )}

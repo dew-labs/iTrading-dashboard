@@ -51,12 +51,21 @@ export const getContainerClasses = (
 export const getPageLayoutClasses = () => ({
   container: getContainerClasses(),
   header: LAYOUT_VARIANTS.page.header,
-  grid: cn('grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4', COMPONENT_SPACING.grid.gap.comfortable)
+  grid: cn(
+    'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+    COMPONENT_SPACING.grid.gap.comfortable
+  )
 })
 
 // Get typography classes
 export const getTypographyClasses = (
-  variant: keyof typeof TYPOGRAPHY_VARIANTS.heading | keyof typeof TYPOGRAPHY_VARIANTS.body | 'subtitle' | 'description' | 'muted' | 'caption'
+  variant:
+    | keyof typeof TYPOGRAPHY_VARIANTS.heading
+    | keyof typeof TYPOGRAPHY_VARIANTS.body
+    | 'subtitle'
+    | 'description'
+    | 'muted'
+    | 'caption'
 ): string => {
   if (variant in TYPOGRAPHY_VARIANTS.heading) {
     return TYPOGRAPHY_VARIANTS.heading[variant as keyof typeof TYPOGRAPHY_VARIANTS.heading]
@@ -86,10 +95,12 @@ export const getIconClasses = (
 }
 
 // Enhanced responsive grid helper
-export const getResponsiveGridClasses = (config: {
-  cols?: { sm?: number; md?: number; lg?: number; xl?: number }
-  gap?: keyof typeof COMPONENT_SPACING.grid.gap
-} = {}): string => {
+export const getResponsiveGridClasses = (
+  config: {
+    cols?: {sm?: number; md?: number; lg?: number; xl?: number}
+    gap?: keyof typeof COMPONENT_SPACING.grid.gap
+  } = {}
+): string => {
   const { cols = { sm: 1, md: 2, lg: 3, xl: 4 }, gap = 'comfortable' } = config
 
   const gridClasses = [

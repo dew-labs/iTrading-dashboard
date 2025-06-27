@@ -1,31 +1,31 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Filter, ChevronDown, X } from 'lucide-react'
 import { cn } from '../utils/theme'
-import { useTranslation } from '../hooks/useTranslation'
+import { useMultipleTranslations } from '../hooks/useTranslation'
 
 interface FilterOption {
-  value: string;
-  label?: string;
-  labelKey?: string;
-  disabled?: boolean;
-  description?: string;
+  value: string
+  label?: string
+  labelKey?: string
+  disabled?: boolean
+  description?: string
 }
 
 interface FilterDropdownProps {
   /** Array of filter options */
-  options: FilterOption[];
+  options: FilterOption[]
   /** Currently selected value */
-  value: string;
+  value: string
   /** Callback when selection changes */
-  onChange: (value: string) => void;
+  onChange: (value: string) => void
   /** Filter name/label for display */
-  label: string;
+  label: string
   /** Additional CSS classes */
-  className?: string;
+  className?: string
   /** Show clear button when value is not 'all' */
-  showClear?: boolean;
+  showClear?: boolean
   /** Disable the filter */
-  disabled?: boolean;
+  disabled?: boolean
 }
 
 const FilterDropdown: React.FC<FilterDropdownProps> = ({
@@ -39,12 +39,32 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const { t } = useTranslation()
+  const { t } = useMultipleTranslations(['common', 'forms', 'navigation'])
 
   // Helper function to get the display label for an option
   const getOptionLabel = (option: FilterOption): string => {
     if (option.labelKey) {
-      return t(option.labelKey)
+      // Try to get from common namespace with proper prefix
+      if (option.labelKey.startsWith('all')) {
+        return t(`common:filters.${option.labelKey}`)
+      } else if (
+        ['active', 'inactive', 'published', 'draft', 'invited', 'suspended'].includes(
+          option.labelKey
+        )
+      ) {
+        return t(`common:status.${option.labelKey}`)
+      } else if (
+        ['news', 'tutorial', 'guide', 'announcement', 'event', 'subscription', 'oneTime'].includes(
+          option.labelKey
+        )
+      ) {
+        return t(`common:content.${option.labelKey}`)
+      } else if (['user', 'admin', 'superAdmin'].includes(option.labelKey)) {
+        return t(`common:roles.${option.labelKey}`)
+      } else {
+        // Try without namespace first, then fallback to direct key
+        return t(option.labelKey) || option.labelKey
+      }
     }
     return option.label || option.value
   }
@@ -95,21 +115,20 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
         )}
       >
         {/* Filter Icon */}
-        <Filter className={cn(
-          'w-3.5 h-3.5',
-          isActive ? 'text-white' : 'text-gray-400'
-        )} />
+        <Filter className={cn('w-3.5 h-3.5', isActive ? 'text-white' : 'text-gray-400')} />
 
         {/* Label */}
-        <span className="whitespace-nowrap">{label}</span>
+        <span className='whitespace-nowrap'>{label}</span>
 
         {/* Selected Value (if not 'all') */}
         {isActive && selectedOption && (
           <>
-            <span className={cn(
-              'text-xs px-1.5 py-0.5 rounded',
-              'bg-white/20 text-white border border-white/30'
-            )}>
+            <span
+              className={cn(
+                'text-xs px-1.5 py-0.5 rounded',
+                'bg-white/20 text-white border border-white/30'
+              )}
+            >
               {getOptionLabel(selectedOption)}
             </span>
           </>
@@ -125,33 +144,36 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
             )}
             title={`Clear ${label.toLowerCase()} filter`}
           >
-            <X className="w-3 h-3" />
+            <X className='w-3 h-3' />
           </button>
         )}
 
         {/* Dropdown Arrow */}
         {hasMultipleOptions && (
-          <ChevronDown className={cn(
-            'w-3.5 h-3.5 transition-transform duration-200',
-            isActive ? 'text-white' : 'text-gray-400',
-            isOpen && 'rotate-180'
-          )} />
+          <ChevronDown
+            className={cn(
+              'w-3.5 h-3.5 transition-transform duration-200',
+              isActive ? 'text-white' : 'text-gray-400',
+              isOpen && 'rotate-180'
+            )}
+          />
         )}
-
       </button>
 
       {/* Dropdown Menu */}
       {isOpen && hasMultipleOptions && (
-        <div className={cn(
-          'absolute top-full left-0 mt-1 min-w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50',
-          'max-h-60 overflow-auto',
-          'animate-in fade-in-0 zoom-in-95 duration-100'
-        )}>
-          <div role="listbox">
+        <div
+          className={cn(
+            'absolute top-full left-0 mt-1 min-w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50',
+            'max-h-60 overflow-auto',
+            'animate-in fade-in-0 zoom-in-95 duration-100'
+          )}
+        >
+          <div role='listbox'>
             {options.map((option, index) => (
               <div
                 key={option.value}
-                role="option"
+                role='option'
                 aria-selected={option.value === value}
                 aria-disabled={option.disabled}
                 onClick={() => !option.disabled && handleOptionClick(option.value)}
@@ -173,15 +195,12 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
                   {getOptionLabel(option)}
                 </span>
 
-                {option.value === value && (
-                  <div className="w-2 h-2 bg-white rounded-full" />
-                )}
+                {option.value === value && <div className='w-2 h-2 bg-white rounded-full' />}
               </div>
             ))}
           </div>
         </div>
       )}
-
     </div>
   )
 }

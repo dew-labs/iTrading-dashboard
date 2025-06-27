@@ -54,7 +54,7 @@ const Badge: React.FC<BadgeProps> = ({
     case 'user':
       return <User className={iconSize} />
 
-    // User Statuses
+      // User Statuses
     case 'active':
       return <CheckCircle className={iconSize} />
     case 'inactive':
@@ -64,13 +64,13 @@ const Badge: React.FC<BadgeProps> = ({
     case 'invited':
       return <UserPlus className={iconSize} />
 
-    // Post Statuses
+      // Post Statuses
     case 'published':
       return <CheckCircle className={iconSize} />
     case 'draft':
       return <Clock className={iconSize} />
 
-    // Post Types
+      // Post Types
     case 'news':
       return <FileText className={iconSize} />
     case 'event':
@@ -80,7 +80,7 @@ const Badge: React.FC<BadgeProps> = ({
     case 'privacy_policy':
       return <Lock className={iconSize} />
 
-    // Product Types
+      // Product Types
     case 'subscription':
       return <Zap className={iconSize} />
     case 'one-time':
@@ -115,11 +115,7 @@ const Badge: React.FC<BadgeProps> = ({
         className
       )}
     >
-      {displayIcon && (
-        <span className="mr-1">
-          {displayIcon}
-        </span>
-      )}
+      {displayIcon && <span className='mr-1'>{displayIcon}</span>}
       {children || getLabel(variant)}
     </span>
   )

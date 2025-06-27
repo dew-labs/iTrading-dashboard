@@ -19,14 +19,12 @@ const DashboardLayout: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col">
+    <div className='h-screen bg-gray-50 flex flex-col'>
       {/* Header spans full width at top */}
-      <Header
-        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-      />
+      <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
       {/* Sidebar and main content below header */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className='flex flex-1 overflow-hidden'>
         <Sidebar
           isOpen={sidebarOpen}
           setIsOpen={setSidebarOpen}
@@ -34,12 +32,12 @@ const DashboardLayout: React.FC = () => {
           setIsCollapsed={setSidebarCollapsed}
         />
 
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
+        <main className='flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6'>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/analytics" element={<Analytics />} />
+            <Route path='/' element={<Dashboard />} />
+            <Route path='/analytics' element={<Analytics />} />
             <Route
-              path="/posts"
+              path='/posts'
               element={
                 <ProtectedRoute requiredPermission={{ resource: 'posts', action: 'read' }}>
                   <Posts />
@@ -47,7 +45,7 @@ const DashboardLayout: React.FC = () => {
               }
             />
             <Route
-              path="/products"
+              path='/products'
               element={
                 <ProtectedRoute requiredPermission={{ resource: 'products', action: 'read' }}>
                   <Products />
@@ -55,7 +53,7 @@ const DashboardLayout: React.FC = () => {
               }
             />
             <Route
-              path="/brokers"
+              path='/brokers'
               element={
                 <ProtectedRoute requiredPermission={{ resource: 'brokers', action: 'read' }}>
                   <Brokers />
@@ -63,7 +61,7 @@ const DashboardLayout: React.FC = () => {
               }
             />
             <Route
-              path="/banners"
+              path='/banners'
               element={
                 <ProtectedRoute requiredPermission={{ resource: 'banners', action: 'read' }}>
                   <Banners />
@@ -71,16 +69,16 @@ const DashboardLayout: React.FC = () => {
               }
             />
             <Route
-              path="/users"
+              path='/users'
               element={
                 <ProtectedRoute requiredPermission={{ resource: 'users', action: 'read' }}>
                   <Users />
                 </ProtectedRoute>
               }
             />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/help" element={<Help />} />
-            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path='/settings' element={<Settings />} />
+            <Route path='/help' element={<Help />} />
+            <Route path='/unauthorized' element={<Unauthorized />} />
           </Routes>
         </main>
       </div>

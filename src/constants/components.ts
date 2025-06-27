@@ -27,31 +27,38 @@ export const CARD_VARIANTS = {
   base: 'bg-white rounded-xl border border-gray-200',
 
   // Interactive cards (with padding)
-  interactive: 'bg-white rounded-xl border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer p-6',
+  interactive:
+    'bg-white rounded-xl border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer p-6',
 
   // Card with shadows (with padding)
   elevated: 'bg-white rounded-xl border border-gray-200 shadow-sm p-6',
 
   // Hover states (with padding)
-  hoverable: 'bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300 transition-all duration-200 p-6',
+  hoverable:
+    'bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300 transition-all duration-200 p-6',
 
   // Stats card specific (with padding)
-  stats: 'bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 p-6'
+  stats:
+    'bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 p-6'
 } as const
 
 // Button variants (pre-computed for performance)
 export const BUTTON_VARIANTS = {
   // Primary button
-  primary: 'inline-flex items-center justify-center font-medium bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-black hover:to-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed',
+  primary:
+    'inline-flex items-center justify-center font-medium bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-black hover:to-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed',
 
   // Secondary button
-  secondary: 'inline-flex items-center justify-center font-medium border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed',
+  secondary:
+    'inline-flex items-center justify-center font-medium border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed',
 
   // Danger button
-  danger: 'inline-flex items-center justify-center font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed',
+  danger:
+    'inline-flex items-center justify-center font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed',
 
   // Ghost button
-  ghost: 'inline-flex items-center justify-center font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
+  ghost:
+    'inline-flex items-center justify-center font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
 
   // Icon button
   icon: 'inline-flex items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
@@ -70,41 +77,59 @@ export const BUTTON_SIZES = {
 export const INPUT_VARIANTS = {
   base: 'w-full border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-black transition-colors duration-200',
 
-  withIcon: 'w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-black transition-colors duration-200',
+  withIcon:
+    'w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-black transition-colors duration-200',
 
-  error: 'w-full border border-red-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors duration-200',
+  error:
+    'w-full border border-red-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors duration-200',
 
-  disabled: 'w-full border border-gray-200 rounded-lg bg-gray-50 text-gray-500 placeholder-gray-400 cursor-not-allowed'
+  disabled:
+    'w-full border border-gray-200 rounded-lg bg-gray-50 text-gray-500 placeholder-gray-400 cursor-not-allowed'
 } as const
 
 // Badge variants (status, role, etc.)
 export const BADGE_VARIANTS = {
   // Status badges
   status: {
-    active: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800',
-    inactive: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800',
-    pending: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800',
-    suspended: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800',
-    invited: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800',
-    published: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800',
-    draft: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800'
+    active:
+      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800',
+    inactive:
+      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800',
+    pending:
+      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800',
+    suspended:
+      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800',
+    invited:
+      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800',
+    published:
+      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800',
+    draft:
+      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800'
   },
 
   // Role badges
   role: {
     user: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800',
-    admin: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800',
-    super_admin: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800'
+    admin:
+      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800',
+    super_admin:
+      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800'
   },
 
   // Type badges
   type: {
-    news: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800',
-    event: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800',
-    terms_of_use: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800',
-    privacy_policy: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800',
-    subscription: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800',
-    'one-time': 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800'
+    'news':
+      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800',
+    'event':
+      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800',
+    'terms_of_use':
+      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800',
+    'privacy_policy':
+      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800',
+    'subscription':
+      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800',
+    'one-time':
+      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800'
   }
 } as const
 
@@ -113,15 +138,21 @@ export const ICON_VARIANTS = {
   // Stats card icons
   stats: {
     base: 'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm',
-    users: 'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm bg-gradient-to-br from-blue-500 to-blue-600',
-    products: 'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm bg-gradient-to-br from-purple-500 to-purple-600',
-    posts: 'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm bg-gradient-to-br from-green-500 to-green-600',
-    banners: 'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm bg-gradient-to-br from-teal-500 to-teal-600',
-    dashboard: 'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm bg-gradient-to-br from-gray-900 to-black'
+    users:
+      'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm bg-gradient-to-br from-blue-500 to-blue-600',
+    products:
+      'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm bg-gradient-to-br from-purple-500 to-purple-600',
+    posts:
+      'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm bg-gradient-to-br from-green-500 to-green-600',
+    banners:
+      'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm bg-gradient-to-br from-teal-500 to-teal-600',
+    dashboard:
+      'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm bg-gradient-to-br from-gray-900 to-black'
   },
 
   // Table row icons
-  table: 'w-10 h-10 bg-gradient-to-br from-gray-900 to-black rounded-lg flex items-center justify-center',
+  table:
+    'w-10 h-10 bg-gradient-to-br from-gray-900 to-black rounded-lg flex items-center justify-center',
 
   // Action icons
   action: 'w-4 h-4'

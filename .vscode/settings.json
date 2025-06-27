@@ -82,29 +82,13 @@
   "json.validate.enable": false,
   "mise.configureExtensionsAutomatically": false,
   "npm.packageManager": "npm",
-  "prettier.documentSelectors": [
-    "**/*.svg"
-  ],
+  "prettier.documentSelectors": ["**/*.svg"],
   "stylelint.packageManager": "npm",
-  "stylelint.snippet": [
-    "css",
-    "postcss",
-    "scss",
-    "sass",
-    "less"
-  ],
-  "stylelint.validate": [
-    "css",
-    "postcss",
-    "scss",
-    "sass",
-    "less"
-  ],
+  "stylelint.snippet": ["css", "postcss", "scss", "sass", "less"],
+  "stylelint.validate": ["css", "postcss", "scss", "sass", "less"],
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.format.enable": false,
-  "typescript.preferences.autoImportSpecifierExcludeRegexes": [
-    "^(node:)?os$"
-  ],
+  "typescript.preferences.autoImportSpecifierExcludeRegexes": ["^(node:)?os$"],
   "typescript.tsdk": "./node_modules/typescript/lib",
   "typescript.tsserver.nodePath": "node",
   "typescript.validate.enable": true,

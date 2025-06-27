@@ -13,13 +13,13 @@ All images uploaded through TinyMCE editors are now stored in **Supabase Cloud S
 
 ## 📦 Storage Buckets
 
-| Bucket | Used For | Folder Structure |
-|--------|----------|------------------|
-| `posts` | Blog posts, news articles | `posts/images/` |
-| `brokers` | Broker descriptions | `brokers/images/` |
-| `products` | Product descriptions | `products/images/` |
-| `banners` | Banner images | `banners/images/` |
-| `images` | General/shared images | `images/` |
+| Bucket     | Used For                  | Folder Structure   |
+| ---------- | ------------------------- | ------------------ |
+| `posts`    | Blog posts, news articles | `posts/images/`    |
+| `brokers`  | Broker descriptions       | `brokers/images/`  |
+| `products` | Product descriptions      | `products/images/` |
+| `banners`  | Banner images             | `banners/images/`  |
+| `images`   | General/shared images     | `images/`          |
 
 ## 🔧 How It Works
 
@@ -65,6 +65,7 @@ Each form uses its designated bucket:
 ### TinyMCE Settings
 
 The editor is configured to:
+
 - ✅ Force automatic uploads (`automatic_uploads: true`)
 - ✅ Prevent local caching (`images_reuse_filename: false`)
 - ✅ Use absolute URLs (`relative_urls: false`)
@@ -74,6 +75,7 @@ The editor is configured to:
 ### Storage Policies
 
 Each bucket has RLS (Row Level Security) policies:
+
 - **INSERT**: Authenticated users can upload
 - **SELECT**: Public read access for all images
 - **UPDATE/DELETE**: Authenticated users can manage their uploads
@@ -90,6 +92,7 @@ Each bucket has RLS (Row Level Security) policies:
 ### Images Showing as Local
 
 If you see `data:image` URLs instead of cloud URLs:
+
 1. Images are being cached locally instead of uploaded
 2. Check TinyMCE configuration has `automatic_uploads: true`
 3. Verify upload handlers are properly configured
@@ -97,6 +100,7 @@ If you see `data:image` URLs instead of cloud URLs:
 ### Permission Issues
 
 If uploads fail with permission errors:
+
 1. Check Supabase authentication status
 2. Verify RLS policies are correctly applied
 3. Ensure bucket exists and is publicly readable
@@ -119,6 +123,7 @@ npx supabase storage --experimental ls ss:///brokers --recursive --linked
 ### Storage Usage
 
 Each bucket is configured with:
+
 - **Size Limit**: 10MB per file
 - **Public Access**: Yes (for image serving)
 - **MIME Types**: `image/jpeg`, `image/jpg`, `image/png`, `image/gif`, `image/webp`
@@ -126,6 +131,7 @@ Each bucket is configured with:
 ## 🎨 Example URLs
 
 Uploaded images get URLs like:
+
 ```
 https://your-project.supabase.co/storage/v1/object/public/products/images/1750961998975-n65d09wsga.png
 https://your-project.supabase.co/storage/v1/object/public/brokers/images/1750963334377-mppd2kttzx.png

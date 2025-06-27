@@ -4,9 +4,11 @@
     "lastName": "Sobrenome",
     "fullName": "Nome Completo",
     "email": "Endereço de E-mail",
+    "emailAddress": "Endereço de E-mail",
     "password": "Senha",
     "confirmPassword": "Confirmar Senha",
     "phone": "Número de Telefone",
+    "phoneNumber": "Número de Telefone",
     "address": "Endereço",
     "city": "Cidade",
     "state": "Estado",
@@ -29,7 +31,10 @@
     "startDate": "Data de Início",
     "endDate": "Data de Fim",
     "isActive": "Ativo",
-    "isPublished": "Publicado"
+    "isPublished": "Publicado",
+    "targetUrl": "URL de Destino",
+    "headquarter": "Sede",
+    "establishedDate": "Data de Fundação"
   },
   "placeholders": {
     "enterFirstName": "Digite o nome",
@@ -61,7 +66,9 @@
     "selectStartDate": "Selecione a data de início",
     "selectEndDate": "Selecione a data de fim",
     "selectResource": "Selecionar recurso",
-    "search": "Pesquisar..."
+    "enterTargetUrl": "Digite a URL de destino",
+    "enterHeadquarter": "Digite a localização da sede",
+    "selectEstablishedDate": "Selecione a data de fundação"
   },
   "validation": {
     "required": "Este campo é obrigatório",
@@ -76,20 +83,5 @@
     "url": "Por favor, digite uma URL válida",
     "file": "Por favor, selecione um arquivo válido",
     "image": "Por favor, selecione um arquivo de imagem válido"
-  },
-  "buttons": {
-    "save": "Salvar",
-    "cancel": "Cancelar",
-    "submit": "Enviar",
-    "reset": "Redefinir",
-    "clear": "Limpar",
-    "upload": "Enviar",
-    "browse": "Procurar",
-    "remove": "Remover",
-    "add": "Adicionar",
-    "edit": "Editar",
-    "delete": "Excluir",
-    "create": "Criar",
-    "update": "Atualizar"
   }
 }

@@ -3,16 +3,16 @@ import { AlertTriangle, Trash2, AlertCircle } from 'lucide-react'
 import { getButtonClasses, getTypographyClasses, cn } from '../utils/theme'
 
 interface ConfirmDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  title: string;
-  message: string;
-  confirmLabel?: string;
-  cancelLabel?: string;
-  isDestructive?: boolean;
-  isLoading?: boolean;
-  variant?: 'warning' | 'danger' | 'info';
+  isOpen: boolean
+  onClose: () => void
+  onConfirm: () => void
+  title: string
+  message: string
+  confirmLabel?: string
+  cancelLabel?: string
+  isDestructive?: boolean
+  isLoading?: boolean
+  variant?: 'warning' | 'danger' | 'info'
 }
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
@@ -71,20 +71,20 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   const { iconBg, iconColor, icon: Icon } = getVariantStyles()
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto" aria-modal="true" role="dialog">
+    <div className='fixed inset-0 z-50 overflow-y-auto' aria-modal='true' role='dialog'>
       {/* Enhanced background overlay */}
       <div
-        className="fixed inset-0 backdrop-blur-md bg-black/30 transition-all duration-300 ease-out"
+        className='fixed inset-0 backdrop-blur-md bg-black/30 transition-all duration-300 ease-out'
         onClick={handleBackdropClick}
       />
 
       {/* Dialog container */}
-      <div className="flex min-h-full items-center justify-center p-4">
+      <div className='flex min-h-full items-center justify-center p-4'>
         {/* Dialog panel */}
-        <div className="relative bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-white/20 w-full max-w-md transform transition-all duration-300 ease-out scale-100">
-          <div className="p-6">
+        <div className='relative bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-white/20 w-full max-w-md transform transition-all duration-300 ease-out scale-100'>
+          <div className='p-6'>
             {/* Icon and content */}
-            <div className="flex items-start">
+            <div className='flex items-start'>
               <div
                 className={cn(
                   'mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-xl shadow-sm',
@@ -94,20 +94,18 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
               >
                 <Icon className={cn('h-6 w-6', iconColor)} />
               </div>
-              <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex-1">
-                <h3 className={cn(getTypographyClasses('h3'), 'mb-2')}>
-                  {title}
-                </h3>
-                <div className="mt-2">
+              <div className='mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex-1'>
+                <h3 className={cn(getTypographyClasses('h3'), 'mb-2')}>{title}</h3>
+                <div className='mt-2'>
                   <p className={getTypographyClasses('small')}>{message}</p>
                 </div>
               </div>
             </div>
 
             {/* Action buttons */}
-            <div className="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 space-y-3 space-y-reverse sm:space-y-0">
+            <div className='mt-6 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 space-y-3 space-y-reverse sm:space-y-0'>
               <button
-                type="button"
+                type='button'
                 className={cn(getButtonClasses('secondary', 'md'), 'w-full sm:w-auto')}
                 onClick={onClose}
                 disabled={isLoading}
@@ -115,7 +113,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                 {cancelLabel}
               </button>
               <button
-                type="button"
+                type='button'
                 className={cn(
                   getButtonClasses(isDestructive ? 'danger' : 'primary', 'md'),
                   'w-full sm:w-auto',
@@ -125,8 +123,8 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  <div className='flex items-center justify-center'>
+                    <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2'></div>
                     Processing...
                   </div>
                 ) : (

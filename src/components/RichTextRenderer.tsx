@@ -9,7 +9,7 @@ interface RichTextRendererProps {
 const RichTextRenderer: React.FC<RichTextRendererProps> = ({
   content,
   className = '',
-  fallback = <span className="text-gray-500 italic">No content available</span>
+  fallback = <span className='text-gray-500 italic'>No content available</span>
 }) => {
   if (!content || content.trim() === '') {
     return <>{fallback}</>
@@ -43,14 +43,11 @@ const RichTextRenderer: React.FC<RichTextRendererProps> = ({
     'prose-th:border prose-th:border-gray-300 prose-th:bg-gray-50 prose-th:px-4 prose-th:py-2 prose-th:text-left prose-th:font-semibold',
     'prose-td:border prose-td:border-gray-300 prose-td:px-4 prose-td:py-2',
     className
-  ].filter(Boolean).join(' ')
+  ]
+    .filter(Boolean)
+    .join(' ')
 
-  return (
-    <div
-      className={proseClasses}
-      dangerouslySetInnerHTML={{ __html: cleanContent }}
-    />
-  )
+  return <div className={proseClasses} dangerouslySetInnerHTML={{ __html: cleanContent }} />
 }
 
 export default RichTextRenderer

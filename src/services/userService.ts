@@ -21,7 +21,7 @@ export const inviteUser = async (
   email: string,
   role: UserRole = 'user',
   fullName?: string
-): Promise<{ success: boolean; error?: string; tempPassword?: string }> => {
+): Promise<{success: boolean; error?: string; tempPassword?: string}> => {
   try {
     // Return the temp password for admin use
     // In production, this should be sent via email
@@ -64,7 +64,10 @@ export const inviteUser = async (
      *
      * Total wait time: ~13 seconds maximum before falling back to manual creation
      */
-    const checkUserExists = async (userId: string, maxRetries: number = 5): Promise<DatabaseUser | null> => {
+    const checkUserExists = async (
+      userId: string,
+      maxRetries: number = 5
+    ): Promise<DatabaseUser | null> => {
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
           const { data: existingUser, error: checkError } = await supabase
@@ -85,7 +88,9 @@ export const inviteUser = async (
 
           // Wait progressively longer between attempts (exponential backoff)
           const waitTime = Math.min(1000 * Math.pow(1.5, attempt - 1), 5000) // Cap at 5 seconds
-          console.warn(`⏳ User profile not found on attempt ${attempt}/${maxRetries}, waiting ${waitTime}ms...`)
+          console.warn(
+            `⏳ User profile not found on attempt ${attempt}/${maxRetries}, waiting ${waitTime}ms...`
+          )
 
           if (attempt < maxRetries) {
             await new Promise(resolve => setTimeout(resolve, waitTime))
@@ -109,15 +114,13 @@ export const inviteUser = async (
     if (!existingUser) {
       console.warn('⚠️ Trigger failed to create user profile, creating manually...')
       // Manually create the user if trigger failed after all retries
-      const { error: manualError } = await supabase
-        .from('users')
-        .insert({
-          id: authData.user.id,
-          email: email,
-          role: role,
-          status: 'invited',
-          full_name: fullName
-        })
+      const { error: manualError } = await supabase.from('users').insert({
+        id: authData.user.id,
+        email: email,
+        role: role,
+        status: 'invited',
+        full_name: fullName
+      })
 
       if (manualError) {
         console.error('Manual user creation failed:', manualError)
@@ -139,7 +142,9 @@ export const inviteUser = async (
     // Grant default permissions for regular users
     await grantDefaultPermissions(authData.user.id, role)
 
-    toast.success(`User invited successfully. ${import.meta.env.DEV ? `Temp password: ${tempPassword}` : 'Check email for instructions.'}`)
+    toast.success(
+      `User invited successfully. ${import.meta.env.DEV ? `Temp password: ${tempPassword}` : 'Check email for instructions.'}`
+    )
 
     return {
       success: true,
@@ -158,12 +163,9 @@ export const inviteUser = async (
 export const updateUserRole = async (
   userId: string,
   newRole: UserRole
-): Promise<{ success: boolean; error?: string }> => {
+): Promise<{success: boolean; error?: string}> => {
   try {
-    const { error } = await supabase
-      .from('users')
-      .update({ role: newRole })
-      .eq('id', userId)
+    const { error } = await supabase.from('users').update({ role: newRole }).eq('id', userId)
 
     if (error) throw error
 
@@ -182,7 +184,7 @@ export const updateUserRole = async (
 export const grantDefaultPermissions = async (
   userId: string,
   role: UserRole
-): Promise<{ success: boolean; error?: string }> => {
+): Promise<{success: boolean; error?: string}> => {
   try {
     // Only grant default permissions for regular users
     if (role !== 'user') {
@@ -198,16 +200,15 @@ export const grantDefaultPermissions = async (
       { user_id: userId, resource: 'notifications', action: 'read' }
     ]
 
-    const { error } = await supabase
-      .from('user_permissions')
-      .insert(defaultPermissions)
+    const { error } = await supabase.from('user_permissions').insert(defaultPermissions)
 
     if (error) throw error
 
     console.warn('Default read permissions granted for user:', userId)
     return { success: true }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Failed to grant default permissions'
+    const errorMessage =
+      error instanceof Error ? error.message : 'Failed to grant default permissions'
     console.error('Error granting default permissions:', errorMessage)
     return { success: false, error: errorMessage }
   }
@@ -220,7 +221,7 @@ export const grantPermission = async (
   userId: string,
   resource: string,
   action: string
-): Promise<{ success: boolean; error?: string }> => {
+): Promise<{success: boolean; error?: string}> => {
   try {
     const { error } = await supabase
       .from('user_permissions')
@@ -244,7 +245,7 @@ export const revokePermission = async (
   userId: string,
   resource: string,
   action: string
-): Promise<{ success: boolean; error?: string }> => {
+): Promise<{success: boolean; error?: string}> => {
   try {
     const { error } = await supabase
       .from('user_permissions')
@@ -312,12 +313,9 @@ export const getUserPermissions = async (userId: string): Promise<Permission[]> 
 export const bulkUpdateUserStatus = async (
   userIds: string[],
   status: 'active' | 'inactive' | 'suspended'
-): Promise<{ success: boolean; error?: string }> => {
+): Promise<{success: boolean; error?: string}> => {
   try {
-    const { error } = await supabase
-      .from('users')
-      .update({ status })
-      .in('id', userIds)
+    const { error } = await supabase.from('users').update({ status }).in('id', userIds)
 
     if (error) throw error
 
@@ -336,26 +334,24 @@ export const bulkUpdateUserStatus = async (
 export const uploadUserAvatar = async (
   userId: string,
   file: File
-): Promise<{ url?: string; error?: string }> => {
+): Promise<{url?: string; error?: string}> => {
   try {
     const fileExt = file.name.split('.').pop()
     const fileName = `${userId}-${Date.now()}.${fileExt}`
     const filePath = `avatars/${fileName}`
 
     // Upload to Supabase Storage
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: true
-      })
+    const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: true
+    })
 
     if (uploadError) throw uploadError
 
     // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('avatars')
-      .getPublicUrl(filePath)
+    const {
+      data: { publicUrl }
+    } = supabase.storage.from('avatars').getPublicUrl(filePath)
 
     // Update user profile
     const { error: updateError } = await supabase

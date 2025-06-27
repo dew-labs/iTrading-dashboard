@@ -15,7 +15,10 @@
 import { FORMAT } from '../constants/theme'
 
 // Date formatting functions
-export const formatDate = (date: string | Date, format: keyof typeof FORMAT.date = 'display'): string => {
+export const formatDate = (
+  date: string | Date,
+  format: keyof typeof FORMAT.date = 'display'
+): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date
 
   if (isNaN(dateObj.getTime())) {
@@ -146,7 +149,7 @@ export const validators = {
    * @param minLength - Minimum password length (default: 8)
    * @returns Object with isValid boolean and array of requirements
    */
-  password: (password: string, minLength = 8): { isValid: boolean; requirements: string[] } => {
+  password: (password: string, minLength = 8): {isValid: boolean; requirements: string[]} => {
     const requirements: string[] = []
 
     if (password.length < minLength) {

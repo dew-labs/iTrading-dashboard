@@ -5,15 +5,15 @@ import Select from './Select'
 import RichTextEditor from './RichTextEditor'
 
 interface PostFormProps {
-  post?: Post | null;
-  onSubmit: (data: PostInsert) => void;
-  onCancel: () => void;
+  post?: Post | null
+  onSubmit: (data: PostInsert) => void
+  onCancel: () => void
 }
 
 interface FormErrors {
-  title?: string;
-  content?: string;
-  type?: string;
+  title?: string
+  content?: string
+  type?: string
 }
 
 const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
@@ -110,22 +110,22 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
     {
       value: 'news',
       label: 'News',
-      icon: <FileText className="w-4 h-4" />
+      icon: <FileText className='w-4 h-4' />
     },
     {
       value: 'event',
       label: 'Event',
-      icon: <Calendar className="w-4 h-4" />
+      icon: <Calendar className='w-4 h-4' />
     },
     {
       value: 'terms_of_use',
       label: 'Terms of Use',
-      icon: <Scale className="w-4 h-4" />
+      icon: <Scale className='w-4 h-4' />
     },
     {
       value: 'privacy_policy',
       label: 'Privacy Policy',
-      icon: <Lock className="w-4 h-4" />
+      icon: <Lock className='w-4 h-4' />
     }
   ]
 
@@ -134,50 +134,50 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
     {
       value: 'draft',
       label: 'Draft',
-      icon: <Clock className="w-4 h-4" />
+      icon: <Clock className='w-4 h-4' />
     },
     {
       value: 'published',
       label: 'Published',
-      icon: <CheckCircle className="w-4 h-4" />
+      icon: <CheckCircle className='w-4 h-4' />
     }
   ]
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className='space-y-6'>
       {/* Title field - full width for emphasis */}
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor='title' className='block text-sm font-medium text-gray-700 mb-1'>
           Title *
         </label>
         <input
-          type="text"
-          id="title"
-          name="title"
+          type='text'
+          id='title'
+          name='title'
           value={formData.title}
           onChange={handleChange}
           className={`w-full px-3 py-2 border ${
             errors.title ? 'border-red-300' : 'border-gray-300'
           } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent`}
-          placeholder="Enter a compelling title..."
+          placeholder='Enter a compelling title...'
           disabled={isSubmitting}
         />
         {errors.title && (
-          <div className="flex items-center mt-1 text-sm text-red-600">
-            <AlertCircle className="w-4 h-4 mr-1" />
+          <div className='flex items-center mt-1 text-sm text-red-600'>
+            <AlertCircle className='w-4 h-4 mr-1' />
             {errors.title}
           </div>
         )}
       </div>
 
       {/* Compact metadata fields in grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
         <div>
           <Select
-            label="Type"
+            label='Type'
             required
             value={formData.type}
-            onChange={(value) => setFormData({ ...formData, type: value as Post['type'] })}
+            onChange={value => setFormData({ ...formData, type: value as Post['type'] })}
             options={typeOptions}
             disabled={isSubmitting}
           />
@@ -185,10 +185,10 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
 
         <div>
           <Select
-            label="Status"
+            label='Status'
             required
             value={formData.status || 'draft'}
-            onChange={(value) => setFormData({ ...formData, status: value as Post['status'] })}
+            onChange={value => setFormData({ ...formData, status: value as Post['status'] })}
             options={statusOptions}
             disabled={isSubmitting}
           />
@@ -196,12 +196,12 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
       </div>
 
       {/* Large content editor section */}
-      <div className="border-t border-gray-200 pt-6">
+      <div className='border-t border-gray-200 pt-6'>
         <RichTextEditor
-          label="Content"
+          label='Content'
           required
           content={formData.content || ''}
-          onChange={(content) => {
+          onChange={content => {
             setFormData({ ...formData, content })
             // Clear errors when user starts typing
             if (errors.content) {
@@ -210,33 +210,33 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
               setErrors(newErrors)
             }
           }}
-          placeholder="Write your post content here - use the rich editor tools to format your text..."
+          placeholder='Write your post content here - use the rich editor tools to format your text...'
           error={errors.content}
           disabled={isSubmitting}
           height={450}
-          bucket="posts"
-          folder="images"
+          bucket='posts'
+          folder='images'
         />
       </div>
 
       {/* Action buttons */}
-      <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+      <div className='flex justify-end space-x-3 pt-6 border-t border-gray-200'>
         <button
-          type="button"
+          type='button'
           onClick={onCancel}
-          className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          className='px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors'
           disabled={isSubmitting}
         >
           Cancel
         </button>
         <button
-          type="submit"
+          type='submit'
           disabled={isSubmitting}
-          className="px-6 py-2 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-black hover:to-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+          className='px-6 py-2 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-black hover:to-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center'
         >
           {isSubmitting ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2'></div>
               {post ? 'Updating...' : 'Creating...'}
             </>
           ) : (

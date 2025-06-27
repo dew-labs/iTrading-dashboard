@@ -10,17 +10,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
   )
 }
 
-export const supabase = createClient<Database>(
-  supabaseUrl,
-  supabaseAnonKey,
-  {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true
-    }
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
   }
-)
+})
 
 // Query key factories for consistent caching
 export const queryKeys = {
@@ -50,7 +46,8 @@ export const queryKeys = {
   images: () => ['images'] as const,
   image: (id: number) => ['images', id] as const,
   imagesByTable: (tableName: string) => ['images', 'table', tableName] as const,
-  imagesByRecord: (tableName: string, recordId: string) => ['images', 'table', tableName, 'record', recordId] as const,
+  imagesByRecord: (tableName: string, recordId: string) =>
+    ['images', 'table', tableName, 'record', recordId] as const,
 
   // Permissions
   rolePermissions: (role: string) => ['role-permissions', role] as const,
@@ -60,14 +57,14 @@ export const queryKeys = {
 // Helper functions for common Supabase operations
 export const supabaseHelpers = {
   // Generic fetch function with error handling
-  async fetchData<T> (queryBuilder: PromiseLike<{ data: T[] | null; error: unknown }>): Promise<T[]> {
+  async fetchData<T> (queryBuilder: PromiseLike<{data: T[] | null; error: unknown}>): Promise<T[]> {
     const { data, error } = await queryBuilder
     if (error) throw new Error(error instanceof Error ? error.message : 'Unknown error')
     return data || []
   },
 
   // Generic single item fetch
-  async fetchSingle<T> (queryBuilder: PromiseLike<{ data: T | null; error: unknown }>): Promise<T> {
+  async fetchSingle<T> (queryBuilder: PromiseLike<{data: T | null; error: unknown}>): Promise<T> {
     const { data, error } = await queryBuilder
     if (error) throw new Error(error instanceof Error ? error.message : 'Unknown error')
     if (!data) throw new Error('Not found')
@@ -75,7 +72,7 @@ export const supabaseHelpers = {
   },
 
   // Generic insert with optimistic updates
-  async insertData<T> (queryBuilder: PromiseLike<{ data: T | null; error: unknown }>): Promise<T> {
+  async insertData<T> (queryBuilder: PromiseLike<{data: T | null; error: unknown}>): Promise<T> {
     const { data, error } = await queryBuilder
     if (error) throw new Error(error instanceof Error ? error.message : 'Unknown error')
     if (!data) throw new Error('Insert failed')
@@ -83,7 +80,7 @@ export const supabaseHelpers = {
   },
 
   // Generic update with optimistic updates
-  async updateData<T> (queryBuilder: PromiseLike<{ data: T | null; error: unknown }>): Promise<T> {
+  async updateData<T> (queryBuilder: PromiseLike<{data: T | null; error: unknown}>): Promise<T> {
     const { data, error } = await queryBuilder
     if (error) throw new Error(error instanceof Error ? error.message : 'Unknown error')
     if (!data) throw new Error('Update failed')
@@ -91,7 +88,7 @@ export const supabaseHelpers = {
   },
 
   // Generic delete
-  async deleteData (queryBuilder: PromiseLike<{ error: unknown }>): Promise<void> {
+  async deleteData (queryBuilder: PromiseLike<{error: unknown}>): Promise<void> {
     const { error } = await queryBuilder
     if (error) throw new Error(error instanceof Error ? error.message : 'Unknown error')
   }

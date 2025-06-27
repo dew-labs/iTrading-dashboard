@@ -126,4 +126,13 @@ export const useErrorTranslation = () => {
   return useTranslation(I18N_NAMESPACES.ERRORS)
 }
 
+/**
+ * Hook specifically for page-related translations
+ *
+ * @returns Translation functions for pages namespace
+ */
+export const usePageTranslation = () => {
+  return useTranslation(I18N_NAMESPACES.PAGES)
+}
+
 export default useTranslation

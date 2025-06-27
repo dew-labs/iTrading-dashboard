@@ -19,16 +19,16 @@ import { toast } from '../utils/toast'
  */
 
 interface AuthState {
-  user: User | null;
-  profile: DatabaseUser | null;
-  loading: boolean;
-  initialized: boolean;
-  signIn: (email: string, password: string) => Promise<{ error?: string }>;
-  signOut: () => Promise<void>;
-  initialize: () => Promise<void>;
-  getCurrentUser: () => Promise<void>;
-  fetchUserProfile: () => Promise<void>;
-  clearUserCache?: () => void;
+  user: User | null
+  profile: DatabaseUser | null
+  loading: boolean
+  initialized: boolean
+  signIn: (email: string, password: string) => Promise<{error?: string}>
+  signOut: () => Promise<void>
+  initialize: () => Promise<void>
+  getCurrentUser: () => Promise<void>
+  fetchUserProfile: () => Promise<void>
+  clearUserCache?: () => void
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -93,11 +93,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (!user) return
 
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .single()
+      const { data, error } = await supabase.from('users').select('*').eq('id', user.id).single()
 
       if (error) {
         // Handle specific errors for deleted users
@@ -112,7 +108,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         }
 
         // Handle other potential auth errors
-        if (error.message.includes('JWT') || error.message.includes('invalid') || error.message.includes('expired')) {
+        if (
+          error.message.includes('JWT') ||
+          error.message.includes('invalid') ||
+          error.message.includes('expired')
+        ) {
           console.warn('Authentication error detected. Signing out user:', error.message)
           toast.error('Your session has expired. Please sign in again.', {
             duration: 4000
@@ -129,12 +129,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       console.error('Error fetching user profile:', error)
 
       // If it's a critical auth error, sign out the user
-      const errorMessage = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase()
-      if (errorMessage.includes('unauthorized') ||
-          errorMessage.includes('forbidden') ||
-          errorMessage.includes('invalid') ||
-          errorMessage.includes('jwt') ||
-          errorMessage.includes('expired')) {
+      const errorMessage =
+        error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase()
+      if (
+        errorMessage.includes('unauthorized') ||
+        errorMessage.includes('forbidden') ||
+        errorMessage.includes('invalid') ||
+        errorMessage.includes('jwt') ||
+        errorMessage.includes('expired')
+      ) {
         console.warn('Critical auth error detected. Signing out user.')
         toast.error('Authentication error. Please sign in again.', {
           duration: 4000

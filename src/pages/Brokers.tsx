@@ -1,16 +1,7 @@
 import React, { useState, useMemo } from 'react'
-import {
-  Plus,
-  Search,
-  Edit2,
-  Trash2,
-  Building2,
-  Calendar,
-  MapPin,
-  FileText
-} from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Building2, Calendar, MapPin, FileText } from 'lucide-react'
 import { useBrokers } from '../hooks/useBrokers'
-import { useTranslation } from '../hooks/useTranslation'
+import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import BrokerForm from '../components/BrokerForm'
@@ -36,7 +27,8 @@ import { INPUT_VARIANTS } from '../constants/components'
 
 const Brokers: React.FC = () => {
   const { brokers, loading, createBroker, updateBroker, deleteBroker, isDeleting } = useBrokers()
-  const { t } = useTranslation()
+  const { t } = usePageTranslation() // Page-specific content
+  const { t: tCommon } = useTranslation() // Common actions and terms
   const [searchTerm, setSearchTerm] = useState('')
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -48,9 +40,9 @@ const Brokers: React.FC = () => {
 
   // Confirm dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
-    isOpen: boolean;
-    brokerId: number | null;
-    brokerName: string | null;
+    isOpen: boolean
+    brokerId: number | null
+    brokerName: string | null
   }>({
     isOpen: false,
     brokerId: null,
@@ -62,9 +54,10 @@ const Brokers: React.FC = () => {
 
   // Enhanced filtering and sorting
   const filteredAndSortedBrokers = useMemo(() => {
-    const filtered = brokers.filter((broker) => {
+    const filtered = brokers.filter(broker => {
       const matchesSearch =
-        (broker.headquarter && broker.headquarter.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (broker.headquarter &&
+          broker.headquarter.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (broker.description && broker.description.toLowerCase().includes(searchTerm.toLowerCase()))
 
       return matchesSearch
@@ -190,23 +183,25 @@ const Brokers: React.FC = () => {
       sortable: true,
       render: (value: unknown, row: Broker) => {
         return (
-          <div className="flex items-center space-x-3">
-            <div className="flex-shrink-0">
+          <div className='flex items-center space-x-3'>
+            <div className='flex-shrink-0'>
               <RecordImage
-                tableName="brokers"
+                tableName='brokers'
                 recordId={row.id.toString()}
-                className="w-12 h-12 rounded-lg object-cover border border-gray-200"
-                fallbackClassName="w-12 h-12 rounded-lg bg-gradient-to-br from-gray-900 to-black flex items-center justify-center"
-                alt={`${value as string || 'Broker'} logo`}
-                fallbackIcon={<Building2 className="w-4 h-4 text-white" />}
+                className='w-12 h-12 rounded-lg object-cover border border-gray-200'
+                fallbackClassName='w-12 h-12 rounded-lg bg-gradient-to-br from-gray-900 to-black flex items-center justify-center'
+                alt={`${(value as string) || 'Broker'} logo`}
+                fallbackIcon={<Building2 className='w-4 h-4 text-white' />}
               />
             </div>
-            <div className="flex-1 min-w-0">
+            <div className='flex-1 min-w-0'>
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>
-                {value as string || t('brokers.noHeadquarterInfo')}
+                {(value as string) || t('brokers.noHeadquarterInfo')}
               </div>
               <div className={cn(getTypographyClasses('small'), 'text-gray-600')}>
-                {row.description ? stripHtmlAndTruncate(row.description, 80) : t('brokers.noDescription')}
+                {row.description
+                  ? stripHtmlAndTruncate(row.description, 80)
+                  : t('brokers.noDescription')}
               </div>
             </div>
           </div>
@@ -221,12 +216,12 @@ const Brokers: React.FC = () => {
         return (
           <div className={cn(getTypographyClasses('small'), 'text-gray-900')}>
             {value ? (
-              <div className="flex items-center">
-                <Calendar className="w-4 h-4 mr-1 text-gray-400" />
+              <div className='flex items-center'>
+                <Calendar className='w-4 h-4 mr-1 text-gray-400' />
                 <span>{formatDateDisplay(value as string)}</span>
               </div>
             ) : (
-              <span className="text-gray-400">{t('brokers.notSpecified')}</span>
+              <span className='text-gray-400'>{t('brokers.notSpecified')}</span>
             )}
           </div>
         )
@@ -239,8 +234,8 @@ const Brokers: React.FC = () => {
       render: (value: unknown) => {
         return (
           <div className={cn(getTypographyClasses('small'), 'text-gray-900')}>
-            <div className="flex items-center">
-              <FileText className="w-4 h-4 mr-1 text-gray-400" />
+            <div className='flex items-center'>
+              <FileText className='w-4 h-4 mr-1 text-gray-400' />
               <span>{formatDateDisplay(value as string)}</span>
             </div>
           </div>
@@ -251,17 +246,17 @@ const Brokers: React.FC = () => {
       header: t('brokers.actions'),
       accessor: 'id' as keyof Broker,
       render: (value: unknown, row: Broker) => (
-        <div className="flex space-x-1">
+        <div className='flex space-x-1'>
           <button
             onClick={() => handleEdit(row)}
-            className="p-2 text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded transition-colors"
+            className='p-2 text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded transition-colors'
             title={t('brokers.tooltips.editBroker')}
           >
             <Edit2 className={getIconClasses('action')} />
           </button>
           <button
             onClick={() => handleDelete(row)}
-            className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+            className='p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors'
             title={t('brokers.tooltips.deleteBroker')}
           >
             <Trash2 className={getIconClasses('action')} />
@@ -273,10 +268,10 @@ const Brokers: React.FC = () => {
 
   // Stats calculations
   const totalBrokers = brokers.length
-  const brokersWithHQ = brokers.filter((b) => b.headquarter).length
-  const brokersWithEstDate = brokers.filter((b) => b.established_at).length
+  const brokersWithHQ = brokers.filter(b => b.headquarter).length
+  const brokersWithEstDate = brokers.filter(b => b.established_at).length
   const recentBrokers = brokers.filter(
-    (b) => new Date(b.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    b => new Date(b.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
   ).length
 
   const totalBrokersProps = getStatsCardProps('products')
@@ -294,7 +289,7 @@ const Brokers: React.FC = () => {
 
   return (
     <div className={layout.container}>
-      <div className="space-y-6">
+      <div className='space-y-6'>
         {/* Header */}
         <div className={layout.header}>
           <div>
@@ -303,12 +298,12 @@ const Brokers: React.FC = () => {
               {t('brokers.description')}
             </p>
           </div>
-          <div className="mt-4 sm:mt-0 flex items-center space-x-3">
+          <div className='mt-4 sm:mt-0 flex items-center space-x-3'>
             <button
               onClick={() => setIsModalOpen(true)}
               className={getButtonClasses('primary', 'md')}
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className='w-4 h-4 mr-2' />
               {t('brokers.addBroker')}
             </button>
           </div>
@@ -317,11 +312,11 @@ const Brokers: React.FC = () => {
         {/* Stats Cards */}
         <div className={layout.grid}>
           <div className={totalBrokersProps.cardClasses}>
-            <div className="flex items-center">
+            <div className='flex items-center'>
               <div className={getIconClasses('stats', 'products')}>
-                <Building2 className="w-6 h-6 text-white" />
+                <Building2 className='w-6 h-6 text-white' />
               </div>
-              <div className="ml-4">
+              <div className='ml-4'>
                 <div className={totalBrokersProps.valueClasses}>{totalBrokers}</div>
                 <div className={totalBrokersProps.labelClasses}>{t('brokers.totalBrokers')}</div>
               </div>
@@ -329,11 +324,11 @@ const Brokers: React.FC = () => {
           </div>
 
           <div className={hqProps.cardClasses}>
-            <div className="flex items-center">
+            <div className='flex items-center'>
               <div className={getIconClasses('stats', 'users')}>
-                <MapPin className="w-6 h-6 text-white" />
+                <MapPin className='w-6 h-6 text-white' />
               </div>
-              <div className="ml-4">
+              <div className='ml-4'>
                 <div className={hqProps.valueClasses}>{brokersWithHQ}</div>
                 <div className={hqProps.labelClasses}>{t('brokers.withHeadquarters')}</div>
               </div>
@@ -341,11 +336,11 @@ const Brokers: React.FC = () => {
           </div>
 
           <div className={estDateProps.cardClasses}>
-            <div className="flex items-center">
+            <div className='flex items-center'>
               <div className={getIconClasses('stats', 'posts')}>
-                <Calendar className="w-6 h-6 text-white" />
+                <Calendar className='w-6 h-6 text-white' />
               </div>
-              <div className="ml-4">
+              <div className='ml-4'>
                 <div className={estDateProps.valueClasses}>{brokersWithEstDate}</div>
                 <div className={estDateProps.labelClasses}>{t('brokers.withEstDate')}</div>
               </div>
@@ -353,11 +348,11 @@ const Brokers: React.FC = () => {
           </div>
 
           <div className={recentProps.cardClasses}>
-            <div className="flex items-center">
+            <div className='flex items-center'>
               <div className={getIconClasses('stats', 'banners')}>
-                <FileText className="w-6 h-6 text-white" />
+                <FileText className='w-6 h-6 text-white' />
               </div>
-              <div className="ml-4">
+              <div className='ml-4'>
                 <div className={recentProps.valueClasses}>{recentBrokers}</div>
                 <div className={recentProps.labelClasses}>{t('brokers.recent30d')}</div>
               </div>
@@ -366,40 +361,41 @@ const Brokers: React.FC = () => {
         </div>
 
         {/* Brokers Content */}
-        <div className={`bg-white shadow-sm border border-gray-200 ${totalPages > 1 ? 'rounded-t-xl' : 'rounded-xl'}`}>
+        <div
+          className={`bg-white shadow-sm border border-gray-200 ${totalPages > 1 ? 'rounded-t-xl' : 'rounded-xl'}`}
+        >
           {/* Enhanced Filters */}
-          <div className="p-6 space-y-4">
+          <div className='p-6 space-y-4'>
             {/* Search and filters row */}
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4">
-              <div className="flex-1 max-w-md">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4'>
+              <div className='flex-1 max-w-md'>
+                <div className='relative'>
+                  <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
                   <input
-                    type="text"
-                    placeholder={t('brokers.searchPlaceholder')}
+                    type='text'
+                    placeholder={tCommon('placeholders.searchBrokersPlaceholder')}
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={e => setSearchTerm(e.target.value)}
                     className={cn(INPUT_VARIANTS.withIcon, 'py-2')}
                   />
                 </div>
               </div>
 
-              <div className="flex items-center space-x-3">
+              <div className='flex items-center space-x-3'>
                 <PaginationSelector
                   value={itemsPerPage}
-                  onChange={(value) => {
+                  onChange={value => {
                     setItemsPerPage(value)
                     setCurrentPage(1) // Reset to first page when changing items per page
                   }}
                   totalItems={filteredAndSortedBrokers.length}
                 />
-
               </div>
             </div>
           </div>
 
           {/* Table with padding */}
-          <div className="px-6 pb-6">
+          <div className='px-6 pb-6'>
             <Table
               data={paginatedBrokers}
               columns={columns}
@@ -411,33 +407,33 @@ const Brokers: React.FC = () => {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 rounded-b-xl">
-              <div className="flex-1 flex justify-between sm:hidden">
+            <div className='bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 rounded-b-xl'>
+              <div className='flex-1 flex justify-between sm:hidden'>
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
                   className={getButtonClasses('secondary', 'md')}
                 >
-                  {t('brokers.previous')}
+                  {tCommon('actions.previous')}
                 </button>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className={cn(getButtonClasses('secondary', 'md'), 'ml-3')}
                 >
-                  {t('brokers.next')}
+                  {tCommon('actions.next')}
                 </button>
               </div>
 
-              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+              <div className='hidden sm:flex-1 sm:flex sm:items-center sm:justify-between'>
                 <div></div>
 
                 <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                  <nav className='relative z-0 inline-flex rounded-md shadow-sm -space-x-px'>
                     <button
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className='relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
                     >
                       ←
                     </button>
@@ -462,7 +458,7 @@ const Brokers: React.FC = () => {
                     <button
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className='relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
                     >
                       →
                     </button>
@@ -479,11 +475,7 @@ const Brokers: React.FC = () => {
           onClose={handleCloseModal}
           title={editingBroker ? t('brokers.editBroker') : t('brokers.addNewBroker')}
         >
-          <BrokerForm
-            broker={editingBroker}
-            onSubmit={handleSubmit}
-            onCancel={handleCloseModal}
-          />
+          <BrokerForm broker={editingBroker} onSubmit={handleSubmit} onCancel={handleCloseModal} />
         </Modal>
 
         {/* Delete Confirmation Dialog */}
@@ -493,13 +485,13 @@ const Brokers: React.FC = () => {
           onConfirm={handleConfirmDelete}
           title={t('brokers.deleteBrokerTitle')}
           message={t('brokers.deleteBrokerMessage', {
-            brokerName: confirmDialog.brokerName || t('thisBroker')
+            brokerName: confirmDialog.brokerName || t('brokers.thisBroker')
           })}
-          confirmLabel={t('delete')}
-          cancelLabel={t('cancel')}
+          confirmLabel={tCommon('actions.delete')}
+          cancelLabel={tCommon('actions.cancel')}
           isDestructive={true}
           isLoading={isDeleting}
-          variant="danger"
+          variant='danger'
         />
       </div>
     </div>
