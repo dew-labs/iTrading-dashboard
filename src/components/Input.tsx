@@ -40,6 +40,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         fullWidth && 'w-full'
       ]
 
+      // Hide number input spinners
+      if (props.type === 'number') {
+        baseClasses.push(
+          '[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+          '[&[type=number]]:appearance-none'
+        )
+      }
+
       // Base size classes
       const baseSizeClasses = {
         sm: 'py-1.5 text-sm',

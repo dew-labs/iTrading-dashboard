@@ -10,7 +10,8 @@ import {
   Bell,
   AlertCircle,
   CheckCircle,
-  Edit
+  Edit,
+  X
 } from 'lucide-react'
 import { getUserPermissions, grantPermission, revokePermission } from '../services/userService'
 import { usePermissions } from '../hooks/usePermissions'
@@ -323,6 +324,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
                   }}
                   className={getButtonClasses('secondary', 'md')}
                 >
+                  <X className='w-4 h-4 mr-2' />
                   {t('actions.cancel')}
                 </button>
                 <button

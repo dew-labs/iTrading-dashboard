@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
-import { User, Shield, CheckCircle2, Users, Sparkles } from 'lucide-react'
+import { User, Shield, Sparkles, X, Save, Mail } from 'lucide-react'
 import type { DatabaseUser, UserInsert, UserRole } from '../types'
 import { usePermissions } from '../hooks/usePermissions'
 import { useTranslation } from '../hooks/useTranslation'
 import { validators } from '../utils/format'
 import { USER_ROLES } from '../constants/general'
-import FormInput from './FormInput'
+import Input from './Input'
+import Select from './Select'
 
 interface UserFormProps {
   user?: DatabaseUser | null
@@ -104,182 +105,111 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
     setErrors(newErrors)
   }
 
-  const roleOptions: {
-    value: UserRole
-    label: string
-    description: string
-    icon: React.ReactNode
-    color: string
-  }[] = [
+  const roleOptions = [
     {
       value: USER_ROLES.USER,
       label: t('roles.user'),
-      description: t('roles.userRoleDescription'),
-      icon: <User className='w-6 h-6' />,
-      color: 'from-blue-500 to-indigo-500'
+      icon: <User className='w-4 h-4' />
     },
     {
       value: USER_ROLES.ADMIN,
       label: t('roles.admin'),
-      description: t('roles.adminRoleDescription'),
-      icon: <Shield className='w-6 h-6' />,
-      color: 'from-purple-500 to-pink-500'
+      icon: <Shield className='w-4 h-4' />
     },
     ...(isSuperAdmin()
       ? [
         {
           value: USER_ROLES.SUPER_ADMIN,
           label: t('roles.superAdmin'),
-          description: t('roles.superAdminRoleDescription'),
-          icon: <Sparkles className='w-6 h-6' />,
-          color: 'from-orange-500 to-red-500'
+          icon: <Sparkles className='w-4 h-4' />
         }
       ]
       : [])
   ]
 
   return (
-    <div className='relative max-w-2xl mx-auto'>
-      <form onSubmit={handleSubmit} className='space-y-6'>
-        {/* Basic Information */}
-        <div className='bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 space-y-6'>
-          <h4 className='text-lg font-semibold text-gray-900 dark:text-white flex items-center'>
-            <User className='w-5 h-5 mr-2 text-gray-600 dark:text-gray-400' />
-            {t('userForm.basicInformation')}
-          </h4>
+    <form onSubmit={handleSubmit} className='space-y-6'>
+      {/* Basic information in grid */}
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+        <Input
+          label={t('forms:labels.emailAddress')}
+          type='email'
+          name='email'
+          value={formData.email}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          placeholder='user@example.com'
+          required
+          disabled={!!user}
+          {...(errors.email && { error: errors.email })}
+          {...(!user && { helperText: t('userForm.emailInviteHelpText') })}
+        />
 
-          <div className='grid gap-6 md:grid-cols-2'>
-            <FormInput
-              name='email'
-              label={t('forms:labels.emailAddress')}
-              type='email'
-              placeholder='user@example.com'
-              required
-              disabled={!!user}
-              value={formData.email}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              icon='email'
-              {...(errors.email && { error: errors.email })}
-              {...(!user && { helpText: t('userForm.emailInviteHelpText') })}
-            />
+        <Input
+          label={t('forms:labels.fullName')}
+          name='full_name'
+          value={formData.full_name || ''}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          placeholder={t('forms:placeholders.fullNamePlaceholder')}
+          required
+          {...(errors.full_name && { error: errors.full_name })}
+        />
+      </div>
 
-            <FormInput
-              name='full_name'
-              label={t('forms:labels.fullName')}
-              placeholder={t('forms:placeholders.fullNamePlaceholder')}
-              required
-              value={formData.full_name || ''}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              icon='user'
-              {...(errors.full_name && { error: errors.full_name })}
-            />
-          </div>
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+        <Input
+          label={t('forms:labels.phoneNumber')}
+          type='tel'
+          name='phone'
+          value={formData.phone || ''}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          placeholder='+1 (555) 123-4567'
+          {...(errors.phone && { error: errors.phone })}
+          helperText={t('userForm.phoneHelpText')}
+        />
 
-          <FormInput
-            name='phone'
-            label={t('forms:labels.phoneNumber')}
-            type='tel'
-            placeholder='+1 (555) 123-4567'
-            value={formData.phone || ''}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            icon='phone'
-            {...(errors.phone && { error: errors.phone })}
-            helpText={t('userForm.phoneHelpText')}
-          />
-        </div>
+        <Select
+          label={t('userForm.userRolePermissions')}
+          required
+          value={formData.role || 'user'}
+          onChange={value => setFormData(prev => ({ ...prev, role: value as UserRole }))}
+          options={roleOptions}
+          disabled={isSubmitting}
+        />
+      </div>
 
-        {/* Role Selection */}
-        <div className='bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 space-y-6'>
-          <h4 className='text-lg font-semibold text-gray-900 dark:text-white flex items-center'>
-            <Shield className='w-5 h-5 mr-2 text-gray-600 dark:text-gray-400' />
-            {t('userForm.userRolePermissions')}
-          </h4>
-
-          <div className='space-y-3'>
-            {roleOptions.map(option => (
-              <label
-                key={option.value}
-                className={`
-                  relative flex items-center p-5 border-2 rounded-2xl cursor-pointer
-                  transition-all duration-200 hover:shadow-lg group
-                  ${
-              formData.role === option.value
-                ? 'border-gray-900 dark:border-white bg-white dark:bg-gray-700 shadow-lg ring-2 ring-gray-100 dark:ring-gray-600'
-                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-gray-50 dark:bg-gray-800 hover:bg-white dark:hover:bg-gray-700'
-              }
-                `}
-              >
-                <input
-                  type='radio'
-                  name='role'
-                  value={option.value}
-                  checked={formData.role === option.value}
-                  onChange={handleChange}
-                  className='sr-only'
-                />
-                <div
-                  className={`
-                  flex items-center justify-center w-14 h-14 rounded-2xl mr-5
-                  bg-gradient-to-br ${option.color} text-white shadow-lg
-                  transition-all duration-200 group-hover:scale-105
-                  ${formData.role === option.value ? 'scale-105' : ''}
-                `}
-                >
-                  {option.icon}
-                </div>
-                <div className='flex-1'>
-                  <h5 className='text-xl font-bold text-gray-900 dark:text-white mb-1'>{option.label}</h5>
-                  <p className='text-sm text-gray-600 dark:text-gray-300 leading-relaxed'>{option.description}</p>
-                </div>
-                {formData.role === option.value && (
-                  <div className='flex items-center justify-center w-8 h-8 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 ml-4'>
-                    <CheckCircle2 className='w-5 h-5' />
-                  </div>
-                )}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className='flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700'>
-          <button
-            type='button'
-            onClick={onCancel}
-            disabled={isSubmitting}
-            className='px-6 py-3 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl
-                       hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200
-                       disabled:opacity-50 disabled:cursor-not-allowed font-semibold'
-          >
-            {t('actions.cancel')}
-          </button>
-          <button
-            type='submit'
-            disabled={isSubmitting}
-            className='px-8 py-3 bg-gradient-to-r from-gray-900 to-black dark:from-white dark:to-gray-100 text-white dark:text-gray-900 rounded-xl
-                       hover:from-black hover:to-gray-900 dark:hover:from-gray-100 dark:hover:to-white transition-all duration-200
-                       shadow-lg hover:shadow-xl transform hover:-translate-y-0.5
-                       disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
-                       flex items-center space-x-2 font-semibold min-w-[160px] justify-center'
-          >
-            {isSubmitting ? (
-              <>
-                <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white' />
-                <span>{user ? t('userForm.updating') : t('userForm.sendingInvite')}</span>
-              </>
-            ) : (
-              <>
-                <Users className='w-5 h-5' />
-                <span>{user ? t('userForm.updateUser') : t('userForm.sendInvitation')}</span>
-              </>
-            )}
-          </button>
-        </div>
-      </form>
-    </div>
+      {/* Action buttons */}
+      <div className='flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700'>
+        <button
+          type='button'
+          onClick={onCancel}
+          disabled={isSubmitting}
+          className='px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center'
+        >
+          <X className='w-4 h-4 mr-2' />
+          {t('actions.cancel')}
+        </button>
+        <button
+          type='submit'
+          disabled={isSubmitting}
+          className='px-6 py-2 bg-gradient-to-r from-gray-900 to-black dark:from-white dark:to-gray-100 text-white dark:text-gray-900 rounded-lg hover:from-black hover:to-gray-900 dark:hover:from-gray-100 dark:hover:to-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center'
+        >
+          {isSubmitting ? (
+            <>
+              <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2'></div>
+              {user ? t('userForm.updating') : t('userForm.sendingInvite')}
+            </>
+          ) : (
+            <>
+              {user ? <Save className='w-4 h-4 mr-2' /> : <Mail className='w-4 h-4 mr-2' />}
+              {user ? t('userForm.updateUser') : t('userForm.sendInvitation')}
+            </>
+          )}
+        </button>
+      </div>
+    </form>
   )
 }
 
