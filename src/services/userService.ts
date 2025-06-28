@@ -341,7 +341,7 @@ export const uploadUserAvatar = async (
     const filePath = `avatars/${fileName}`
 
     // Upload to Supabase Storage
-    const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file, {
+    const { error: uploadError } = await supabase.storage.from('users').upload(filePath, file, {
       cacheControl: '3600',
       upsert: true
     })
@@ -351,7 +351,7 @@ export const uploadUserAvatar = async (
     // Get public URL
     const {
       data: { publicUrl }
-    } = supabase.storage.from('avatars').getPublicUrl(filePath)
+    } = supabase.storage.from('users').getPublicUrl(filePath)
 
     // Update user profile
     const { error: updateError } = await supabase

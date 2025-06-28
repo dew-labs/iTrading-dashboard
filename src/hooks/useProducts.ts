@@ -63,6 +63,7 @@ export const useProducts = () => {
         description: newProduct.description || null,
         price: newProduct.price,
         subscription: newProduct.subscription || false,
+        featured_image_url: newProduct.featured_image_url || null,
         created_at: new Date().toISOString()
       }
 

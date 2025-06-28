@@ -94,5 +94,13 @@
   },
   "hints": {
     "logoRecommendation": "Recommended: Square images work best"
+  },
+  "userForm": {
+    "profilePicture": "Profile Picture",
+    "profilePictureDescription": "Upload a profile picture for this user",
+    "avatarGuidelines": "Choose a clear, professional photo that represents this user",
+    "avatarSquareRecommended": "Square images work best (1:1 aspect ratio)",
+    "avatarMaxSize": "Maximum file size: 10MB",
+    "avatarFormats": "Supported formats: JPG, PNG, GIF, WebP"
   }
 }

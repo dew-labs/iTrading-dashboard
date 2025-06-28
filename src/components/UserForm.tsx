@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { User, Shield, Sparkles, X, Save, Mail } from 'lucide-react'
+import { User, Shield, Sparkles, X, Save, Mail, Camera } from 'lucide-react'
 import type { DatabaseUser, UserInsert, UserRole } from '../types'
 import { usePermissions } from '../hooks/usePermissions'
 import { useTranslation } from '../hooks/useTranslation'
@@ -7,6 +7,7 @@ import { validators } from '../utils/format'
 import { USER_ROLES } from '../constants/general'
 import Input from './Input'
 import Select from './Select'
+import MainImageUpload from './MainImageUpload'
 
 interface UserFormProps {
   user?: DatabaseUser | null
@@ -22,7 +23,8 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
     full_name: user?.full_name || '',
     phone: user?.phone || '',
     role: user?.role || 'user',
-    status: 'invited' // Always set to invited for new users
+    status: 'invited', // Always set to invited for new users
+    avatar_url: user?.avatar_url ?? null
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -105,6 +107,10 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
     setErrors(newErrors)
   }
 
+  const handleAvatarUpload = (url: string | null) => {
+    setFormData(prev => ({ ...prev, avatar_url: url }))
+  }
+
   const roleOptions = [
     {
       value: USER_ROLES.USER,
@@ -129,6 +135,47 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
 
   return (
     <form onSubmit={handleSubmit} className='space-y-6'>
+      {/* Avatar Upload Section */}
+      <div className='bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border border-gray-200 dark:border-gray-700'>
+        <div className='flex items-center space-x-4 mb-4'>
+          <div className='flex-shrink-0 p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg'>
+            <Camera className='w-5 h-5 text-blue-600 dark:text-blue-400' />
+          </div>
+          <div>
+            <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>
+              {t('forms:userForm.profilePicture')}
+            </h3>
+            <p className='text-sm text-gray-600 dark:text-gray-400'>
+              {t('forms:userForm.profilePictureDescription')}
+            </p>
+          </div>
+        </div>
+
+        <div className='flex items-start space-x-6'>
+          <MainImageUpload
+            imageUrl={formData.avatar_url ?? null}
+            onChange={handleAvatarUpload}
+            bucket='users'
+            folder='avatars'
+            alt={`${formData.full_name || formData.email} avatar`}
+            label=''
+            size='md'
+            disabled={isSubmitting}
+            className='flex-shrink-0'
+          />
+          <div className='flex-1 space-y-2'>
+            <p className='text-sm text-gray-600 dark:text-gray-400'>
+              {t('forms:userForm.avatarGuidelines')}
+            </p>
+            <ul className='text-xs text-gray-500 dark:text-gray-500 space-y-1'>
+              <li>• {t('forms:userForm.avatarSquareRecommended')}</li>
+              <li>• {t('forms:userForm.avatarMaxSize')}</li>
+              <li>• {t('forms:userForm.avatarFormats')}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
       {/* Basic information in grid */}
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
         <Input

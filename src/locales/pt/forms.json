@@ -93,5 +93,13 @@
   },
   "hints": {
     "logoRecommendation": "Recomendado: Imagens quadradas funcionam melhor"
+  },
+  "userForm": {
+    "profilePicture": "Foto de Perfil",
+    "profilePictureDescription": "Carregue uma foto de perfil para este usuário",
+    "avatarGuidelines": "Escolha uma foto clara e profissional que represente este usuário",
+    "avatarSquareRecommended": "Imagens quadradas funcionam melhor (proporção 1:1)",
+    "avatarMaxSize": "Tamanho máximo do arquivo: 10MB",
+    "avatarFormats": "Formatos suportados: JPG, PNG, GIF, WebP"
   }
 }

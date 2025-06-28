@@ -19,6 +19,7 @@ import { useThemeStore } from '../store/themeStore'
 import { LANGUAGES } from '../constants'
 import { useTranslation, useNotificationTranslation } from '../hooks/useTranslation'
 import Badge from './Badge'
+import Avatar from './Avatar'
 import type { Theme } from '../types'
 
 interface HeaderProps {
@@ -323,19 +324,15 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 </div>
               </div>
 
-              <div className='relative flex-shrink-0'>
-                <div className='w-11 h-11 bg-gradient-to-br from-teal-500 via-cyan-500 to-blue-500 rounded-full flex items-center justify-center hover:shadow-xl transition-all duration-300 transform hover:scale-110 group-hover:rotate-3 ring-2 ring-white shadow-lg'>
-                  <span className='text-white font-bold text-base tracking-wide'>
-                    {user?.email?.charAt(0).toUpperCase() || 'U'}
-                  </span>
-                </div>
-
-                {/* Enhanced online indicator with pulse */}
-                <div className='absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 border-2 border-white rounded-full shadow-sm'>
-                  <div className='absolute inset-0 bg-green-400 rounded-full animate-ping opacity-75'></div>
-                  <div className='relative w-full h-full bg-green-400 rounded-full'></div>
-                </div>
-              </div>
+              <Avatar
+                src={profile?.avatar_url ?? null}
+                alt={`${profile?.full_name || user?.email} avatar`}
+                size='md'
+                fallback={user?.email?.charAt(0).toUpperCase() || 'U'}
+                clickable
+                showOnline
+                className='group-hover:rotate-3'
+              />
 
               <ChevronDown
                 className={`w-4 h-4 text-gray-400 dark:text-gray-500 transition-all duration-300 group-hover:text-gray-600 dark:group-hover:text-gray-300 ${
@@ -350,14 +347,13 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 {/* User Info Section */}
                 <div className='px-4 py-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800'>
                   <div className='flex items-center space-x-4'>
-                    <div className='relative'>
-                      <div className='w-14 h-14 bg-gradient-to-br from-teal-500 via-cyan-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg ring-3 ring-white'>
-                        <span className='text-white font-bold text-lg tracking-wide'>
-                          {user?.email?.charAt(0).toUpperCase() || 'U'}
-                        </span>
-                      </div>
-                      <div className='absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full shadow-sm'></div>
-                    </div>
+                    <Avatar
+                      src={profile?.avatar_url ?? null}
+                      alt={`${profile?.full_name || user?.email} avatar`}
+                      size='lg'
+                      fallback={user?.email?.charAt(0).toUpperCase() || 'U'}
+                      showOnline
+                    />
                     <div className='flex-1 min-w-0'>
                       <p className='font-semibold text-gray-900 dark:text-white truncate text-base'>
                         {user?.user_metadata?.full_name || profile?.full_name || t('roles.user')}

@@ -59,9 +59,11 @@ export const useBrokers = () => {
       // Optimistically update to the new value
       const optimisticBroker: Broker = {
         id: Date.now(), // Temporary ID
-        established_at: newBroker.established_at || null,
+        name: newBroker.name,
+        established_in: newBroker.established_in || null,
         headquarter: newBroker.headquarter || null,
         description: newBroker.description || null,
+        logo_url: newBroker.logo_url || null,
         created_at: new Date().toISOString()
       }
 
