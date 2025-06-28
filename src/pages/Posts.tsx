@@ -10,10 +10,9 @@ import {
   Tag,
   FileText,
   Bookmark,
-  TrendingUp,
-  X
+  TrendingUp
 } from 'lucide-react'
-import { usePosts } from '../hooks/usePosts'
+import { usePosts, type PostWithAuthor } from '../hooks/usePosts'
 import { useAuthStore } from '../store/authStore'
 import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
 import Table from '../components/Table'
@@ -26,9 +25,9 @@ import FilterDropdown from '../components/FilterDropdown'
 import PaginationSelector from '../components/PaginationSelector'
 import RecordImage from '../components/RecordImage'
 import Badge from '../components/Badge'
-import RichTextRenderer from '../components/RichTextRenderer'
+import PostViewModal from '../components/PostViewModal'
 import { POST_STATUSES, POST_TYPES } from '../constants/general'
-import type { Post, PostInsert } from '../types'
+import type { PostInsert } from '../types'
 
 // Theme imports
 import {
@@ -43,12 +42,8 @@ import Input from '../components/Input'
 import { formatDateDisplay } from '../utils/format'
 import { FILTER_OPTIONS } from '../constants/components'
 
-// Extended Post type to include additional fields that might exist
-interface ExtendedPost extends Post {
-  author?: string
-  views?: number
-  updated_at?: string
-}
+// Use PostWithAuthor which includes all the fields we need
+type ExtendedPost = PostWithAuthor
 
 // Tab configuration keys
 const POST_TAB_CONFIGS = [
@@ -87,23 +82,23 @@ const Posts: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [activeTab, setActiveTab] = useState<string>('all')
   const [filterStatus, setFilterStatus] = useState<'all' | 'draft' | 'published'>('all')
-  const [sortColumn, setSortColumn] = useState<keyof Post | null>('created_at')
+  const [sortColumn, setSortColumn] = useState<keyof PostWithAuthor | null>('created_at')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [pageInputValue, setPageInputValue] = useState('1')
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingPost, setEditingPost] = useState<Post | null>(null)
+  const [editingPost, setEditingPost] = useState<PostWithAuthor | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<{
     isOpen: boolean
-    post: Post | null
+    post: PostWithAuthor | null
     isDeleting: boolean
   }>({
     isOpen: false,
     post: null,
     isDeleting: false
   })
-  const [viewingPost, setViewingPost] = useState<Post | null>(null)
+  const [viewingPost, setViewingPost] = useState<PostWithAuthor | null>(null)
 
   // Theme classes
   const layout = getPageLayoutClasses()
@@ -125,8 +120,8 @@ const Posts: React.FC = () => {
       const matchesSearch =
         post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (post.content && post.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (extendedPost.author &&
-          extendedPost.author.toLowerCase().includes(searchTerm.toLowerCase()))
+        (extendedPost.author?.full_name &&
+          extendedPost.author.full_name.toLowerCase().includes(searchTerm.toLowerCase()))
 
       const matchesType = activeTab === 'all' || post.type === activeTab
       const matchesStatus = filterStatus === 'all' || post.status === filterStatus
@@ -167,11 +162,11 @@ const Posts: React.FC = () => {
     currentPage * itemsPerPage
   )
 
-  const handleView = (post: Post) => {
+  const handleView = (post: PostWithAuthor) => {
     setViewingPost(post)
   }
 
-  const handleEdit = (post: Post) => {
+  const handleEdit = (post: PostWithAuthor) => {
     // Security check - only allow editing if user is authenticated
     if (!user) {
       alert(t('posts.loginRequired', { action: tCommon('actions.edit').toLowerCase() }))
@@ -181,7 +176,7 @@ const Posts: React.FC = () => {
     setIsModalOpen(true)
   }
 
-  const handleDelete = (post: Post) => {
+  const handleDelete = (post: PostWithAuthor) => {
     // Security check - only allow deleting if user is authenticated
     if (!user) {
       alert(t('posts.loginRequired', { action: tCommon('actions.delete').toLowerCase() }))
@@ -241,11 +236,11 @@ const Posts: React.FC = () => {
   // Use predefined filter options from constants
   const statusOptions = [...FILTER_OPTIONS.postStatus]
 
-  const handleSort = (column: keyof Post) => {
+  const handleSort = (column: keyof PostWithAuthor) => {
     if (column === sortColumn) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
     } else {
-      setSortColumn(column)
+      setSortColumn(column as keyof PostWithAuthor)
       setSortDirection('desc')
     }
   }
@@ -253,9 +248,9 @@ const Posts: React.FC = () => {
   const columns = [
     {
       header: t('posts.postDetails'),
-      accessor: 'title' as keyof Post,
+      accessor: 'title' as keyof PostWithAuthor,
       sortable: true,
-      render: (value: unknown, row: Post) => {
+      render: (value: unknown, row: PostWithAuthor) => {
         return (
           <div className='flex items-center space-x-3'>
             <div className='flex-shrink-0'>
@@ -292,8 +287,8 @@ const Posts: React.FC = () => {
     },
     {
       header: t('posts.status'),
-      accessor: 'id' as keyof Post,
-      render: (value: unknown, row: Post) => {
+      accessor: 'id' as keyof PostWithAuthor,
+      render: (value: unknown, row: PostWithAuthor) => {
         return (
           <Badge variant={row.status as 'published' | 'draft'} size='sm' showIcon>
             {tCommon(`status.${row.status}`)}
@@ -303,33 +298,29 @@ const Posts: React.FC = () => {
     },
     {
       header: t('posts.authorAndDates'),
-      accessor: 'created_at' as keyof Post,
+      accessor: 'created_at' as keyof PostWithAuthor,
       sortable: true,
-      render: (value: unknown, row: Post) => {
+      render: (value: unknown, row: PostWithAuthor) => {
         const extendedRow = row as ExtendedPost
         return (
           <div className={getTypographyClasses('small')}>
             <div className='flex items-center text-gray-900 dark:text-gray-100 mb-1'>
               <User className='w-4 h-4 mr-1 text-gray-400 dark:text-gray-500' />
-              <span>{extendedRow.author || t('posts.unknownAuthor')}</span>
+              <span>{extendedRow.author?.full_name || t('posts.unknownAuthor')}</span>
             </div>
             <div className='flex items-center text-gray-500 dark:text-gray-400'>
               <Clock className='w-4 h-4 mr-1' />
               <span>{formatDateDisplay(value as string)}</span>
             </div>
-            {extendedRow.updated_at && (
-              <div className='text-xs text-gray-400 dark:text-gray-500 mt-1'>
-                {t('posts.updated')} {formatDateDisplay(extendedRow.updated_at)}
-              </div>
-            )}
+
           </div>
         )
       }
     },
     {
       header: t('posts.engagement'),
-      accessor: 'id' as keyof Post,
-      render: (value: unknown, row: Post) => {
+      accessor: 'id' as keyof PostWithAuthor,
+      render: (value: unknown, row: PostWithAuthor) => {
         const extendedRow = row as ExtendedPost
         return (
           <div className={cn(getTypographyClasses('small'), 'text-gray-900 dark:text-gray-100')}>
@@ -345,8 +336,8 @@ const Posts: React.FC = () => {
     },
     {
       header: t('posts.actions'),
-      accessor: 'id' as keyof Post,
-      render: (value: unknown, row: Post) => (
+      accessor: 'id' as keyof PostWithAuthor,
+      render: (value: unknown, row: PostWithAuthor) => (
         <div className='flex space-x-1'>
           <button
             onClick={() => handleView(row)}
@@ -503,7 +494,7 @@ const Posts: React.FC = () => {
             </div>
 
             {/* Table */}
-            <Table
+            <Table<PostWithAuthor>
               data={paginatedPosts}
               columns={columns}
               sortColumn={sortColumn}
@@ -607,6 +598,7 @@ const Posts: React.FC = () => {
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           title={editingPost ? t('posts.editPost') : t('posts.createNewPost')}
+          size='xl'
         >
           <PostForm post={editingPost} onSubmit={handleSubmit} onCancel={handleCloseModal} />
         </Modal>
@@ -627,70 +619,17 @@ const Posts: React.FC = () => {
           variant='danger'
         />
 
-        {/* Post Viewer Modal */}
+        {/* Enhanced Post Viewer Modal */}
         {viewingPost && (
-          <Modal
+          <PostViewModal
             isOpen={true}
             onClose={() => setViewingPost(null)}
-            title={`${t('posts.viewPost')}: ${viewingPost.title}`}
-          >
-            <div className='space-y-4'>
-              <div className='flex items-center justify-between'>
-                <Badge variant={viewingPost.status as 'published' | 'draft'} size='sm' showIcon>
-                  {tCommon(`status.${viewingPost.status}`)}
-                </Badge>
-                <Badge
-                  variant={viewingPost.type as 'news' | 'event' | 'terms_of_use' | 'privacy_policy'}
-                  size='sm'
-                  showIcon
-                >
-                  {tCommon(
-                    viewingPost.type === 'terms_of_use'
-                      ? 'content.termsOfUse'
-                      : viewingPost.type === 'privacy_policy'
-                        ? 'content.privacyPolicy'
-                        : `content.${viewingPost.type}`
-                  )}
-                </Badge>
-              </div>
-
-              <div className='space-y-4'>
-                <div className={getTypographyClasses('h2')}>{viewingPost.title}</div>
-                {viewingPost.content && (
-                  <div className='mt-4'>
-                    <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'>Content</label>
-                    <RichTextRenderer content={viewingPost.content} />
-                  </div>
-                )}
-              </div>
-
-              <div className='pt-4 border-t border-gray-200 dark:border-gray-700'>
-                <div
-                  className={cn('flex items-center justify-between', getTypographyClasses('small'))}
-                >
-                  <span>
-                    {t('posts.created')} {formatDateDisplay(viewingPost.created_at || new Date().toISOString())}
-                  </span>
-                  {(viewingPost as ExtendedPost).views && (
-                    <span>
-                      {t('posts.views')}: {(viewingPost as ExtendedPost).views?.toLocaleString()}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className='flex justify-end'>
-                <Button
-                  variant='secondary'
-                  size='md'
-                  leftIcon={X}
-                  onClick={() => setViewingPost(null)}
-                >
-                  {tCommon('actions.close')}
-                </Button>
-              </div>
-            </div>
-          </Modal>
+            post={viewingPost}
+            onEdit={() => {
+              handleEdit(viewingPost)
+              setViewingPost(null)
+            }}
+          />
         )}
       </div>
     </div>

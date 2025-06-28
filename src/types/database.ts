@@ -75,7 +75,7 @@ export type Database = {
           headquarter?: string | null
           id?: never
           logo_url?: string | null
-          name?: string
+          name: string
         }
         Update: {
           created_at?: string | null
@@ -158,33 +158,50 @@ export type Database = {
       }
       posts: {
         Row: {
+          author_id: string | null
           content: string | null
           created_at: string | null
           id: number
           published_at: string | null
           status: Database['public']['Enums']['post_status']
+          thumbnail_url: string | null
           title: string
           type: Database['public']['Enums']['post_type']
+          views: number
         }
         Insert: {
+          author_id?: string | null
           content?: string | null
           created_at?: string | null
           id?: never
           published_at?: string | null
           status?: Database['public']['Enums']['post_status']
+          thumbnail_url?: string | null
           title: string
           type?: Database['public']['Enums']['post_type']
+          views?: number
         }
         Update: {
+          author_id?: string | null
           content?: string | null
           created_at?: string | null
           id?: never
           published_at?: string | null
           status?: Database['public']['Enums']['post_status']
+          thumbnail_url?: string | null
           title?: string
           type?: Database['public']['Enums']['post_type']
+          views?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: 'posts_author_id_fkey'
+            columns: ['author_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+        ]
       }
       products: {
         Row: {
@@ -358,6 +375,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      increment_post_views: {
+        Args: { post_id: number }
+        Returns: undefined
+      }
       is_admin: {
         Args: { user_id: string }
         Returns: boolean

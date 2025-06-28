@@ -23,32 +23,55 @@ const validatePost = (post: PostInsert): string | null => {
   return null
 }
 
+// Extended Post type with author information
+export interface PostWithAuthor extends Post, Record<string, unknown> {
+  author?: {
+    id: string
+    full_name: string | null
+    email: string
+    avatar_url: string | null
+  } | null
+}
+
 // Fetch functions
-const fetchPosts = async (): Promise<Post[]> => {
+const fetchPosts = async (): Promise<PostWithAuthor[]> => {
   return supabaseHelpers.fetchData(
-    supabase.from('posts').select('*').order('created_at', { ascending: false })
+    supabase
+      .from('posts')
+      .select(`
+        *,
+        author:users(id, full_name, email, avatar_url)
+      `)
+      .order('created_at', { ascending: false })
   )
 }
 
-const createPostMutation = async (post: PostInsert): Promise<Post> => {
+const createPostMutation = async (post: PostInsert): Promise<PostWithAuthor> => {
   // Validate input
   const validationError = validatePost(post)
   if (validationError) {
     throw new Error(validationError)
   }
 
-  return supabaseHelpers.insertData(
-    supabase
-      .from('posts')
-      .insert([
-        {
-          ...post,
-          published_at: post.status === 'published' ? new Date().toISOString() : null
-        }
-      ])
-      .select()
-      .single()
-  )
+  const { data, error } = await supabase
+    .from('posts')
+    .insert([
+      {
+        ...post,
+        type: post.type || 'news', // Ensure type is never undefined
+        published_at: post.status === 'published' ? new Date().toISOString() : null
+      }
+    ])
+    .select(`
+      *,
+      author:users(id, full_name, email, avatar_url)
+    `)
+    .single()
+
+  if (error) throw new Error(error.message)
+  if (!data) throw new Error('Insert failed')
+
+  return data as PostWithAuthor
 }
 
 const updatePostMutation = async ({
@@ -57,9 +80,17 @@ const updatePostMutation = async ({
 }: {
   id: number
   updates: PostUpdate
-}): Promise<Post> => {
+}): Promise<PostWithAuthor> => {
   return supabaseHelpers.updateData(
-    supabase.from('posts').update(updates).eq('id', id).select().single()
+    supabase
+      .from('posts')
+      .update(updates)
+      .eq('id', id)
+      .select(`
+        *,
+        author:users(id, full_name, email, avatar_url)
+      `)
+      .single()
   )
 }
 
@@ -95,20 +126,24 @@ export const usePosts = () => {
     onMutate: async newPost => {
       await queryClient.cancelQueries({ queryKey: queryKeys.posts() })
 
-      const previousPosts = queryClient.getQueryData<Post[]>(queryKeys.posts())
+      const previousPosts = queryClient.getQueryData<PostWithAuthor[]>(queryKeys.posts())
 
       // Optimistically update
-      const optimisticPost: Post = {
+      const optimisticPost: PostWithAuthor = {
         id: Date.now(), // Temporary ID
         title: newPost.title,
         content: newPost.content || null,
-        type: newPost.type,
+        type: newPost.type || 'news',
         status: newPost.status || 'draft',
+        author_id: newPost.author_id || null,
+        thumbnail_url: newPost.thumbnail_url || null,
+        views: 0,
         published_at: newPost.status === 'published' ? new Date().toISOString() : '',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        author: null
       }
 
-      queryClient.setQueryData<Post[]>(queryKeys.posts(), (old = []) => [optimisticPost, ...old])
+      queryClient.setQueryData<PostWithAuthor[]>(queryKeys.posts(), (old = []) => [optimisticPost, ...old])
 
       return { previousPosts }
     },
@@ -131,9 +166,9 @@ export const usePosts = () => {
     onMutate: async ({ id, updates }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.posts() })
 
-      const previousPosts = queryClient.getQueryData<Post[]>(queryKeys.posts())
+      const previousPosts = queryClient.getQueryData<PostWithAuthor[]>(queryKeys.posts())
 
-      queryClient.setQueryData<Post[]>(queryKeys.posts(), (old = []) =>
+      queryClient.setQueryData<PostWithAuthor[]>(queryKeys.posts(), (old = []) =>
         old.map(post => (post.id === id ? { ...post, ...updates } : post))
       )
 
@@ -158,10 +193,10 @@ export const usePosts = () => {
     onMutate: async deletedId => {
       await queryClient.cancelQueries({ queryKey: queryKeys.posts() })
 
-      const previousPosts = queryClient.getQueryData<Post[]>(queryKeys.posts())
+      const previousPosts = queryClient.getQueryData<PostWithAuthor[]>(queryKeys.posts())
       const deletedPost = previousPosts?.find(p => p.id === deletedId)
 
-      queryClient.setQueryData<Post[]>(queryKeys.posts(), (old = []) =>
+      queryClient.setQueryData<PostWithAuthor[]>(queryKeys.posts(), (old = []) =>
         old.filter(post => post.id !== deletedId)
       )
 

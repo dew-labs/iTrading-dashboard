@@ -1,147 +1,377 @@
--- Seed data for development and testing
+/*
+  # Simplified Realistic Seed Data for iTrading Dashboard
 
--- Insert default role permissions
-INSERT INTO role_permissions (role, resource, action) VALUES
--- User permissions
-('user', 'profile', 'read'),
-('user', 'profile', 'update'),
-('user', 'posts', 'read'),
-('user', 'products', 'read'),
-('user', 'brokers', 'read'),
-('user', 'banners', 'read'),
+  This file contains realistic seed data that works with hosted Supabase.
+  Uses the existing admin user for relationships and provides comprehensive
+  sample data for all resources.
+*/
 
--- Admin permissions
-('admin', 'profile', 'read'),
-('admin', 'profile', 'update'),
-('admin', 'posts', 'read'),
-('admin', 'posts', 'create'),
-('admin', 'posts', 'update'),
-('admin', 'posts', 'delete'),
-('admin', 'products', 'read'),
-('admin', 'products', 'create'),
-('admin', 'products', 'update'),
-('admin', 'products', 'delete'),
-('admin', 'brokers', 'read'),
-('admin', 'brokers', 'create'),
-('admin', 'brokers', 'update'),
-('admin', 'brokers', 'delete'),
-('admin', 'banners', 'read'),
-('admin', 'banners', 'create'),
-('admin', 'banners', 'update'),
-('admin', 'banners', 'delete'),
-('admin', 'users', 'read'),
-('admin', 'users', 'create'),
-('admin', 'users', 'update'),
+-- ===============================================
+-- CLEAN EXISTING SEED DATA
+-- ===============================================
 
--- Super admin permissions (all permissions)
-('super_admin', 'profile', 'read'),
-('super_admin', 'profile', 'update'),
-('super_admin', 'posts', 'read'),
-('super_admin', 'posts', 'create'),
-('super_admin', 'posts', 'update'),
-('super_admin', 'posts', 'delete'),
-('super_admin', 'products', 'read'),
-('super_admin', 'products', 'create'),
-('super_admin', 'products', 'update'),
-('super_admin', 'products', 'delete'),
-('super_admin', 'brokers', 'read'),
-('super_admin', 'brokers', 'create'),
-('super_admin', 'brokers', 'update'),
-('super_admin', 'brokers', 'delete'),
-('super_admin', 'banners', 'read'),
-('super_admin', 'banners', 'create'),
-('super_admin', 'banners', 'update'),
-('super_admin', 'banners', 'delete'),
-('super_admin', 'users', 'read'),
-('super_admin', 'users', 'create'),
-('super_admin', 'users', 'update'),
-('super_admin', 'users', 'delete'),
-('super_admin', 'permissions', 'read'),
-('super_admin', 'permissions', 'create'),
-('super_admin', 'permissions', 'update'),
-('super_admin', 'permissions', 'delete');
+DELETE FROM user_notifications;
+DELETE FROM notifications WHERE user_id IS NOT NULL;
+DELETE FROM images;
+DELETE FROM banners;
+DELETE FROM products;
+DELETE FROM posts WHERE author_id = (SELECT id FROM users WHERE email = 'admin@admin.com');
+DELETE FROM brokers;
 
--- ============================================================================
--- ADMIN USER SETUP
--- ============================================================================
--- Admin user is created in the migration file 20250622070403_create_admin_user.sql
+-- ===============================================
+-- BROKERS (Realistic Trading Brokers)
+-- ===============================================
 
--- ============================================================================
+INSERT INTO brokers (name, established_in, headquarter, description, logo_url) VALUES
+(
+  'Charles Schwab',
+  1971,
+  'Westlake, Texas, USA',
+  'Charles Schwab Corporation is a leading provider of financial services, offering a wide range of investment, advisory, banking and retirement plan services to individual investors and independent investment advisors.',
+  'https://images.pexels.com/photos/3760067/pexels-photo-3760067.jpeg'
+),
+(
+  'Interactive Brokers',
+  1978,
+  'Greenwich, Connecticut, USA',
+  'Interactive Brokers is an automated global electronic broker and market maker that specializes in routing orders and executing and processing trades in securities, futures and foreign exchange instruments.',
+  'https://images.pexels.com/photos/3182773/pexels-photo-3182773.jpeg'
+),
+(
+  'TD Ameritrade',
+  1975,
+  'Omaha, Nebraska, USA',
+  'TD Ameritrade is an American online broker that offers an electronic trading platform for the trade of financial securities to retail investors.',
+  'https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg'
+),
+(
+  'E*TRADE',
+  1991,
+  'Arlington, Virginia, USA',
+  'E*TRADE Financial Corporation offers an electronic trading platform to trade financial securities. The company provides online investing services to retail investors.',
+  'https://images.pexels.com/photos/534216/pexels-photo-534216.jpeg'
+),
+(
+  'Robinhood',
+  2013,
+  'Menlo Park, California, USA',
+  'Robinhood is an American financial services company offering commission-free stock trading through a mobile app and website.',
+  'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg'
+),
+(
+  'Fidelity Investments',
+  1946,
+  'Boston, Massachusetts, USA',
+  'Fidelity Investments is an American multinational financial services corporation offering fund management, fund distribution, investment advice, retirement services, wealth management, securities execution and clearance.',
+  'https://images.pexels.com/photos/4386321/pexels-photo-4386321.jpeg'
+),
+(
+  'Vanguard',
+  1975,
+  'Malvern, Pennsylvania, USA',
+  'The Vanguard Group is an American registered investment advisor based in Malvern, Pennsylvania, with over $7 trillion in global assets under management.',
+  'https://images.pexels.com/photos/210742/pexels-photo-210742.jpeg'
+),
+(
+  'Merrill Lynch',
+  1914,
+  'New York City, New York, USA',
+  'Merrill Lynch is an American investment management and wealth management division of Bank of America that offers a broad range of brokerage, investment advisory and other financial services.',
+  'https://images.pexels.com/photos/3760067/pexels-photo-3760067.jpeg'
+);
 
--- Sample posts
-INSERT INTO posts (title, content, type) VALUES
-('Welcome to Our Platform', 'We are excited to announce the launch of our new platform. This marks a significant milestone in our journey to provide better services to our users.', 'news'),
-('Upcoming Maintenance Window', 'We will be performing scheduled maintenance on our systems this weekend. Please expect brief service interruptions.', 'news'),
-('Annual Conference 2024', 'Join us for our annual conference featuring industry leaders, workshops, and networking opportunities. Registration is now open.', 'event'),
-('Product Launch Event', 'We are hosting an exclusive product launch event next month. Limited seats available for this special occasion.', 'event'),
-('Terms of Use', 'By using our platform, you agree to comply with and be bound by the following terms and conditions of use. These terms govern your access to and use of our services.', 'terms_of_use'),
-('Privacy Policy', 'This Privacy Policy describes how we collect, use, and protect your personal information when you use our services. We are committed to protecting your privacy.', 'privacy_policy');
+-- ===============================================
+-- PRODUCTS (Trading & Investment Products)
+-- ===============================================
 
--- Sample products
-INSERT INTO products (name, price, description, subscription) VALUES
-('Premium Plan', 29.99, 'Access to all premium features including advanced analytics, priority support, and unlimited storage.', true),
-('Professional Tools', 99.99, 'Complete set of professional tools for advanced users. One-time purchase with lifetime updates.', false),
-('Enterprise Solution', 199.99, 'Comprehensive enterprise solution with dedicated support, custom integrations, and advanced security.', true),
-('Starter Package', 9.99, 'Perfect for beginners. Includes basic features and email support.', true),
-('Custom Development', 499.99, 'Custom development services tailored to your specific needs. Includes consultation and implementation.', false),
-('Analytics Dashboard', 49.99, 'Advanced analytics and reporting dashboard with real-time insights and custom metrics.', true);
+INSERT INTO products (name, price, description, featured_image_url, subscription) VALUES
+(
+  'Premium Trading Platform',
+  49.99,
+  'Advanced trading platform with real-time market data, advanced charting tools, portfolio analytics, and priority customer support. Perfect for active traders who need professional-grade tools.',
+  'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg',
+  true
+),
+(
+  'Market Research Pro',
+  29.99,
+  'Comprehensive market research and analysis tools including sector analysis, earnings forecasts, technical indicators, and expert market insights updated daily.',
+  'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg',
+  true
+),
+(
+  'Algorithmic Trading Suite',
+  199.99,
+  'Complete algorithmic trading solution with backtesting capabilities, strategy development tools, and automated execution. Includes popular trading algorithms and custom strategy builder.',
+  'https://images.pexels.com/photos/3182773/pexels-photo-3182773.jpeg',
+  false
+),
+(
+  'Risk Management Dashboard',
+  79.99,
+  'Professional risk management tools with portfolio risk assessment, Value at Risk (VaR) calculations, stress testing, and real-time risk monitoring for your investments.',
+  'https://images.pexels.com/photos/590041/pexels-photo-590041.jpeg',
+  true
+),
+(
+  'Mobile Trading App Pro',
+  19.99,
+  'Enhanced mobile trading experience with advanced order types, real-time alerts, mobile charts, and seamless synchronization across all your devices.',
+  'https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg',
+  true
+),
+(
+  'Educational Trading Course',
+  149.99,
+  'Comprehensive online trading course covering fundamentals, technical analysis, risk management, and advanced trading strategies. Includes video lessons, quizzes, and certification.',
+  'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg',
+  false
+),
+(
+  'Portfolio Analytics Pro',
+  39.99,
+  'Advanced portfolio analysis with performance attribution, benchmark comparison, asset allocation tracking, and detailed reporting tools for serious investors.',
+  'https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg',
+  true
+),
+(
+  'Options Trading Tools',
+  89.99,
+  'Specialized options trading platform with options chain analysis, volatility modeling, Greeks calculator, and strategy analyzer for options traders.',
+  'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg',
+  true
+);
 
--- Sample brokers
-INSERT INTO brokers (established_at, headquarter, description) VALUES
-('1971-02-05', 'New York, USA', 'Leading investment company founded by Charles Schwab, offering comprehensive brokerage services, financial planning, and investment management for individual and institutional clients.'),
-('1975-05-01', 'Omaha, Nebraska, USA', 'Interactive Brokers is a premier electronic trading platform providing direct access to global markets with competitive pricing and advanced trading technology.'),
-('1946-10-01', 'San Francisco, USA', 'One of the largest investment management companies in the world, known for low-cost index funds and ETFs that help investors build long-term wealth.'),
-('2013-04-18', 'Palo Alto, USA', 'Commission-free trading platform that democratizes finance for all, offering stocks, ETFs, options, and cryptocurrency trading through an intuitive mobile app.'),
-('1992-01-01', 'Boston, USA', 'Full-service brokerage firm providing investment services, wealth management, and financial planning with a focus on client relationships and personalized service.'),
-('1981-03-15', 'St. Petersburg, Florida, USA', 'Online discount brokerage offering low-cost trading, research tools, and educational resources for self-directed investors and active traders.'),
-('1963-06-12', 'Jersey City, USA', 'Premier investment bank and financial services company offering wealth management, investment banking, and trading services to institutions and high-net-worth individuals.'),
-('1870-07-01', 'New York, USA', 'Historic investment bank with a long tradition of providing investment banking, securities trading, and wealth management services to corporations and individuals worldwide.');
+-- ===============================================
+-- POSTS (Trading News & Content) - Using Admin as Author
+-- ===============================================
 
--- Sample banners
-INSERT INTO banners (target_url, is_active) VALUES
-('https://example.com/welcome', true),
-('https://example.com/promotion', true),
-('https://example.com/new-features', true),
-('https://example.com/maintenance', false);
+INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views) VALUES
+(
+  'Market Analysis: Q1 2024 Review',
+  '<h2>Q1 2024 Market Performance</h2><p>The first quarter of 2024 has shown remarkable resilience in global markets despite ongoing economic uncertainties. <strong>Key highlights include:</strong></p><ul><li>S&P 500 up 8.2% year-to-date</li><li>Technology sector leading gains with 12.5% growth</li><li>Emerging markets showing strong momentum</li><li>Bond yields stabilizing around historical averages</li></ul><p>Looking ahead, we expect continued volatility as markets navigate through earnings season and evolving monetary policy decisions.</p><h3>Investment Recommendations</h3><p>Our analysis suggests maintaining a diversified portfolio with a slight overweight in technology and healthcare sectors while remaining cautious about interest rate sensitive assets.</p>',
+  'news',
+  'published',
+  (SELECT id FROM users WHERE email = 'admin@admin.com'),
+  'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg',
+  2847
+),
+(
+  'Understanding Options Trading: A Beginner''s Guide',
+  '<h2>What Are Options?</h2><p>Options are financial contracts that give traders the right, but not the obligation, to buy or sell an underlying asset at a predetermined price within a specific timeframe.</p><h3>Types of Options</h3><ul><li><strong>Call Options:</strong> Give you the right to buy an asset</li><li><strong>Put Options:</strong> Give you the right to sell an asset</li></ul><h3>Key Benefits</h3><p>Options trading offers several advantages:</p><ul><li>Leverage your investment capital</li><li>Hedge existing positions</li><li>Generate additional income</li><li>Limited risk with defined maximum loss</li></ul><p><em>Remember: Options trading involves significant risk and may not be suitable for all investors. Always consult with a financial advisor before making investment decisions.</em></p>',
+  'news',
+  'published',
+  (SELECT id FROM users WHERE email = 'admin@admin.com'),
+  'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg',
+  1924
+),
+(
+  'Virtual Trading Conference 2024',
+  '<h2>Join Us for the Premier Trading Event of the Year</h2><p>We''re excited to announce our <strong>Virtual Trading Conference 2024</strong>, bringing together industry experts, professional traders, and investment enthusiasts from around the world.</p><h3>Event Details</h3><ul><li><strong>Date:</strong> March 15-17, 2024</li><li><strong>Format:</strong> Virtual (Online)</li><li><strong>Duration:</strong> 3 days of intensive sessions</li><li><strong>Registration:</strong> Early bird pricing available</li></ul><h3>Featured Speakers</h3><p>This year''s lineup includes renowned market analysts, successful hedge fund managers, and fintech innovators who will share their insights on:</p><ul><li>Market trends and predictions for 2024</li><li>Advanced trading strategies</li><li>Risk management techniques</li><li>Technology trends in finance</li></ul><p><strong>Register now</strong> and secure your spot at this exclusive event. Limited seats available!</p>',
+  'event',
+  'published',
+  (SELECT id FROM users WHERE email = 'admin@admin.com'),
+  'https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg',
+  856
+),
+(
+  'New Platform Features: Advanced Charting Tools',
+  '<h2>Enhanced Technical Analysis Capabilities</h2><p>We''re thrilled to introduce our latest platform update featuring advanced charting tools designed to empower traders with professional-grade analysis capabilities.</p><h3>New Features Include:</h3><ul><li><strong>200+ Technical Indicators:</strong> From basic moving averages to complex momentum oscillators</li><li><strong>Custom Drawing Tools:</strong> Fibonacci retracements, trend lines, and pattern recognition</li><li><strong>Multiple Timeframes:</strong> Analyze from 1-minute to monthly charts</li><li><strong>Real-time Data:</strong> Lightning-fast market data updates</li><li><strong>Alert System:</strong> Custom price and indicator alerts</li></ul><h3>How to Access</h3><p>All Premium and Pro subscribers can access these features immediately through the updated web platform and mobile app. Free users can explore basic charting tools with limited indicators.</p><p>Our development team has worked tirelessly to ensure these tools meet the highest standards of accuracy and performance.</p>',
+  'news',
+  'published',
+  (SELECT id FROM users WHERE email = 'admin@admin.com'),
+  'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg',
+  3421
+),
+(
+  'Risk Management in Volatile Markets',
+  '<h2>Protecting Your Portfolio During Market Uncertainty</h2><p>Recent market volatility has highlighted the critical importance of robust risk management strategies. Here''s how professional traders protect their capital during uncertain times.</p><h3>Essential Risk Management Principles</h3><ol><li><strong>Position Sizing:</strong> Never risk more than 2% of your portfolio on a single trade</li><li><strong>Stop Losses:</strong> Always set predetermined exit points</li><li><strong>Diversification:</strong> Spread risk across different assets and sectors</li><li><strong>Regular Review:</strong> Continuously assess and adjust your strategy</li></ol><h3>Tools for Risk Assessment</h3><p>Modern risk management relies on quantitative tools:</p><ul><li>Value at Risk (VaR) calculations</li><li>Beta analysis for portfolio volatility</li><li>Correlation analysis between holdings</li><li>Stress testing against historical scenarios</li></ul><p><strong>Remember:</strong> The goal isn''t to eliminate risk entirely, but to manage it intelligently while pursuing your investment objectives.</p>',
+  'news',
+  'published',
+  (SELECT id FROM users WHERE email = 'admin@admin.com'),
+  'https://images.pexels.com/photos/590041/pexels-photo-590041.jpeg',
+  1677
+),
+(
+  'Privacy Policy Update',
+  '<h2>Updated Privacy Policy - Effective March 1, 2024</h2><p>We are committed to protecting your privacy and have updated our privacy policy to provide greater transparency about how we collect, use, and protect your personal information.</p><h3>Key Changes</h3><ul><li><strong>Enhanced Data Protection:</strong> Additional security measures for sensitive financial data</li><li><strong>Cookie Management:</strong> Improved controls for managing website cookies and tracking</li><li><strong>Third-Party Integrations:</strong> Clear disclosure of data sharing with trading partners</li><li><strong>User Rights:</strong> Expanded rights for data access, correction, and deletion</li></ul><h3>Your Data Rights</h3><p>Under our updated policy, you have the right to:</p><ul><li>Access your personal data</li><li>Correct inaccurate information</li><li>Request data deletion (subject to regulatory requirements)</li><li>Opt-out of marketing communications</li><li>Export your data in a portable format</li></ul><p>For questions about this policy update, please contact our privacy team at privacy@trading.com</p>',
+  'privacy_policy',
+  'published',
+  (SELECT id FROM users WHERE email = 'admin@admin.com'),
+  'https://images.pexels.com/photos/4386321/pexels-photo-4386321.jpeg',
+  654
+),
+(
+  'Platform Terms of Service',
+  '<h2>Terms of Service Agreement</h2><p>By accessing and using our trading platform, you agree to comply with and be bound by the following terms and conditions.</p><h3>Account Requirements</h3><ul><li>Users must be 18 years or older</li><li>Accurate information required for account verification</li><li>Compliance with applicable securities regulations</li><li>Maintenance of account security credentials</li></ul><h3>Trading Rules</h3><p>All trading activities must comply with:</p><ul><li>Market regulations and exchange rules</li><li>Anti-money laundering (AML) requirements</li><li>Pattern day trading regulations where applicable</li><li>Position limits and margin requirements</li></ul><h3>Risk Disclosure</h3><p><strong>Important:</strong> Trading securities involves substantial risk of loss and is not suitable for all investors. Past performance does not guarantee future results. Please read our full risk disclosure before trading.</p><h3>Limitation of Liability</h3><p>Our platform is provided "as is" without warranties. We are not liable for trading losses, system downtime, or market data delays beyond our reasonable control.</p>',
+  'terms_of_use',
+  'published',
+  (SELECT id FROM users WHERE email = 'admin@admin.com'),
+  'https://images.pexels.com/photos/210742/pexels-photo-210742.jpeg',
+  432
+),
+(
+  'Cryptocurrency Integration Coming Soon',
+  '<h2>Expanding Our Offering: Digital Assets</h2><p>We''re excited to announce that cryptocurrency trading will be available on our platform starting Q2 2024. This expansion represents our commitment to providing comprehensive investment opportunities.</p><h3>Supported Cryptocurrencies</h3><p>Initially, we''ll support major cryptocurrencies including:</p><ul><li>Bitcoin (BTC)</li><li>Ethereum (ETH)</li><li>Cardano (ADA)</li><li>Solana (SOL)</li><li>Polygon (MATIC)</li></ul><h3>Security Measures</h3><p>Cryptocurrency trading will feature enhanced security protocols:</p><ul><li>Cold storage for digital assets</li><li>Multi-signature wallet technology</li><li>Two-factor authentication requirement</li><li>Real-time transaction monitoring</li></ul><p><em>This feature is currently in beta testing. Full rollout expected by June 2024.</em></p>',
+  'news',
+  'draft',
+  (SELECT id FROM users WHERE email = 'admin@admin.com'),
+  'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg',
+  0
+);
 
--- Sample notifications (system-wide)
+-- ===============================================
+-- BANNERS (Promotional Content)
+-- ===============================================
+
+INSERT INTO banners (name, target_url, is_active) VALUES
+('Welcome New Traders', 'https://trading.com/welcome-bonus', true),
+('Premium Features Upgrade', 'https://trading.com/premium-upgrade', true),
+('Trading Conference 2024', 'https://trading.com/conference-2024', true),
+('Mobile App Download', 'https://trading.com/mobile-app', true),
+('Educational Resources', 'https://trading.com/education', true),
+('Risk Management Guide', 'https://trading.com/risk-management', false),
+('Options Trading Course', 'https://trading.com/options-course', true);
+
+-- ===============================================
+-- NOTIFICATIONS (System-wide only for now)
+-- ===============================================
+
 INSERT INTO notifications (title, description, user_id) VALUES
-('Welcome to the Platform', 'Thank you for joining our platform. We are excited to have you on board and look forward to helping you achieve your goals!', NULL),
-('System Maintenance Scheduled', 'We will be performing system maintenance this weekend from 2:00 AM to 6:00 AM UTC. Please save your work and expect brief service interruptions.', NULL),
-('New Features Available', 'Check out our latest features including improved dashboard, enhanced security, and better performance monitoring tools.', NULL),
-('Security Update', 'We have implemented additional security measures to protect your data. Please review your account settings and update your password if needed.', NULL);
+('Platform Maintenance Scheduled', 'We will be performing scheduled maintenance on Sunday, March 10th from 2:00 AM to 6:00 AM EST. Trading will be temporarily unavailable during this time.', NULL),
+('New Security Features', 'We''ve enhanced our security with two-factor authentication and biometric login options. Update your security settings in your account preferences.', NULL),
+('Market Data Provider Update', 'We''ve upgraded our market data feeds for faster and more accurate real-time quotes. You may notice improved response times across the platform.', NULL),
+('Educational Webinar Series', 'Join our free webinar series "Advanced Trading Strategies" every Thursday at 2 PM EST. Register now to secure your spot for expert insights.', NULL);
 
--- Sample images (demonstrating the centralized image system)
--- Using text values for record_id to handle both bigint and uuid references
-INSERT INTO images (table_name, record_id, image_url, alt_text, mime_type) VALUES
-('products', '1', 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg', 'Premium Plan illustration', 'image/jpeg'),
-('products', '2', 'https://images.pexels.com/photos/437037/pexels-photo-437037.jpeg', 'Professional Tools showcase', 'image/jpeg'),
-('products', '3', 'https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg', 'Enterprise Solution overview', 'image/jpeg'),
-('brokers', '1', 'https://images.pexels.com/photos/534216/pexels-photo-534216.jpeg', 'Charles Schwab office building', 'image/jpeg'),
-('brokers', '2', 'https://images.pexels.com/photos/3182773/pexels-photo-3182773.jpeg', 'Interactive Brokers trading floor', 'image/jpeg'),
-('brokers', '3', 'https://images.pexels.com/photos/4386321/pexels-photo-4386321.jpeg', 'Vanguard investment office', 'image/jpeg'),
-('brokers', '4', 'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg', 'Robinhood mobile trading', 'image/jpeg'),
-('posts', '1', 'https://images.pexels.com/photos/1229861/pexels-photo-1229861.jpeg', 'Welcome announcement image', 'image/jpeg'),
-('posts', '3', 'https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg', 'Conference event image', 'image/jpeg');
+-- ===============================================
+-- IMAGES (Centralized Image Management)
+-- ===============================================
 
--- Add banner images after banners are created
+-- Product images
+INSERT INTO images (table_name, record_id, image_url, alt_text, mime_type, file_size) VALUES
+('products', '1', 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg', 'Premium Trading Platform Dashboard', 'image/jpeg', 245760),
+('products', '2', 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg', 'Market Research Analytics', 'image/jpeg', 198340),
+('products', '3', 'https://images.pexels.com/photos/3182773/pexels-photo-3182773.jpeg', 'Algorithmic Trading Interface', 'image/jpeg', 302150),
+('products', '4', 'https://images.pexels.com/photos/590041/pexels-photo-590041.jpeg', 'Risk Management Dashboard', 'image/jpeg', 156890),
+('products', '5', 'https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg', 'Mobile Trading App Screenshot', 'image/jpeg', 128450),
+('products', '6', 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg', 'Trading Education Course', 'image/jpeg', 234670),
+('products', '7', 'https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg', 'Portfolio Analytics Interface', 'image/jpeg', 187520),
+('products', '8', 'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg', 'Options Trading Tools', 'image/jpeg', 167840);
+
+-- Broker images (logos)
+INSERT INTO images (table_name, record_id, image_url, alt_text, mime_type, file_size) VALUES
+('brokers', '1', 'https://images.pexels.com/photos/3760067/pexels-photo-3760067.jpeg', 'Charles Schwab Logo', 'image/jpeg', 89320),
+('brokers', '2', 'https://images.pexels.com/photos/3182773/pexels-photo-3182773.jpeg', 'Interactive Brokers Logo', 'image/jpeg', 76540),
+('brokers', '3', 'https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg', 'TD Ameritrade Logo', 'image/jpeg', 82150),
+('brokers', '4', 'https://images.pexels.com/photos/534216/pexels-photo-534216.jpeg', 'E*TRADE Logo', 'image/jpeg', 78920),
+('brokers', '5', 'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg', 'Robinhood Logo', 'image/jpeg', 65780),
+('brokers', '6', 'https://images.pexels.com/photos/4386321/pexels-photo-4386321.jpeg', 'Fidelity Investments Logo', 'image/jpeg', 94330),
+('brokers', '7', 'https://images.pexels.com/photos/210742/pexels-photo-210742.jpeg', 'Vanguard Logo', 'image/jpeg', 71240),
+('brokers', '8', 'https://images.pexels.com/photos/3760067/pexels-photo-3760067.jpeg', 'Merrill Lynch Logo', 'image/jpeg', 88650);
+
+-- Post thumbnail images
+INSERT INTO images (table_name, record_id, image_url, alt_text, mime_type, file_size) VALUES
+('posts', '1', 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg', 'Q1 2024 Market Analysis Chart', 'image/jpeg', 156780),
+('posts', '2', 'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg', 'Options Trading Illustration', 'image/jpeg', 143290),
+('posts', '3', 'https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg', 'Virtual Trading Conference Banner', 'image/jpeg', 289340),
+('posts', '4', 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg', 'New Platform Features', 'image/jpeg', 198760),
+('posts', '5', 'https://images.pexels.com/photos/590041/pexels-photo-590041.jpeg', 'Risk Management Illustration', 'image/jpeg', 167430),
+('posts', '6', 'https://images.pexels.com/photos/4386321/pexels-photo-4386321.jpeg', 'Privacy Policy Document', 'image/jpeg', 134520),
+('posts', '7', 'https://images.pexels.com/photos/210742/pexels-photo-210742.jpeg', 'Terms of Service Agreement', 'image/jpeg', 145780),
+('posts', '8', 'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg', 'Cryptocurrency Trading', 'image/jpeg', 178290);
+
+-- Banner images (using UUIDs for banner record_id)
 DO $$
 DECLARE
-    banner_id_1 uuid;
-    banner_id_2 uuid;
+    banner_record RECORD;
+    image_urls text[] := ARRAY[
+        'https://images.pexels.com/photos/1303081/pexels-photo-1303081.jpeg',
+        'https://images.pexels.com/photos/586996/pexels-photo-586996.jpeg',
+        'https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg',
+        'https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg',
+        'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg',
+        'https://images.pexels.com/photos/590041/pexels-photo-590041.jpeg',
+        'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg'
+    ];
+    alt_texts text[] := ARRAY[
+        'Welcome New Traders Banner',
+        'Premium Features Upgrade Banner',
+        'Trading Conference 2024 Banner',
+        'Mobile App Download Banner',
+        'Educational Resources Banner',
+        'Risk Management Guide Banner',
+        'Options Trading Course Banner'
+    ];
+    counter int := 1;
 BEGIN
-    -- Get banner IDs
-    SELECT id INTO banner_id_1 FROM banners WHERE target_url = 'https://example.com/welcome' LIMIT 1;
-    SELECT id INTO banner_id_2 FROM banners WHERE target_url = 'https://example.com/promotion' LIMIT 1;
+    FOR banner_record IN
+        SELECT id, name FROM banners ORDER BY created_at
+    LOOP
+        INSERT INTO images (table_name, record_id, image_url, alt_text, mime_type, file_size)
+        VALUES (
+            'banners',
+            banner_record.id::text,
+            image_urls[counter],
+            alt_texts[counter],
+            'image/jpeg',
+            200000 + (random() * 100000)::int
+        );
+        counter := counter + 1;
+    END LOOP;
+END $$;
 
-    -- Insert banner images
-    IF banner_id_1 IS NOT NULL THEN
-        INSERT INTO images (table_name, record_id, image_url, alt_text, mime_type)
-        VALUES ('banners', banner_id_1::text, 'https://images.pexels.com/photos/1303081/pexels-photo-1303081.jpeg', 'Welcome banner image', 'image/jpeg');
+-- ===============================================
+-- SEED DATA SUMMARY REPORT
+-- ===============================================
+
+DO $$
+DECLARE
+    total_users int;
+    total_posts int;
+    total_products int;
+    total_brokers int;
+    total_banners int;
+    total_notifications int;
+    total_images int;
+    admin_user_exists boolean;
+BEGIN
+    -- Count all seeded data
+    SELECT count(*) INTO total_users FROM users;
+    SELECT count(*) INTO total_posts FROM posts;
+    SELECT count(*) INTO total_products FROM products;
+    SELECT count(*) INTO total_brokers FROM brokers;
+    SELECT count(*) INTO total_banners FROM banners;
+    SELECT count(*) INTO total_notifications FROM notifications;
+    SELECT count(*) INTO total_images FROM images;
+    SELECT exists(SELECT 1 FROM users WHERE email = 'admin@admin.com') INTO admin_user_exists;
+
+    -- Generate report
+    RAISE NOTICE '';
+    RAISE NOTICE '🎉 =======================================';
+    RAISE NOTICE '🎉 SIMPLIFIED SEED DATA COMPLETE!';
+    RAISE NOTICE '🎉 =======================================';
+    RAISE NOTICE '';
+    RAISE NOTICE '📊 SEEDED DATA SUMMARY:';
+    RAISE NOTICE '👥 Users: % (admin only)', total_users;
+    RAISE NOTICE '📝 Posts: % (with admin as author)', total_posts;
+    RAISE NOTICE '🛍️  Products: % (with featured images)', total_products;
+    RAISE NOTICE '🏢 Brokers: % (major trading brokers)', total_brokers;
+    RAISE NOTICE '🖼️  Banners: % (promotional banners)', total_banners;
+    RAISE NOTICE '🔔 Notifications: % (system notifications)', total_notifications;
+    RAISE NOTICE '📷 Images: % (across all resources)', total_images;
+    RAISE NOTICE '';
+
+    IF admin_user_exists THEN
+        RAISE NOTICE '✅ Admin account ready:';
+        RAISE NOTICE '   📧 admin@admin.com - password: 123123123';
     END IF;
 
-    IF banner_id_2 IS NOT NULL THEN
-        INSERT INTO images (table_name, record_id, image_url, alt_text, mime_type)
-        VALUES ('banners', banner_id_2::text, 'https://images.pexels.com/photos/586996/pexels-photo-586996.jpeg', 'Promotion banner image', 'image/jpeg');
-    END IF;
+    RAISE NOTICE '';
+    RAISE NOTICE '📝 NOTE: Additional users should be created through:';
+    RAISE NOTICE '   1. Your application''s signup process';
+    RAISE NOTICE '   2. Supabase Auth dashboard';
+    RAISE NOTICE '   3. Auth API calls';
+    RAISE NOTICE '';
+    RAISE NOTICE '🚀 Your application is ready with realistic sample data!';
+    RAISE NOTICE '';
 END $$;

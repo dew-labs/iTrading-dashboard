@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import { AlertCircle, FileText, Calendar, Scale, Lock, Clock, CheckCircle } from 'lucide-react'
-import type { Post, PostInsert } from '../types'
+import { AlertCircle, FileText, Calendar, Scale, Lock, Clock, CheckCircle, Save, X, Plus } from 'lucide-react'
+import type { PostInsert } from '../types'
+import type { PostWithAuthor } from '../hooks/usePosts'
 import Select from './Select'
 import RichTextEditor from './RichTextEditor'
+import MainImageUpload from './MainImageUpload'
+import { useAuth } from '../hooks/useAuth'
 
 interface PostFormProps {
-  post?: Post | null
+  post?: PostWithAuthor | null
   onSubmit: (data: PostInsert) => void
   onCancel: () => void
 }
@@ -17,11 +20,16 @@ interface FormErrors {
 }
 
 const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
+  const { user } = useAuth()
+
   const [formData, setFormData] = useState<PostInsert>({
     title: '',
     content: '',
     type: 'news',
-    status: 'draft'
+    status: 'draft',
+    author_id: user?.id || null,
+    thumbnail_url: null,
+    views: 0
   })
 
   const [errors, setErrors] = useState<FormErrors>({})
@@ -33,10 +41,13 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
         title: post.title,
         type: post.type,
         content: post.content || '',
-        status: post.status
+        status: post.status,
+        author_id: post.author_id || user?.id || null,
+        thumbnail_url: post.thumbnail_url || null,
+        views: post.views || 0
       })
     }
-  }, [post])
+  }, [post, user?.id])
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
@@ -75,8 +86,11 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
       const submitData: PostInsert = {
         title: formData.title.trim(),
         content: formData.content?.trim() || '',
-        type: formData.type,
-        status: formData.status || 'draft'
+        type: formData.type || 'news',
+        status: formData.status || 'draft',
+        author_id: formData.author_id || user?.id || null,
+        thumbnail_url: formData.thumbnail_url || null,
+        views: formData.views || 0
       }
 
       await onSubmit(submitData)
@@ -170,53 +184,70 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
         )}
       </div>
 
-      {/* Compact metadata fields in grid */}
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-        <div>
-          <Select
-            label='Type'
-            required
-            value={formData.type}
-            onChange={value => setFormData({ ...formData, type: value as Post['type'] })}
-            options={typeOptions}
-            disabled={isSubmitting}
-          />
+      {/* Enhanced layout for larger modal */}
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+        {/* Left column - Metadata and thumbnail */}
+        <div className='lg:col-span-1 space-y-6'>
+          {/* Type and Status in vertical layout for better spacing */}
+          <div className='space-y-4'>
+            <Select
+              label='Type'
+              required
+              value={formData.type || 'news'}
+              onChange={value => setFormData({ ...formData, type: value as PostWithAuthor['type'] })}
+              options={typeOptions}
+              disabled={isSubmitting}
+            />
+
+            <Select
+              label='Status'
+              required
+              value={formData.status || 'draft'}
+              onChange={value => setFormData({ ...formData, status: value as PostWithAuthor['status'] })}
+              options={statusOptions}
+              disabled={isSubmitting}
+            />
+          </div>
+
+          {/* Thumbnail upload section */}
+          <div className='border-t border-gray-200 dark:border-gray-700 pt-6'>
+            <MainImageUpload
+              label='Thumbnail Image'
+              imageUrl={formData.thumbnail_url || null}
+              onChange={(url) => setFormData({ ...formData, thumbnail_url: url })}
+              bucket='posts'
+              folder='thumbnails'
+              size='lg'
+              disabled={isSubmitting}
+              recommendationText='Use high-quality images (1200x630px) for best social sharing results'
+              alt='Post thumbnail'
+            />
+          </div>
         </div>
 
-        <div>
-          <Select
-            label='Status'
+        {/* Right column - Content editor */}
+        <div className='lg:col-span-2'>
+          <RichTextEditor
+            label='Content'
             required
-            value={formData.status || 'draft'}
-            onChange={value => setFormData({ ...formData, status: value as Post['status'] })}
-            options={statusOptions}
+            content={formData.content || ''}
+            onChange={content => {
+              setFormData({ ...formData, content })
+              // Clear errors when user starts typing
+              if (errors.content) {
+                const newErrors = { ...errors }
+                delete newErrors.content
+                setErrors(newErrors)
+              }
+            }}
+            placeholder='Write your post content here - use the rich editor tools to format your text...'
+            error={errors.content}
             disabled={isSubmitting}
+            height={500}
+            bucket='posts'
+            folder='images'
           />
         </div>
-      </div>
-
-      {/* Large content editor section */}
-      <div className='border-t border-gray-200 dark:border-gray-700 pt-6'>
-        <RichTextEditor
-          label='Content'
-          required
-          content={formData.content || ''}
-          onChange={content => {
-            setFormData({ ...formData, content })
-            // Clear errors when user starts typing
-            if (errors.content) {
-              const newErrors = { ...errors }
-              delete newErrors.content
-              setErrors(newErrors)
-            }
-          }}
-          placeholder='Write your post content here - use the rich editor tools to format your text...'
-          error={errors.content}
-          disabled={isSubmitting}
-          height={450}
-          bucket='posts'
-          folder='images'
-        />
       </div>
 
       {/* Action buttons */}
@@ -224,9 +255,10 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
         <button
           type='button'
           onClick={onCancel}
-          className='px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
+          className='px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center'
           disabled={isSubmitting}
         >
+          <X className='w-4 h-4 mr-2' />
           Cancel
         </button>
         <button
@@ -236,11 +268,23 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
         >
           {isSubmitting ? (
             <>
-              <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2'></div>
+              <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white dark:border-b-gray-900 mr-2'></div>
               {post ? 'Updating...' : 'Creating...'}
             </>
           ) : (
-            <>{post ? 'Update' : 'Create'} Post</>
+            <>
+              {post ? (
+                <>
+                  <Save className='w-4 h-4 mr-2' />
+                  Update Post
+                </>
+              ) : (
+                <>
+                  <Plus className='w-4 h-4 mr-2' />
+                  Create Post
+                </>
+              )}
+            </>
           )}
         </button>
       </div>
