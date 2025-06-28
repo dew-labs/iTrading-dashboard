@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, queryKeys, supabaseHelpers } from '../lib/supabase'
 import type { Product, ProductInsert, ProductUpdate } from '../types'
-import { toast } from '../utils/toast'
+import { useToast } from './useToast'
 
 // Fetch functions
 const fetchProducts = async (): Promise<Product[]> => {
@@ -32,6 +32,7 @@ const deleteProductMutation = async (id: number): Promise<void> => {
 
 export const useProducts = () => {
   const queryClient = useQueryClient()
+  const toast = useToast()
 
   // Main query for products list
   const {
@@ -81,12 +82,12 @@ export const useProducts = () => {
         queryClient.setQueryData(queryKeys.products(), context.previousProducts)
       }
       const errorMessage = error instanceof Error ? error.message : 'Failed to create product'
-      toast.error(errorMessage)
+      toast.error(null, null, errorMessage)
     },
     onSuccess: _data => {
       // Invalidate and refetch products to get the real data
       queryClient.invalidateQueries({ queryKey: queryKeys.products() })
-      toast.success('Product created successfully')
+      toast.success('created', 'product')
     }
   })
 
@@ -110,11 +111,11 @@ export const useProducts = () => {
         queryClient.setQueryData(queryKeys.products(), context.previousProducts)
       }
       const errorMessage = error instanceof Error ? error.message : 'Failed to update product'
-      toast.error(errorMessage)
+      toast.error(null, null, errorMessage)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.products() })
-      toast.success('Product updated successfully')
+      toast.success('updated', 'product')
     }
   })
 
@@ -138,11 +139,11 @@ export const useProducts = () => {
         queryClient.setQueryData(queryKeys.products(), context.previousProducts)
       }
       const errorMessage = error instanceof Error ? error.message : 'Failed to delete product'
-      toast.error(errorMessage)
+      toast.error(null, null, errorMessage)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.products() })
-      toast.success('Product deleted successfully')
+      toast.success('deleted', 'product')
     }
   })
 

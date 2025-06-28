@@ -57,5 +57,69 @@
     "weeksAgo": "{{count}} weeks ago",
     "monthAgo": "1 month ago",
     "monthsAgo": "{{count}} months ago"
+  },
+  "toast": {
+    "success": {
+      "general": "Operation completed successfully",
+      "saved": "Changes saved successfully",
+      "created": "Created successfully",
+      "updated": "Updated successfully",
+      "deleted": "Deleted successfully",
+      "uploaded": "Uploaded successfully",
+      "downloaded": "Downloaded successfully",
+      "published": "Published successfully",
+      "activated": "Activated successfully",
+      "deactivated": "Deactivated successfully",
+      "invited": "Invitation sent successfully",
+      "granted": "granted successfully",
+      "revoked": "revoked successfully",
+      "restored": "Restored successfully",
+      "duplicated": "Duplicated successfully"
+    },
+    "error": {
+      "general": "Something went wrong. Please try again.",
+      "failed": "Operation failed",
+      "notFound": "Item not found",
+      "unauthorized": "You don't have permission to perform this action",
+      "validation": "Please check your input and try again",
+      "network": "Network error. Please check your connection.",
+      "timeout": "Request timed out. Please try again.",
+      "fileSize": "File is too large",
+      "fileType": "Invalid file type",
+      "required": "This field is required",
+      "invalidFormat": "Invalid format",
+      "alreadyExists": "Item already exists",
+      "sessionExpired": "Your session has expired. Please sign in again.",
+      "accountRemoved": "Your account has been removed. Please contact your administrator.",
+      "unexpectedError": "An unexpected error occurred"
+    },
+    "info": {
+      "loading": "Loading...",
+      "processing": "Processing...",
+      "saving": "Saving changes...",
+      "uploading": "Uploading...",
+      "downloading": "Downloading...",
+      "waiting": "Please wait...",
+      "maintenance": "System maintenance in progress"
+    },
+    "entities": {
+      "user": "User",
+      "users": "Users",
+      "post": "Post",
+      "posts": "Posts",
+      "product": "Product",
+      "products": "Products",
+      "broker": "Broker",
+      "brokers": "Brokers",
+      "banner": "Banner",
+      "banners": "Banners",
+      "image": "Image",
+      "images": "Images",
+      "permission": "Permission",
+      "permissions": "Permissions",
+      "role": "Role",
+      "avatar": "Avatar",
+      "mainImage": "Main image"
+    }
   }
 }

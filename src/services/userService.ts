@@ -1,6 +1,5 @@
 import { supabase } from '../lib/supabase'
 import type { UserRole, Permission, DatabaseUser } from '../types'
-import { toast } from '../utils/toast'
 
 /**
  * Generate a secure temporary password
@@ -142,9 +141,7 @@ export const inviteUser = async (
     // Grant default permissions for regular users
     await grantDefaultPermissions(authData.user.id, role)
 
-    toast.success(
-      `User invited successfully. ${import.meta.env.DEV ? `Temp password: ${tempPassword}` : 'Check email for instructions.'}`
-    )
+    // Success message handled by component
 
     return {
       success: true,
@@ -152,7 +149,6 @@ export const inviteUser = async (
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Failed to invite user'
-    toast.error(errorMessage)
     return { success: false, error: errorMessage }
   }
 }
@@ -169,11 +165,9 @@ export const updateUserRole = async (
 
     if (error) throw error
 
-    toast.success('User role updated successfully')
     return { success: true }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Failed to update user role'
-    toast.error(errorMessage)
     return { success: false, error: errorMessage }
   }
 }
@@ -229,11 +223,9 @@ export const grantPermission = async (
 
     if (error) throw error
 
-    toast.success('Permission granted successfully')
     return { success: true }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Failed to grant permission'
-    toast.error(errorMessage)
     return { success: false, error: errorMessage }
   }
 }
@@ -254,11 +246,9 @@ export const revokePermission = async (
 
     if (error) throw error
 
-    toast.success('Permission revoked successfully')
     return { success: true }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Failed to revoke permission'
-    toast.error(errorMessage)
     return { success: false, error: errorMessage }
   }
 }
@@ -319,11 +309,9 @@ export const bulkUpdateUserStatus = async (
 
     if (error) throw error
 
-    toast.success(`${userIds.length} users updated successfully`)
     return { success: true }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Failed to update users'
-    toast.error(errorMessage)
     return { success: false, error: errorMessage }
   }
 }
@@ -361,11 +349,9 @@ export const uploadUserAvatar = async (
 
     if (updateError) throw updateError
 
-    toast.success('Avatar uploaded successfully')
     return { url: publicUrl }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Failed to upload avatar'
-    toast.error(errorMessage)
     return { error: errorMessage }
   }
 }

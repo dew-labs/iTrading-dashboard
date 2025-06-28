@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, queryKeys, supabaseHelpers } from '../lib/supabase'
 import type { Banner, BannerInsert, BannerUpdate } from '../types'
-import { toast } from '../utils/toast'
+import { useToast } from './useToast'
 
 // Fetch functions
 const fetchBanners = async (): Promise<Banner[]> => {
@@ -32,6 +32,7 @@ const deleteBannerMutation = async (id: string): Promise<void> => {
 
 export const useBanners = () => {
   const queryClient = useQueryClient()
+  const toast = useToast()
 
   // Main query for banners list
   const {
@@ -74,11 +75,11 @@ export const useBanners = () => {
         queryClient.setQueryData(queryKeys.banners(), context.previousBanners)
       }
       const errorMessage = error instanceof Error ? error.message : 'Failed to create banner'
-      toast.error(errorMessage)
+      toast.error(null, null, errorMessage)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.banners() })
-      toast.success('Banner created successfully')
+      toast.success('created', 'banner')
     }
   })
 
@@ -102,11 +103,11 @@ export const useBanners = () => {
         queryClient.setQueryData(queryKeys.banners(), context.previousBanners)
       }
       const errorMessage = error instanceof Error ? error.message : 'Failed to update banner'
-      toast.error(errorMessage)
+      toast.error(null, null, errorMessage)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.banners() })
-      toast.success('Banner updated successfully')
+      toast.success('updated', 'banner')
     }
   })
 
@@ -130,11 +131,11 @@ export const useBanners = () => {
         queryClient.setQueryData(queryKeys.banners(), context.previousBanners)
       }
       const errorMessage = error instanceof Error ? error.message : 'Failed to delete banner'
-      toast.error(errorMessage)
+      toast.error(null, null, errorMessage)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.banners() })
-      toast.success('Banner deleted successfully')
+      toast.success('deleted', 'banner')
     }
   })
 

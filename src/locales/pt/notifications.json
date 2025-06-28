@@ -57,5 +57,69 @@
     "weeksAgo": "{{count}} semanas atrás",
     "monthAgo": "1 mês atrás",
     "monthsAgo": "{{count}} meses atrás"
+  },
+  "toast": {
+    "success": {
+      "general": "Operação realizada com sucesso",
+      "saved": "Alterações salvas com sucesso",
+      "created": "Criado com sucesso",
+      "updated": "Atualizado com sucesso",
+      "deleted": "Excluído com sucesso",
+      "uploaded": "Enviado com sucesso",
+      "downloaded": "Baixado com sucesso",
+      "published": "Publicado com sucesso",
+      "activated": "Ativado com sucesso",
+      "deactivated": "Desativado com sucesso",
+      "invited": "Convite enviado com sucesso",
+      "granted": "concedida com sucesso",
+      "revoked": "revogada com sucesso",
+      "restored": "Restaurado com sucesso",
+      "duplicated": "Duplicado com sucesso"
+    },
+    "error": {
+      "general": "Algo deu errado. Tente novamente.",
+      "failed": "Operação falhou",
+      "notFound": "Item não encontrado",
+      "unauthorized": "Você não tem permissão para realizar esta ação",
+      "validation": "Verifique sua entrada e tente novamente",
+      "network": "Erro de rede. Verifique sua conexão.",
+      "timeout": "Tempo limite da solicitação. Tente novamente.",
+      "fileSize": "Arquivo muito grande",
+      "fileType": "Tipo de arquivo inválido",
+      "required": "Este campo é obrigatório",
+      "invalidFormat": "Formato inválido",
+      "alreadyExists": "Item já existe",
+      "sessionExpired": "Sua sessão expirou. Faça login novamente.",
+      "accountRemoved": "Sua conta foi removida. Entre em contato com o administrador.",
+      "unexpectedError": "Ocorreu um erro inesperado"
+    },
+    "info": {
+      "loading": "Carregando...",
+      "processing": "Processando...",
+      "saving": "Salvando alterações...",
+      "uploading": "Enviando...",
+      "downloading": "Baixando...",
+      "waiting": "Aguarde...",
+      "maintenance": "Manutenção do sistema em andamento"
+    },
+    "entities": {
+      "user": "Usuário",
+      "users": "Usuários",
+      "post": "Post",
+      "posts": "Posts",
+      "product": "Produto",
+      "products": "Produtos",
+      "broker": "Corretor",
+      "brokers": "Corretores",
+      "banner": "Banner",
+      "banners": "Banners",
+      "image": "Imagem",
+      "images": "Imagens",
+      "permission": "Permissão",
+      "permissions": "Permissões",
+      "role": "Função",
+      "avatar": "Avatar",
+      "mainImage": "Imagem principal"
+    }
   }
 }

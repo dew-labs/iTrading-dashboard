@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, queryKeys, supabaseHelpers } from '../lib/supabase'
 import type { Broker, BrokerInsert, BrokerUpdate } from '../types'
-import { toast } from '../utils/toast'
+import { useToast } from './useToast'
 
 // Fetch functions
 const fetchBrokers = async (): Promise<Broker[]> => {
@@ -32,6 +32,7 @@ const deleteBrokerMutation = async (id: number): Promise<void> => {
 
 export const useBrokers = () => {
   const queryClient = useQueryClient()
+  const toast = useToast()
 
   // Main query for brokers list
   const {
@@ -81,12 +82,12 @@ export const useBrokers = () => {
         queryClient.setQueryData(queryKeys.brokers(), context.previousBrokers)
       }
       const errorMessage = error instanceof Error ? error.message : 'Failed to create broker'
-      toast.error(errorMessage)
+      toast.error(null, null, errorMessage)
     },
     onSuccess: _data => {
       // Invalidate and refetch brokers to get the real data
       queryClient.invalidateQueries({ queryKey: queryKeys.brokers() })
-      toast.success('Broker created successfully')
+      toast.success('created', 'broker')
     }
   })
 
@@ -110,11 +111,11 @@ export const useBrokers = () => {
         queryClient.setQueryData(queryKeys.brokers(), context.previousBrokers)
       }
       const errorMessage = error instanceof Error ? error.message : 'Failed to update broker'
-      toast.error(errorMessage)
+      toast.error(null, null, errorMessage)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.brokers() })
-      toast.success('Broker updated successfully')
+      toast.success('updated', 'broker')
     }
   })
 
@@ -138,11 +139,11 @@ export const useBrokers = () => {
         queryClient.setQueryData(queryKeys.brokers(), context.previousBrokers)
       }
       const errorMessage = error instanceof Error ? error.message : 'Failed to delete broker'
-      toast.error(errorMessage)
+      toast.error(null, null, errorMessage)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.brokers() })
-      toast.success('Broker deleted successfully')
+      toast.success('deleted', 'broker')
     }
   })
 

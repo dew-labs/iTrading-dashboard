@@ -20,7 +20,7 @@ import type { DatabaseUser, Permission } from '../types'
 import LoadingSpinner from './LoadingSpinner'
 import Select from './Select'
 import Badge from './Badge'
-import { toast } from '../utils/toast'
+import { useToast } from '../hooks/useToast'
 import { getButtonClasses, getTypographyClasses, cn } from '../utils/theme'
 
 interface PermissionManagerProps {
@@ -31,6 +31,7 @@ interface PermissionManagerProps {
 const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _onClose }) => {
   const { t } = useTranslation()
   const { isSuperAdmin } = usePermissions()
+  const toast = useToast()
   const [permissions, setPermissions] = useState<Permission[]>([])
   const [loading, setLoading] = useState(true)
   const [newResource, setNewResource] = useState('')
@@ -119,11 +120,11 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
       const userPermissions = await getUserPermissions(user.id)
       setPermissions(userPermissions)
     } catch (_error) {
-      toast.error(t('permissionModal.failedToLoadPermissions'))
+      toast.error(null, null, t('permissionModal.failedToLoadPermissions'))
     } finally {
       setLoading(false)
     }
-  }, [user.id, t])
+  }, [user.id, t, toast])
 
   useEffect(() => {
     fetchPermissions()
@@ -145,7 +146,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
 
   const handleGrant = async () => {
     if (!newResource) {
-      toast.error(t('permissionModal.pleaseSelectResource'))
+      toast.error(null, null, t('permissionModal.pleaseSelectResource'))
       return
     }
 
@@ -154,25 +155,29 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
     )
 
     if (existingPermission) {
-      toast.error(t('permissionModal.permissionAlreadyExists'))
+      toast.error('alreadyExists', 'permission')
       return
     }
 
-    const { success } = await grantPermission(user.id, newResource, newAction)
+    const { success, error } = await grantPermission(user.id, newResource, newAction)
     if (success) {
       await fetchPermissions()
       setNewResource('')
       setNewAction('read')
       setIsAdding(false)
-      toast.success(t('permissionModal.permissionGrantedSuccessfully'))
+      toast.success('granted', 'permission')
+    } else {
+      toast.error(null, null, error || 'Failed to grant permission')
     }
   }
 
   const handleRevoke = async (resource: string, action: string) => {
-    const { success } = await revokePermission(user.id, resource, action)
+    const { success, error } = await revokePermission(user.id, resource, action)
     if (success) {
       await fetchPermissions()
-      toast.success(t('permissionModal.permissionRevokedSuccessfully'))
+      toast.success('revoked', 'permission')
+    } else {
+      toast.error(null, null, error || 'Failed to revoke permission')
     }
   }
 

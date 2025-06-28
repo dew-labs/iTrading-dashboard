@@ -3,7 +3,7 @@ import { supabase, queryKeys, supabaseHelpers } from '../lib/supabase'
 import type { DatabaseUser, UserInsert, UserUpdate } from '../types'
 import { inviteUser } from '../services/userService'
 import { usePermissions } from './usePermissions'
-import { toast } from '../utils/toast'
+import { useToast } from './useToast'
 
 // Fetch functions
 const fetchUsers = async (): Promise<DatabaseUser[]> => {
@@ -69,6 +69,7 @@ const updateLastLoginMutation = async (id: string): Promise<void> => {
 export const useUsers = () => {
   const queryClient = useQueryClient()
   const { can, isSuperAdmin } = usePermissions()
+  const toast = useToast()
 
   // Main query for users list
   const {
@@ -112,12 +113,12 @@ export const useUsers = () => {
     },
     onError: error => {
       const errorMessage = error instanceof Error ? error.message : 'Failed to create user'
-      toast.error(errorMessage)
+      toast.error(null, null, errorMessage)
     },
     onSuccess: () => {
       // Refresh the user list
       queryClient.invalidateQueries({ queryKey: queryKeys.users() })
-      toast.success('User invited successfully')
+      toast.success('invited', 'user')
     }
   })
 
@@ -147,11 +148,11 @@ export const useUsers = () => {
         queryClient.setQueryData(queryKeys.users(), context.previousUsers)
       }
       const errorMessage = error instanceof Error ? error.message : 'Failed to update user'
-      toast.error(errorMessage)
+      toast.error(null, null, errorMessage)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.users() })
-      toast.success('User updated successfully')
+      toast.success('updated', 'user')
     }
   })
 
@@ -179,11 +180,11 @@ export const useUsers = () => {
         queryClient.setQueryData(queryKeys.users(), context.previousUsers)
       }
       const errorMessage = error instanceof Error ? error.message : 'Failed to delete user'
-      toast.error(errorMessage)
+      toast.error(null, null, errorMessage)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.users() })
-      toast.success('User deleted successfully')
+      toast.success('deleted', 'user')
     }
   })
 

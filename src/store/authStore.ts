@@ -100,9 +100,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         if (error.code === 'PGRST116' || error.message.includes('No rows found')) {
           // User profile doesn't exist in database - sign them out
           console.warn('User profile not found in database. Signing out user:', user.email)
-          toast.error('Your account has been removed. Please contact your administrator.', {
-            duration: 5000
-          })
+          toast.errorTranslated.accountRemoved()
           await get().signOut()
           return
         }
@@ -114,9 +112,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           error.message.includes('expired')
         ) {
           console.warn('Authentication error detected. Signing out user:', error.message)
-          toast.error('Your session has expired. Please sign in again.', {
-            duration: 4000
-          })
+          toast.errorTranslated.sessionExpired()
           await get().signOut()
           return
         }
@@ -139,9 +135,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         errorMessage.includes('expired')
       ) {
         console.warn('Critical auth error detected. Signing out user.')
-        toast.error('Authentication error. Please sign in again.', {
-          duration: 4000
-        })
+        toast.errorTranslated.authError()
         await get().signOut()
       }
     }

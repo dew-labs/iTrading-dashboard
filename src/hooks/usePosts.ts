@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, queryKeys, supabaseHelpers } from '../lib/supabase'
 import type { Post, PostInsert, PostUpdate } from '../types'
-import { toast } from '../utils/toast'
+import { useToast } from './useToast'
 
 // Validation function
 const validatePost = (post: PostInsert): string | null => {
@@ -74,6 +74,7 @@ const incrementPostViews = async (id: number): Promise<void> => {
 
 export const usePosts = () => {
   const queryClient = useQueryClient()
+  const toast = useToast()
 
   // Main query for posts list
   const {
@@ -116,11 +117,11 @@ export const usePosts = () => {
         queryClient.setQueryData(queryKeys.posts(), context.previousPosts)
       }
       const errorMessage = error instanceof Error ? error.message : 'Failed to create post'
-      toast.error(`Creation failed: ${errorMessage}`)
+      toast.error(null, null, `Creation failed: ${errorMessage}`)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.posts() })
-      toast.success('Post created successfully! 🎉')
+      toast.success('created', 'post')
     }
   })
 
@@ -143,11 +144,11 @@ export const usePosts = () => {
         queryClient.setQueryData(queryKeys.posts(), context.previousPosts)
       }
       const errorMessage = error instanceof Error ? error.message : 'Failed to update post'
-      toast.error(`Update failed: ${errorMessage}`)
+      toast.error(null, null, `Update failed: ${errorMessage}`)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.posts() })
-      toast.success('Post updated successfully! ✨')
+      toast.success('updated', 'post')
     }
   })
 
@@ -171,12 +172,11 @@ export const usePosts = () => {
         queryClient.setQueryData(queryKeys.posts(), context.previousPosts)
       }
       const errorMessage = error instanceof Error ? error.message : 'Failed to delete post'
-      toast.error(`Deletion failed: ${errorMessage}`)
+      toast.error(null, null, `Deletion failed: ${errorMessage}`)
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: (_data, _variables, _context) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.posts() })
-      const postTitle = context?.deletedPost?.title || 'Post'
-      toast.success(`"${postTitle}" deleted successfully! 🗑️`)
+      toast.success('deleted', 'post')
     }
   })
 
@@ -200,7 +200,7 @@ export const usePosts = () => {
     },
     onError: error => {
       const errorMessage = error instanceof Error ? error.message : 'Failed to duplicate post'
-      toast.error(`Duplication failed: ${errorMessage}`)
+      toast.error(null, null, `Duplication failed: ${errorMessage}`)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.posts() })
