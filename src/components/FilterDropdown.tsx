@@ -106,16 +106,16 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
         disabled={disabled}
         className={cn(
           'inline-flex items-center space-x-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors duration-200',
-          'focus:outline-none focus:border-black',
+          'focus:outline-none focus:border-black dark:focus:border-white',
           disabled
-            ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+            ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-600 cursor-not-allowed'
             : isActive
-              ? 'bg-gray-900 text-white border-gray-900 shadow-md hover:shadow-lg'
-              : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+              ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-gray-900 dark:border-white shadow-md hover:shadow-lg'
+              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700'
         )}
       >
         {/* Filter Icon */}
-        <Filter className={cn('w-3.5 h-3.5', isActive ? 'text-white' : 'text-gray-400')} />
+        <Filter className={cn('w-3.5 h-3.5', isActive ? 'text-white dark:text-gray-900' : 'text-gray-400 dark:text-gray-500')} />
 
         {/* Label */}
         <span className='whitespace-nowrap'>{label}</span>
@@ -126,7 +126,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
             <span
               className={cn(
                 'text-xs px-1.5 py-0.5 rounded',
-                'bg-white/20 text-white border border-white/30'
+                'bg-white/20 dark:bg-gray-900/20 text-white dark:text-gray-900 border border-white/30 dark:border-gray-900/30'
               )}
             >
               {getOptionLabel(selectedOption)}
@@ -139,8 +139,8 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
           <button
             onClick={handleClear}
             className={cn(
-              'p-0.5 rounded hover:bg-white/20 transition-colors',
-              'text-white/80 hover:text-white'
+              'p-0.5 rounded hover:bg-white/20 dark:hover:bg-gray-900/20 transition-colors',
+              'text-white/80 dark:text-gray-900/80 hover:text-white dark:hover:text-gray-900'
             )}
             title={`Clear ${label.toLowerCase()} filter`}
           >
@@ -153,7 +153,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
           <ChevronDown
             className={cn(
               'w-3.5 h-3.5 transition-transform duration-200',
-              isActive ? 'text-white' : 'text-gray-400',
+              isActive ? 'text-white dark:text-gray-900' : 'text-gray-400 dark:text-gray-500',
               isOpen && 'rotate-180'
             )}
           />
@@ -164,7 +164,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
       {isOpen && hasMultipleOptions && (
         <div
           className={cn(
-            'absolute top-full left-0 mt-1 min-w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50',
+            'absolute top-full left-0 mt-1 min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50',
             'max-h-60 overflow-auto',
             'animate-in fade-in-0 zoom-in-95 duration-100'
           )}
@@ -182,10 +182,10 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
                   'flex items-center justify-between',
                   'transition-colors duration-150',
                   option.disabled
-                    ? 'text-gray-400 cursor-not-allowed bg-gray-50'
+                    ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed bg-gray-50 dark:bg-gray-700'
                     : option.value === value
-                      ? 'bg-gray-900 text-white'
-                      : 'text-gray-900 hover:bg-gray-50',
+                      ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
+                      : 'text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700',
                   // Apply border radius to first and last items
                   index === 0 ? 'rounded-t-lg' : '',
                   index === options.length - 1 ? 'rounded-b-lg' : ''
@@ -195,7 +195,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
                   {getOptionLabel(option)}
                 </span>
 
-                {option.value === value && <div className='w-2 h-2 bg-white rounded-full' />}
+                {option.value === value && <div className='w-2 h-2 bg-white dark:bg-gray-900 rounded-full' />}
               </div>
             ))}
           </div>

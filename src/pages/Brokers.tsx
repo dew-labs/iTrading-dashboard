@@ -48,7 +48,7 @@ interface BrokerCardProps {
 const BrokerCard: React.FC<BrokerCardProps> = ({ broker, onView, onEdit, onDelete }) => {
   const { t } = usePageTranslation()
   return (
-    <div className='bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden'>
+    <div className='bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden'>
       {/* Header with logo and actions */}
       <div className='p-6 pb-4'>
         <div className='flex items-start justify-between mb-4'>
@@ -67,11 +67,11 @@ const BrokerCard: React.FC<BrokerCardProps> = ({ broker, onView, onEdit, onDelet
               )}
             </div>
             <div className='flex-1 min-w-0'>
-              <h3 className='text-lg font-semibold text-gray-900 truncate'>
+              <h3 className='text-lg font-semibold text-gray-900 dark:text-white truncate'>
                 {broker.name || broker.headquarter || t('brokers.unknownBroker')}
               </h3>
               {broker.established_in && (
-                <div className='flex items-center text-sm text-gray-500 mt-1'>
+                <div className='flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1'>
                   <Calendar className='w-4 h-4 mr-1' />
                   <span>
                     {t('brokers.est')} {broker.established_in}
@@ -85,21 +85,21 @@ const BrokerCard: React.FC<BrokerCardProps> = ({ broker, onView, onEdit, onDelet
           <div className='flex space-x-1'>
             <button
               onClick={() => onView(broker)}
-              className='p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors'
+              className='p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors'
               title={t('brokers.tooltips.viewBroker')}
             >
               <Eye className='w-4 h-4' />
             </button>
             <button
               onClick={() => onEdit(broker)}
-              className='p-2 text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors'
+              className='p-2 text-gray-600 dark:text-gray-300 hover:text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-lg transition-colors'
               title={t('brokers.tooltips.editBroker')}
             >
               <Edit2 className='w-4 h-4' />
             </button>
             <button
               onClick={() => onDelete(broker)}
-              className='p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors'
+              className='p-2 text-gray-600 dark:text-gray-300 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors'
               title={t('brokers.tooltips.deleteBroker')}
             >
               <Trash2 className='w-4 h-4' />
@@ -109,14 +109,14 @@ const BrokerCard: React.FC<BrokerCardProps> = ({ broker, onView, onEdit, onDelet
 
         {/* Headquarter info */}
         {broker.headquarter && (
-          <div className='flex items-center text-sm text-gray-600 mb-3'>
-            <MapPin className='w-4 h-4 mr-1 text-gray-400' />
+          <div className='flex items-center text-sm text-gray-600 dark:text-gray-300 mb-3'>
+            <MapPin className='w-4 h-4 mr-1 text-gray-400 dark:text-gray-500' />
             <span>{broker.headquarter}</span>
           </div>
         )}
 
         {/* Description */}
-        <div className='text-sm text-gray-600 line-clamp-3'>
+        <div className='text-sm text-gray-600 dark:text-gray-300 line-clamp-3'>
           {broker.description ? (
             <div
               dangerouslySetInnerHTML={{
@@ -127,14 +127,14 @@ const BrokerCard: React.FC<BrokerCardProps> = ({ broker, onView, onEdit, onDelet
               }}
             />
           ) : (
-            <span className='italic text-gray-400'>{t('brokers.noDescriptionAvailable')}</span>
+            <span className='italic text-gray-400 dark:text-gray-500'>{t('brokers.noDescriptionAvailable')}</span>
           )}
         </div>
       </div>
 
       {/* Footer with metadata */}
-      <div className='px-6 py-3 bg-gray-50 border-t border-gray-100'>
-        <div className='flex items-center justify-between text-xs text-gray-500'>
+      <div className='px-6 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-100 dark:border-gray-600'>
+        <div className='flex items-center justify-between text-xs text-gray-500 dark:text-gray-400'>
           <div className='flex items-center'>
             <FileText className='w-3 h-3 mr-1' />
             <span>
@@ -333,10 +333,10 @@ const Brokers: React.FC = () => {
             </div>
             <div className='flex-1 min-w-0'>
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>{row.name}</div>
-              <div className={cn(getTypographyClasses('small'), 'text-gray-600 truncate')}>
+              <div className={cn(getTypographyClasses('small'), 'text-gray-600 dark:text-gray-300 truncate')}>
                 {row.headquarter || t('brokers.noHeadquarterInfo')}
               </div>
-              <div className={cn(getTypographyClasses('small'), 'text-gray-500 truncate')}>
+              <div className={cn(getTypographyClasses('small'), 'text-gray-500 dark:text-gray-400 truncate')}>
                 {row.description
                   ? stripHtmlAndTruncate(row.description, 60)
                   : t('brokers.noDescription')}
@@ -352,14 +352,14 @@ const Brokers: React.FC = () => {
       sortable: true,
       render: (value: unknown) => {
         return (
-          <div className={cn(getTypographyClasses('small'), 'text-gray-900')}>
+          <div className={cn(getTypographyClasses('small'), 'text-gray-900 dark:text-gray-100')}>
             {value ? (
               <div className='flex items-center'>
-                <Calendar className='w-4 h-4 mr-1 text-gray-400' />
+                <Calendar className='w-4 h-4 mr-1 text-gray-400 dark:text-gray-500' />
                 <span>{value as number}</span>
               </div>
             ) : (
-              <span className='text-gray-400'>{t('brokers.notSpecified')}</span>
+              <span className='text-gray-400 dark:text-gray-500'>{t('brokers.notSpecified')}</span>
             )}
           </div>
         )
@@ -371,9 +371,9 @@ const Brokers: React.FC = () => {
       sortable: true,
       render: (value: unknown) => {
         return (
-          <div className={cn(getTypographyClasses('small'), 'text-gray-900')}>
+          <div className={cn(getTypographyClasses('small'), 'text-gray-900 dark:text-gray-100')}>
             <div className='flex items-center'>
-              <FileText className='w-4 h-4 mr-1 text-gray-400' />
+              <FileText className='w-4 h-4 mr-1 text-gray-400 dark:text-gray-500' />
               <span>{formatDateDisplay(value as string)}</span>
             </div>
           </div>
@@ -387,21 +387,21 @@ const Brokers: React.FC = () => {
         <div className='flex space-x-1'>
           <button
             onClick={() => handleView(row)}
-            className='p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors'
+            className='p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors'
             title={t('brokers.tooltips.viewBroker')}
           >
             <Eye className={getIconClasses('action')} />
           </button>
           <button
             onClick={() => handleEdit(row)}
-            className='p-2 text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded transition-colors'
+            className='p-2 text-gray-600 dark:text-gray-300 hover:text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded transition-colors'
             title={t('brokers.tooltips.editBroker')}
           >
             <Edit2 className={getIconClasses('action')} />
           </button>
           <button
             onClick={() => handleDelete(row)}
-            className='p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors'
+            className='p-2 text-gray-600 dark:text-gray-300 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors'
             title={t('brokers.tooltips.deleteBroker')}
           >
             <Trash2 className={getIconClasses('action')} />
@@ -507,7 +507,7 @@ const Brokers: React.FC = () => {
         </div>
 
         {/* Brokers Content */}
-        <div className='bg-white rounded-xl border border-gray-200 shadow-sm'>
+        <div className='bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm'>
           <div className='p-6 space-y-4'>
             {/* Search and filters row */}
             <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4'>
@@ -524,13 +524,13 @@ const Brokers: React.FC = () => {
 
               <div className='flex items-center space-x-3'>
                 {/* View Toggle */}
-                <div className='flex items-center bg-gray-100 rounded-lg p-1'>
+                <div className='flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1'>
                   <button
                     onClick={() => setViewMode('list')}
                     className={`p-2 rounded-md transition-colors ${
                       viewMode === 'list'
-                        ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700'
+                        ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                     }`}
                     title={t('brokers.listView')}
                   >
@@ -540,8 +540,8 @@ const Brokers: React.FC = () => {
                     onClick={() => setViewMode('card')}
                     className={`p-2 rounded-md transition-colors ${
                       viewMode === 'card'
-                        ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700'
+                        ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                     }`}
                     title={t('brokers.cardView')}
                   >
@@ -576,11 +576,11 @@ const Brokers: React.FC = () => {
                   </div>
                 ) : (
                   <div className='text-center py-12'>
-                    <Building2 className='mx-auto h-12 w-12 text-gray-400' />
-                    <h3 className='mt-2 text-sm font-medium text-gray-900'>
+                    <Building2 className='mx-auto h-12 w-12 text-gray-400 dark:text-gray-500' />
+                    <h3 className='mt-2 text-sm font-medium text-gray-900 dark:text-gray-100'>
                       {t('brokers.noBrokersFound')}
                     </h3>
-                    <p className='mt-1 text-sm text-gray-500'>
+                    <p className='mt-1 text-sm text-gray-500 dark:text-gray-400'>
                       {t('brokers.getStartedByCreating')}
                     </p>
                     <div className='mt-6'>
@@ -609,7 +609,7 @@ const Brokers: React.FC = () => {
                   }}
                 />
                 <div className='flex items-center'>
-                  <span className='text-sm text-gray-700'>
+                  <span className='text-sm text-gray-700 dark:text-gray-300'>
                     {tCommon('pagination.showingRows', {
                       startItem: (currentPage - 1) * itemsPerPage + 1,
                       endItem: Math.min(
@@ -627,7 +627,7 @@ const Brokers: React.FC = () => {
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className='p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
+                    className='p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                   >
                     <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                       <path
@@ -639,7 +639,7 @@ const Brokers: React.FC = () => {
                     </svg>
                   </button>
                   <div className='flex items-center'>
-                    <span className='text-sm text-gray-700'>{tCommon('pagination.page')}</span>
+                    <span className='text-sm text-gray-700 dark:text-gray-300'>{tCommon('pagination.page')}</span>
                   </div>
                   <div className='flex items-center space-x-1'>
                     <input
@@ -666,16 +666,16 @@ const Brokers: React.FC = () => {
                           }
                         }
                       }}
-                      className='w-12 px-2 py-1 text-sm text-center border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+                      className='w-12 px-2 py-1 text-sm text-center border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:border-black dark:focus:border-white bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors duration-200'
                     />
-                    <span className='text-sm text-gray-700'>
+                    <span className='text-sm text-gray-700 dark:text-gray-300'>
                       {tCommon('pagination.of')} {totalPages}
                     </span>
                   </div>
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className='p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
+                    className='p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                   >
                     <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                       <path
@@ -714,7 +714,7 @@ const Brokers: React.FC = () => {
           >
             <div className='space-y-6'>
               {/* Header Section with Logo, Company Info, and System Info */}
-              <div className='bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6'>
+              <div className='bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl p-6'>
                 <div className='flex flex-col xl:flex-row items-start xl:items-center space-y-6 xl:space-y-0 xl:space-x-8'>
                   {/* Left side: Logo and Company Information */}
                   <div className='flex flex-col lg:flex-row items-start lg:items-center space-y-4 lg:space-y-0 lg:space-x-6 flex-1'>
@@ -735,21 +735,21 @@ const Brokers: React.FC = () => {
 
                     {/* Company Information */}
                     <div className='flex-1 min-w-0'>
-                      <h2 className='text-2xl lg:text-3xl font-bold text-gray-900 mb-2'>
+                      <h2 className='text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2'>
                         {viewingBroker.name}
                       </h2>
 
                       <div className='space-y-2'>
                         {viewingBroker.headquarter && (
-                          <div className='flex items-center text-gray-600'>
-                            <MapPin className='w-5 h-5 mr-2 text-gray-400' />
+                          <div className='flex items-center text-gray-600 dark:text-gray-300'>
+                            <MapPin className='w-5 h-5 mr-2 text-gray-400 dark:text-gray-500' />
                             <span className='text-lg'>{viewingBroker.headquarter}</span>
                           </div>
                         )}
 
                         {viewingBroker.established_in && (
-                          <div className='flex items-center text-gray-600'>
-                            <Calendar className='w-5 h-5 mr-2 text-gray-400' />
+                          <div className='flex items-center text-gray-600 dark:text-gray-300'>
+                            <Calendar className='w-5 h-5 mr-2 text-gray-400 dark:text-gray-500' />
                             <span className='text-lg'>
                               {t('brokers.establishedIn')} {viewingBroker.established_in}
                             </span>
@@ -762,21 +762,21 @@ const Brokers: React.FC = () => {
                   {/* Right side: System Information */}
                   <div className='flex-shrink-0 w-full xl:w-60'>
                     <div className='space-y-3'>
-                      <h3 className='text-sm font-medium text-gray-500 uppercase tracking-wide'>
+                      <h3 className='text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide'>
                         {t('brokers.systemInformation')}
                       </h3>
 
                       <div className='space-y-2'>
                         <div className='flex justify-between items-center'>
-                          <span className='text-xs text-gray-400'>{t('brokers.added')}</span>
-                          <span className='text-xs text-gray-600'>
+                          <span className='text-xs text-gray-400 dark:text-gray-500'>{t('brokers.added')}</span>
+                          <span className='text-xs text-gray-600 dark:text-gray-300'>
                             {formatDateDisplay(viewingBroker.created_at)}
                           </span>
                         </div>
 
                         <div className='flex justify-between items-center'>
-                          <span className='text-xs text-gray-400'>{t('brokers.updated')}</span>
-                          <span className='text-xs text-gray-600'>
+                          <span className='text-xs text-gray-400 dark:text-gray-500'>{t('brokers.updated')}</span>
+                          <span className='text-xs text-gray-600 dark:text-gray-300'>
                             {formatDateDisplay(viewingBroker.created_at)}
                           </span>
                         </div>
@@ -789,11 +789,11 @@ const Brokers: React.FC = () => {
               {/* Description Section */}
               {viewingBroker.description && (
                 <div className='space-y-4'>
-                  <h3 className='text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2'>
+                  <h3 className='text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2'>
                     {t('brokers.description')}
                   </h3>
-                  <div className='bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6'>
-                    <div className='prose prose-sm max-w-none text-gray-700'>
+                  <div className='bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl p-6'>
+                    <div className='prose prose-sm max-w-none text-gray-700 dark:text-gray-300'>
                       <div dangerouslySetInnerHTML={{ __html: viewingBroker.description }} />
                     </div>
                   </div>
@@ -801,7 +801,7 @@ const Brokers: React.FC = () => {
               )}
 
               {/* Action Buttons */}
-              <div className='flex justify-end space-x-3 pt-6 border-t border-gray-200'>
+              <div className='flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700'>
                 <Button
                   variant='secondary'
                   size='md'
@@ -836,12 +836,12 @@ const Brokers: React.FC = () => {
             <div>
               <p>
                 {t('brokers.confirmDeleteMessage')}{' '}
-                <strong className='font-semibold text-gray-900'>
+                <strong className='font-semibold text-gray-900 dark:text-gray-100'>
                   {confirmDialog.brokerName || t('brokers.thisBroker')}
                 </strong>
                 ?
               </p>
-              <p className='mt-2 text-gray-600'>{t('brokers.actionCannotBeUndone')}</p>
+              <p className='mt-2 text-gray-600 dark:text-gray-400'>{t('brokers.actionCannotBeUndone')}</p>
             </div>
           }
           confirmLabel={tCommon('actions.delete')}

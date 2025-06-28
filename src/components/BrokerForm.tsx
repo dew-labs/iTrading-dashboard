@@ -115,7 +115,7 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
       </div>
 
       {/* Large editor section */}
-      <div className='border-t border-gray-200 pt-6'>
+      <div className='border-t border-gray-200 dark:border-gray-700 pt-6'>
         <RichTextEditor
           label={tForm('labels.description')}
           content={formData.description || ''}
@@ -128,7 +128,7 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
       </div>
 
       {/* Action buttons */}
-      <div className='flex justify-end space-x-3 pt-6 border-t border-gray-200'>
+      <div className='flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700'>
         <Button type='button' variant='secondary' size='md' leftIcon={X} onClick={onCancel}>
           {t('actions.cancel')}
         </Button>

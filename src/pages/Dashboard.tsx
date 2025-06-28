@@ -196,31 +196,55 @@ const Dashboard: React.FC = () => {
           </div>
 
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
-            {quickActions.map((action, index) => (
-              <div
-                key={index}
-                className='bg-white p-6 rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md cursor-pointer group'
-                onClick={action.action}
-              >
-                <div className='flex items-center mb-4'>
-                  <div
-                    className={`p-3 rounded-lg bg-${action.color}-100 text-${action.color}-600 group-hover:bg-${action.color}-200 transition-colors`}
-                  >
-                    <action.icon className='w-6 h-6' />
+            {quickActions.map((action, index) => {
+              // Define color-specific styles for light and dark themes
+              const getCardStyles = (color: string) => {
+                const colorStyles = {
+                  blue: 'bg-white dark:bg-blue-900/20 border-gray-200 dark:border-blue-800/30 hover:border-gray-300 dark:hover:border-blue-700/50',
+                  green: 'bg-white dark:bg-green-900/20 border-gray-200 dark:border-green-800/30 hover:border-gray-300 dark:hover:border-green-700/50',
+                  purple: 'bg-white dark:bg-purple-900/20 border-gray-200 dark:border-purple-800/30 hover:border-gray-300 dark:hover:border-purple-700/50',
+                  orange: 'bg-white dark:bg-orange-900/20 border-gray-200 dark:border-orange-800/30 hover:border-gray-300 dark:hover:border-orange-700/50'
+                }
+                return colorStyles[color as keyof typeof colorStyles] || colorStyles.blue
+              }
+
+              const getIconStyles = (color: string) => {
+                const iconStyles = {
+                  blue: 'p-3 rounded-lg bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 group-hover:bg-blue-200 dark:group-hover:bg-blue-500/30 transition-colors',
+                  green: 'p-3 rounded-lg bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 group-hover:bg-green-200 dark:group-hover:bg-green-500/30 transition-colors',
+                  purple: 'p-3 rounded-lg bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 group-hover:bg-purple-200 dark:group-hover:bg-purple-500/30 transition-colors',
+                  orange: 'p-3 rounded-lg bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 group-hover:bg-orange-200 dark:group-hover:bg-orange-500/30 transition-colors'
+                }
+                return iconStyles[color as keyof typeof iconStyles] || iconStyles.blue
+              }
+
+              return (
+                <div
+                  key={index}
+                  className={cn(
+                    'p-6 rounded-xl transition-all duration-200 hover:shadow-md cursor-pointer group',
+                    getCardStyles(action.color)
+                  )}
+                  onClick={action.action}
+                >
+                  <div className='flex items-center mb-4'>
+                    <div className={getIconStyles(action.color)}>
+                      <action.icon className='w-6 h-6' />
+                    </div>
+                  </div>
+                  <h3 className={cn(getTypographyClasses('h4'), 'mb-2', 'dark:text-white')}>{action.title}</h3>
+                  <p className={cn(getTypographyClasses('small'), 'text-gray-600 dark:text-gray-300')}>
+                    {action.description}
+                  </p>
+                  <div className='mt-4'>
+                    <button className={cn(getButtonClasses('primary', 'sm'), 'w-full')}>
+                      <Plus className='w-4 h-4 mr-2' />
+                      {tCommon('actions.create')}
+                    </button>
                   </div>
                 </div>
-                <h3 className={cn(getTypographyClasses('h4'), 'mb-2')}>{action.title}</h3>
-                <p className={cn(getTypographyClasses('small'), 'text-gray-600')}>
-                  {action.description}
-                </p>
-                <div className='mt-4'>
-                  <button className={cn(getButtonClasses('primary', 'sm'), 'w-full')}>
-                    <Plus className='w-4 h-4 mr-2' />
-                    {tCommon('actions.create')}
-                  </button>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 
@@ -235,38 +259,38 @@ const Dashboard: React.FC = () => {
 
           <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
             {/* User Growth */}
-            <div className='bg-white p-6 rounded-xl border border-gray-200'>
+            <div className='bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700'>
               <div className='flex items-center justify-between mb-4'>
-                <h3 className={getTypographyClasses('h4')}>{t('dashboard.userGrowthRate')}</h3>
+                <h3 className={cn(getTypographyClasses('h4'), 'dark:text-white')}>{t('dashboard.userGrowthRate')}</h3>
                 <TrendingUp className='w-5 h-5 text-green-500' />
               </div>
               <div className='space-y-2'>
-                <div className={getTypographyClasses('large')}>+12.5%</div>
-                <p className={cn(getTypographyClasses('small'), 'text-gray-600')}>vs last month</p>
+                <div className={cn(getTypographyClasses('large'), 'dark:text-white')}>+12.5%</div>
+                <p className={cn(getTypographyClasses('small'), 'text-gray-600 dark:text-gray-300')}>vs last month</p>
               </div>
             </div>
 
             {/* Content Published */}
-            <div className='bg-white p-6 rounded-xl border border-gray-200'>
+            <div className='bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700'>
               <div className='flex items-center justify-between mb-4'>
-                <h3 className={getTypographyClasses('h4')}>{t('dashboard.contentPublished')}</h3>
+                <h3 className={cn(getTypographyClasses('h4'), 'dark:text-white')}>{t('dashboard.contentPublished')}</h3>
                 <Activity className='w-5 h-5 text-blue-500' />
               </div>
               <div className='space-y-2'>
-                <div className={getTypographyClasses('large')}>23</div>
-                <p className={cn(getTypographyClasses('small'), 'text-gray-600')}>this month</p>
+                <div className={cn(getTypographyClasses('large'), 'dark:text-white')}>23</div>
+                <p className={cn(getTypographyClasses('small'), 'text-gray-600 dark:text-gray-300')}>this month</p>
               </div>
             </div>
 
             {/* Banner Activity */}
-            <div className='bg-white p-6 rounded-xl border border-gray-200'>
+            <div className='bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700'>
               <div className='flex items-center justify-between mb-4'>
-                <h3 className={getTypographyClasses('h4')}>{t('dashboard.bannerActivity')}</h3>
+                <h3 className={cn(getTypographyClasses('h4'), 'dark:text-white')}>{t('dashboard.bannerActivity')}</h3>
                 <BarChart3 className='w-5 h-5 text-purple-500' />
               </div>
               <div className='space-y-2'>
-                <div className={getTypographyClasses('large')}>67%</div>
-                <p className={cn(getTypographyClasses('small'), 'text-gray-600')}>
+                <div className={cn(getTypographyClasses('large'), 'dark:text-white')}>67%</div>
+                <p className={cn(getTypographyClasses('small'), 'text-gray-600 dark:text-gray-300')}>
                   {tCommon('status.active')} rate
                 </p>
               </div>

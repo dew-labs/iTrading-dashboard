@@ -215,14 +215,14 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
     return (
       <div className='p-8 text-center'>
         <div className='flex flex-col items-center space-y-4'>
-          <div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center'>
-            <Shield className='w-8 h-8 text-gray-400' />
+          <div className='w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center'>
+            <Shield className='w-8 h-8 text-gray-400 dark:text-gray-500' />
           </div>
           <div>
-            <h3 className={cn(getTypographyClasses('h3'), 'text-gray-900 mb-2')}>
+            <h3 className={cn(getTypographyClasses('h3'), 'text-gray-900 dark:text-white mb-2')}>
               {t('permissionModal.accessRestricted')}
             </h3>
-            <p className={cn(getTypographyClasses('small'), 'text-gray-600')}>
+            <p className={cn(getTypographyClasses('small'), 'text-gray-600 dark:text-gray-300')}>
               {t('permissionModal.onlySuperAdminsCanManage')}
             </p>
           </div>
@@ -240,14 +240,14 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
       ) : (
         <div className='p-6 space-y-6'>
           {/* Role Information */}
-          <div className='bg-blue-50 border border-blue-200 rounded-xl p-4'>
+          <div className='bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30 rounded-xl p-4'>
             <div className='flex items-start space-x-3'>
-              <AlertCircle className='w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5' />
+              <AlertCircle className='w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5' />
               <div>
-                <h4 className={cn(getTypographyClasses('small'), 'font-medium text-blue-900 mb-1')}>
+                <h4 className={cn(getTypographyClasses('small'), 'font-medium text-blue-900 dark:text-blue-300 mb-1')}>
                   {t('permissionModal.roleBasedPermissions')}
                 </h4>
-                <p className={cn(getTypographyClasses('small'), 'text-blue-800')}>
+                <p className={cn(getTypographyClasses('small'), 'text-blue-800 dark:text-blue-300')}>
                   {user.role === 'user'
                     ? t('permissionModal.regularUsersReadOnly')
                     : t('permissionModal.userInheritsPermissions', {
@@ -275,13 +275,13 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
 
           {availableResources.length === 0 && (
             <div className='text-center py-6'>
-              <div className='w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3'>
-                <CheckCircle className='w-6 h-6 text-green-600' />
+              <div className='w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3'>
+                <CheckCircle className='w-6 h-6 text-green-600 dark:text-green-400' />
               </div>
-              <p className={cn(getTypographyClasses('small'), 'text-gray-600 font-medium')}>
+              <p className={cn(getTypographyClasses('small'), 'text-gray-600 dark:text-gray-300 font-medium')}>
                 {t('permissionModal.allPermissionsGranted')}
               </p>
-              <p className={cn(getTypographyClasses('small'), 'text-gray-500 mt-1')}>
+              <p className={cn(getTypographyClasses('small'), 'text-gray-500 dark:text-gray-400 mt-1')}>
                 {user.role === 'user'
                   ? t('permissionModal.userHasAllAvailablePermissions')
                   : t('permissionModal.userHasAllPossiblePermissions')}
@@ -290,7 +290,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
           )}
 
           {isAdding && (
-            <div className='bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-4'>
+            <div className='bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 space-y-4'>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <Select
                   label={t('permissionModal.resource')}
@@ -344,7 +344,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
           {/* Current Permissions */}
           <div>
             <div className='flex items-center justify-between mb-4'>
-              <h4 className={cn(getTypographyClasses('h4'), 'text-gray-900')}>
+              <h4 className={cn(getTypographyClasses('h4'), 'text-gray-900 dark:text-white')}>
                 {t('permissionModal.customPermissions')}
               </h4>
               <div className='flex items-center space-x-2'>
@@ -356,36 +356,38 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
 
             {Object.keys(groupedPermissions).length === 0 ? (
               <div className='text-center py-8'>
-                <div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-                  <Key className='w-8 h-8 text-gray-400' />
+                <div className='w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4'>
+                  <Key className='w-8 h-8 text-gray-400 dark:text-gray-500' />
                 </div>
-                <p className={cn(getTypographyClasses('small'), 'text-gray-600')}>
+                <p className={cn(getTypographyClasses('small'), 'text-gray-600 dark:text-gray-300')}>
                   {t('permissionModal.noCustomPermissions')}
                 </p>
-                <p className={cn(getTypographyClasses('small'), 'text-gray-500 mt-1')}>
+                <p className={cn(getTypographyClasses('small'), 'text-gray-500 dark:text-gray-400 mt-1')}>
                   {t('permissionModal.addPermissionsToCustomize')}
                 </p>
               </div>
             ) : (
               <div className='space-y-4'>
                 {Object.entries(groupedPermissions).map(([resource, resourcePermissions]) => (
-                  <div key={resource} className='border border-gray-200 rounded-xl p-4'>
+                  <div key={resource} className='border border-gray-200 dark:border-gray-700 rounded-xl p-4'>
                     <div className='flex items-center space-x-3 mb-3'>
-                      <div className='w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center'>
-                        {getResourceIcon(resource)}
+                      <div className='w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center'>
+                        <div className='text-gray-600 dark:text-gray-400'>
+                          {getResourceIcon(resource)}
+                        </div>
                       </div>
                       <div className='flex-1'>
                         <h5
                           className={cn(
                             getTypographyClasses('small'),
-                            'font-medium text-gray-900 capitalize'
+                            'font-medium text-gray-900 dark:text-white capitalize'
                           )}
                         >
                           {t(
                             `permissionModal.permission${resource.charAt(0).toUpperCase() + resource.slice(1)}`
                           ) || resource}
                         </h5>
-                        <p className={cn(getTypographyClasses('small'), 'text-gray-500')}>
+                        <p className={cn(getTypographyClasses('small'), 'text-gray-500 dark:text-gray-400')}>
                           {resourcePermissions.length} {t('entities.permissions')}
                         </p>
                       </div>
@@ -394,14 +396,14 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
                       {resourcePermissions.map((permission, index) => (
                         <div
                           key={index}
-                          className='flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100'
+                          className='flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-600'
                         >
                           <div className='flex items-center space-x-2'>
-                            <div className='text-gray-400'>{getActionIcon(permission.action)}</div>
+                            <div className='text-gray-400 dark:text-gray-500'>{getActionIcon(permission.action)}</div>
                             <span
                               className={cn(
                                 getTypographyClasses('small'),
-                                'font-medium text-gray-900 capitalize'
+                                'font-medium text-gray-900 dark:text-white capitalize'
                               )}
                             >
                               {t(`permissions.${permission.action}`)}
@@ -409,7 +411,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
                           </div>
                           <button
                             onClick={() => handleRevoke(permission.resource, permission.action)}
-                            className='p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors'
+                            className='p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors'
                             title={t('permissionModal.revokePermission')}
                           >
                             <Trash2 className='w-3.5 h-3.5' />

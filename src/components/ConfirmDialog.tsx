@@ -44,26 +44,26 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
     switch (variant) {
     case 'danger':
       return {
-        iconBg: 'bg-red-100',
-        iconColor: 'text-red-600',
+        iconBg: 'bg-red-100 dark:bg-red-900/20',
+        iconColor: 'text-red-600 dark:text-red-400',
         icon: Trash2
       }
     case 'warning':
       return {
-        iconBg: 'bg-yellow-100',
-        iconColor: 'text-yellow-600',
+        iconBg: 'bg-yellow-100 dark:bg-yellow-900/20',
+        iconColor: 'text-yellow-600 dark:text-yellow-400',
         icon: AlertTriangle
       }
     case 'info':
       return {
-        iconBg: 'bg-blue-100',
-        iconColor: 'text-blue-600',
+        iconBg: 'bg-blue-100 dark:bg-blue-900/20',
+        iconColor: 'text-blue-600 dark:text-blue-400',
         icon: AlertCircle
       }
     default:
       return {
-        iconBg: 'bg-yellow-100',
-        iconColor: 'text-yellow-600',
+        iconBg: 'bg-yellow-100 dark:bg-yellow-900/20',
+        iconColor: 'text-yellow-600 dark:text-yellow-400',
         icon: AlertTriangle
       }
     }
@@ -75,14 +75,14 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
     <div className='fixed inset-0 z-50 overflow-y-auto' aria-modal='true' role='dialog'>
       {/* Enhanced background overlay */}
       <div
-        className='fixed inset-0 backdrop-blur-md bg-black/30 transition-all duration-300 ease-out'
+        className='fixed inset-0 backdrop-blur-md bg-black/30 dark:bg-black/50 transition-all duration-300 ease-out'
         onClick={handleBackdropClick}
       />
 
       {/* Dialog container */}
       <div className='flex min-h-full items-center justify-center p-4'>
         {/* Dialog panel */}
-        <div className='relative bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-white/20 w-full max-w-md transform transition-all duration-300 ease-out scale-100'>
+        <div className='relative bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-2xl border border-white/20 dark:border-gray-700/50 w-full max-w-md transform transition-all duration-300 ease-out scale-100'>
           <div className='p-6'>
             {/* Icon and content */}
             <div className='flex items-start'>

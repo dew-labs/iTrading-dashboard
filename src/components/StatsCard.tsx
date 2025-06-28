@@ -19,11 +19,11 @@ const StatsCard: React.FC<StatsCardProps> = ({
   color
 }) => {
   return (
-    <div className='bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 group'>
+    <div className='bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 group'>
       <div className='flex items-center justify-between'>
         <div className='flex-1'>
-          <p className='text-gray-600 text-sm font-medium mb-1'>{title}</p>
-          <p className='text-3xl font-bold text-gray-900 mb-2'>{value}</p>
+          <p className='text-gray-600 dark:text-gray-300 text-sm font-medium mb-1'>{title}</p>
+          <p className='text-3xl font-bold text-gray-900 dark:text-white mb-2'>{value}</p>
           <div className='flex items-center'>
             {changeType === 'positive' ? (
               <TrendingUp className='w-4 h-4 text-green-500 mr-1' />
@@ -37,7 +37,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
             >
               {change}
             </span>
-            <span className='text-gray-500 text-sm ml-1'>vs last month</span>
+            <span className='text-gray-500 dark:text-gray-400 text-sm ml-1'>vs last month</span>
           </div>
         </div>
         <div

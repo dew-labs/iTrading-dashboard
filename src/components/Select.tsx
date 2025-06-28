@@ -135,31 +135,31 @@ const Select: React.FC<SelectProps> = ({
 
   const getButtonStyles = () => {
     const baseStyles = `
-      relative w-full bg-white border rounded-lg
+      relative w-full bg-white dark:bg-gray-800 border rounded-lg
       flex items-center justify-between
       transition-colors duration-200 ease-in-out
-      focus:outline-none focus:border-black
+      focus:outline-none focus:border-black dark:focus:border-white
       ${config.button}
     `
 
     if (disabled) {
-      return `${baseStyles} border-gray-300 bg-gray-50 text-gray-400 cursor-not-allowed`
+      return `${baseStyles} border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-400 dark:text-gray-500 cursor-not-allowed`
     }
 
     if (error) {
-      return `${baseStyles} border-red-300 hover:border-red-400 text-gray-900 focus:border-red-500`
+      return `${baseStyles} border-red-300 dark:border-red-600 hover:border-red-400 dark:hover:border-red-500 text-gray-900 dark:text-white focus:border-red-500`
     }
 
     if (variant === 'minimal') {
-      return `${baseStyles} border-transparent hover:bg-gray-50 text-gray-900 focus:border-black`
+      return `${baseStyles} border-transparent hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white focus:border-black dark:focus:border-white`
     }
 
-    return `${baseStyles} border-gray-300 hover:border-gray-400 text-gray-900 focus:border-black`
+    return `${baseStyles} border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 text-gray-900 dark:text-white focus:border-black dark:focus:border-white`
   }
 
   const getDropdownStyles = () => {
     return `
-      absolute z-50 w-full bg-white border border-gray-200 rounded-lg shadow-lg
+      absolute z-50 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg
       max-h-60 overflow-auto
       ${config.dropdown}
       ${isOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'}
@@ -176,7 +176,7 @@ const Select: React.FC<SelectProps> = ({
         <label
           htmlFor={selectId}
           className={`block text-sm font-medium mb-1 ${
-            disabled ? 'text-gray-400' : error ? 'text-red-700' : 'text-gray-700'
+            disabled ? 'text-gray-400 dark:text-gray-500' : error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'
           }`}
         >
           {label}
@@ -202,13 +202,13 @@ const Select: React.FC<SelectProps> = ({
             {selectedOption?.icon && (
               <span className='mr-2 flex-shrink-0'>{selectedOption.icon}</span>
             )}
-            <span className={selectedOption ? 'text-gray-900' : 'text-gray-500'}>
+            <span className={selectedOption ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}>
               {selectedOption ? selectedOption.label : placeholder}
             </span>
           </div>
 
           <ChevronDown
-            className={`${config.icon} text-gray-400 transition-transform duration-200 ${
+            className={`${config.icon} text-gray-400 dark:text-gray-500 transition-transform duration-200 ${
               isOpen ? 'rotate-180' : ''
             }`}
           />
@@ -231,12 +231,12 @@ const Select: React.FC<SelectProps> = ({
                   transition-colors duration-150
                   ${
               option.disabled
-                ? 'text-gray-400 cursor-not-allowed bg-gray-50'
+                ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed bg-gray-50 dark:bg-gray-700'
                 : focusedIndex === index
-                  ? 'bg-gray-900 text-white'
+                  ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
                   : option.value === value
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-900 hover:bg-gray-50'
+                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
+                    : 'text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'
               }
                   ${index === 0 ? 'rounded-t-lg' : ''}
                   ${index === options.length - 1 ? 'rounded-b-lg' : ''}
@@ -250,7 +250,7 @@ const Select: React.FC<SelectProps> = ({
                 {option.value === value && (
                   <Check
                     className={`w-4 h-4 flex-shrink-0 ${
-                      focusedIndex === index ? 'text-white' : 'text-gray-900'
+                      focusedIndex === index ? 'text-white dark:text-gray-900' : 'text-gray-900 dark:text-white'
                     }`}
                   />
                 )}
@@ -262,7 +262,7 @@ const Select: React.FC<SelectProps> = ({
 
       {/* Error Message */}
       {error && (
-        <p className='mt-1 text-sm text-red-600' role='alert'>
+        <p className='mt-1 text-sm text-red-600 dark:text-red-400' role='alert'>
           {error}
         </p>
       )}

@@ -107,11 +107,23 @@
     "welcome": "Bem-vindo",
     "welcomeBack": "Bem-vindo de volta!",
     "goodbye": "Até logo",
-    "hello": "Olá"
+    "hello": "Olá",
+    "adminDashboard": "Painel Administrativo",
+    "signInToAccess": "Entre para acessar sua conta",
+    "emailAddress": "Endereço de E-mail",
+    "enterEmail": "Digite seu e-mail",
+    "enterPassword": "Digite sua senha",
+    "signingIn": "Entrando...",
+    "adminAccessOnly": "Acesso apenas para administradores"
   },
   "ui": {
     "language": "Idioma",
-    "theme": "Tema",
+    "theme": {
+      "title": "Tema",
+      "light": "Claro",
+      "dark": "Escuro",
+      "system": "Sistema"
+    },
     "settings": "Configurações",
     "profile": "Perfil",
     "image": "Imagem",

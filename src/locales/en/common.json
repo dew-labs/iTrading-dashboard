@@ -107,11 +107,23 @@
     "welcome": "Welcome",
     "welcomeBack": "Welcome back!",
     "goodbye": "Goodbye",
-    "hello": "Hello"
+    "hello": "Hello",
+    "adminDashboard": "Admin Dashboard",
+    "signInToAccess": "Sign in to access your account",
+    "emailAddress": "Email Address",
+    "enterEmail": "Enter your email",
+    "enterPassword": "Enter your password",
+    "signingIn": "Signing in...",
+    "adminAccessOnly": "Admin access only"
   },
   "ui": {
     "language": "Language",
-    "theme": "Theme",
+    "theme": {
+      "title": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
     "settings": "Settings",
     "profile": "Profile",
     "image": "Image",

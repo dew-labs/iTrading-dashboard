@@ -133,35 +133,35 @@ export const SPACING = {
 export const TYPOGRAPHY = {
   // Headings
   heading: {
-    h1: 'text-3xl font-bold text-gray-900',
-    h2: 'text-2xl font-bold text-gray-900',
-    h3: 'text-lg font-semibold text-gray-900',
-    h4: 'text-base font-semibold text-gray-900'
+    h1: 'text-3xl font-bold text-gray-900 dark:text-white',
+    h2: 'text-2xl font-bold text-gray-900 dark:text-white',
+    h3: 'text-lg font-semibold text-gray-900 dark:text-white',
+    h4: 'text-base font-semibold text-gray-900 dark:text-white'
   },
 
   // Body text
   body: {
-    large: 'text-lg text-gray-600',
-    medium: 'text-base text-gray-600',
-    small: 'text-sm text-gray-600',
-    xsmall: 'text-xs text-gray-500'
+    large: 'text-lg text-gray-600 dark:text-gray-300',
+    medium: 'text-base text-gray-600 dark:text-gray-300',
+    small: 'text-sm text-gray-600 dark:text-gray-300',
+    xsmall: 'text-xs text-gray-500 dark:text-gray-400'
   },
 
   // Special text styles
-  subtitle: 'text-gray-600 font-medium',
-  description: 'text-gray-600',
-  muted: 'text-gray-500',
-  caption: 'text-xs text-gray-500'
+  subtitle: 'text-gray-600 dark:text-gray-300 font-medium',
+  description: 'text-gray-600 dark:text-gray-300',
+  muted: 'text-gray-500 dark:text-gray-400',
+  caption: 'text-xs text-gray-500 dark:text-gray-400'
 } as const
 
 // Component Styles
 export const COMPONENTS = {
   // Cards
   card: {
-    base: 'bg-white rounded-xl shadow-sm border border-gray-200',
+    base: 'bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700',
     hover: 'hover:shadow-md transition-all duration-200',
     interactive:
-      'bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200'
+      'bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200'
   },
 
   // Buttons
@@ -176,7 +176,7 @@ export const COMPONENTS = {
 
   // Form elements
   input: {
-    base: 'w-full border border-gray-300 rounded-lg focus:outline-none focus:border-black transition-colors duration-200',
+    base: 'w-full border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white',
     withIcon: 'pl-10 pr-4 py-2'
   },
 

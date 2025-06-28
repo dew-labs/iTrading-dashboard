@@ -56,7 +56,7 @@ const FormInput: React.FC<FormInputProps> = ({
 
   return (
     <div className='space-y-2'>
-      <label htmlFor={name} className='block text-sm font-semibold text-gray-800'>
+      <label htmlFor={name} className='block text-sm font-semibold text-gray-800 dark:text-gray-200'>
         {label} {required && <span className='text-red-500'>*</span>}
       </label>
       <div className='relative group'>
@@ -76,16 +76,16 @@ const FormInput: React.FC<FormInputProps> = ({
           className={`
             w-full ${showIcon ? 'pl-12' : 'pl-4'} pr-4 py-3.5 border-2 rounded-xl
             transition-colors duration-200 ease-in-out
-            focus:outline-none
+            focus:outline-none text-gray-900 dark:text-white
+            placeholder:text-gray-400 dark:placeholder:text-gray-500
             ${
     hasError
-      ? 'border-red-300 bg-red-50 focus:border-red-500'
+      ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20 focus:border-red-500'
       : hasValue
-        ? 'border-green-300 bg-green-50 focus:border-green-500'
-        : 'border-gray-200 bg-white focus:border-black hover:border-gray-300'
+        ? 'border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/20 focus:border-green-500'
+        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:border-black dark:focus:border-white hover:border-gray-300 dark:hover:border-gray-600'
     }
-            ${disabled ? 'bg-gray-50 cursor-not-allowed opacity-75' : ''}
-            placeholder:text-gray-400
+            ${disabled ? 'bg-gray-50 dark:bg-gray-900 cursor-not-allowed opacity-75' : ''}
           `}
           placeholder={placeholder}
         />
@@ -101,7 +101,7 @@ const FormInput: React.FC<FormInputProps> = ({
           <p className='text-sm font-medium'>{error}</p>
         </div>
       )}
-      {helpText && !hasError && <p className='text-sm text-gray-500'>{helpText}</p>}
+      {helpText && !hasError && <p className='text-sm text-gray-500 dark:text-gray-400'>{helpText}</p>}
     </div>
   )
 }

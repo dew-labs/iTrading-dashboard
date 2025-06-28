@@ -181,10 +181,10 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
   return (
     <div className={`space-y-2 ${className}`}>
       {/* Label */}
-      <label className='block text-sm font-medium text-gray-700'>
+      <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
         {label}
         {isUploading && (
-          <span className='ml-2 text-xs text-blue-600'>Uploading... {progress}%</span>
+          <span className='ml-2 text-xs text-blue-600 dark:text-blue-400'>Uploading... {progress}%</span>
         )}
       </label>
 
@@ -243,20 +243,20 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
                     type='button'
                     onClick={handleClick}
                     disabled={disabled}
-                    className='p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors disabled:opacity-50'
+                    className='p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50'
                     title='Change image'
                   >
-                    <Camera className='w-4 h-4 text-gray-600' />
+                    <Camera className='w-4 h-4 text-gray-600 dark:text-gray-300' />
                   </button>
                   {showRemoveButton && (
                     <button
                       type='button'
                       onClick={handleRemove}
                       disabled={disabled}
-                      className='p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors disabled:opacity-50'
+                      className='p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50'
                       title='Remove image'
                     >
-                      <Trash2 className='w-4 h-4 text-red-600' />
+                      <Trash2 className='w-4 h-4 text-red-600 dark:text-red-400' />
                     </button>
                   )}
                 </div>
@@ -267,10 +267,10 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
           <div
             className={`${config.uploadArea} ${config.padding} border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors ${
               dragActive
-                ? 'border-blue-500 bg-blue-50'
+                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                 : disabled || isUploading
-                  ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                  : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+                  ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 cursor-not-allowed'
+                  : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
@@ -279,23 +279,23 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
             onClick={handleClick}
           >
             <div className={`flex flex-col items-center ${config.spacing}`}>
-              <ImageIcon className={`${config.icon} text-gray-400`} />
+              <ImageIcon className={`${config.icon} text-gray-400 dark:text-gray-500`} />
               <div className='text-center'>
-                <span className={`${config.text} text-gray-600 font-medium block`}>
+                <span className={`${config.text} text-gray-600 dark:text-gray-300 font-medium block`}>
                   {size === 'lg' ? 'Click to upload' : 'Upload'}
                 </span>
                 {size === 'lg' && (
-                  <span className={`${config.text} text-gray-500 block`}>or drag & drop</span>
+                  <span className={`${config.text} text-gray-500 dark:text-gray-400 block`}>or drag & drop</span>
                 )}
               </div>
-              {size === 'lg' && <span className='text-xs text-gray-500'>PNG, JPG up to 10MB</span>}
+              {size === 'lg' && <span className='text-xs text-gray-500 dark:text-gray-400'>PNG, JPG up to 10MB</span>}
             </div>
           </div>
         )}
       </div>
 
       {/* Compact hint for large size only */}
-      {size === 'lg' && <p className='text-xs text-gray-500 mt-2'>{recommendationText}</p>}
+      {size === 'lg' && <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>{recommendationText}</p>}
     </div>
   )
 }

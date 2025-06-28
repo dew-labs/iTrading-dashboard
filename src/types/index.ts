@@ -10,3 +10,14 @@ export * from './brokers'
 
 // Keep the main Database interface export
 export type { Database } from './database'
+
+/**
+ * Theme Types
+ */
+export type Theme = 'light' | 'dark'
+
+export interface ThemeState {
+  theme: Theme
+  setTheme: (theme: Theme) => void
+  toggleTheme: () => void
+}

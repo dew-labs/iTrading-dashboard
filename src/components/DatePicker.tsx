@@ -158,14 +158,14 @@ const DatePicker: React.FC<DatePickerProps> = ({
   return (
     <div className={`space-y-2 ${className}`} ref={containerRef}>
       {label && (
-        <label htmlFor={id} className='block text-sm font-medium text-gray-700 mb-1'>
+        <label htmlFor={id} className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
           {label} {required && <span className='text-red-500'>*</span>}
         </label>
       )}
 
       <div className='relative'>
         <div className='absolute left-3 top-1/2 transform -translate-y-1/2 z-10'>
-          <Calendar className={`w-4 h-4 ${error ? 'text-red-400' : 'text-gray-400'}`} />
+          <Calendar className={`w-4 h-4 ${error ? 'text-red-400' : 'text-gray-400 dark:text-gray-500'}`} />
         </div>
 
         {/* Custom display input that shows formatted date */}
@@ -174,12 +174,12 @@ const DatePicker: React.FC<DatePickerProps> = ({
           className={`
             w-full pl-10 pr-4 py-2 border rounded-lg cursor-pointer
             transition-colors duration-200 ease-in-out
-            focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent
-            ${error ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white hover:border-gray-400'}
-            ${disabled ? 'bg-gray-50 cursor-not-allowed opacity-75' : ''}
+            focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-300 focus:border-transparent
+            ${error ? 'border-red-300 bg-red-50 dark:border-red-600 dark:bg-red-900/20' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:border-gray-500'}
+            ${disabled ? 'bg-gray-50 dark:bg-gray-700 cursor-not-allowed opacity-75' : ''}
           `}
         >
-          <span className={displayValue ? 'text-gray-900' : 'text-gray-400'}>
+          <span className={displayValue ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'}>
             {displayValue || placeholder}
           </span>
         </div>
@@ -199,32 +199,32 @@ const DatePicker: React.FC<DatePickerProps> = ({
 
         {/* Custom Calendar Overlay */}
         {isOpen && !disabled && (
-          <div className='absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4 w-80'>
+          <div className='absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 p-4 w-80'>
             {/* Calendar Header */}
             <div className='flex items-center justify-between mb-4'>
               <button
                 type='button'
                 onClick={() => navigateMonth('prev')}
-                className='p-2 hover:bg-gray-100 rounded-lg transition-colors'
+                className='p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors'
               >
-                <ChevronLeft className='w-4 h-4' />
+                <ChevronLeft className='w-4 h-4 text-gray-600 dark:text-gray-300' />
               </button>
 
-              <h3 className='font-semibold text-gray-900'>{monthYear}</h3>
+              <h3 className='font-semibold text-gray-900 dark:text-white'>{monthYear}</h3>
 
               <button
                 type='button'
                 onClick={() => navigateMonth('next')}
-                className='p-2 hover:bg-gray-100 rounded-lg transition-colors'
+                className='p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors'
               >
-                <ChevronRight className='w-4 h-4' />
+                <ChevronRight className='w-4 h-4 text-gray-600 dark:text-gray-300' />
               </button>
             </div>
 
             {/* Day Headers */}
             <div className='grid grid-cols-7 gap-1 mb-2'>
               {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-                <div key={day} className='text-center text-xs font-medium text-gray-500 p-2'>
+                <div key={day} className='text-center text-xs font-medium text-gray-500 dark:text-gray-400 p-2'>
                   {day}
                 </div>
               ))}
@@ -246,12 +246,12 @@ const DatePicker: React.FC<DatePickerProps> = ({
                       p-2 text-sm rounded-lg transition-colors
                       ${
                   !isCurrentMonth
-                    ? 'text-gray-300 hover:bg-gray-50'
+                    ? 'text-gray-300 dark:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
                     : isSelectedDate
-                      ? 'bg-gray-900 text-white'
+                      ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
                       : isTodayDate
-                        ? 'bg-blue-100 text-blue-900 font-semibold'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-300 font-semibold'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                   }
                     `}
                   >
@@ -262,11 +262,11 @@ const DatePicker: React.FC<DatePickerProps> = ({
             </div>
 
             {/* Quick Actions */}
-            <div className='flex justify-between mt-4 pt-3 border-t border-gray-100'>
+            <div className='flex justify-between mt-4 pt-3 border-t border-gray-100 dark:border-gray-700'>
               <button
                 type='button'
                 onClick={() => handleDateSelect(new Date())}
-                className='text-sm text-gray-600 hover:text-gray-900 transition-colors'
+                className='text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors'
               >
                 Today
               </button>
@@ -277,7 +277,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
                   onChange('')
                   setIsOpen(false)
                 }}
-                className='text-sm text-gray-600 hover:text-gray-900 transition-colors'
+                className='text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors'
               >
                 Clear
               </button>
@@ -287,7 +287,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
       </div>
 
       {error && (
-        <div className='flex items-center mt-1 text-sm text-red-600'>
+        <div className='flex items-center mt-1 text-sm text-red-600 dark:text-red-400'>
           <AlertCircle className='w-4 h-4 mr-1' />
           {error}
         </div>

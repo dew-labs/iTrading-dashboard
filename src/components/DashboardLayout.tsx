@@ -15,7 +15,7 @@ const DashboardLayout: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   return (
-    <div className='h-screen bg-gray-50 flex flex-col'>
+    <div className='h-screen bg-gray-50 dark:bg-gray-900 flex flex-col'>
       {/* Header spans full width at top */}
       <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
@@ -28,7 +28,7 @@ const DashboardLayout: React.FC = () => {
           setIsCollapsed={setSidebarCollapsed}
         />
 
-        <main className='flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6'>
+        <main className='flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900 p-6'>
           <Routes>
             <Route path='/' element={<Dashboard />} />
             {/* Analytics page hidden - route commented out */}

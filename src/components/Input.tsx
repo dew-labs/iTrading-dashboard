@@ -34,8 +34,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const getInputClasses = () => {
       const baseClasses = [
-        'border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500',
-        'focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent',
+        'border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400',
+        'focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-300 focus:border-transparent',
         'transition-all duration-200',
         fullWidth && 'w-full'
       ]
@@ -71,12 +71,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
       // Variant classes
       if (variant === 'error' || error) {
-        baseClasses.push('border-red-300 focus:ring-red-500 focus:border-red-500')
+        baseClasses.push('border-red-300 dark:border-red-600 focus:ring-red-500 focus:border-red-500')
       }
 
       // Disabled state
       if (disabled) {
-        baseClasses.push('bg-gray-50 text-gray-500 cursor-not-allowed border-gray-200')
+        baseClasses.push('bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed border-gray-200 dark:border-gray-600')
       }
 
       return cn(...baseClasses, className)
@@ -84,7 +84,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const getIconClasses = () => {
       const iconSize = inputSize === 'sm' ? 'w-4 h-4' : inputSize === 'lg' ? 'w-5 h-5' : 'w-4 h-4'
-      return `${iconSize} text-gray-400 pointer-events-none`
+      return `${iconSize} text-gray-400 dark:text-gray-500 pointer-events-none`
     }
 
     const getIconPosition = (position: 'left' | 'right') => {
@@ -113,7 +113,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             htmlFor={inputId}
             className={cn(
               'block text-sm font-medium',
-              error ? 'text-red-700' : disabled ? 'text-gray-400' : 'text-gray-700'
+              error ? 'text-red-700 dark:text-red-400' : disabled ? 'text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-300'
             )}
           >
             {label}
@@ -141,7 +141,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
         {/* Helper Text or Error */}
         {(error || helperText) && (
-          <p className={cn('text-xs', error ? 'text-red-600' : 'text-gray-500')}>
+          <p className={cn('text-xs', error ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400')}>
             {error || helperText}
           </p>
         )}

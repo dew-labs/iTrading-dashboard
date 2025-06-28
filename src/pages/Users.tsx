@@ -339,14 +339,14 @@ const Users: React.FC = () => {
       render: (value: unknown, row: DatabaseUser) => {
         return (
           <div className={getTypographyClasses('small')}>
-            <div className='flex items-center text-gray-900 mb-1'>
-              <Clock className='w-4 h-4 mr-1 text-gray-400' />
+            <div className='flex items-center text-gray-900 dark:text-gray-100 mb-1'>
+              <Clock className='w-4 h-4 mr-1 text-gray-400 dark:text-gray-500' />
               <span>
                 {t('users.last')}:{' '}
                 {row.last_login ? formatDateDisplay(row.last_login) : t('users.never')}
               </span>
             </div>
-            <div className='flex items-center text-gray-500'>
+            <div className='flex items-center text-gray-500 dark:text-gray-400'>
               <Calendar className='w-4 h-4 mr-1' />
               <span>
                 {t('users.joined')}: {formatDateDisplay(value as string)}
@@ -363,7 +363,7 @@ const Users: React.FC = () => {
         <div className='flex space-x-1'>
           <button
             onClick={() => handleEdit(row)}
-            className='p-2 text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded transition-colors'
+            className='p-2 text-gray-600 dark:text-gray-300 hover:text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded transition-colors'
             title={t('users.editUser')}
           >
             <Edit2 className={getIconClasses('action')} />
@@ -371,7 +371,7 @@ const Users: React.FC = () => {
           {isSuperAdmin() && row.role !== 'user' && (
             <button
               onClick={() => setManagingPermissionsFor(row)}
-              className='p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors'
+              className='p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors'
               title={t('users.managePermissions')}
             >
               <Key className={getIconClasses('action')} />
@@ -379,7 +379,7 @@ const Users: React.FC = () => {
           )}
           <button
             onClick={() => handleDelete(row)}
-            className='p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors'
+            className='p-2 text-gray-600 dark:text-gray-300 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors'
             title={t('users.deleteUser')}
           >
             <Trash2 className={getIconClasses('action')} />
@@ -545,7 +545,7 @@ const Users: React.FC = () => {
                   }}
                 />
                 <div className='flex items-center'>
-                  <span className='text-sm text-gray-700'>
+                  <span className='text-sm text-gray-700 dark:text-gray-300'>
                     {tCommon('pagination.showingRows', {
                       startItem: (currentPage - 1) * itemsPerPage + 1,
                       endItem: Math.min(currentPage * itemsPerPage, filteredAndSortedUsers.length),
@@ -559,7 +559,7 @@ const Users: React.FC = () => {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className='p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
+                  className='p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                 >
                   <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                     <path
@@ -571,7 +571,7 @@ const Users: React.FC = () => {
                   </svg>
                 </button>
                 <div className='flex items-center'>
-                  <span className='text-sm text-gray-700'>{tCommon('pagination.page')}</span>
+                  <span className='text-sm text-gray-700 dark:text-gray-300'>{tCommon('pagination.page')}</span>
                 </div>
                 <div className='flex items-center space-x-1'>
                   <input
@@ -598,16 +598,16 @@ const Users: React.FC = () => {
                         }
                       }
                     }}
-                    className='w-12 px-2 py-1 text-sm text-center border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+                    className='w-12 px-2 py-1 text-sm text-center border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:border-black dark:focus:border-white bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors duration-200'
                   />
-                  <span className='text-sm text-gray-700'>
+                  <span className='text-sm text-gray-700 dark:text-gray-300'>
                     {tCommon('pagination.of')} {totalPages}
                   </span>
                 </div>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className='p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
+                  className='p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                 >
                   <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                     <path

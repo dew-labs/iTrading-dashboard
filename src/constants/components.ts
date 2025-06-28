@@ -24,33 +24,33 @@ export const BASE_STYLES = {
 // Card variants
 export const CARD_VARIANTS = {
   // Base card styles (no padding - user applies their own)
-  base: 'bg-white rounded-xl border border-gray-200',
+  base: 'bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700',
 
   // Interactive cards (with padding)
   interactive:
-    'bg-white rounded-xl border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer p-6',
+    'bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 cursor-pointer p-6',
 
   // Card with shadows (with padding)
-  elevated: 'bg-white rounded-xl border border-gray-200 shadow-sm p-6',
+  elevated: 'bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6',
 
   // Hover states (with padding)
   hoverable:
-    'bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300 transition-all duration-200 p-6',
+    'bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 p-6',
 
   // Stats card specific (with padding)
   stats:
-    'bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 p-6'
+    'bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200 p-6'
 } as const
 
 // Button variants (pre-computed for performance)
 export const BUTTON_VARIANTS = {
   // Primary button
   primary:
-    'inline-flex items-center justify-center font-medium bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-black hover:to-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed',
+    'inline-flex items-center justify-center font-medium bg-gradient-to-r from-gray-900 to-black dark:from-white dark:to-gray-100 text-white dark:text-gray-900 rounded-lg hover:from-black hover:to-gray-900 dark:hover:from-gray-100 dark:hover:to-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:ring-offset-2 transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed',
 
   // Secondary button
   secondary:
-    'inline-flex items-center justify-center font-medium border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed',
+    'inline-flex items-center justify-center font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed',
 
   // Danger button
   danger:
@@ -58,10 +58,10 @@ export const BUTTON_VARIANTS = {
 
   // Ghost button
   ghost:
-    'inline-flex items-center justify-center font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
+    'inline-flex items-center justify-center font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
 
   // Icon button
-  icon: 'inline-flex items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+  icon: 'inline-flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
 } as const
 
 // Button sizes
@@ -75,16 +75,16 @@ export const BUTTON_SIZES = {
 
 // Input variants
 export const INPUT_VARIANTS = {
-  base: 'w-full border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-black transition-colors duration-200',
+  base: 'w-full border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-200',
 
   withIcon:
-    'w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-black transition-colors duration-200',
+    'w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-200',
 
   error:
-    'w-full border border-red-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors duration-200',
+    'w-full border border-red-300 dark:border-red-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-red-500 transition-colors duration-200',
 
   disabled:
-    'w-full border border-gray-200 rounded-lg bg-gray-50 text-gray-500 placeholder-gray-400 cursor-not-allowed'
+    'w-full border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 placeholder-gray-400 dark:placeholder-gray-500 cursor-not-allowed'
 } as const
 
 // Badge variants (status, role, etc.)
@@ -162,32 +162,32 @@ export const ICON_VARIANTS = {
 export const TYPOGRAPHY_VARIANTS = {
   // Headings
   heading: {
-    h1: 'text-3xl font-bold text-gray-900 tracking-tight',
-    h2: 'text-2xl font-bold text-gray-900 tracking-tight',
-    h3: 'text-lg font-semibold text-gray-900',
-    h4: 'text-base font-semibold text-gray-900'
+    h1: 'text-3xl font-bold text-gray-900 dark:text-white tracking-tight',
+    h2: 'text-2xl font-bold text-gray-900 dark:text-white tracking-tight',
+    h3: 'text-lg font-semibold text-gray-900 dark:text-white',
+    h4: 'text-base font-semibold text-gray-900 dark:text-white'
   },
 
   // Body text
   body: {
-    large: 'text-lg text-gray-600 leading-relaxed',
-    base: 'text-base text-gray-600 leading-normal',
-    small: 'text-sm text-gray-600 leading-normal',
-    xs: 'text-xs text-gray-500 leading-normal'
+    large: 'text-lg text-gray-600 dark:text-gray-300 leading-relaxed',
+    base: 'text-base text-gray-600 dark:text-gray-300 leading-normal',
+    small: 'text-sm text-gray-600 dark:text-gray-300 leading-normal',
+    xs: 'text-xs text-gray-500 dark:text-gray-400 leading-normal'
   },
 
   // Special text
-  subtitle: 'text-gray-600 font-medium',
-  description: 'text-gray-600 leading-relaxed',
-  muted: 'text-gray-500',
-  caption: 'text-xs text-gray-500 leading-relaxed'
+  subtitle: 'text-gray-600 dark:text-gray-300 font-medium',
+  description: 'text-gray-600 dark:text-gray-300 leading-relaxed',
+  muted: 'text-gray-500 dark:text-gray-400',
+  caption: 'text-xs text-gray-500 dark:text-gray-400 leading-relaxed'
 } as const
 
 // Layout variants
 export const LAYOUT_VARIANTS = {
   // Container layouts
   container: {
-    full: 'min-h-full bg-gray-50'
+    full: 'min-h-full bg-gray-50 dark:bg-gray-900'
   },
 
   // Page layouts

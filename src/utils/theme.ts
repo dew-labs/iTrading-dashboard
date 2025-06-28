@@ -39,7 +39,7 @@ export const getContainerClasses = (
   section: keyof typeof CONTAINER.section = 'normal'
 ): string => {
   return cn(
-    'min-h-full bg-gray-50',
+    'min-h-full bg-gray-50 dark:bg-gray-900',
     CONTAINER.maxWidth[width],
     'mx-auto',
     CONTAINER.padding[padding],
@@ -156,7 +156,7 @@ export const getStatsCardProps = (feature: keyof typeof ICON_VARIANTS.stats) => 
   cardClasses: getCardClasses('stats'),
   iconClasses: getIconClasses('stats', feature),
   titleClasses: getTypographyClasses('h4'),
-  valueClasses: 'text-2xl font-bold text-gray-900',
+  valueClasses: 'text-2xl font-bold text-gray-900 dark:text-white',
   labelClasses: cn(getTypographyClasses('small'), 'font-medium')
 })
 

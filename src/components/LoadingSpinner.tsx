@@ -32,7 +32,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
     return (
       <div className={`relative ${sizeClasses[size]} ${className}`}>
         <div className='absolute inset-0 rounded-full bg-gradient-to-r from-teal-500 via-cyan-500 to-teal-600 animate-spin'>
-          <div className='absolute inset-1 rounded-full bg-white'></div>
+          <div className='absolute inset-1 rounded-full bg-white dark:bg-gray-800'></div>
         </div>
         <div className='absolute inset-2 rounded-full bg-gradient-to-r from-teal-400 to-cyan-400 animate-pulse'></div>
       </div>

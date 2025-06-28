@@ -289,7 +289,7 @@ const Banners: React.FC = () => {
         <div className='flex space-x-1'>
           <button
             onClick={() => handleToggleStatus(row)}
-            className='p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors'
+            className='p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors'
             title={
               row.is_active
                 ? t('banners.tooltips.deactivateBanner')
@@ -304,14 +304,14 @@ const Banners: React.FC = () => {
           </button>
           <button
             onClick={() => handleEdit(row)}
-            className='p-2 text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded transition-colors'
+            className='p-2 text-gray-600 dark:text-gray-300 hover:text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded transition-colors'
             title={t('banners.tooltips.editBanner')}
           >
             <Edit2 className={getIconClasses('action')} />
           </button>
           <button
             onClick={() => handleDelete(row)}
-            className='p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors'
+            className='p-2 text-gray-600 dark:text-gray-300 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors'
             title={t('banners.tooltips.deleteBanner')}
           >
             <Trash2 className={getIconClasses('action')} />
@@ -414,7 +414,7 @@ const Banners: React.FC = () => {
         </div>
 
         {/* Banners Content */}
-        <div className='bg-white rounded-xl border border-gray-200 shadow-sm'>
+        <div className='bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm'>
           <div className='p-6 space-y-4'>
             {/* Search and filters row */}
             <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4'>
@@ -462,7 +462,7 @@ const Banners: React.FC = () => {
                   }}
                 />
                 <div className='flex items-center'>
-                  <span className='text-sm text-gray-700'>
+                  <span className='text-sm text-gray-700 dark:text-gray-300'>
                     {tCommon('pagination.showingRows', {
                       startItem: (currentPage - 1) * itemsPerPage + 1,
                       endItem: Math.min(
@@ -480,7 +480,7 @@ const Banners: React.FC = () => {
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className='p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
+                    className='p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                   >
                     <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                       <path
@@ -492,7 +492,7 @@ const Banners: React.FC = () => {
                     </svg>
                   </button>
                   <div className='flex items-center'>
-                    <span className='text-sm text-gray-700'>{tCommon('pagination.page')}</span>
+                    <span className='text-sm text-gray-700 dark:text-gray-300'>{tCommon('pagination.page')}</span>
                   </div>
                   <div className='flex items-center space-x-1'>
                     <input
@@ -519,7 +519,7 @@ const Banners: React.FC = () => {
                           }
                         }
                       }}
-                      className='w-12 px-2 py-1 text-sm text-center border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+                      className='w-12 px-2 py-1 text-sm text-center border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:border-black dark:focus:border-white bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors duration-200'
                     />
                     <span className='text-sm text-gray-700'>
                       {tCommon('pagination.of')} {totalPages}

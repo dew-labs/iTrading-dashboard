@@ -9,12 +9,17 @@ import {
   Activity,
   Clock,
   Globe,
-  LogOut
+  LogOut,
+  Sun,
+  Moon,
+  Monitor
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
+import { useThemeStore } from '../store/themeStore'
 import { LANGUAGES } from '../constants'
 import { useTranslation, useNotificationTranslation } from '../hooks/useTranslation'
 import Badge from './Badge'
+import type { Theme } from '../types'
 
 interface HeaderProps {
   onToggleSidebar: () => void
@@ -31,6 +36,7 @@ interface NotificationItem {
 
 const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const { user, profile, signOut } = useAuthStore()
+  const { theme, setTheme } = useThemeStore()
   const { t, language, changeLanguage } = useTranslation()
   const { t: tNotifications } = useNotificationTranslation()
   const [showProfileDropdown, setShowProfileDropdown] = useState(false)
@@ -134,6 +140,33 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
     setShowProfileDropdown(false)
   }
 
+  const handleThemeChange = (newTheme: Theme) => {
+    setTheme(newTheme)
+    setShowProfileDropdown(false)
+  }
+
+  const getThemeIcon = (themeOption: Theme) => {
+    switch (themeOption) {
+    case 'light':
+      return <Sun className='w-4 h-4' />
+    case 'dark':
+      return <Moon className='w-4 h-4' />
+    default:
+      return <Monitor className='w-4 h-4' />
+    }
+  }
+
+  const getThemeLabel = (themeOption: Theme) => {
+    switch (themeOption) {
+    case 'light':
+      return t('ui.theme.light')
+    case 'dark':
+      return t('ui.theme.dark')
+    default:
+      return t('ui.theme.system')
+    }
+  }
+
   const getNotificationIcon = (type: string) => {
     switch (type) {
     case 'user':
@@ -165,14 +198,14 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   }
 
   return (
-    <header className='bg-white border-b border-gray-200 relative z-10'>
+    <header className='bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 relative z-10'>
       <div className='flex items-center justify-between h-20 px-6'>
         <div className='flex items-center'>
           <button
             onClick={onToggleSidebar}
-            className='lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors'
+            className='lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
           >
-            <Menu className='w-5 h-5 text-gray-600' />
+            <Menu className='w-5 h-5 text-gray-600 dark:text-gray-300' />
           </button>
 
           {/* Logo */}
@@ -181,7 +214,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               <span className='text-white font-bold text-lg'>i</span>
             </div>
             <div className='ml-3'>
-              <h1 className='text-xl font-bold text-gray-900'>iTrading</h1>
+              <h1 className='text-xl font-bold text-gray-900 dark:text-white'>iTrading</h1>
             </div>
           </div>
         </div>
@@ -191,7 +224,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           <div className='relative' ref={notificationRef}>
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className='relative p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all group'
+              className='relative p-2.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all group'
             >
               <Bell className='w-5 h-5' />
               <span className='absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse'></span>
@@ -200,11 +233,11 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
 
             {/* Notification Dropdown */}
             {showNotifications && (
-              <div className='absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50 max-h-96 overflow-hidden'>
+              <div className='absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 max-h-96 overflow-hidden'>
                 {/* Header */}
-                <div className='px-4 py-3 border-b border-gray-100'>
+                <div className='px-4 py-3 border-b border-gray-100 dark:border-gray-700'>
                   <div className='flex items-center justify-between'>
-                    <h3 className='font-semibold text-gray-900'>
+                    <h3 className='font-semibold text-gray-900 dark:text-white'>
                       {tNotifications('recentActivity')}
                     </h3>
                     <span className='text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full'>
@@ -218,7 +251,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                   {recentNotifications.map(notification => (
                     <div
                       key={notification.id}
-                      className='px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0'
+                      className='px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-50 dark:border-gray-700 last:border-b-0'
                     >
                       <div className='flex items-start space-x-3'>
                         <div
@@ -230,17 +263,17 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                         </div>
                         <div className='flex-1 min-w-0'>
                           <div className='flex items-center justify-between'>
-                            <p className='text-sm font-medium text-gray-900 truncate'>
+                            <p className='text-sm font-medium text-gray-900 dark:text-white truncate'>
                               {notification.action}
                             </p>
-                            <div className='flex items-center text-xs text-gray-500 ml-2'>
+                            <div className='flex items-center text-xs text-gray-500 dark:text-gray-400 ml-2'>
                               <Clock className='w-3 h-3 mr-1' />
                               {notification.timestamp}
                             </div>
                           </div>
-                          <p className='text-xs text-gray-600 mt-1'>by {notification.user}</p>
+                          <p className='text-xs text-gray-600 dark:text-gray-300 mt-1'>by {notification.user}</p>
                           {notification.details && (
-                            <p className='text-xs text-gray-500 mt-1 truncate'>
+                            <p className='text-xs text-gray-500 dark:text-gray-400 mt-1 truncate'>
                               {notification.details}
                             </p>
                           )}
@@ -251,8 +284,8 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 </div>
 
                 {/* Footer */}
-                <div className='px-4 py-3 border-t border-gray-100'>
-                  <button className='w-full text-sm text-gray-900 hover:text-black font-medium text-center'>
+                <div className='px-4 py-3 border-t border-gray-100 dark:border-gray-700'>
+                  <button className='w-full text-sm text-gray-900 dark:text-white hover:text-black dark:hover:text-gray-200 font-medium text-center'>
                     {tNotifications('viewAll')}
                   </button>
                 </div>
@@ -261,16 +294,16 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           </div>
 
           {/* Divider */}
-          <div className='w-px h-8 bg-gray-200 mx-4'></div>
+          <div className='w-px h-8 bg-gray-200 dark:bg-gray-700 mx-4'></div>
 
           {/* User Profile Dropdown */}
           <div className='relative' ref={dropdownRef}>
             <button
               onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-              className='flex items-center space-x-3 hover:bg-gray-50 rounded-xl transition-all duration-200 py-3 px-4 group'
+              className='flex items-center space-x-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 py-3 px-4 group'
             >
               <div className='hidden sm:block text-right min-w-0'>
-                <p className='text-sm font-medium text-gray-900 truncate group-hover:text-gray-700 transition-colors'>
+                <p className='text-sm font-medium text-gray-900 dark:text-white truncate group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors'>
                   {user?.user_metadata?.full_name || profile?.full_name || t('roles.user')}
                 </p>
                 <div className='flex items-center justify-end'>
@@ -305,7 +338,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               </div>
 
               <ChevronDown
-                className={`w-4 h-4 text-gray-400 transition-all duration-300 group-hover:text-gray-600 ${
+                className={`w-4 h-4 text-gray-400 dark:text-gray-500 transition-all duration-300 group-hover:text-gray-600 dark:group-hover:text-gray-300 ${
                   showProfileDropdown ? 'rotate-180 text-teal-500' : ''
                 }`}
               />
@@ -313,9 +346,9 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
 
             {/* Dropdown Menu */}
             {showProfileDropdown && (
-              <div className='absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50'>
+              <div className='absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50'>
                 {/* User Info Section */}
-                <div className='px-4 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white'>
+                <div className='px-4 py-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800'>
                   <div className='flex items-center space-x-4'>
                     <div className='relative'>
                       <div className='w-14 h-14 bg-gradient-to-br from-teal-500 via-cyan-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg ring-3 ring-white'>
@@ -326,10 +359,10 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                       <div className='absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full shadow-sm'></div>
                     </div>
                     <div className='flex-1 min-w-0'>
-                      <p className='font-semibold text-gray-900 truncate text-base'>
+                      <p className='font-semibold text-gray-900 dark:text-white truncate text-base'>
                         {user?.user_metadata?.full_name || profile?.full_name || t('roles.user')}
                       </p>
-                      <p className='text-sm text-gray-500 truncate'>{user?.email}</p>
+                      <p className='text-sm text-gray-500 dark:text-gray-400 truncate'>{user?.email}</p>
                       <div className='mt-1'>
                         {profile?.role && (
                           <Badge
@@ -351,7 +384,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
 
                 {/* Language Selection */}
                 <div className='px-2 py-2'>
-                  <div className='px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                  <div className='px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'>
                     {t('ui.language')}
                   </div>
                   {LANGUAGES.map(lang => (
@@ -361,7 +394,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                       className={`w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors ${
                         language === lang.code
                           ? 'bg-teal-500 text-white'
-                          : 'text-gray-700 hover:bg-gray-50'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                       }`}
                     >
                       <Globe className='w-4 h-4 mr-3' />
@@ -375,13 +408,40 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 </div>
 
                 {/* Divider */}
-                <div className='border-t border-gray-100 my-2'></div>
+                <div className='border-t border-gray-100 dark:border-gray-700 my-2'></div>
+
+                {/* Theme Selection */}
+                <div className='px-2 py-2'>
+                  <div className='px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'>
+                    {t('ui.theme.title')}
+                  </div>
+                  {(['light', 'dark'] as Theme[]).map(themeOption => (
+                    <button
+                      key={themeOption}
+                      onClick={() => handleThemeChange(themeOption)}
+                      className={`w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors ${
+                        theme === themeOption
+                          ? 'bg-teal-500 text-white'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      {getThemeIcon(themeOption)}
+                      <span className='ml-3 flex-1 text-left'>{getThemeLabel(themeOption)}</span>
+                      {theme === themeOption && (
+                        <div className='w-2 h-2 bg-white rounded-full'></div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Divider */}
+                <div className='border-t border-gray-100 dark:border-gray-700 my-2'></div>
 
                 {/* Logout */}
                 <div className='px-2'>
                   <button
                     onClick={handleSignOut}
-                    className='w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors group'
+                    className='w-full flex items-center px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors group'
                   >
                     <LogOut className='w-4 h-4 mr-3 group-hover:scale-110 transition-transform' />
                     {t('auth.signOut')}

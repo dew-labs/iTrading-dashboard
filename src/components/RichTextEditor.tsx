@@ -155,7 +155,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   return (
     <div className={`space-y-2 ${className}`}>
       {label && (
-        <label className='block text-sm font-medium text-gray-700'>
+        <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
           {label} {required && <span className='text-red-500'>*</span>}
         </label>
       )}
@@ -186,7 +186,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       )}
 
       {content && (
-        <div className='mt-1 text-sm text-gray-500'>
+        <div className='mt-1 text-sm text-gray-500 dark:text-gray-400'>
           {content.replace(/<[^>]*>/g, '').length} characters • Cloud storage: {bucket}/{folder}
         </div>
       )}

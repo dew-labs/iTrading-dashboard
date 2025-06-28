@@ -142,9 +142,9 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
     <div className='relative max-w-2xl mx-auto'>
       <form onSubmit={handleSubmit} className='space-y-6'>
         {/* Basic Information */}
-        <div className='bg-gray-50 rounded-2xl p-6 space-y-6'>
-          <h4 className='text-lg font-semibold text-gray-900 flex items-center'>
-            <User className='w-5 h-5 mr-2' />
+        <div className='bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 space-y-6'>
+          <h4 className='text-lg font-semibold text-gray-900 dark:text-white flex items-center'>
+            <User className='w-5 h-5 mr-2 text-gray-600 dark:text-gray-400' />
             {t('userForm.basicInformation')}
           </h4>
 
@@ -192,9 +192,9 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
         </div>
 
         {/* Role Selection */}
-        <div className='bg-gray-50 rounded-2xl p-6 space-y-6'>
-          <h4 className='text-lg font-semibold text-gray-900 flex items-center'>
-            <Shield className='w-5 h-5 mr-2' />
+        <div className='bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 space-y-6'>
+          <h4 className='text-lg font-semibold text-gray-900 dark:text-white flex items-center'>
+            <Shield className='w-5 h-5 mr-2 text-gray-600 dark:text-gray-400' />
             {t('userForm.userRolePermissions')}
           </h4>
 
@@ -207,8 +207,8 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
                   transition-all duration-200 hover:shadow-lg group
                   ${
               formData.role === option.value
-                ? 'border-gray-900 bg-white shadow-lg ring-2 ring-gray-100'
-                : 'border-gray-200 hover:border-gray-300 bg-gray-50 hover:bg-white'
+                ? 'border-gray-900 dark:border-white bg-white dark:bg-gray-700 shadow-lg ring-2 ring-gray-100 dark:ring-gray-600'
+                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-gray-50 dark:bg-gray-800 hover:bg-white dark:hover:bg-gray-700'
               }
                 `}
               >
@@ -231,11 +231,11 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
                   {option.icon}
                 </div>
                 <div className='flex-1'>
-                  <h5 className='text-xl font-bold text-gray-900 mb-1'>{option.label}</h5>
-                  <p className='text-sm text-gray-600 leading-relaxed'>{option.description}</p>
+                  <h5 className='text-xl font-bold text-gray-900 dark:text-white mb-1'>{option.label}</h5>
+                  <p className='text-sm text-gray-600 dark:text-gray-300 leading-relaxed'>{option.description}</p>
                 </div>
                 {formData.role === option.value && (
-                  <div className='flex items-center justify-center w-8 h-8 rounded-full bg-gray-900 text-white ml-4'>
+                  <div className='flex items-center justify-center w-8 h-8 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 ml-4'>
                     <CheckCircle2 className='w-5 h-5' />
                   </div>
                 )}
@@ -245,13 +245,13 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
         </div>
 
         {/* Action Buttons */}
-        <div className='flex justify-end space-x-4 pt-6 border-t border-gray-200'>
+        <div className='flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700'>
           <button
             type='button'
             onClick={onCancel}
             disabled={isSubmitting}
-            className='px-6 py-3 text-gray-700 bg-white border-2 border-gray-300 rounded-xl
-                       hover:bg-gray-50 hover:border-gray-400 transition-all duration-200
+            className='px-6 py-3 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl
+                       hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200
                        disabled:opacity-50 disabled:cursor-not-allowed font-semibold'
           >
             {t('actions.cancel')}
@@ -259,8 +259,8 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
           <button
             type='submit'
             disabled={isSubmitting}
-            className='px-8 py-3 bg-gradient-to-r from-gray-900 to-black text-white rounded-xl
-                       hover:from-black hover:to-gray-900 transition-all duration-200
+            className='px-8 py-3 bg-gradient-to-r from-gray-900 to-black dark:from-white dark:to-gray-100 text-white dark:text-gray-900 rounded-xl
+                       hover:from-black hover:to-gray-900 dark:hover:from-gray-100 dark:hover:to-white transition-all duration-200
                        shadow-lg hover:shadow-xl transform hover:-translate-y-0.5
                        disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
                        flex items-center space-x-2 font-semibold min-w-[160px] justify-center'
