@@ -343,7 +343,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
 
             {/* Dropdown Menu */}
             {showProfileDropdown && (
-              <div className='absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50'>
+              <div className='absolute right-0 mt-2 w-66 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50'>
                 {/* User Info Section */}
                 <div className='px-4 py-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800'>
                   <div className='flex items-center space-x-4'>

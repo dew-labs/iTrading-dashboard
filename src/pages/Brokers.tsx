@@ -138,7 +138,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({ broker, onView, onEdit, onDelet
           <div className='flex items-center'>
             <FileText className='w-3 h-3 mr-1' />
             <span>
-              {t('brokers.added')} {formatDateDisplay(broker.created_at)}
+              {t('brokers.added')} {formatDateDisplay(broker.created_at || new Date().toISOString())}
             </span>
           </div>
         </div>
@@ -209,8 +209,8 @@ const Brokers: React.FC = () => {
         bValue = b.established_in || 0
         break
       case 'created_at':
-        aValue = new Date(a.created_at).getTime()
-        bValue = new Date(b.created_at).getTime()
+        aValue = new Date(a.created_at || 0).getTime()
+        bValue = new Date(b.created_at || 0).getTime()
         break
       default:
         return 0
@@ -416,7 +416,7 @@ const Brokers: React.FC = () => {
   const brokersWithHQ = brokers.filter(b => b.headquarter).length
   const brokersWithEstDate = brokers.filter(b => b.established_in).length
   const recentBrokers = brokers.filter(
-    b => new Date(b.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    b => new Date(b.created_at || 0) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
   ).length
 
   const totalBrokersProps = getStatsCardProps('products')
@@ -770,14 +770,14 @@ const Brokers: React.FC = () => {
                         <div className='flex justify-between items-center'>
                           <span className='text-xs text-gray-400 dark:text-gray-500'>{t('brokers.added')}</span>
                           <span className='text-xs text-gray-600 dark:text-gray-300'>
-                            {formatDateDisplay(viewingBroker.created_at)}
+                            {formatDateDisplay(viewingBroker.created_at || new Date().toISOString())}
                           </span>
                         </div>
 
                         <div className='flex justify-between items-center'>
                           <span className='text-xs text-gray-400 dark:text-gray-500'>{t('brokers.updated')}</span>
                           <span className='text-xs text-gray-600 dark:text-gray-300'>
-                            {formatDateDisplay(viewingBroker.created_at)}
+                            {formatDateDisplay(viewingBroker.created_at || new Date().toISOString())}
                           </span>
                         </div>
                       </div>

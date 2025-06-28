@@ -146,8 +146,8 @@ const Posts: React.FC = () => {
         break
       case 'created_at':
       default:
-        aValue = new Date(a.created_at).getTime()
-        bValue = new Date(b.created_at).getTime()
+        aValue = new Date(a.created_at || 0).getTime()
+        bValue = new Date(b.created_at || 0).getTime()
       }
 
       if (sortDirection === 'asc') {
@@ -669,7 +669,7 @@ const Posts: React.FC = () => {
                   className={cn('flex items-center justify-between', getTypographyClasses('small'))}
                 >
                   <span>
-                    {t('posts.created')} {formatDateDisplay(viewingPost.created_at)}
+                    {t('posts.created')} {formatDateDisplay(viewingPost.created_at || new Date().toISOString())}
                   </span>
                   {(viewingPost as ExtendedPost).views && (
                     <span>

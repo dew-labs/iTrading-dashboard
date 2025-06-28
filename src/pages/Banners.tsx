@@ -5,8 +5,8 @@ import {
   Edit2,
   Trash2,
   Image,
-  ToggleLeft,
-  ToggleRight,
+  Eye,
+  EyeOff,
   Calendar,
   Link,
   Activity,
@@ -14,6 +14,7 @@ import {
   XCircle
 } from 'lucide-react'
 import { useBanners } from '../hooks/useBanners'
+import { useImages } from '../hooks/useImages'
 import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
@@ -42,6 +43,7 @@ import { FILTER_OPTIONS } from '../constants/components'
 
 const Banners: React.FC = () => {
   const { banners, loading, createBanner, updateBanner, deleteBanner, isDeleting } = useBanners()
+  const { createImageFromUpload } = useImages()
   const { t } = usePageTranslation() // Page-specific content
   const { t: tCommon } = useTranslation() // Common actions and terms
   const [searchTerm, setSearchTerm] = useState('')
@@ -71,9 +73,9 @@ const Banners: React.FC = () => {
   // Enhanced filtering and sorting
   const filteredAndSortedBanners = useMemo(() => {
     const filtered = banners.filter(banner => {
-      const matchesSearch = banner.target_url
-        ? banner.target_url.toLowerCase().includes(searchTerm.toLowerCase())
-        : searchTerm === ''
+      const matchesSearch = searchTerm === '' ||
+        banner.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (banner.target_url && banner.target_url.toLowerCase().includes(searchTerm.toLowerCase()))
 
       const matchesStatus =
         filterStatus === 'all' ||
@@ -91,6 +93,10 @@ const Banners: React.FC = () => {
       let bValue: string | number | boolean
 
       switch (sortColumn) {
+      case 'name':
+        aValue = a.name.toLowerCase()
+        bValue = b.name.toLowerCase()
+        break
       case 'target_url':
         aValue = (a.target_url || '').toLowerCase()
         bValue = (b.target_url || '').toLowerCase()
@@ -100,8 +106,8 @@ const Banners: React.FC = () => {
         bValue = b.is_active ? 1 : 0
         break
       case 'created_at':
-        aValue = new Date(a.created_at).getTime()
-        bValue = new Date(b.created_at).getTime()
+        aValue = new Date(a.created_at || 0).getTime()
+        bValue = new Date(b.created_at || 0).getTime()
         break
       default:
         return 0
@@ -172,12 +178,34 @@ const Banners: React.FC = () => {
     setEditingBanner(null)
   }
 
-  const handleSubmit = async (data: BannerInsert) => {
+  const handleSubmit = async (
+    data: BannerInsert,
+    imageUploadResult?: {
+      url: string
+      path: string
+      id: string
+      file?: File
+    }
+  ) => {
     try {
       if (editingBanner) {
         await updateBanner(editingBanner.id, data)
       } else {
-        await createBanner(data)
+        // Create banner first
+        const newBanner = await createBanner(data)
+
+        // If there's an image upload result, create the image record
+        if (imageUploadResult && newBanner && imageUploadResult.file) {
+          await createImageFromUpload(
+            'banners',
+            newBanner.id,
+            imageUploadResult,
+            `Banner ${newBanner.id.slice(0, 8)} image`,
+            imageUploadResult.file.size,
+            imageUploadResult.file.type
+          )
+        }
+
         // Go to first page to see the new banner
         setCurrentPage(1)
       }
@@ -207,7 +235,7 @@ const Banners: React.FC = () => {
   const columns = [
     {
       header: t('banners.bannerDetails'),
-      accessor: 'target_url' as keyof Banner,
+      accessor: 'name' as keyof Banner,
       sortable: true,
       render: (value: unknown, row: Banner) => {
         return (
@@ -224,12 +252,9 @@ const Banners: React.FC = () => {
             </div>
             <div className='flex-1 min-w-0'>
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>
-                {(value as string | null) || t('banners.noTargetUrl')}
+                {row.name || 'Untitled Banner'}
               </div>
-              <div className={cn(getTypographyClasses('small'), 'truncate')}>
-                ID: {row.id.slice(0, 8)}...
-              </div>
-              <div className='flex items-center space-x-2 mt-1'>
+              <div className='flex items-center space-x-2 mt-2'>
                 <Badge variant={row.is_active ? 'active' : 'inactive'} size='sm' showIcon>
                   {tCommon(row.is_active ? 'status.active' : 'status.inactive')}
                 </Badge>
@@ -297,9 +322,9 @@ const Banners: React.FC = () => {
             }
           >
             {row.is_active ? (
-              <ToggleLeft className={getIconClasses('action')} />
+              <Eye className={getIconClasses('action')} />
             ) : (
-              <ToggleRight className={getIconClasses('action')} />
+              <EyeOff className={getIconClasses('action')} />
             )}
           </button>
           <button

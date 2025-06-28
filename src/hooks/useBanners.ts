@@ -58,6 +58,7 @@ export const useBanners = () => {
       // Optimistically update
       const optimisticBanner: Banner = {
         id: crypto.randomUUID(), // Temporary ID
+        name: newBanner.name || 'New Banner',
         target_url: newBanner.target_url || null,
         is_active: newBanner.is_active || false,
         created_at: new Date().toISOString()
