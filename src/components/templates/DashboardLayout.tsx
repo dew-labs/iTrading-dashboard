@@ -13,6 +13,7 @@ const Banners = React.lazy(() => import('../../pages/Banners'))
 const Users = React.lazy(() => import('../../pages/Users'))
 const Settings = React.lazy(() => import('../../pages/Settings'))
 const Products = React.lazy(() => import('../../pages/Products'))
+const Audits = React.lazy(() => import('../../pages/Audits'))
 const Unauthorized = React.lazy(() => import('../../pages/Unauthorized'))
 
 const DashboardLayout: React.FC = () => {
@@ -79,6 +80,15 @@ const DashboardLayout: React.FC = () => {
                 }
               />
               <Route path='/settings' element={<Settings />} />
+
+              <Route
+                path='/audits'
+                element={
+                  <ProtectedRoute requiredPermission={{ resource: 'audit_logs', action: 'read' }}>
+                    <Audits />
+                  </ProtectedRoute>
+                }
+              />
 
               <Route path='/unauthorized' element={<Unauthorized />} />
             </Routes>

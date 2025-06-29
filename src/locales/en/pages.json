@@ -250,5 +250,62 @@
     "enterEmail": "Enter your email",
     "enterPassword": "Enter your password",
     "signingIn": "Signing in..."
+  },
+  "audits": {
+    "title": "Recent Activities",
+    "description": "Monitor recent administrative actions and system changes",
+    "loadingActivities": "Loading recent activities...",
+    "exportData": "Export Data",
+    "cleanOldLogs": "Clean Old Logs",
+    "permissionRequired": "You don't have permission to perform this action",
+    "activityDetails": "Activity Details",
+    "deleteLogTitle": "Delete Activity Log",
+    "deleteLogMessage": "Are you sure you want to delete this activity log? This action cannot be undone.",
+    "bulkDeleteTitle": "Clean Up Old Activities",
+    "bulkDeleteMessage": "This will permanently delete all activity logs older than 30 days. This action cannot be undone.",
+    "stats": {
+      "totalActivities": "Total Activities",
+      "activeUsers": "Active Users",
+      "recentActivities": "Recent Activities",
+      "criticalActions": "Critical Actions"
+    },
+    "tabs": {
+      "all": {
+        "label": "All Activities",
+        "description": "View all recorded activities"
+      },
+      "users": {
+        "label": "User Activities",
+        "description": "Activities related to user management"
+      },
+      "posts": {
+        "label": "Content Activities",
+        "description": "Activities related to content management"
+      },
+      "products": {
+        "label": "Product Activities",
+        "description": "Activities related to product management"
+      },
+      "brokers": {
+        "label": "Broker Activities",
+        "description": "Activities related to broker management"
+      }
+    },
+    "filters": {
+      "table": "Table",
+      "resource": "Resource",
+      "action": "Action",
+      "role": "Role"
+    },
+    "clearFilters": "Clear Filters",
+    "activityDetails": "Activity Details",
+    "userInfo": "User Information",
+    "targetAndTime": "Target & Time",
+    "changes": "Changes",
+    "actions": "Actions",
+    "viewDetails": "View Details",
+    "deleteLog": "Delete Log",
+    "noChanges": "No changes",
+    "noTarget": "No target"
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { Image as ImageIcon, Upload, Camera, Trash2, X, Save, Plus, Link } from 'lucide-react'
 import type { Banner, BannerInsert } from '../../../types'
 import { useFormValidation } from '../../../hooks/useFormValidation'
@@ -6,6 +6,28 @@ import { FormField } from '../../atoms'
 import { useImages } from '../../../hooks/useImages'
 import { useFileUpload } from '../../../hooks/useFileUpload'
 import { toast } from '../../../utils/toast'
+
+// Move schema outside component to prevent re-renders
+const BANNER_FORM_SCHEMA = {
+  name: {
+    required: true,
+    minLength: 2,
+    maxLength: 100,
+    message: 'Banner name must be between 2 and 100 characters'
+  },
+  target_url: {
+    required: true,
+    custom: (value: string) => {
+      try {
+        new URL(value)
+        return true
+      } catch {
+        return false
+      }
+    },
+    message: 'Please enter a valid URL'
+  }
+} as const
 
 interface BannerFormProps {
   banner?: Banner | null
@@ -19,6 +41,13 @@ interface BannerFormProps {
 }
 
 const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) => {
+  // Memoize initial data to prevent re-renders
+  const initialData = useMemo(() => ({
+    name: '',
+    target_url: '',
+    is_active: false
+  }), [])
+
   // Enhanced form validation with our new hook
   const {
     data: formData,
@@ -30,31 +59,8 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
     handleSubmit,
     reset
   } = useFormValidation({
-    schema: {
-      name: {
-        required: true,
-        minLength: 2,
-        maxLength: 100,
-        message: 'Banner name must be between 2 and 100 characters'
-      },
-      target_url: {
-        required: true,
-        custom: (value: string) => {
-          try {
-            new URL(value)
-            return true
-          } catch {
-            return false
-          }
-        },
-        message: 'Please enter a valid URL'
-      }
-    },
-    initialData: {
-      name: '',
-      target_url: '',
-      is_active: false
-    },
+    schema: BANNER_FORM_SCHEMA,
+    initialData,
     validateOnBlur: true,
     validateOnChange: false
   })
@@ -72,8 +78,17 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
   const { createImageFromUpload, deleteImage, isCreating: isCreatingImage } = useImages()
   const { uploadFile, isUploading, progress } = useFileUpload()
 
-  // Load existing banner image if editing
-  const { images: existingImages } = useImages('banners', banner?.id || '')
+  // Load existing banner image if editing (only when we have a banner ID)
+  const { images: existingImages } = useImages(
+    banner?.id ? 'banners' : undefined,
+    banner?.id || undefined
+  )
+
+  // Memoize the first existing image to prevent re-renders
+  const existingImage = useMemo(() =>
+    existingImages?.[0] || null,
+    [existingImages]
+  )
 
   React.useEffect(() => {
     if (banner) {
@@ -82,16 +97,18 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
         target_url: banner.target_url || '',
         is_active: !!banner.is_active
       })
-
-      // Load existing image
-      if (existingImages?.[0]?.image_url) {
-        setImageUrl(existingImages[0].image_url)
-      }
     }
-  }, [banner, existingImages, reset])
+  }, [banner, reset])
+
+  // Separate effect for loading existing image to prevent infinite loops
+  React.useEffect(() => {
+    if (banner?.id && existingImage?.image_url) {
+      setImageUrl(existingImage.image_url)
+    }
+  }, [banner?.id, existingImage?.image_url])
 
   // Handle file selection
-  const handleFileSelect = async (file: File) => {
+  const handleFileSelect = useCallback(async (file: File) => {
     if (!file.type.startsWith('image/')) {
       toast.error('Please select an image file')
       return
@@ -138,7 +155,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
       console.error('Upload error:', error)
       setPreview(null)
     }
-  }
+  }, [banner?.id, uploadFile, createImageFromUpload])
 
   // Handle drag events
   const handleDrag = (e: React.DragEvent) => {
@@ -174,7 +191,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
   }
 
   // Handle remove image
-  const handleRemove = async () => {
+  const handleRemove = useCallback(async () => {
     if (isUploading) return
 
     setImageUrl(null)
@@ -182,15 +199,15 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
     setUploadResult(null)
 
     // If editing and there's an existing image, delete it
-    if (banner?.id && existingImages?.[0]) {
+    if (banner?.id && existingImage) {
       try {
-        await deleteImage(existingImages[0].id)
+        await deleteImage(existingImage.id)
         toast.success('Image removed successfully!')
       } catch (error) {
         console.error('Failed to delete image:', error)
       }
     }
-  }
+  }, [banner?.id, existingImage, isUploading, deleteImage])
 
   // Handle click to open file dialog
   const handleClick = () => {
@@ -198,7 +215,9 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
     document.getElementById('banner-file-input')?.click()
   }
 
-  const handleFormSubmit = async (data: typeof formData) => {
+  const handleFormSubmit = useCallback(async (data: typeof formData) => {
+    const currentImage = preview || imageUrl
+
     // Validate that image is provided
     if (!banner && !currentImage && !uploadResult) {
       toast.error('Please upload a banner image')
@@ -216,7 +235,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
     } catch (error) {
       console.error('Failed to save banner:', error)
     }
-  }
+  }, [banner, preview, imageUrl, uploadResult, onSubmit])
 
   const currentImage = preview || imageUrl
   const showRemoveButton = currentImage && !isUploading

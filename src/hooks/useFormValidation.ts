@@ -3,7 +3,7 @@
  * Provides comprehensive form validation with real-time feedback
  */
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useRef } from 'react'
 import { validateField, validateForm, type ValidationSchema, type FieldValidationResult } from '../utils/validation'
 import { useTranslation } from './useTranslation'
 
@@ -44,7 +44,7 @@ export type UseFormValidationReturn<T> = FormValidationState<T> & FormValidation
 /**
  * Enhanced form validation hook with comprehensive features
  */
-export function useFormValidation<T extends Record<string, any>>({
+export function useFormValidation<T extends Record<string, unknown>>({
   schema,
   validateOnBlur = true,
   validateOnChange = false,
@@ -53,11 +53,19 @@ export function useFormValidation<T extends Record<string, any>>({
 }: UseFormValidationOptions<T>): UseFormValidationReturn<T> {
   const { t } = useTranslation()
 
+  // Use refs to track latest values without adding them as dependencies
+  const dataRef = useRef<T>(initialData || {} as T)
+  const schemaRef = useRef(schema)
+
   // Form state
   const [data, setDataState] = useState<T>(initialData || {} as T)
   const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({})
   const [touched, setTouched] = useState<Partial<Record<keyof T, boolean>>>({})
   const [isValidating, setIsValidating] = useState(false)
+
+  // Update refs when state changes
+  dataRef.current = data
+  schemaRef.current = schema
 
   // Computed values
   const isValid = useMemo(() => {
@@ -77,18 +85,19 @@ export function useFormValidation<T extends Record<string, any>>({
   const updateField = useCallback((field: keyof T, value: T[keyof T]) => {
     setDataState(prev => ({ ...prev, [field]: value }))
 
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => {
+    // Clear error when user starts typing (using functional update to avoid dependency)
+    setErrors(prev => {
+      if (prev[field]) {
         const newErrors = { ...prev }
         delete newErrors[field]
         return newErrors
-      })
-    }
+      }
+      return prev
+    })
 
     // Validate on change if enabled
     if (validateOnChange) {
-      const rule = schema[field]
+      const rule = schemaRef.current[field]
       if (rule) {
         const result = validateField(value, rule, field as string, t)
         if (!result.isValid && result.error) {
@@ -96,13 +105,13 @@ export function useFormValidation<T extends Record<string, any>>({
         }
       }
     }
-  }, [schema, errors, validateOnChange, t])
+  }, [validateOnChange, t])
 
   const validateFieldFn = useCallback((field: keyof T): FieldValidationResult => {
-    const rule = schema[field]
+    const rule = schemaRef.current[field]
     if (!rule) return { isValid: true }
 
-    const result = validateField(data[field], rule, field as string, t)
+    const result = validateField(dataRef.current[field], rule, field as string, t)
 
     if (!result.isValid && result.error) {
       setErrors(prev => ({ ...prev, [field]: result.error }))
@@ -115,17 +124,17 @@ export function useFormValidation<T extends Record<string, any>>({
     }
 
     return result
-  }, [data, schema, t])
+  }, [t])
 
   const validateFormFn = useCallback(() => {
     setIsValidating(true)
 
-    const result = validateForm(data, schema, t)
+    const result = validateForm(dataRef.current, schemaRef.current, t)
     setErrors(result.errors)
 
     setIsValidating(false)
     return result
-  }, [data, schema, t])
+  }, [t])
 
   const setFieldTouched = useCallback((field: keyof T, isTouched = true) => {
     setTouched(prev => ({ ...prev, [field]: isTouched }))
@@ -156,7 +165,7 @@ export function useFormValidation<T extends Record<string, any>>({
   }, [initialData])
 
   // Event handlers
-    const handleBlur = useCallback((field: keyof T) => (_e: React.FocusEvent) => {
+  const handleBlur = useCallback((field: keyof T) => (_e: React.FocusEvent) => {
     setFieldTouched(field, true)
 
     if (validateOnBlur) {
@@ -191,7 +200,7 @@ export function useFormValidation<T extends Record<string, any>>({
         if (!result.isValid) {
           // Mark all fields as touched to show errors
           const allTouched: Partial<Record<keyof T, boolean>> = {}
-          Object.keys(schema).forEach(key => {
+          Object.keys(schemaRef.current).forEach(key => {
             allTouched[key as keyof T] = true
           })
           setTouched(allTouched)
@@ -201,11 +210,11 @@ export function useFormValidation<T extends Record<string, any>>({
 
       setIsValidating(true)
       try {
-        await onSubmit(data)
+        await onSubmit(dataRef.current)
       } finally {
         setIsValidating(false)
       }
-    }, [data, schema, validateOnSubmit, validateFormFn])
+    }, [validateOnSubmit, validateFormFn])
 
   return {
     // State

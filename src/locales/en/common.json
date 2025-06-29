@@ -228,6 +228,7 @@
     "searchPostsPlaceholder": "Search posts by title, content, or author...",
     "searchProductsPlaceholder": "Search products by name or description...",
     "searchBannersPlaceholder": "Search banners by URL...",
-    "searchBrokersPlaceholder": "Search brokers by headquarter or description..."
+    "searchBrokersPlaceholder": "Search brokers by headquarter or description...",
+    "searchActivitiesPlaceholder": "Search activities by user, action, or target..."
   }
 }

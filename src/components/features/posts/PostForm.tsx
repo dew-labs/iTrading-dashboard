@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { AlertCircle, FileText, Calendar, Scale, Lock, Clock, CheckCircle, Save, X, Plus } from 'lucide-react'
 import type { PostInsert } from '../../../types'
 import type { PostWithAuthor } from '../../../hooks/usePosts'
@@ -7,7 +7,21 @@ import { FormField } from '../../atoms'
 import { Select } from '../../molecules'
 import RichTextEditor from './RichTextEditor'
 import { MainImageUpload } from '../images'
-import { useAuth } from '../../../hooks/useAuth'
+
+// Move schema outside component to prevent re-renders
+const POST_FORM_SCHEMA = {
+  title: {
+    required: true,
+    minLength: 3,
+    maxLength: 200,
+    message: 'Title must be between 3 and 200 characters'
+  },
+  content: {
+    required: true,
+    minLength: 10,
+    message: 'Content must be at least 10 characters'
+  }
+} as const
 
 interface PostFormProps {
   post?: PostWithAuthor | null
@@ -16,7 +30,17 @@ interface PostFormProps {
 }
 
 const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
-  const { user } = useAuth()
+
+  // Memoize initial data to prevent re-renders
+  const initialData = useMemo(() => ({
+    title: '',
+    content: '',
+    type: 'news' as PostWithAuthor['type'],
+    status: 'draft' as PostWithAuthor['status'],
+    author_id: null as string | null,
+    thumbnail_url: null as string | null,
+    views: 0
+  }), [])
 
   // Enhanced form validation with our new hook
   const {
@@ -28,37 +52,9 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
     handleChange,
     handleSubmit,
     reset
-  } = useFormValidation<{
-    title: string
-    content: string
-    type: PostWithAuthor['type']
-    status: PostWithAuthor['status']
-    author_id: string | null
-    thumbnail_url: string | null
-    views: number
-  }>({
-    schema: {
-      title: {
-        required: true,
-        minLength: 3,
-        maxLength: 200,
-        message: 'Title must be between 3 and 200 characters'
-      },
-      content: {
-        required: true,
-        minLength: 10,
-        message: 'Content must be at least 10 characters'
-      }
-    },
-    initialData: {
-      title: '',
-      content: '',
-      type: 'news',
-      status: 'draft',
-      author_id: user?.id || null,
-      thumbnail_url: null,
-      views: 0
-    },
+  } = useFormValidation({
+    schema: POST_FORM_SCHEMA,
+    initialData,
     validateOnBlur: true,
     validateOnChange: false
   })
@@ -70,23 +66,23 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
         type: post.type,
         content: post.content || '',
         status: post.status,
-        author_id: post.author_id || user?.id || null,
+        author_id: post.author_id,
         thumbnail_url: post.thumbnail_url || null,
         views: post.views || 0
       })
     }
-  }, [post, user?.id, reset])
+  }, [post, reset])
 
-  const handleContentChange = (content: string) => {
+  const handleContentChange = useCallback((content: string) => {
     updateField('content', content)
-  }
+  }, [updateField])
 
-  const handleThumbnailChange = (url: string | null) => {
+  const handleThumbnailChange = useCallback((url: string | null) => {
     updateField('thumbnail_url', url)
-  }
+  }, [updateField])
 
   // Create type options with Badge component icons
-  const typeOptions = [
+  const typeOptions = useMemo(() => [
     {
       value: 'news',
       label: 'News',
@@ -107,10 +103,10 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
       label: 'Privacy Policy',
       icon: <Lock className='w-4 h-4' />
     }
-  ]
+  ], [])
 
   // Create status options with Badge component icons
-  const statusOptions = [
+  const statusOptions = useMemo(() => [
     {
       value: 'draft',
       label: 'Draft',
@@ -121,10 +117,14 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
       label: 'Published',
       icon: <CheckCircle className='w-4 h-4' />
     }
-  ]
+  ], [])
+
+  const handleFormSubmit = useCallback((data: typeof formData) => {
+    onSubmit(data as PostInsert)
+  }, [onSubmit])
 
   return (
-    <form onSubmit={handleSubmit((data) => onSubmit(data as PostInsert))} className='space-y-6'>
+    <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
       {/* Title field - full width for emphasis using enhanced FormField */}
       <FormField
         label='Title'

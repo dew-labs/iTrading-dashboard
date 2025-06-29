@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { User, Shield, Sparkles, X, Save, Mail, Camera } from 'lucide-react'
 import type { DatabaseUser, UserInsert, UserRole } from '../../../types'
 import { usePermissions } from '../../../hooks/usePermissions'
@@ -10,6 +10,17 @@ import { FormField } from '../../atoms'
 import { Select } from '../../molecules'
 import { MainImageUpload } from '../images'
 
+// Move schema outside component to prevent re-renders
+const USER_FORM_SCHEMA = {
+  ...formSchemas.user,
+  // Add custom validation for role
+  role: {
+    required: true,
+    custom: (value: UserRole) => Object.values(USER_ROLES).includes(value),
+    message: 'Please select a valid role'
+  }
+} as const
+
 interface UserFormProps {
   user?: DatabaseUser | null
   onSubmit: (data: Omit<UserInsert, 'id'>) => void
@@ -19,6 +30,16 @@ interface UserFormProps {
 const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
   const { t } = useTranslation()
   const { isSuperAdmin } = usePermissions()
+
+  // Memoize initial data to prevent re-renders
+  const initialData = useMemo(() => ({
+    email: '',
+    full_name: '',
+    phone: '',
+    role: 'user' as UserRole,
+    status: 'invited' as const,
+    avatar_url: null as string | null
+  }), [])
 
   // Enhanced form validation with our new hook
   const {
@@ -31,23 +52,8 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
     handleSubmit,
     reset
   } = useFormValidation({
-    schema: {
-      ...formSchemas.user,
-      // Add custom validation for confirm password matching
-      role: {
-        required: true,
-        custom: (value: UserRole) => Object.values(USER_ROLES).includes(value),
-        message: 'Please select a valid role'
-      }
-    },
-    initialData: {
-      email: user?.email || '',
-      full_name: user?.full_name || '',
-      phone: user?.phone || '',
-      role: user?.role || 'user',
-      status: 'invited' as const, // Always set to invited for new users
-      avatar_url: user?.avatar_url ?? null
-    },
+    schema: USER_FORM_SCHEMA,
+    initialData,
     validateOnBlur: true,
     validateOnChange: false
   })
@@ -65,11 +71,11 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
     }
   }, [user, reset])
 
-  const handleAvatarUpload = (url: string | null) => {
+  const handleAvatarUpload = useCallback((url: string | null) => {
     updateField('avatar_url', url)
-  }
+  }, [updateField])
 
-  const roleOptions = [
+  const roleOptions = useMemo(() => [
     {
       value: USER_ROLES.USER,
       label: t('roles.user'),
@@ -89,10 +95,14 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
         }
       ]
       : [])
-  ]
+  ], [t, isSuperAdmin])
+
+  const handleFormSubmit = useCallback((data: typeof formData) => {
+    onSubmit(data)
+  }, [onSubmit])
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+    <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
       {/* Avatar Upload Section */}
       <div className='bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border border-gray-200 dark:border-gray-700'>
         <div className='flex items-center space-x-4 mb-4'>
@@ -176,7 +186,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
           placeholder='+1 (555) 123-4567'
           disabled={isValidating}
           {...(errors.phone && { error: errors.phone })}
-          helperText={t('userForm.phoneHelpText')}
+          helperText={t('userForm.phoneOptional')}
         />
 
         <Select

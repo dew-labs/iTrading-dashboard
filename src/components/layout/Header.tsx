@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import {
   Menu,
@@ -10,10 +10,15 @@ import {
   Activity,
   Clock,
   LogOut,
-  Settings
+  Settings,
+  Building,
+  Image,
+  Shield,
+  ShieldCheck
 } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 import { useTranslation, useNotificationTranslation } from '../../hooks/useTranslation'
+import { useRecentActivity } from '../../hooks/useRecentActivity'
 import { Badge } from '../atoms'
 import { Avatar } from '../features/users'
 
@@ -21,94 +26,17 @@ interface HeaderProps {
   onToggleSidebar: () => void
 }
 
-interface NotificationItem {
-  id: number
-  type: 'user' | 'post' | 'product' | 'banner' | 'system'
-  action: string
-  user: string
-  timestamp: string
-  details?: string
-}
+
 
 const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const { user, profile, signOut } = useAuthStore()
   const { t } = useTranslation()
   const { t: tNotifications } = useNotificationTranslation()
+  const { recentActivity, loading: activityLoading, hasPermission } = useRecentActivity()
   const [showProfileDropdown, setShowProfileDropdown] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const notificationRef = useRef<HTMLDivElement>(null)
-
-  // Mock recent activity data - memoized to prevent recreating on every render
-  const recentNotifications: NotificationItem[] = useMemo(
-    () => [
-      {
-        id: 1,
-        type: 'user',
-        action: 'New user registered',
-        user: 'Sarah Wilson',
-        timestamp: '2 minutes ago',
-        details: 'sarah.wilson@company.com'
-      },
-      {
-        id: 2,
-        type: 'product',
-        action: 'Product updated',
-        user: 'Mike Johnson',
-        timestamp: '15 minutes ago',
-        details: 'Premium Wireless Headphones - Stock updated'
-      },
-      {
-        id: 3,
-        type: 'post',
-        action: 'News post published',
-        user: 'Emma Davis',
-        timestamp: '1 hour ago',
-        details: 'Company Quarterly Results'
-      },
-      {
-        id: 4,
-        type: 'banner',
-        action: 'Banner activated',
-        user: 'John Smith',
-        timestamp: '2 hours ago',
-        details: 'Summer Sale Campaign'
-      },
-      {
-        id: 5,
-        type: 'system',
-        action: 'System backup completed',
-        user: 'System',
-        timestamp: '3 hours ago',
-        details: 'Daily backup successful'
-      },
-      {
-        id: 6,
-        type: 'user',
-        action: 'User account suspended',
-        user: 'Admin',
-        timestamp: '4 hours ago',
-        details: 'alex.chen@company.com'
-      },
-      {
-        id: 7,
-        type: 'product',
-        action: 'Low stock alert',
-        user: 'System',
-        timestamp: '5 hours ago',
-        details: 'Smart Fitness Watch - Only 2 items left'
-      },
-      {
-        id: 8,
-        type: 'post',
-        action: 'Event scheduled',
-        user: 'Marketing Team',
-        timestamp: '6 hours ago',
-        details: 'Annual Conference 2024'
-      }
-    ],
-    []
-  )
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -132,29 +60,40 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-    case 'user':
+    case 'users':
       return <Users className='w-4 h-4' />
-    case 'post':
+    case 'posts':
       return <FileText className='w-4 h-4' />
-    case 'product':
+    case 'products':
       return <Package className='w-4 h-4' />
-    case 'banner':
-      return <Activity className='w-4 h-4' />
+    case 'banners':
+      return <Image className='w-4 h-4' />
+    case 'brokers':
+      return <Building className='w-4 h-4' />
+    case 'user_permissions':
+      return <Shield className='w-4 h-4' />
+    case 'role_permissions':
+      return <ShieldCheck className='w-4 h-4' />
     default:
-      return <Bell className='w-4 h-4' />
+      return <Activity className='w-4 h-4' />
     }
   }
 
   const getNotificationColor = (type: string) => {
     switch (type) {
-    case 'user':
+    case 'users':
       return 'bg-blue-100 text-blue-600'
-    case 'post':
+    case 'posts':
       return 'bg-green-100 text-green-600'
-    case 'product':
+    case 'products':
       return 'bg-purple-100 text-purple-600'
-    case 'banner':
-      return 'bg-teal-100 text-teal-600'
+    case 'banners':
+      return 'bg-pink-100 text-pink-600'
+    case 'brokers':
+      return 'bg-orange-100 text-orange-600'
+    case 'user_permissions':
+    case 'role_permissions':
+      return 'bg-red-100 text-red-600'
     default:
       return 'bg-gray-100 text-gray-600'
     }
@@ -190,28 +129,47 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               className='relative p-2.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all group'
             >
               <Bell className='w-5 h-5' />
-              <span className='absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse'></span>
-              <span className='absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping'></span>
+              {hasPermission && recentActivity.length > 0 && (
+                <>
+                  <span className='absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse'></span>
+                  <span className='absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping'></span>
+                </>
+              )}
             </button>
 
             {/* Notification Dropdown */}
             {showNotifications && (
-              <div className='absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 max-h-96 overflow-hidden'>
+              <div className='absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50 max-h-[32rem] flex flex-col'>
                 {/* Header */}
-                <div className='px-4 py-3 border-b border-gray-100 dark:border-gray-700'>
-                  <div className='flex items-center justify-between'>
-                    <h3 className='font-semibold text-gray-900 dark:text-white'>
+                <div className='px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex-shrink-0'>
+                  <div className='flex items-center justify-between min-h-[32px]'>
+                    <h3 className='font-semibold text-gray-900 dark:text-white leading-none'>
                       {tNotifications('recentActivity')}
                     </h3>
-                    <span className='text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full'>
-                      {tNotifications('newNotifications', { count: recentNotifications.length })}
-                    </span>
+                    {hasPermission && recentActivity.length > 0 && (
+                      <span className='text-xs bg-red-100 text-red-600 px-2.5 py-1 rounded-full font-medium leading-none flex items-center justify-center min-h-[20px]'>
+                        {tNotifications('newNotifications', { count: recentActivity.length })}
+                      </span>
+                    )}
                   </div>
                 </div>
 
                 {/* Notifications List */}
-                <div className='max-h-80 overflow-y-auto'>
-                  {recentNotifications.map(notification => (
+                <div className='flex-1 overflow-y-auto min-h-0'>
+                  {!hasPermission ? (
+                    <div className='px-4 py-6 text-center text-gray-500 dark:text-gray-400'>
+                      <p>You don't have permission to view recent activity</p>
+                    </div>
+                  ) : activityLoading ? (
+                    <div className='px-4 py-6 text-center text-gray-500 dark:text-gray-400'>
+                      <p>Loading recent activity...</p>
+                    </div>
+                  ) : recentActivity.length === 0 ? (
+                    <div className='px-4 py-6 text-center text-gray-500 dark:text-gray-400'>
+                      <p>No recent activity</p>
+                    </div>
+                  ) : (
+                    recentActivity.map(notification => (
                     <div
                       key={notification.id}
                       className='px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-50 dark:border-gray-700 last:border-b-0'
@@ -243,14 +201,21 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                         </div>
                       </div>
                     </div>
-                  ))}
+                  ))
+                  )}
                 </div>
 
                 {/* Footer */}
-                <div className='px-4 py-3 border-t border-gray-100 dark:border-gray-700'>
-                  <button className='w-full text-sm text-gray-900 dark:text-white hover:text-black dark:hover:text-gray-200 font-medium text-center'>
-                    {tNotifications('viewAll')}
-                  </button>
+                <div className='px-4 py-3 border-t border-gray-100 dark:border-gray-700 flex-shrink-0'>
+                  <div className='flex justify-center'>
+                    <NavLink
+                      to='/audits'
+                      onClick={() => setShowNotifications(false)}
+                      className='text-sm text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors'
+                    >
+                      {tNotifications('viewAll')}
+                    </NavLink>
+                  </div>
                 </div>
               </div>
             )}

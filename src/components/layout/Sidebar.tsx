@@ -80,7 +80,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
           action: 'read'
         }
       ]
-    }
+    },
+
   ]
 
   // Filter menu items based on permissions

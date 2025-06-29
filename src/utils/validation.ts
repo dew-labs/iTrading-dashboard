@@ -4,7 +4,7 @@
  */
 
 // Validation rule interface
-export interface ValidationRule<T = any> {
+export interface ValidationRule<T = unknown> {
   required?: boolean
   minLength?: number
   maxLength?: number
@@ -78,7 +78,7 @@ export const validators = {
   /**
    * Validates required field
    */
-  required: (value: any): boolean => {
+  required: (value: unknown): boolean => {
     if (value === null || value === undefined) return false
     if (typeof value === 'string') return value.trim().length > 0
     if (typeof value === 'number') return !isNaN(value)
@@ -149,6 +149,7 @@ export const validateField = <T>(
   value: T,
   rule: ValidationRule<T>,
   fieldName: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   t?: (key: string, params?: any) => string
 ): FieldValidationResult => {
   const errors: string[] = []
@@ -229,9 +230,10 @@ export const validateField = <T>(
 /**
  * Validates an entire form against a schema
  */
-export const validateForm = <T extends Record<string, any>>(
+export const validateForm = <T extends Record<string, unknown>>(
   data: T,
   schema: ValidationSchema<T>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   t?: (key: string, params?: any) => string
 ): { isValid: boolean; errors: Partial<Record<keyof T, string>> } => {
   const errors: Partial<Record<keyof T, string>> = {}

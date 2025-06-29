@@ -1,27 +1,58 @@
-import React from 'react'
-import { Lock, Save, X, CheckCircle } from 'lucide-react'
-import { useTranslation } from '../../../hooks/useTranslation'
-import { useChangePassword } from '../../../hooks/useChangePassword'
+import React, { useMemo, useCallback } from 'react'
+import { Lock, CheckCircle, AlertCircle, X } from 'lucide-react'
 import { useFormValidation } from '../../../hooks/useFormValidation'
-import { validators } from '../../../utils/validation'
-import { getButtonClasses, getTypographyClasses, cn } from '../../../utils/theme'
+import { useChangePassword } from '../../../hooks/useChangePassword'
+import { useTranslation } from '../../../hooks/useTranslation'
 import { FormField } from '../../atoms'
-import { LoadingSpinner } from '../../feedback'
+import { cn, getTypographyClasses } from '../../../utils/theme'
+
+
+
+// Move schema outside component to prevent re-renders
+const CHANGE_PASSWORD_SCHEMA = {
+  currentPassword: {
+    required: true,
+    message: 'Current password is required'
+  },
+  newPassword: {
+    required: true,
+    minLength: 8,
+    custom: (value: string): boolean | string => {
+      const errors = []
+      if (value.length < 8) errors.push('at least 8 characters')
+      if (!/[a-z]/.test(value)) errors.push('one lowercase letter')
+      if (!/[A-Z]/.test(value)) errors.push('one uppercase letter')
+      if (!/\d/.test(value)) errors.push('one number')
+      if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) errors.push('one special character')
+
+      if (errors.length > 0) {
+        return `Password must contain: ${errors.join(', ')}`
+      }
+      return true
+    }
+  },
+  confirmNewPassword: {
+    required: true,
+    message: 'Please confirm your new password'
+  }
+} as const
 
 interface ChangePasswordFormProps {
   onSuccess?: () => void
   onCancel?: () => void
 }
 
-interface FormData {
-  currentPassword: string
-  newPassword: string
-  confirmNewPassword: string
-}
-
 const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ onSuccess, onCancel }) => {
   const { t } = useTranslation()
   const { changePassword, loading } = useChangePassword()
+
+  // Memoize initial data to prevent re-renders
+  const initialData = useMemo(() => ({
+    currentPassword: '',
+    newPassword: '',
+    confirmNewPassword: ''
+  }), [])
+
   // Enhanced form validation with our new hook
   const {
     data: formData,
@@ -32,47 +63,37 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ onSuccess, onCa
     handleChange,
     handleSubmit,
     reset
-  } = useFormValidation<FormData>({
-    schema: {
-      currentPassword: {
-        required: true,
-        message: 'Current password is required'
-      },
-      newPassword: {
-        required: true,
-        minLength: 8,
-        custom: (value: string): boolean | string => {
-          const result = validators.password(value)
-          if (!result.isValid) {
-            return `Password requirements: ${result.requirements
-              .filter(req => !req.met)
-              .map(req => req.text)
-              .join(', ')}`
-          }
-          return true
-        }
-      },
-      confirmNewPassword: {
-        required: true,
-        custom: (value: string): boolean | string => {
-          return value === formData.newPassword || 'Passwords must match'
-        },
-        message: 'Please confirm your new password'
-      }
-    },
-    initialData: {
-      currentPassword: '',
-      newPassword: '',
-      confirmNewPassword: ''
-    },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } = useFormValidation<any>({
+    schema: CHANGE_PASSWORD_SCHEMA,
+    initialData,
     validateOnBlur: true,
     validateOnChange: false
   })
 
-  const handleFormSubmit = async (data: FormData) => {
-    // Additional validation: check if new password is different from current
+  // Custom validation for password confirmation
+  const validatePasswordConfirmation = useCallback(() => {
+    if (formData.confirmNewPassword && formData.newPassword !== formData.confirmNewPassword) {
+      updateField('confirmNewPassword', formData.confirmNewPassword)
+      // The validation will trigger through the dependency check
+    }
+  }, [formData.newPassword, formData.confirmNewPassword, updateField])
+
+  React.useEffect(() => {
+    validatePasswordConfirmation()
+  }, [validatePasswordConfirmation])
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleFormSubmit = useCallback(async (data: any) => {
+    // Check if new password is same as current
     if (data.currentPassword === data.newPassword) {
       updateField('newPassword', data.newPassword) // Trigger validation
+      return
+    }
+
+    // Check password confirmation
+    if (data.newPassword !== data.confirmNewPassword) {
+      updateField('confirmNewPassword', data.confirmNewPassword)
       return
     }
 
@@ -89,29 +110,39 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ onSuccess, onCa
     } catch (error) {
       console.error('Password change error:', error)
     }
-  }
+  }, [changePassword, updateField, reset, onSuccess])
 
-
-
-  const getPasswordStrength = (password: string): { score: number; label: string; color: string } => {
+  const getPasswordStrength = useCallback((password: string): { score: number; label: string; color: string } => {
     if (!password) return { score: 0, label: '', color: '' }
 
-    const result = validators.password(password)
-    const score = result.score
+    let score = 0
+    if (password.length >= 8) score++
+    if (/[a-z]/.test(password)) score++
+    if (/[A-Z]/.test(password)) score++
+    if (/\d/.test(password)) score++
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score++
 
     const strength = [
-      { label: 'Weak', color: 'bg-red-500' },
+      { label: 'Very Weak', color: 'bg-red-500' },
+      { label: 'Weak', color: 'bg-red-400' },
       { label: 'Fair', color: 'bg-orange-500' },
       { label: 'Good', color: 'bg-yellow-500' },
       { label: 'Strong', color: 'bg-green-500' }
     ]
 
-    const strengthData = strength[Math.min(score - 1, 3)] || { label: '', color: '' }
+    const strengthData = strength[score] || { label: 'Very Weak', color: 'bg-red-500' }
     return { score, ...strengthData }
-  }
+  }, [])
 
-  const passwordStrength = getPasswordStrength(formData.newPassword)
-  const passwordRequirements = validators.password(formData.newPassword).requirements
+  const passwordStrength = useMemo(() => getPasswordStrength(formData.newPassword), [formData.newPassword, getPasswordStrength])
+
+  const passwordRequirements = useMemo(() => [
+    { text: 'At least 8 characters', met: formData.newPassword.length >= 8 },
+    { text: 'One lowercase letter', met: /[a-z]/.test(formData.newPassword) },
+    { text: 'One uppercase letter', met: /[A-Z]/.test(formData.newPassword) },
+    { text: 'One number', met: /\d/.test(formData.newPassword) },
+    { text: 'One special character', met: /[!@#$%^&*(),.?":{}|<>]/.test(formData.newPassword) }
+  ], [formData.newPassword])
 
   return (
     <div className="space-y-6">
@@ -163,16 +194,41 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ onSuccess, onCa
           {/* Password Strength Indicator */}
           {formData.newPassword && (
             <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div
-                    className={cn('h-2 rounded-full transition-all duration-300', passwordStrength.color)}
-                    style={{ width: `${(passwordStrength.score / 4) * 100}%` }}
-                  />
-                </div>
-                <span className="text-xs text-gray-600 dark:text-gray-400 min-w-0">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Password Strength:</span>
+                <span className={`text-sm font-medium ${
+                  passwordStrength.score >= 3 ? 'text-green-600' :
+                  passwordStrength.score >= 2 ? 'text-yellow-600' : 'text-red-600'
+                }`}>
                   {passwordStrength.label}
                 </span>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div
+                  className={`h-2 rounded-full transition-all duration-300 ${passwordStrength.color}`}
+                  style={{ width: `${(passwordStrength.score / 4) * 100}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Password Requirements */}
+          {formData.newPassword && (
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400">Password Requirements:</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                {passwordRequirements.map((req, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    {req.met ? (
+                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                    )}
+                    <span className={`text-xs ${req.met ? 'text-green-600' : 'text-gray-500'}`}>
+                      {req.text}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -193,72 +249,39 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ onSuccess, onCa
           icon={<Lock className="w-5 h-5" />}
           isPasswordField
           showPasswordToggle
+          helperText={t('forms.changePassword.confirmPasswordHelp')}
         />
 
-        {/* Password Requirements */}
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-          <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
-            {t('forms.changePassword.passwordRequirements')}
-          </h4>
-          <ul className="space-y-2">
-            {passwordRequirements.map((requirement, index) => (
-              <li key={index} className="flex items-center space-x-2">
-                <CheckCircle
-                  className={cn(
-                    'w-4 h-4',
-                    requirement.met ? 'text-green-500' : 'text-gray-300 dark:text-gray-600'
-                  )}
-                />
-                <span className={cn(
-                  'text-sm',
-                  requirement.met ? 'text-green-700 dark:text-green-400' : 'text-gray-600 dark:text-gray-400'
-                )}>
-                  {requirement.text}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-4">
-          <button
-            type="submit"
-            disabled={isValidating || loading || Object.keys(errors).length > 0}
-            className={cn(
-              getButtonClasses('primary', 'md'),
-              'flex-1 sm:flex-none sm:min-w-[140px]'
-            )}
-          >
-            {isValidating || loading ? (
-              <div className="flex items-center justify-center space-x-2">
-                <LoadingSpinner size="sm" className="text-white" />
-                <span>Changing...</span>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center space-x-2">
-                <Save className="w-4 h-4" />
-                <span>{t('forms.changePassword.submitButton')}</span>
-              </div>
-            )}
-          </button>
-
+        <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
           {onCancel && (
             <button
               type="button"
               onClick={onCancel}
               disabled={isValidating || loading}
-              className={cn(
-                getButtonClasses('secondary', 'md'),
-                'flex-1 sm:flex-none sm:min-w-[100px]'
-              )}
+              className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
             >
-              <div className="flex items-center justify-center space-x-2">
-                <X className="w-4 h-4" />
-                <span>{t('forms.changePassword.cancelButton')}</span>
-              </div>
+              <X className="w-4 h-4 mr-2" />
+              {t('forms.actions.cancel')}
             </button>
           )}
+          <button
+            type="submit"
+            disabled={isValidating || loading || !formData.currentPassword || !formData.newPassword || !formData.confirmNewPassword}
+            className="px-6 py-2 bg-gradient-to-r from-gray-900 to-black dark:from-white dark:to-gray-100 text-white dark:text-gray-900 rounded-lg hover:from-black hover:to-gray-900 dark:hover:from-gray-100 dark:hover:to-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+          >
+            {isValidating || loading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white dark:border-gray-900 mr-2"></div>
+                {t('forms.changePassword.changing')}
+              </>
+            ) : (
+              <>
+                <Lock className="w-4 h-4 mr-2" />
+                {t('forms.changePassword.changePassword')}
+              </>
+            )}
+          </button>
         </div>
       </form>
     </div>

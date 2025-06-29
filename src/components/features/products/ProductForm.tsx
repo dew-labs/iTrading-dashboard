@@ -1,10 +1,25 @@
-import React from 'react'
-import { Package, DollarSign, FileText } from 'lucide-react'
+import React, { useMemo, useCallback } from 'react'
+import { DollarSign, Package, Save, X, Plus, Zap, Clock } from 'lucide-react'
 import type { Product, ProductInsert } from '../../../types'
 import { useFormValidation } from '../../../hooks/useFormValidation'
 import { FormField } from '../../atoms'
-import { RichTextEditor } from '../posts'
+import { Select } from '../../molecules'
 import { MainImageUpload } from '../images'
+
+// Move schema outside component to prevent re-renders
+const PRODUCT_FORM_SCHEMA = {
+  name: {
+    required: true,
+    minLength: 2,
+    maxLength: 100,
+    message: 'Product name must be between 2 and 100 characters'
+  },
+  price: {
+    required: true,
+    min: 0,
+    message: 'Price must be a positive number'
+  }
+} as const
 
 interface ProductFormProps {
   product?: Product | null
@@ -13,6 +28,15 @@ interface ProductFormProps {
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }) => {
+  // Memoize initial data to prevent re-renders
+  const initialData = useMemo(() => ({
+    name: '',
+    price: 0,
+    description: '',
+    subscription: false,
+    featured_image_url: null as string | null
+  }), [])
+
   // Enhanced form validation with our new hook
   const {
     data: formData,
@@ -23,33 +47,9 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
     handleChange,
     handleSubmit,
     reset
-  } = useFormValidation<{
-    name: string
-    price: number
-    description: string
-    subscription: boolean
-    featured_image_url: string | null
-  }>({
-    schema: {
-      name: {
-        required: true,
-        minLength: 2,
-        maxLength: 100,
-        message: 'Product name must be between 2 and 100 characters'
-      },
-      price: {
-        required: true,
-        min: 0,
-        message: 'Price must be a positive number'
-      }
-    },
-    initialData: {
-      name: '',
-      price: 0,
-      description: '',
-      subscription: false,
-      featured_image_url: null
-    },
+  } = useFormValidation({
+    schema: PRODUCT_FORM_SCHEMA,
+    initialData,
     validateOnBlur: true,
     validateOnChange: false
   })
@@ -60,123 +60,129 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
         name: product.name,
         price: product.price,
         description: product.description || '',
-        subscription: !!product.subscription,
+        subscription: product.subscription || false,
         featured_image_url: product.featured_image_url || null
       })
     }
   }, [product, reset])
 
-  const handleDescriptionChange = (description: string) => {
-    updateField('description', description)
-  }
+  const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    updateField('description', e.target.value)
+  }, [updateField])
 
-  const handleImageChange = (url: string | null) => {
+  const handleImageChange = useCallback((url: string | null) => {
     updateField('featured_image_url', url)
-  }
+  }, [updateField])
 
-  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePriceChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
-    updateField('price', value === '' ? 0 : parseFloat(value) || 0)
-  }
+    updateField('price', value ? parseFloat(value) : 0)
+  }, [updateField])
 
-  const handleSubscriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateField('subscription', e.target.checked)
-  }
+  // Create type options
+  const typeOptions = useMemo(() => [
+    {
+      value: 'false',
+      label: 'One-time Purchase',
+      icon: <Package className='w-4 h-4' />
+    },
+    {
+      value: 'true',
+      label: 'Subscription',
+      icon: <Zap className='w-4 h-4' />
+    }
+  ], [])
+
+  const handleFormSubmit = useCallback((data: typeof formData) => {
+    onSubmit(data as ProductInsert)
+  }, [onSubmit])
 
   return (
-    <form onSubmit={handleSubmit((data) => onSubmit(data as ProductInsert))} className='space-y-6'>
-      {/* Main image and basic info grid */}
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-        {/* Main Image Upload */}
-        <div className='md:col-span-1'>
+    <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
+      {/* Product name field using enhanced FormField */}
+      <FormField
+        label='Product Name'
+        name='name'
+        value={formData.name}
+        onChange={handleChange('name')}
+        onBlur={handleBlur('name')}
+        placeholder='Enter product name'
+        required
+        disabled={isValidating}
+        {...(errors.name && { error: errors.name })}
+        icon={<Package className='w-5 h-5' />}
+        helperText='A clear, descriptive name for your product'
+      />
+
+      {/* Enhanced layout */}
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+        {/* Left column - Image and basic info */}
+        <div className='lg:col-span-1 space-y-6'>
+          {/* Featured image upload */}
           <MainImageUpload
+            label='Featured Image'
             imageUrl={formData.featured_image_url || null}
             onChange={handleImageChange}
             bucket='products'
             folder='featured-images'
-            alt='Product featured image'
-            label='Featured Image'
             size='lg'
             disabled={isValidating}
-            recommendationText='Use high-quality product images for better customer engagement'
+            recommendationText='Use square images (1:1 ratio) for best display'
+            alt='Product featured image'
           />
+
+          {/* Price and type */}
+          <div className='space-y-4'>
+            <FormField
+              label='Price'
+              type='number'
+              name='price'
+              value={formData.price.toString()}
+              onChange={handlePriceChange}
+              onBlur={handleBlur('price')}
+              placeholder='0.00'
+              min={0}
+              step={0.01}
+              required
+              disabled={isValidating}
+              {...(errors.price && { error: errors.price })}
+              icon={<DollarSign className='w-5 h-5' />}
+              helperText='Product price in USD'
+            />
+
+            <Select
+              label='Product Type'
+              required
+              value={formData.subscription.toString()}
+              onChange={value => updateField('subscription', value === 'true')}
+              options={typeOptions}
+              disabled={isValidating}
+            />
+          </div>
         </div>
 
-        {/* Product Details using enhanced FormField components */}
-        <div className='md:col-span-2 space-y-4'>
-          <FormField
-            label='Product Name'
-            name='name'
-            value={formData.name}
-            onChange={handleChange('name')}
-            onBlur={handleBlur('name')}
-            placeholder='Enter product name'
-            required
-            disabled={isValidating}
-            {...(errors.name && { error: errors.name })}
-            icon={<Package className='w-5 h-5' />}
-            helperText='Choose a clear, descriptive name for your product'
-          />
-
-          <FormField
-            label='Price ($)'
-            type='number'
-            name='price'
-            value={formData.price.toString()}
-            onChange={handlePriceChange}
-            onBlur={handleBlur('price')}
-            placeholder='0.00'
-            step={0.01}
-            min={0}
-            required
-            disabled={isValidating}
-            {...(errors.price && { error: errors.price })}
-            icon={<DollarSign className='w-5 h-5' />}
-            helperText='Set the price in USD (use 0.00 format for cents)'
-          />
-        </div>
-      </div>
-
-      {/* Subscription checkbox inline */}
-      <div className='flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded-lg'>
-        <div className='flex items-center'>
-          <input
-            type='checkbox'
-            id='subscription'
-            name='subscription'
-            checked={formData.subscription ?? false}
-            onChange={handleSubscriptionChange}
-            disabled={isValidating}
-            className='h-4 w-4 text-gray-900 dark:text-white focus:ring-gray-900 dark:focus:ring-gray-300 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700'
-          />
-          <label htmlFor='subscription' className='ml-2 block text-sm text-gray-700 dark:text-gray-300'>
-            Subscription Product
-          </label>
-        </div>
-        <span className='text-xs text-gray-500 dark:text-gray-400'>
-          {formData.subscription ? 'Recurring billing' : 'One-time payment'}
-        </span>
-      </div>
-
-      {/* Large editor section */}
-      <div className='border-t border-gray-200 dark:border-gray-700 pt-6'>
-        <div className='space-y-2'>
-          <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
-            <FileText className='w-4 h-4 inline mr-1' />
-            Product Description
-          </label>
-          <RichTextEditor
-            content={formData.description || ''}
-            onChange={handleDescriptionChange}
-            placeholder='Describe your product in detail - features, benefits, specifications...'
-            height={450}
-            disabled={isValidating}
-            bucket='products'
-            folder='images'
-          />
-          <p className='text-xs text-gray-500 dark:text-gray-400'>
-            Provide detailed information about your product's features, benefits, and specifications
-          </p>
+        {/* Right column - Description */}
+        <div className='lg:col-span-2'>
+          <div className='space-y-2'>
+            <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+              Description
+            </label>
+            <textarea
+              name='description'
+              value={formData.description || ''}
+              onChange={handleDescriptionChange}
+              onBlur={handleBlur('description')}
+              placeholder='Describe your product features, benefits, and details...'
+              rows={10}
+              disabled={isValidating}
+              className={`w-full px-4 py-3 border rounded-lg resize-vertical transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 ${
+                isValidating ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            />
+            <p className='text-xs text-gray-500 dark:text-gray-400'>
+              Provide a detailed description of your product to help customers understand its value
+            </p>
+          </div>
         </div>
       </div>
 
@@ -186,22 +192,35 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
           type='button'
           onClick={onCancel}
           disabled={isValidating}
-          className='px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+          className='px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center'
         >
+          <X className='w-4 h-4 mr-2' />
           Cancel
         </button>
         <button
           type='submit'
           disabled={isValidating}
-          className='px-6 py-2 bg-gradient-to-r from-gray-900 to-black dark:from-white dark:to-gray-100 text-white dark:text-gray-900 rounded-lg hover:from-black hover:to-gray-900 dark:hover:from-gray-100 dark:hover:to-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+          className='px-6 py-2 bg-gradient-to-r from-gray-900 to-black dark:from-white dark:to-gray-100 text-white dark:text-gray-900 rounded-lg hover:from-black hover:to-gray-900 dark:hover:from-gray-100 dark:hover:to-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center'
         >
           {isValidating ? (
-            <div className='flex items-center space-x-2'>
-              <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white dark:border-b-gray-900'></div>
-              <span>{product ? 'Updating...' : 'Creating...'}</span>
-            </div>
+            <>
+              <Clock className='w-4 h-4 mr-2 animate-spin' />
+              {product ? 'Updating...' : 'Creating...'}
+            </>
           ) : (
-            <span>{product ? 'Update' : 'Add'} Product</span>
+            <>
+              {product ? (
+                <>
+                  <Save className='w-4 h-4 mr-2' />
+                  Update Product
+                </>
+              ) : (
+                <>
+                  <Plus className='w-4 h-4 mr-2' />
+                  Create Product
+                </>
+              )}
+            </>
           )}
         </button>
       </div>

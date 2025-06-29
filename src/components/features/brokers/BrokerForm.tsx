@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { X, Save, Plus, AlertCircle, Building2, Calendar, MapPin } from 'lucide-react'
 import type { Broker, BrokerInsert } from '../../../types'
 import { useFormValidation } from '../../../hooks/useFormValidation'
@@ -6,6 +6,30 @@ import { FormField } from '../../atoms'
 import { RichTextEditor } from '../posts'
 import { MainImageUpload } from '../images'
 import { useFormTranslation, useTranslation } from '../../../hooks/useTranslation'
+
+// Move schema outside component to prevent re-renders
+const BROKER_FORM_SCHEMA = {
+  name: {
+    required: true,
+    minLength: 2,
+    maxLength: 100,
+    message: 'Broker name must be between 2 and 100 characters'
+  },
+  established_in: {
+    min: 1800,
+    max: new Date().getFullYear(),
+    custom: (value: number | null) => !value || (value >= 1800 && value <= new Date().getFullYear()),
+    message: 'Please enter a valid year between 1800 and current year'
+  },
+  headquarter: {
+    maxLength: 100,
+    message: 'Headquarter must be less than 100 characters'
+  },
+  description: {
+    minLength: 10,
+    message: 'Description must be at least 10 characters'
+  }
+} as const
 
 interface BrokerFormProps {
   broker?: Broker | null
@@ -17,6 +41,15 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
   const { t: tForm } = useFormTranslation()
   const { t } = useTranslation()
 
+  // Memoize initial data to prevent re-renders
+  const initialData = useMemo(() => ({
+    name: '',
+    established_in: null as number | null,
+    headquarter: '',
+    description: '',
+    logo_url: null as string | null
+  }), [])
+
   // Enhanced form validation with our new hook
   const {
     data: formData,
@@ -27,42 +60,9 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
     handleChange,
     handleSubmit,
     reset
-  } = useFormValidation<{
-    name: string
-    established_in: number | null
-    headquarter: string
-    description: string
-    logo_url: string | null
-  }>({
-    schema: {
-      name: {
-        required: true,
-        minLength: 2,
-        maxLength: 100,
-        message: 'Broker name must be between 2 and 100 characters'
-      },
-      established_in: {
-        min: 1800,
-        max: new Date().getFullYear(),
-        custom: (value: number | null) => !value || (value >= 1800 && value <= new Date().getFullYear()),
-        message: 'Please enter a valid year between 1800 and current year'
-      },
-      headquarter: {
-        maxLength: 100,
-        message: 'Headquarter must be less than 100 characters'
-      },
-      description: {
-        minLength: 10,
-        message: 'Description must be at least 10 characters'
-      }
-    },
-    initialData: {
-      name: '',
-      established_in: null,
-      headquarter: '',
-      description: '',
-      logo_url: null
-    },
+  } = useFormValidation({
+    schema: BROKER_FORM_SCHEMA,
+    initialData,
     validateOnBlur: true,
     validateOnChange: false
   })
@@ -79,21 +79,25 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
     }
   }, [broker, reset])
 
-  const handleDescriptionChange = (description: string) => {
+  const handleDescriptionChange = useCallback((description: string) => {
     updateField('description', description)
-  }
+  }, [updateField])
 
-  const handleLogoUpload = (url: string | null) => {
+  const handleLogoUpload = useCallback((url: string | null) => {
     updateField('logo_url', url)
-  }
+  }, [updateField])
 
-  const handleEstablishedYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEstablishedYearChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     updateField('established_in', value ? parseInt(value) : null)
-  }
+  }, [updateField])
+
+  const handleFormSubmit = useCallback((data: typeof formData) => {
+    onSubmit(data)
+  }, [onSubmit])
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+    <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
       {/* Broker name field - full width for emphasis using enhanced FormField */}
       <FormField
         label={tForm('labels.name')}

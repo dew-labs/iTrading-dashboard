@@ -10,6 +10,8 @@
   "help": "Help Center",
   "overview": "Overview",
   "management": "Management",
+  "system": "System",
+  "audits": "Recent Activities",
   "userManagement": "User Management",
   "contentManagement": "Content Management",
   "productManagement": "Product Management",
@@ -18,7 +20,16 @@
   "systemSettings": "System Settings",
   "home": "Home",
   "menu": "Menu",
-  "sidebar": "Sidebar",
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "posts": "Content",
+    "products": "Products",
+    "brokers": "Brokers",
+    "banners": "Banners",
+    "audits": "Recent Activities",
+    "settings": "Settings"
+  },
   "header": "Header",
   "footer": "Footer",
   "breadcrumb": "Breadcrumb",
@@ -29,5 +40,16 @@
   "account": "Account",
   "preferences": "Preferences",
   "logout": "Sign Out",
-  "login": "Sign In"
+  "login": "Sign In",
+  "breadcrumbs": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "posts": "Content",
+    "products": "Products",
+    "brokers": "Brokers",
+    "banners": "Banners",
+    "audits": "Recent Activities",
+    "settings": "Settings"
+  }
 }
