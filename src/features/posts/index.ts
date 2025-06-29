@@ -7,8 +7,8 @@ export * from './api/types'
 // 🧬 Components
 export * from './components'
 
-// 📄 Pages
-export { default as PostsPage } from './pages/PostsPage'
+// 📄 Pages (exported from main pages directory)
+// PostsPage is available at '../pages/Posts'
 
 // 🔧 Utilities
 export * from './utils/postHelpers'

@@ -62,6 +62,6 @@
       // }
     ]
   },
-  "exclude": ["vitest.config.ts.timestamp*"],
+  "exclude": [],
   "include": ["src/**/*", "*"]
 }

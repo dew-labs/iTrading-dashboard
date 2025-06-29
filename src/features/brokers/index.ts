@@ -7,8 +7,8 @@ export * from './api/types'
 // 🧬 Components
 export * from './components'
 
-// 📄 Pages
-export { default as BrokersPage } from './pages/BrokersPage'
+// 📄 Pages (exported from main pages directory)
+// BrokersPage is available at '../pages/Brokers'
 
 // 🔧 Utilities
 export * from './utils/brokerHelpers'

@@ -1,15 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Sidebar from '../layout/Sidebar'
 import Header from '../layout/Header'
 import { ProtectedRoute } from '../common'
-import Dashboard from '../../pages/Dashboard'
-import Posts from '../../pages/Posts'
-import Brokers from '../../pages/Brokers'
-import Banners from '../../pages/Banners'
-import Users from '../../pages/Users'
-import Settings from '../../pages/Settings'
-import Unauthorized from '../../pages/Unauthorized'
+import { PageLoadingSpinner } from '../feedback'
+
+// Lazy load page components for code splitting
+const Dashboard = React.lazy(() => import('../../pages/Dashboard'))
+const Posts = React.lazy(() => import('../../pages/Posts'))
+const Brokers = React.lazy(() => import('../../pages/Brokers'))
+const Banners = React.lazy(() => import('../../pages/Banners'))
+const Users = React.lazy(() => import('../../pages/Users'))
+const Settings = React.lazy(() => import('../../pages/Settings'))
+const Products = React.lazy(() => import('../../pages/Products'))
+const Unauthorized = React.lazy(() => import('../../pages/Unauthorized'))
 
 const DashboardLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -30,54 +34,55 @@ const DashboardLayout: React.FC = () => {
         />
 
         <main className='flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900 p-6'>
-          <Routes>
-            <Route path='/' element={<Dashboard />} />
+          <Suspense fallback={<PageLoadingSpinner message='Loading page...' />}>
+            <Routes>
+              <Route path='/' element={<Dashboard />} />
 
-            <Route
-              path='/posts'
-              element={
-                <ProtectedRoute requiredPermission={{ resource: 'posts', action: 'read' }}>
-                  <Posts />
-                </ProtectedRoute>
-              }
-            />
-            {/* Products page hidden - route commented out */}
-            {/* <Route
-              path='/products'
-              element={
-                <ProtectedRoute requiredPermission={{ resource: 'products', action: 'read' }}>
-                  <Products />
-                </ProtectedRoute>
-              }
-            /> */}
-            <Route
-              path='/brokers'
-              element={
-                <ProtectedRoute requiredPermission={{ resource: 'brokers', action: 'read' }}>
-                  <Brokers />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path='/banners'
-              element={
-                <ProtectedRoute requiredPermission={{ resource: 'banners', action: 'read' }}>
-                  <Banners />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path='/users'
-              element={
-                <ProtectedRoute requiredPermission={{ resource: 'users', action: 'read' }}>
-                  <Users />
-                </ProtectedRoute>
-              }
-            />
-            <Route path='/settings' element={<Settings />} />
+              <Route
+                path='/posts'
+                element={
+                  <ProtectedRoute requiredPermission={{ resource: 'posts', action: 'read' }}>
+                    <Posts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/products'
+                element={
+                  <ProtectedRoute requiredPermission={{ resource: 'products', action: 'read' }}>
+                    <Products />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/brokers'
+                element={
+                  <ProtectedRoute requiredPermission={{ resource: 'brokers', action: 'read' }}>
+                    <Brokers />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/banners'
+                element={
+                  <ProtectedRoute requiredPermission={{ resource: 'banners', action: 'read' }}>
+                    <Banners />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/users'
+                element={
+                  <ProtectedRoute requiredPermission={{ resource: 'users', action: 'read' }}>
+                    <Users />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path='/settings' element={<Settings />} />
 
-            <Route path='/unauthorized' element={<Unauthorized />} />
-          </Routes>
+              <Route path='/unauthorized' element={<Unauthorized />} />
+            </Routes>
+          </Suspense>
         </main>
       </div>
     </div>

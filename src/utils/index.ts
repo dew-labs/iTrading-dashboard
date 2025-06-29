@@ -45,3 +45,11 @@ export {
   formatFileSize,
   formatRelativeTime
 } from './format'
+
+// Error handling utilities
+export * from './errorHandler'
+export { default as errorHandler } from './errorHandler'
+
+// Performance monitoring utilities
+export * from './performanceMonitor'
+export { default as performanceMonitor } from './performanceMonitor'
