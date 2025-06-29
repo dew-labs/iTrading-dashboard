@@ -4,6 +4,7 @@ import { formatDateLong } from '@/utils/format'
 import { cn, getTypographyClasses } from '@/utils/theme'
 import { AUDIT_TABLES, AUDIT_ACTIONS, type AuditLog } from '@/types/audits'
 import { Badge } from '@/components/atoms'
+import { usePageTranslation } from '@/hooks/useTranslation'
 
 interface AuditLogDetailsProps {
   auditLog: AuditLog | null
@@ -13,6 +14,8 @@ interface AuditLogDetailsProps {
 const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({
   auditLog
 }) => {
+  const { t } = usePageTranslation()
+
   if (!auditLog) return null
 
   const getActionBadgeVariant = (action: string) => {
@@ -89,7 +92,7 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({
               <Plus className="w-5 h-5 text-green-600 dark:text-green-400" />
             </div>
             <h3 className={cn(getTypographyClasses('h3'), 'text-gray-900 dark:text-white')}>
-              New Record Created
+              {t('audits.newRecordCreated')}
             </h3>
           </div>
           <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800 rounded-lg p-4">
@@ -111,7 +114,7 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({
               <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
             </div>
             <h3 className={cn(getTypographyClasses('h3'), 'text-gray-900 dark:text-white')}>
-              Deleted Record Data
+              {t('audits.deletedRecordData')}
             </h3>
           </div>
           <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg p-4">
@@ -132,10 +135,10 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({
                 <FileText className="w-8 h-8 text-gray-400 dark:text-gray-500" />
               </div>
               <h3 className={cn(getTypographyClasses('h3'), 'text-gray-900 dark:text-white mb-2')}>
-                No Changes Recorded
+                {t('audits.noChangesRecorded')}
               </h3>
               <p className={cn(getTypographyClasses('base'), 'text-gray-500 dark:text-gray-400')}>
-                This update operation didn't record any field changes
+                {t('audits.noChangesDescription')}
               </p>
             </div>
           </div>
@@ -149,11 +152,11 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({
               <Edit className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <h3 className={cn(getTypographyClasses('h3'), 'text-gray-900 dark:text-white')}>
-              Field Changes
+              {t('audits.fieldChanges')}
             </h3>
             <div className="ml-auto">
               <Badge variant="user">
-                {auditLog.changed_fields.length} {auditLog.changed_fields.length === 1 ? 'field' : 'fields'}
+                {auditLog.changed_fields.length} {auditLog.changed_fields.length === 1 ? t('audits.field') : t('audits.fields')}
               </Badge>
             </div>
           </div>
@@ -172,7 +175,7 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({
                         {field}
                       </span>
                       <span className={cn(getTypographyClasses('small'), 'text-gray-500 dark:text-gray-400 ml-auto')}>
-                        Change #{index + 1}
+                        {t('audits.changeNumber', { number: index + 1 })}
                       </span>
                     </div>
                   </div>
@@ -183,7 +186,7 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-3 h-3 rounded-full bg-red-400"></div>
                         <span className={cn(getTypographyClasses('small'), 'text-red-600 dark:text-red-400 font-medium')}>
-                          Previous Value
+                          {t('audits.previousValue')}
                         </span>
                       </div>
                       <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-md p-3">
@@ -198,7 +201,7 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-3 h-3 rounded-full bg-green-400"></div>
                         <span className={cn(getTypographyClasses('small'), 'text-green-600 dark:text-green-400 font-medium')}>
-                          New Value
+                          {t('audits.newValue')}
                         </span>
                       </div>
                       <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800 rounded-md p-3">
@@ -225,15 +228,15 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* User Information */}
         <InfoCard
-          title="User Information"
+          title={t('audits.userInfo')}
           icon={User}
           iconColor="text-blue-600 dark:text-blue-400"
         >
           <InfoItem
-            label="Email Address"
+            label={t('audits.emailAddress')}
             value={
               <span className="font-medium">
-                {auditLog.user_email || 'Unknown User'}
+                {auditLog.user_email || t('audits.unknownUser')}
               </span>
             }
             icon={User}
@@ -241,10 +244,10 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({
 
           {auditLog.user_role && (
             <InfoItem
-              label="Role"
+              label={t('audits.role')}
               value={
                 <Badge variant={auditLog.user_role as 'super_admin' | 'admin'} showIcon>
-                  {auditLog.user_role === 'super_admin' ? 'Super Admin' : 'Admin'}
+                  {auditLog.user_role === 'super_admin' ? t('audits.superAdmin') : t('audits.admin')}
                 </Badge>
               }
               icon={Tag}
@@ -253,7 +256,7 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({
 
           {auditLog.session_id && (
             <InfoItem
-              label="Session ID"
+              label={t('audits.sessionId')}
               value={
                 <code className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded font-mono">
                   {auditLog.session_id}
@@ -266,12 +269,12 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({
 
         {/* Action Information */}
         <InfoCard
-          title="Action Information"
+          title={t('audits.actionInfo')}
           icon={Database}
           iconColor="text-green-600 dark:text-green-400"
         >
           <InfoItem
-            label="Action Type"
+            label={t('audits.actionType')}
             value={
               <Badge variant={getActionBadgeVariant(auditLog.action)}>
                 <div className="flex items-center gap-1.5">
@@ -289,7 +292,7 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({
           />
 
           <InfoItem
-            label="Target Table"
+            label={t('audits.targetTable')}
             value={
               <span className="font-medium">
                 {AUDIT_TABLES[auditLog.table_name]?.displayName || auditLog.table_name}
@@ -299,7 +302,7 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({
           />
 
           <InfoItem
-            label="Record ID"
+            label={t('audits.recordId')}
             value={
               <code className="text-sm bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded font-mono">
                 {auditLog.record_id}
@@ -309,11 +312,11 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({
           />
 
           <InfoItem
-            label="Timestamp"
+            label={t('audits.timestamp')}
             value={
               <div className="flex items-center gap-2">
                 <span className="font-medium">
-                  {auditLog.created_at ? formatDateLong(auditLog.created_at) : 'Unknown'}
+                  {auditLog.created_at ? formatDateLong(auditLog.created_at) : t('audits.unknown')}
                 </span>
               </div>
             }

@@ -121,14 +121,18 @@ const Audits: React.FC = () => {
 
       // Simple CSV export with human-readable headers
       const csvContent = [
-        'Date & Time,User,Role,Action,Target,Description',
+        `${t('audits.export.headers.dateTime')},${t('audits.export.headers.user')},${t('audits.export.headers.role')},${t('audits.export.headers.action')},${t('audits.export.headers.target')},${t('audits.export.headers.description')}`,
         ...filteredAuditLogs.map(log => {
           const date = new Date(log.created_at || '').toLocaleString()
-          const user = log.user_email || 'Unknown User'
-          const role = (log.user_role || 'unknown').replace('_', ' ').toUpperCase()
+          const user = log.user_email || t('audits.export.unknownUser')
+          const role = (log.user_role || t('audits.export.unknownRole')).replace('_', ' ').toUpperCase()
           const action = log.action.toLowerCase()
           const target = log.table_name.replace('_', ' ').toUpperCase()
-          const description = `${action} ${target.toLowerCase()} record (ID: ${log.record_id})`
+          const description = t('audits.export.recordDescription', {
+            action,
+            target: target.toLowerCase(),
+            id: log.record_id
+          })
 
           return `"${date}","${user}","${role}","${action}","${target}","${description}"`
         })
@@ -157,9 +161,9 @@ const Audits: React.FC = () => {
 
   const actionOptions = [
     { value: 'all', label: tCommon('general.all') },
-    { value: 'INSERT', label: 'Created' },
-    { value: 'UPDATE', label: 'Updated' },
-    { value: 'DELETE', label: 'Deleted' }
+    { value: 'INSERT', label: tCommon('actions.create') },
+    { value: 'UPDATE', label: tCommon('actions.update') },
+    { value: 'DELETE', label: tCommon('actions.delete') }
   ]
 
   if (loading) {
@@ -368,7 +372,7 @@ const Audits: React.FC = () => {
           <Modal
             isOpen={true}
             onClose={() => setViewingLog(null)}
-            title="Audit Log Details"
+            title={t('audits.activityDetails')}
             size='lg'
           >
             <AuditLogDetails

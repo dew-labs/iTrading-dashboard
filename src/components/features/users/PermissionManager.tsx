@@ -176,7 +176,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = memo(({ user, onClos
       setIsAdding(false)
       toast.success('granted', 'permission')
     } else {
-      toast.error(null, null, error || 'Failed to grant permission')
+      toast.error(null, null, error || t('permissionModal.failedToLoadPermissions'))
     }
   }
 
@@ -187,7 +187,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = memo(({ user, onClos
       setPermissions(prev => prev.filter(p => !(p.resource === resource && p.action === action)))
       toast.success('revoked', 'permission')
     } else {
-      toast.error(null, null, error || 'Failed to revoke permission')
+      toast.error(null, null, error || t('permissionModal.failedToLoadPermissions'))
     }
   }
 

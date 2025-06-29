@@ -2,7 +2,8 @@ import React, { useState, useRef, useCallback } from 'react'
 import { X, Upload, Image as ImageIcon, AlertCircle, Loader2 } from 'lucide-react'
 import { useFileUpload } from '../../../hooks/useFileUpload'
 import { useImages } from '../../../hooks/useImages'
-import { toast } from '../../../utils/toast'
+import { useToast } from '../../../hooks/useToast'
+import { useFormTranslation } from '../../../hooks/useTranslation'
 
 interface ImageUploadModalProps {
   isOpen: boolean
@@ -33,6 +34,8 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { uploadFile, isUploading, progress } = useFileUpload()
   const { createImageFromUpload } = useImages()
+  const toast = useToast()
+  const { t: tForm } = useFormTranslation()
 
   // Reset modal state
   const resetModal = useCallback(() => {
@@ -48,7 +51,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
   // Handle file selection
   const handleFileSelect = useCallback((file: File) => {
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file')
+      toast.error('fileType')
       return
     }
 
@@ -60,7 +63,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
       setPreview(e.target?.result as string)
     }
     reader.readAsDataURL(file)
-  }, [])
+  }, [toast])
 
   // Handle drag events
   const handleDrag = useCallback((e: React.DragEvent) => {
@@ -100,7 +103,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
   // Handle upload and insert
   const handleUpload = async () => {
     if (!selectedFile) {
-      toast.error('Please select an image first')
+      toast.error('required')
       return
     }
 
@@ -125,7 +128,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
       }
 
       onImageInsert(result.url, altText || selectedFile.name)
-      toast.success('Image uploaded successfully!')
+      toast.success('uploaded', 'image')
       resetModal()
       onClose()
     } catch (error) {
@@ -137,7 +140,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
   // Handle close
   const handleClose = () => {
     if (isUploading) {
-      toast.error('Please wait for upload to complete')
+      toast.error('general', null, 'Please wait for upload to complete')
       return
     }
     resetModal()
@@ -231,7 +234,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                   type='text'
                   value={altText}
                   onChange={e => setAltText(e.target.value)}
-                  placeholder='Describe the image for accessibility'
+                  placeholder={tForm('placeholders.imageDescription')}
                   disabled={isUploading}
                   className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent disabled:bg-gray-50 dark:disabled:bg-gray-600 disabled:cursor-not-allowed'
                 />

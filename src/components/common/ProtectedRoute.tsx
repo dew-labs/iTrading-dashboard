@@ -2,6 +2,7 @@ import React, { memo } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { usePermissions } from '../../hooks/usePermissions'
+import { useTranslation } from '../../hooks/useTranslation'
 import { EnhancedLoadingScreen } from '../feedback'
 import type { UserRole } from '../../types'
 
@@ -19,12 +20,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = memo(
   ({ children, requiredRole, requiredPermission, redirectTo = '/login' }) => {
     const { user, profile, loading: authLoading, initialized } = useAuthStore()
     const { can, hasRole, loading: permissionsLoading } = usePermissions()
+    const { t } = useTranslation()
 
     if (!initialized || authLoading || permissionsLoading) {
       return (
         <EnhancedLoadingScreen
-          message='Authenticating'
-          subtitle='Verifying your credentials and permissions...'
+          message={t('auth.authenticating')}
+          subtitle={t('auth.verifyingCredentials')}
         />
       )
     }

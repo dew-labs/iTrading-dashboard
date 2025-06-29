@@ -2,7 +2,7 @@ import React, { useMemo, useCallback } from 'react'
 import { User, Shield, Sparkles, X, Save, Mail, Camera } from 'lucide-react'
 import type { DatabaseUser, UserInsert, UserRole } from '../../../types'
 import { usePermissions } from '../../../hooks/usePermissions'
-import { useTranslation } from '../../../hooks/useTranslation'
+import { useTranslation, useFormTranslation } from '../../../hooks/useTranslation'
 import { useFormValidation } from '../../../hooks/useFormValidation'
 import { formSchemas } from '../../../utils/validation'
 import { USER_ROLES } from '../../../constants/general'
@@ -29,6 +29,7 @@ interface UserFormProps {
 
 const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
   const { t } = useTranslation()
+  const { t: tForm } = useFormTranslation()
   const { isSuperAdmin } = usePermissions()
 
   // Memoize initial data to prevent re-renders
@@ -153,7 +154,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
           value={formData.email}
           onChange={handleChange('email')}
           onBlur={handleBlur('email')}
-          placeholder='user@example.com'
+          placeholder={tForm('placeholders.userEmail')}
           required
           disabled={!!user || isValidating}
           {...(errors.email && { error: errors.email })}
@@ -183,7 +184,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
           value={formData.phone || ''}
           onChange={handleChange('phone')}
           onBlur={handleBlur('phone')}
-          placeholder='+1 (555) 123-4567'
+          placeholder={tForm('placeholders.userPhone')}
           disabled={isValidating}
           {...(errors.phone && { error: errors.phone })}
           helperText={t('userForm.phoneOptional')}

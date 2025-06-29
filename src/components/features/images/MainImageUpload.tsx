@@ -1,7 +1,8 @@
 import React, { useState, useRef, useCallback } from 'react'
 import { Upload, Image as ImageIcon, Camera, Trash2 } from 'lucide-react'
 import { useFileUpload } from '../../../hooks/useFileUpload'
-import { toast } from '../../../utils/toast'
+import { useToast } from '../../../hooks/useToast'
+import { useTranslation } from '../../../hooks/useTranslation'
 
 interface MainImageUploadProps {
   /** Current image URL */
@@ -42,6 +43,8 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
   const [preview, setPreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { uploadFile, isUploading, progress } = useFileUpload()
+  const toast = useToast()
+  const { t: tCommon } = useTranslation()
 
   // Size configurations
   const sizeConfig = {
@@ -77,12 +80,12 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
   const handleFileSelect = useCallback(
     (file: File) => {
       if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file')
+        toast.error('fileType')
         return
       }
 
       if (file.size > 10 * 1024 * 1024) {
-        toast.error('Image must be less than 10MB')
+        toast.error('fileSize')
         return
       }
 
@@ -103,14 +106,14 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
         .then(result => {
           onChange(result.url)
           setPreview(null)
-          toast.success('Main image uploaded successfully!')
+          toast.success('uploaded', 'mainImage')
         })
         .catch(error => {
           console.error('Upload error:', error)
           setPreview(null)
         })
     },
-    [uploadFile, bucket, folder, onChange]
+    [uploadFile, bucket, folder, onChange, toast]
   )
 
   // Handle drag events
@@ -244,7 +247,7 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
                     onClick={handleClick}
                     disabled={disabled}
                     className='p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50'
-                    title='Change image'
+                                            title={tCommon('ui.accessibility.changeImage')}
                   >
                     <Camera className='w-4 h-4 text-gray-600 dark:text-gray-300' />
                   </button>
@@ -254,7 +257,7 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
                       onClick={handleRemove}
                       disabled={disabled}
                       className='p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50'
-                      title='Remove image'
+                                                title={tCommon('ui.accessibility.removeImage')}
                     >
                       <Trash2 className='w-4 h-4 text-red-600 dark:text-red-400' />
                     </button>

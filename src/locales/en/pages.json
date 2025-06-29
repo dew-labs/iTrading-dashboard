@@ -251,6 +251,15 @@
     "enterPassword": "Enter your password",
     "signingIn": "Signing in..."
   },
+  "unauthorized": {
+    "title": "Access Denied",
+    "subtitle": "You don't have permission to access this page.",
+    "contactAdmin": "Please contact your administrator if you believe this is an error.",
+    "goToDashboard": "Go to Dashboard",
+    "needHelp": "Need Help?",
+    "supportText": "Contact your system administrator or reach out to",
+    "supportEmail": "support@example.com"
+  },
   "audits": {
     "title": "Recent Activities",
     "description": "Monitor recent administrative actions and system changes",
@@ -306,6 +315,50 @@
     "viewDetails": "View Details",
     "deleteLog": "Delete Log",
     "noChanges": "No changes",
-    "noTarget": "No target"
+    "noTarget": "No target",
+    "export": {
+      "headers": {
+        "dateTime": "Date & Time",
+        "user": "User",
+        "role": "Role",
+        "action": "Action",
+        "target": "Target",
+        "description": "Description"
+      },
+      "unknownUser": "Unknown User",
+      "unknownRole": "unknown",
+      "recordDescription": "{{action}} {{target}} record (ID: {{id}})"
+    },
+    "newRecordCreated": "New Record Created",
+    "deletedRecordData": "Deleted Record Data",
+    "noChangesRecorded": "No Changes Recorded",
+    "noChangesDescription": "This update operation didn't record any field changes",
+    "fieldChanges": "Field Changes",
+    "field": "field",
+    "fields": "fields",
+    "changeNumber": "Change #{{number}}",
+    "previousValue": "Previous Value",
+    "newValue": "New Value",
+    "emailAddress": "Email Address",
+    "role": "Role",
+    "superAdmin": "Super Admin",
+    "admin": "Admin",
+    "sessionId": "Session ID",
+    "actionInfo": "Action Information",
+    "actionType": "Action Type",
+    "targetTable": "Target Table",
+    "recordId": "Record ID",
+    "timestamp": "Timestamp",
+    "unknown": "Unknown",
+    "when": "When",
+    "who": "Who",
+    "whatHappened": "What Happened",
+    "on": "on",
+    "target": "Target",
+    "changes": "Changes",
+    "notApplicable": "N/A",
+    "moreFields": "+{{count}} more",
+    "noRecentActivities": "No recent activities",
+    "activitiesWillAppear": "Administrative activities will appear here as they happen."
   }
 }

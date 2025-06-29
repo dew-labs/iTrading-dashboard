@@ -114,7 +114,13 @@
     "enterEmail": "Enter your email",
     "enterPassword": "Enter your password",
     "signingIn": "Signing in...",
-    "adminAccessOnly": "Admin access only"
+    "adminAccessOnly": "Admin access only",
+    "authenticating": "Authenticating",
+    "verifyingCredentials": "Verifying your credentials and permissions..."
+  },
+  "app": {
+    "initializingApplication": "Initializing Application",
+    "settingUpDashboard": "Setting up your dashboard experience..."
   },
   "ui": {
     "language": "Language",
@@ -129,7 +135,17 @@
     "image": "Image",
     "file": "File",
     "avatar": "avatar",
-    "profileImage": "profile image"
+    "profileImage": "profile image",
+    "accessibility": {
+      "itemsPerPage": "Items per page",
+      "pagination": "Pagination",
+      "tabs": "Tabs",
+      "viewDetails": "View details",
+      "deleteItem": "Delete item",
+      "editItem": "Edit item",
+      "changeImage": "Change image",
+      "removeImage": "Remove image"
+    }
   },
   "roles": {
     "user": "User",

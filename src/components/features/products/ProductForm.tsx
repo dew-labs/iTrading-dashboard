@@ -5,6 +5,7 @@ import { useFormValidation } from '../../../hooks/useFormValidation'
 import { FormField } from '../../atoms'
 import { Select } from '../../molecules'
 import { MainImageUpload } from '../images'
+import { useFormTranslation } from '../../../hooks/useTranslation'
 
 // Move schema outside component to prevent re-renders
 const PRODUCT_FORM_SCHEMA = {
@@ -53,6 +54,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
     validateOnBlur: true,
     validateOnChange: false
   })
+
+  const { t: tForm } = useFormTranslation()
 
   React.useEffect(() => {
     if (product) {
@@ -106,7 +109,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
         value={formData.name}
         onChange={handleChange('name')}
         onBlur={handleBlur('name')}
-        placeholder='Enter product name'
+        placeholder={tForm('placeholders.productName')}
         required
         disabled={isValidating}
         {...(errors.name && { error: errors.name })}
@@ -140,7 +143,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
               value={formData.price.toString()}
               onChange={handlePriceChange}
               onBlur={handleBlur('price')}
-              placeholder='0.00'
+              placeholder={tForm('placeholders.productPrice')}
               min={0}
               step={0.01}
               required
@@ -172,7 +175,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
               value={formData.description || ''}
               onChange={handleDescriptionChange}
               onBlur={handleBlur('description')}
-              placeholder='Describe your product features, benefits, and details...'
+              placeholder={tForm('placeholders.productDescription')}
               rows={10}
               disabled={isValidating}
               className={`w-full px-4 py-3 border rounded-lg resize-vertical transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 ${

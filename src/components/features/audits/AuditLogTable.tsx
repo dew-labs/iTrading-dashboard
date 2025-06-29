@@ -5,6 +5,7 @@ import { cn, getTypographyClasses } from '@/utils/theme'
 import { AUDIT_TABLES, AUDIT_ACTIONS, type AuditLog } from '@/types/audits'
 import { Badge } from '@/components/atoms'
 import { Table } from '@/components/molecules'
+import { usePageTranslation } from '@/hooks/useTranslation'
 
 interface AuditLogTableProps {
   auditLogs: AuditLog[]
@@ -33,6 +34,8 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
   canDelete = false,
   className
 }) => {
+  const { t } = usePageTranslation()
+
   const getActionBadgeVariant = (action: string) => {
     switch (action) {
       case 'DELETE': return 'suspended'
@@ -55,8 +58,6 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
     return AUDIT_TABLES[tableName]?.displayName || tableName
   }
 
-
-
   const getSeverityColor = (auditLog: AuditLog) => {
     // Determine severity based on action and table
     if (auditLog.action === 'DELETE') return 'red'
@@ -67,7 +68,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
 
   const columns = [
     {
-      header: 'When',
+      header: t('audits.when'),
       accessor: 'created_at' as keyof AuditLog,
       sortable: true,
       render: (value: unknown) => (
@@ -82,24 +83,24 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
       )
     },
     {
-      header: 'Who',
+      header: t('audits.who'),
       accessor: 'user_email' as keyof AuditLog,
       sortable: true,
       render: (value: unknown, row: AuditLog) => (
         <div className="space-y-1">
           <div className={cn(getTypographyClasses('small'), 'font-medium')}>
-            {value as string || 'Unknown'}
+            {value as string || t('audits.unknown')}
           </div>
           {row.user_role && (
             <Badge variant={row.user_role as 'super_admin' | 'admin'} size="sm" showIcon>
-              {row.user_role === 'super_admin' ? 'Super Admin' : 'Admin'}
+              {row.user_role === 'super_admin' ? t('audits.superAdmin') : t('audits.admin')}
             </Badge>
           )}
         </div>
       )
     },
     {
-      header: 'What Happened',
+      header: t('audits.whatHappened'),
       accessor: 'action' as keyof AuditLog,
       sortable: true,
       render: (value: unknown, row: AuditLog) => {
@@ -118,14 +119,14 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
               </Badge>
             </div>
             <div className={cn(getTypographyClasses('xs'), 'text-gray-500 dark:text-gray-400')}>
-              on {getTableDisplayName(row.table_name)}
+              {t('audits.on')} {getTableDisplayName(row.table_name)}
             </div>
           </div>
         )
       }
     },
     {
-      header: 'Target',
+      header: t('audits.target'),
       accessor: 'record_id' as keyof AuditLog,
       sortable: false,
       render: (value: unknown, row: AuditLog) => (
@@ -140,7 +141,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
       )
     },
     {
-      header: 'Changes',
+      header: t('audits.changes'),
       accessor: 'changed_fields' as keyof AuditLog,
       sortable: false,
       render: (value: unknown, row: AuditLog) => {
@@ -151,7 +152,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
         if (row.action === 'INSERT' || row.action === 'DELETE') {
           return (
             <span className={cn(getTypographyClasses('small'), 'text-gray-400 dark:text-gray-500')}>
-              N/A
+              {t('audits.notApplicable')}
             </span>
           )
         }
@@ -178,7 +179,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
                   'px-2 py-1 rounded text-xs font-medium',
                   'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
                 )}>
-                  +{fields.length - 3} more
+                  {t('audits.moreFields', { count: fields.length - 3 })}
                 </span>
               )}
             </div>
@@ -188,13 +189,13 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
         // Fallback for other cases
         return (
           <span className={cn(getTypographyClasses('small'), 'text-gray-400 dark:text-gray-500')}>
-            N/A
+            {t('audits.notApplicable')}
           </span>
         )
       }
     },
     {
-      header: 'Actions',
+      header: t('audits.actions'),
       accessor: 'id' as keyof AuditLog,
       sortable: false,
       render: (value: unknown, row: AuditLog) => (
@@ -202,7 +203,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
           <button
             onClick={() => onViewDetails(row)}
             className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-            title="View Details"
+            title={t('audits.viewDetails')}
           >
             <Eye className="w-4 h-4" />
           </button>
@@ -210,7 +211,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
             <button
               onClick={() => onDeleteLog(row.id)}
               className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-              title="Delete Log"
+              title={t('audits.deleteLog')}
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -238,10 +239,10 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
       <div className={cn('text-center py-12', className)}>
         <Clock className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
         <h3 className={cn(getTypographyClasses('h3'), 'text-gray-500 dark:text-gray-400 mb-2')}>
-          No recent activities
+          {t('audits.noRecentActivities')}
         </h3>
         <p className={cn(getTypographyClasses('base'), 'text-gray-400 dark:text-gray-500')}>
-          Administrative activities will appear here as they happen.
+          {t('audits.activitiesWillAppear')}
         </p>
       </div>
     )

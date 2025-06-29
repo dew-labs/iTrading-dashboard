@@ -2,7 +2,7 @@ import React, { useRef, useCallback } from 'react'
 import { Editor } from '@tinymce/tinymce-react'
 import { AlertCircle } from 'lucide-react'
 import { useFileUpload } from '../../../hooks/useFileUpload'
-import { toast } from '../../../utils/toast'
+import { useToast } from '../../../hooks/useToast'
 import { getTinyMCEConfig, type TinyMCEUploadConfig } from '../../../utils/tinymceConfig'
 
 interface RichTextEditorProps {
@@ -41,6 +41,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 }) => {
   const editorRef = useRef<TinyMCEEditor | null>(null)
   const { uploadFile, isUploading } = useFileUpload()
+  const toast = useToast()
 
   // Custom image upload handler
   const handleImageUpload = useCallback(
@@ -74,7 +75,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             })
 
             progress(100)
-            toast.success('Image uploaded to cloud storage!')
+            toast.success('uploaded', 'image')
             resolve(result.url)
           } catch (error) {
             console.error('Cloud storage upload error:', error)
@@ -85,7 +86,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         uploadAsync()
       })
     },
-    [uploadFile, bucket, folder]
+    [uploadFile, bucket, folder, toast]
   )
 
   // Custom file picker for images
@@ -108,7 +109,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           if (!file) return
 
           if (isUploading) {
-            toast.error('Please wait for current upload to complete')
+            toast.error('general', null, 'Please wait for current upload to complete')
             return
           }
 
@@ -121,17 +122,17 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             })
 
             callback(result.url, { alt: file.name })
-            toast.success('Image uploaded to cloud storage!')
+            toast.success('uploaded', 'image')
           } catch (error) {
             console.error('Cloud storage upload error:', error)
-            toast.error('Cloud storage upload failed')
+            toast.error('failed', null, 'Cloud storage upload failed')
           }
         })
 
         input.click()
       }
     },
-    [uploadFile, isUploading, bucket, folder]
+    [uploadFile, isUploading, bucket, folder, toast]
   )
 
   const handleEditorChange = useCallback(

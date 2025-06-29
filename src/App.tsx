@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from './store/authStore'
+import { useTranslation } from './hooks/useTranslation'
 import { ErrorBoundary, EnhancedLoadingScreen } from './components/feedback'
 import { ProtectedRoute } from './components/common'
 import { DashboardLayout } from './components'
@@ -12,6 +13,7 @@ import Unauthorized from './pages/Unauthorized'
 function App () {
   const { initialize, initialized, user } = useAuthStore()
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   useEffect(() => {
     // Provide cache clearing function to auth store
@@ -30,8 +32,8 @@ function App () {
   if (!initialized) {
     return (
       <EnhancedLoadingScreen
-        message='Initializing Application'
-        subtitle='Setting up your dashboard experience...'
+        message={t('app.initializingApplication')}
+        subtitle={t('app.settingUpDashboard')}
       />
     )
   }

@@ -5,7 +5,8 @@ import { useFormValidation } from '../../../hooks/useFormValidation'
 import { FormField } from '../../atoms'
 import { useImages } from '../../../hooks/useImages'
 import { useFileUpload } from '../../../hooks/useFileUpload'
-import { toast } from '../../../utils/toast'
+import { useToast } from '../../../hooks/useToast'
+import { useFormTranslation, useTranslation } from '../../../hooks/useTranslation'
 
 // Move schema outside component to prevent re-renders
 const BANNER_FORM_SCHEMA = {
@@ -77,6 +78,9 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
 
   const { createImageFromUpload, deleteImage, isCreating: isCreatingImage } = useImages()
   const { uploadFile, isUploading, progress } = useFileUpload()
+  const toast = useToast()
+  const { t: tForm } = useFormTranslation()
+  const { t: tCommon } = useTranslation()
 
   // Load existing banner image if editing (only when we have a banner ID)
   const { images: existingImages } = useImages(
@@ -110,12 +114,12 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
   // Handle file selection
   const handleFileSelect = useCallback(async (file: File) => {
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file')
+      toast.error('fileType')
       return
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      toast.error('Image must be less than 10MB')
+      toast.error('fileSize')
       return
     }
 
@@ -138,7 +142,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
       setImageUrl(result.url)
       setPreview(null)
       setUploadResult({ ...result, file })
-      toast.success('Banner image uploaded successfully!')
+      toast.success('uploaded', 'image')
 
       // If editing an existing banner, create the image record immediately
       if (banner?.id) {
@@ -155,7 +159,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
       console.error('Upload error:', error)
       setPreview(null)
     }
-  }, [banner?.id, uploadFile, createImageFromUpload])
+  }, [banner?.id, uploadFile, createImageFromUpload, toast])
 
   // Handle drag events
   const handleDrag = (e: React.DragEvent) => {
@@ -202,12 +206,12 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
     if (banner?.id && existingImage) {
       try {
         await deleteImage(existingImage.id)
-        toast.success('Image removed successfully!')
+        toast.success('deleted', 'image')
       } catch (error) {
         console.error('Failed to delete image:', error)
       }
     }
-  }, [banner?.id, existingImage, isUploading, deleteImage])
+  }, [banner?.id, existingImage, isUploading, deleteImage, toast])
 
   // Handle click to open file dialog
   const handleClick = () => {
@@ -220,12 +224,12 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
 
     // Validate that image is provided
     if (!banner && !currentImage && !uploadResult) {
-      toast.error('Please upload a banner image')
+      toast.error('required', null, 'Please upload a banner image')
       return
     }
 
     if (banner && !currentImage) {
-      toast.error('Please upload a banner image')
+      toast.error('required', null, 'Please upload a banner image')
       return
     }
 
@@ -235,7 +239,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
     } catch (error) {
       console.error('Failed to save banner:', error)
     }
-  }, [banner, preview, imageUrl, uploadResult, onSubmit])
+  }, [banner, preview, imageUrl, uploadResult, onSubmit, toast])
 
   const currentImage = preview || imageUrl
   const showRemoveButton = currentImage && !isUploading
@@ -249,7 +253,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
         value={formData.name}
         onChange={handleChange('name')}
         onBlur={handleBlur('name')}
-        placeholder='Enter a descriptive name for this banner'
+        placeholder={tForm('placeholders.bannerName')}
         required
         disabled={isValidating || isUploading || isCreatingImage}
         {...(errors.name && { error: errors.name })}
@@ -323,7 +327,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
                       type='button'
                       onClick={handleClick}
                       className='p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
-                      title='Change image'
+                      title={tCommon('ui.accessibility.changeImage')}
                     >
                       <Camera className='w-4 h-4 text-gray-600 dark:text-gray-300' />
                     </button>
@@ -332,7 +336,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
                         type='button'
                         onClick={handleRemove}
                         className='p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
-                        title='Remove image'
+                        title={tCommon('ui.accessibility.removeImage')}
                       >
                         <Trash2 className='w-4 h-4 text-red-600 dark:text-red-400' />
                       </button>
@@ -390,7 +394,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
             value={formData.target_url || ''}
             onChange={handleChange('target_url')}
             onBlur={handleBlur('target_url')}
-            placeholder='https://example.com/landing-page'
+            placeholder={tForm('placeholders.bannerUrl')}
             required
             disabled={isValidating || isUploading || isCreatingImage}
             {...(errors.target_url && { error: errors.target_url })}

@@ -3,6 +3,7 @@ import { AlertCircle, FileText, Calendar, Scale, Lock, Clock, CheckCircle, Save,
 import type { PostInsert } from '../../../types'
 import type { PostWithAuthor } from '../../../hooks/usePosts'
 import { useFormValidation } from '../../../hooks/useFormValidation'
+import { useFormTranslation } from '../../../hooks/useTranslation'
 import { FormField } from '../../atoms'
 import { Select } from '../../molecules'
 import RichTextEditor from './RichTextEditor'
@@ -30,6 +31,7 @@ interface PostFormProps {
 }
 
 const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
+  const { t: tForm } = useFormTranslation()
 
   // Memoize initial data to prevent re-renders
   const initialData = useMemo(() => ({
@@ -132,7 +134,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
         value={formData.title}
         onChange={handleChange('title')}
         onBlur={handleBlur('title')}
-        placeholder='Enter a compelling title...'
+                  placeholder={tForm('placeholders.postTitle')}
         required
         disabled={isValidating}
         {...(errors.title && { error: errors.title })}
@@ -190,7 +192,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
             <RichTextEditor
               content={formData.content || ''}
               onChange={handleContentChange}
-              placeholder='Write your post content here - use the rich editor tools to format your text...'
+              placeholder={tForm('placeholders.postContent')}
               disabled={isValidating}
               height={500}
               bucket='posts'

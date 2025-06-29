@@ -114,7 +114,13 @@
     "enterEmail": "Digite seu e-mail",
     "enterPassword": "Digite sua senha",
     "signingIn": "Entrando...",
-    "adminAccessOnly": "Acesso apenas para administradores"
+    "adminAccessOnly": "Acesso apenas para administradores",
+    "authenticating": "Autenticando",
+    "verifyingCredentials": "Verificando suas credenciais e permissões..."
+  },
+  "app": {
+    "initializingApplication": "Inicializando Aplicação",
+    "settingUpDashboard": "Configurando sua experiência do painel..."
   },
   "ui": {
     "language": "Idioma",
@@ -129,7 +135,17 @@
     "image": "Imagem",
     "file": "Arquivo",
     "avatar": "avatar",
-    "profileImage": "imagem de perfil"
+    "profileImage": "imagem de perfil",
+    "accessibility": {
+      "itemsPerPage": "Itens por página",
+      "pagination": "Paginação",
+      "tabs": "Abas",
+      "viewDetails": "Ver detalhes",
+      "deleteItem": "Excluir item",
+      "editItem": "Editar item",
+      "changeImage": "Alterar imagem",
+      "removeImage": "Remover imagem"
+    }
   },
   "roles": {
     "user": "Usuário",

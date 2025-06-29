@@ -244,11 +244,121 @@
     "light": "Claro",
     "dark": "Escuro"
   },
+  "audits": {
+    "title": "Atividades Recentes",
+    "description": "Monitorar ações administrativas recentes e mudanças do sistema",
+    "loadingActivities": "Carregando atividades recentes...",
+    "exportData": "Exportar Dados",
+    "cleanOldLogs": "Limpar Logs Antigos",
+    "permissionRequired": "Você não tem permissão para realizar esta ação",
+    "activityDetails": "Detalhes da Atividade",
+    "deleteLogTitle": "Excluir Log de Atividade",
+    "deleteLogMessage": "Tem certeza de que deseja excluir este log de atividade? Esta ação não pode ser desfeita.",
+    "bulkDeleteTitle": "Limpeza de Atividades Antigas",
+    "bulkDeleteMessage": "Isso excluirá permanentemente todos os logs de atividade com mais de 30 dias. Esta ação não pode ser desfeita.",
+    "stats": {
+      "totalActivities": "Total de Atividades",
+      "activeUsers": "Usuários Ativos",
+      "recentActivities": "Atividades Recentes",
+      "criticalActions": "Ações Críticas"
+    },
+    "tabs": {
+      "all": {
+        "label": "Todas as Atividades",
+        "description": "Ver todas as atividades registradas"
+      },
+      "users": {
+        "label": "Atividades de Usuário",
+        "description": "Atividades relacionadas ao gerenciamento de usuários"
+      },
+      "posts": {
+        "label": "Atividades de Conteúdo",
+        "description": "Atividades relacionadas ao gerenciamento de conteúdo"
+      },
+      "products": {
+        "label": "Atividades de Produto",
+        "description": "Atividades relacionadas ao gerenciamento de produtos"
+      },
+      "brokers": {
+        "label": "Atividades de Corretora",
+        "description": "Atividades relacionadas ao gerenciamento de corretoras"
+      }
+    },
+    "filters": {
+      "table": "Tabela",
+      "resource": "Recurso",
+      "action": "Ação",
+      "role": "Função"
+    },
+    "clearFilters": "Limpar Filtros",
+    "activityDetails": "Detalhes da Atividade",
+    "userInfo": "Informações do Usuário",
+    "targetAndTime": "Alvo e Tempo",
+    "changes": "Mudanças",
+    "actions": "Ações",
+    "viewDetails": "Ver Detalhes",
+    "deleteLog": "Excluir Log",
+    "noChanges": "Sem mudanças",
+    "noTarget": "Sem alvo",
+    "export": {
+      "headers": {
+        "dateTime": "Data e Hora",
+        "user": "Usuário",
+        "role": "Função",
+        "action": "Ação",
+        "target": "Alvo",
+        "description": "Descrição"
+      },
+      "unknownUser": "Usuário Desconhecido",
+      "unknownRole": "desconhecido",
+      "recordDescription": "{{action}} registro de {{target}} (ID: {{id}})"
+    },
+    "newRecordCreated": "Novo Registro Criado",
+    "deletedRecordData": "Dados do Registro Excluído",
+    "noChangesRecorded": "Nenhuma Mudança Registrada",
+    "noChangesDescription": "Esta operação de atualização não registrou mudanças nos campos",
+    "fieldChanges": "Mudanças nos Campos",
+    "field": "campo",
+    "fields": "campos",
+    "changeNumber": "Mudança #{{number}}",
+    "previousValue": "Valor Anterior",
+    "newValue": "Novo Valor",
+    "emailAddress": "Endereço de E-mail",
+    "role": "Função",
+    "superAdmin": "Super Administrador",
+    "admin": "Administrador",
+    "sessionId": "ID da Sessão",
+    "actionInfo": "Informações da Ação",
+    "actionType": "Tipo de Ação",
+    "targetTable": "Tabela Alvo",
+    "recordId": "ID do Registro",
+    "timestamp": "Data e Hora",
+    "unknown": "Desconhecido",
+    "when": "Quando",
+    "who": "Quem",
+    "whatHappened": "O Que Aconteceu",
+    "on": "em",
+    "target": "Alvo",
+    "changes": "Mudanças",
+    "notApplicable": "N/A",
+    "moreFields": "+{{count}} mais",
+    "noRecentActivities": "Nenhuma atividade recente",
+    "activitiesWillAppear": "As atividades administrativas aparecerão aqui conforme acontecerem."
+  },
   "login": {
     "adminAccessOnly": "Acesso apenas para administradores. Contate seu super admin para acesso à conta.",
     "emailAddress": "Endereço de E-mail",
     "enterEmail": "Digite seu e-mail",
     "enterPassword": "Digite sua senha",
     "signingIn": "Entrando..."
+  },
+  "unauthorized": {
+    "title": "Acesso Negado",
+    "subtitle": "Você não tem permissão para acessar esta página.",
+    "contactAdmin": "Entre em contato com seu administrador se acreditar que isso é um erro.",
+    "goToDashboard": "Ir ao Painel",
+    "needHelp": "Precisa de Ajuda?",
+    "supportText": "Entre em contato com seu administrador do sistema ou envie um email para",
+    "supportEmail": "support@example.com"
   }
 }
