@@ -28,6 +28,7 @@ interface AuthState {
   initialize: () => Promise<void>
   getCurrentUser: () => Promise<void>
   fetchUserProfile: () => Promise<void>
+  changePassword: (newPassword: string) => Promise<{error?: string}>
   clearUserCache?: () => void
 }
 
@@ -99,8 +100,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         // Handle specific errors for deleted users
         if (error.code === 'PGRST116' || error.message.includes('No rows found')) {
           // User profile doesn't exist in database - sign them out
-          console.warn('User profile not found in database. Signing out user:', user.email)
           toast.errorTranslated.accountRemoved()
+          await get().signOut()
+          return
+        }
+
+        // Handle 400 Bad Request (likely RLS policy issue)
+        if (error.code === '42501' || error.message.includes('RLS') || error.message.includes('policy')) {
+          toast.error('Unable to access profile. Please try signing in again.')
           await get().signOut()
           return
         }
@@ -109,9 +116,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         if (
           error.message.includes('JWT') ||
           error.message.includes('invalid') ||
-          error.message.includes('expired')
+          error.message.includes('expired') ||
+          error.code === 'PGRST301'
         ) {
-          console.warn('Authentication error detected. Signing out user:', error.message)
           toast.errorTranslated.sessionExpired()
           await get().signOut()
           return
@@ -132,9 +139,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         errorMessage.includes('forbidden') ||
         errorMessage.includes('invalid') ||
         errorMessage.includes('jwt') ||
-        errorMessage.includes('expired')
+        errorMessage.includes('expired') ||
+        errorMessage.includes('400')
       ) {
-        console.warn('Critical auth error detected. Signing out user.')
         toast.errorTranslated.authError()
         await get().signOut()
       }
@@ -182,6 +189,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (user) {
       set({ user })
       await get().fetchUserProfile()
+    }
+  },
+
+  changePassword: async (newPassword: string) => {
+    set({ loading: true })
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      })
+
+      if (error) {
+        set({ loading: false })
+        return { error: error.message }
+      }
+
+      set({ loading: false })
+      return {}
+    } catch {
+      set({ loading: false })
+      return { error: 'Failed to change password' }
     }
   }
 }))

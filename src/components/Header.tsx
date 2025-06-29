@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react'
+import { NavLink } from 'react-router-dom'
 import {
   Menu,
   Bell,
@@ -8,19 +9,13 @@ import {
   Package,
   Activity,
   Clock,
-  Globe,
   LogOut,
-  Sun,
-  Moon,
-  Monitor
+  Settings
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
-import { useThemeStore } from '../store/themeStore'
-import { LANGUAGES } from '../constants'
 import { useTranslation, useNotificationTranslation } from '../hooks/useTranslation'
 import Badge from './Badge'
 import Avatar from './Avatar'
-import type { Theme } from '../types'
 
 interface HeaderProps {
   onToggleSidebar: () => void
@@ -37,8 +32,7 @@ interface NotificationItem {
 
 const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const { user, profile, signOut } = useAuthStore()
-  const { theme, setTheme } = useThemeStore()
-  const { t, language, changeLanguage } = useTranslation()
+  const { t } = useTranslation()
   const { t: tNotifications } = useNotificationTranslation()
   const [showProfileDropdown, setShowProfileDropdown] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
@@ -134,38 +128,6 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const handleSignOut = async () => {
     await signOut()
     setShowProfileDropdown(false)
-  }
-
-  const handleLanguageChange = (languageCode: string) => {
-    changeLanguage(languageCode)
-    setShowProfileDropdown(false)
-  }
-
-  const handleThemeChange = (newTheme: Theme) => {
-    setTheme(newTheme)
-    setShowProfileDropdown(false)
-  }
-
-  const getThemeIcon = (themeOption: Theme) => {
-    switch (themeOption) {
-    case 'light':
-      return <Sun className='w-4 h-4' />
-    case 'dark':
-      return <Moon className='w-4 h-4' />
-    default:
-      return <Monitor className='w-4 h-4' />
-    }
-  }
-
-  const getThemeLabel = (themeOption: Theme) => {
-    switch (themeOption) {
-    case 'light':
-      return t('ui.theme.light')
-    case 'dark':
-      return t('ui.theme.dark')
-    default:
-      return t('ui.theme.system')
-    }
   }
 
   const getNotificationIcon = (type: string) => {
@@ -378,56 +340,16 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                   </div>
                 </div>
 
-                {/* Language Selection */}
+                {/* Account Settings */}
                 <div className='px-2 py-2'>
-                  <div className='px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'>
-                    {t('ui.language')}
-                  </div>
-                  {LANGUAGES.map(lang => (
-                    <button
-                      key={lang.code}
-                      onClick={() => handleLanguageChange(lang.code)}
-                      className={`w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors ${
-                        language === lang.code
-                          ? 'bg-teal-500 text-white'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      <Globe className='w-4 h-4 mr-3' />
-                      <span className='mr-2'>{lang.flag}</span>
-                      <span className='flex-1 text-left'>{lang.name}</span>
-                      {language === lang.code && (
-                        <div className='w-2 h-2 bg-white rounded-full'></div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Divider */}
-                <div className='border-t border-gray-100 dark:border-gray-700 my-2'></div>
-
-                {/* Theme Selection */}
-                <div className='px-2 py-2'>
-                  <div className='px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'>
-                    {t('ui.theme.title')}
-                  </div>
-                  {(['light', 'dark'] as Theme[]).map(themeOption => (
-                    <button
-                      key={themeOption}
-                      onClick={() => handleThemeChange(themeOption)}
-                      className={`w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors ${
-                        theme === themeOption
-                          ? 'bg-teal-500 text-white'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      {getThemeIcon(themeOption)}
-                      <span className='ml-3 flex-1 text-left'>{getThemeLabel(themeOption)}</span>
-                      {theme === themeOption && (
-                        <div className='w-2 h-2 bg-white rounded-full'></div>
-                      )}
-                    </button>
-                  ))}
+                  <NavLink
+                    to='/settings'
+                    onClick={() => setShowProfileDropdown(false)}
+                    className='w-full flex items-center px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors'
+                  >
+                    <Settings className='w-4 h-4 mr-3' />
+                    Account Settings
+                  </NavLink>
                 </div>
 
                 {/* Divider */}

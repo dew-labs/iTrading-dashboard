@@ -8,6 +8,7 @@ import Posts from '../pages/Posts'
 import Brokers from '../pages/Brokers'
 import Banners from '../pages/Banners'
 import Users from '../pages/Users'
+import Settings from '../pages/Settings'
 import Unauthorized from '../pages/Unauthorized'
 
 const DashboardLayout: React.FC = () => {
@@ -74,8 +75,8 @@ const DashboardLayout: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-            {/* Settings and Help pages hidden - routes commented out */}
-            {/* <Route path='/settings' element={<Settings />} /> */}
+            <Route path='/settings' element={<Settings />} />
+            {/* Help page hidden - route commented out */}
             {/* <Route path='/help' element={<Help />} /> */}
             <Route path='/unauthorized' element={<Unauthorized />} />
           </Routes>
