@@ -11,7 +11,7 @@ import {
   Activity
 } from 'lucide-react'
 import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
-import Badge from '../components/Badge'
+import { Badge } from '../components/ui'
 
 // Theme imports
 import {

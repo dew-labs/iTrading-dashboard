@@ -15,17 +15,12 @@ import {
 import { usePosts, type PostWithAuthor } from '../hooks/usePosts'
 import { useAuthStore } from '../store/authStore'
 import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
-import Table from '../components/Table'
-import Modal from '../components/Modal'
-import PostForm from '../components/PostForm'
-import ConfirmDialog from '../components/ConfirmDialog'
-import PageLoadingSpinner from '../components/PageLoadingSpinner'
-import TabNavigation from '../components/TabNavigation'
-import FilterDropdown from '../components/FilterDropdown'
-import PaginationSelector from '../components/PaginationSelector'
-import RecordImage from '../components/RecordImage'
-import Badge from '../components/Badge'
-import PostViewModal from '../components/PostViewModal'
+import { Table, FilterDropdown } from '../components/data-display'
+import { Modal, TabNavigation, PaginationSelector, Badge, Button, Input } from '../components/ui'
+import { PostForm, PostViewModal } from '../components/features/posts'
+import { ConfirmDialog } from '../components/common'
+import { PageLoadingSpinner } from '../components/feedback'
+import { RecordImage } from '../components/features/images'
 import { POST_STATUSES, POST_TYPES } from '../constants/general'
 import type { PostInsert } from '../types'
 
@@ -37,8 +32,6 @@ import {
   getTypographyClasses,
   cn
 } from '../utils/theme'
-import Button from '../components/Button'
-import Input from '../components/Input'
 import { formatDateDisplay } from '../utils/format'
 import { FILTER_OPTIONS } from '../constants/components'
 

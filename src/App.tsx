@@ -3,12 +3,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from './store/authStore'
-import ErrorBoundary from './components/ErrorBoundary'
-import ProtectedRoute from './components/ProtectedRoute'
-import EnhancedLoadingScreen from './components/EnhancedLoadingScreen'
+import { ErrorBoundary, EnhancedLoadingScreen } from './components/feedback'
+import { ProtectedRoute } from './components/common'
+import { DashboardLayout } from './components/layout'
 import Login from './pages/Login'
 import Unauthorized from './pages/Unauthorized'
-import DashboardLayout from './components/DashboardLayout'
 
 function App () {
   const { initialize, initialized, user } = useAuthStore()

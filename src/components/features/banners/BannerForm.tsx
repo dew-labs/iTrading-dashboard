@@ -1,0 +1,448 @@
+import React, { useState, useEffect } from 'react'
+import { Image as ImageIcon, Upload, Camera, Trash2, X, Save, Plus } from 'lucide-react'
+import type { Banner, BannerInsert } from '../../../types'
+import { useImages } from '../../../hooks/useImages'
+import { useFileUpload } from '../../../hooks/useFileUpload'
+import { toast } from '../../../utils/toast'
+
+interface BannerFormProps {
+  banner?: Banner | null
+  onSubmit: (data: BannerInsert, imageUploadResult?: {
+    url: string
+    path: string
+    id: string
+    file?: File
+  }) => void
+  onCancel: () => void
+}
+
+const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) => {
+  const [formData, setFormData] = useState<BannerInsert>({
+    name: '',
+    target_url: '',
+    is_active: false
+  })
+
+  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [dragActive, setDragActive] = useState(false)
+  const [preview, setPreview] = useState<string | null>(null)
+  const [uploadResult, setUploadResult] = useState<{
+    url: string
+    path: string
+    id: string
+    file?: File
+  } | null>(null)
+
+  const { createImageFromUpload, deleteImage, isCreating: isCreatingImage } = useImages()
+  const { uploadFile, isUploading, progress } = useFileUpload()
+
+  // Load existing banner image if editing
+  const { images: existingImages } = useImages('banners', banner?.id || '')
+
+  useEffect(() => {
+    if (banner) {
+      setFormData({
+        name: banner.name || '',
+        target_url: banner.target_url || '',
+        is_active: banner.is_active
+      })
+
+      // Load existing image
+      if (existingImages?.[0]?.image_url) {
+        setImageUrl(existingImages[0].image_url)
+      }
+    }
+  }, [banner, existingImages])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // Validate required fields
+    if (!formData.name.trim()) {
+      toast.error('Please enter a banner name')
+      return
+    }
+
+    if (!formData.target_url?.trim()) {
+      toast.error('Please enter a target URL')
+      return
+    }
+
+    // Validate that image is provided
+    if (!banner && !currentImage && !uploadResult) {
+      toast.error('Please upload a banner image')
+      return
+    }
+
+    if (banner && !currentImage) {
+      toast.error('Please upload a banner image')
+      return
+    }
+
+    try {
+      // Create/update the banner and pass image upload result for new banners
+      await onSubmit(formData, uploadResult || undefined)
+    } catch (error) {
+      console.error('Failed to save banner:', error)
+    }
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target
+    setFormData({
+      ...formData,
+      [name]: type === 'checkbox' ? checked : value
+    })
+  }
+
+  // Handle file selection
+  const handleFileSelect = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file')
+      return
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Image must be less than 10MB')
+      return
+    }
+
+    // Create preview
+    const reader = new FileReader()
+    reader.onload = e => {
+      setPreview(e.target?.result as string)
+    }
+    reader.readAsDataURL(file)
+
+    try {
+      // Upload file
+      const result = await uploadFile(file, {
+        bucket: 'banners',
+        folder: 'main-images',
+        allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+        maxSizeInMB: 10
+      })
+
+      setImageUrl(result.url)
+      setPreview(null)
+      setUploadResult({ ...result, file })
+      toast.success('Banner image uploaded successfully!')
+
+      // If editing an existing banner, create the image record immediately
+      if (banner?.id) {
+        await createImageFromUpload(
+          'banners',
+          banner.id,
+          result,
+          `Banner ${banner.id.slice(0, 8)} image`,
+          file.size,
+          file.type
+        )
+      }
+    } catch (error) {
+      console.error('Upload error:', error)
+      setPreview(null)
+    }
+  }
+
+  // Handle drag events
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (isUploading) return
+
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true)
+    } else if (e.type === 'dragleave') {
+      setDragActive(false)
+    }
+  }
+
+  // Handle drop
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragActive(false)
+
+    if (isUploading) return
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileSelect(e.dataTransfer.files[0])
+    }
+  }
+
+  // Handle input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFileSelect(e.target.files[0])
+    }
+  }
+
+  // Handle remove image
+  const handleRemove = async () => {
+    if (isUploading) return
+
+    setImageUrl(null)
+    setPreview(null)
+    setUploadResult(null)
+
+    // If editing and there's an existing image, delete it
+    if (banner?.id && existingImages?.[0]) {
+      try {
+        await deleteImage(existingImages[0].id)
+        toast.success('Image removed successfully!')
+      } catch (error) {
+        console.error('Failed to delete image:', error)
+      }
+    }
+  }
+
+  // Handle click to open file dialog
+  const handleClick = () => {
+    if (isUploading) return
+    document.getElementById('banner-file-input')?.click()
+  }
+
+  const currentImage = preview || imageUrl
+  const showRemoveButton = currentImage && !isUploading
+
+  return (
+    <form onSubmit={handleSubmit} className='space-y-6'>
+      {/* Banner Name */}
+      <div>
+        <label htmlFor='name' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
+          Banner Name <span className='text-red-500'>*</span>
+        </label>
+        <input
+          type='text'
+          id='name'
+          name='name'
+          value={formData.name}
+          onChange={handleChange}
+          className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-300 focus:border-transparent'
+          placeholder='Enter a descriptive name for this banner'
+          required
+        />
+        <p className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
+          A clear name to identify this banner in your dashboard
+        </p>
+      </div>
+
+      {/* Image Upload Section */}
+      <div className='space-y-2'>
+        <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+          Banner Image <span className='text-red-500'>*</span>
+          {isUploading && (
+            <span className='ml-2 text-xs text-blue-600 dark:text-blue-400'>
+              Uploading... {progress}%
+            </span>
+          )}
+        </label>
+
+        <div className='relative'>
+          {/* Hidden file input */}
+          <input
+            id='banner-file-input'
+            type='file'
+            accept='image/*'
+            onChange={handleInputChange}
+            className='hidden'
+            disabled={isUploading}
+          />
+
+          {/* Image preview or upload area */}
+          {currentImage ? (
+            <div className='relative group'>
+              <img
+                src={currentImage}
+                alt='Banner preview'
+                className={`w-full h-32 object-cover rounded-lg border-2 border-gray-200 transition-opacity ${
+                  isUploading ? 'opacity-50' : 'opacity-100'
+                }`}
+              />
+
+              {/* Upload progress overlay */}
+              {isUploading && (
+                <div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg'>
+                  <div className='text-white text-center'>
+                    <Upload className='w-6 h-6 mx-auto mb-1 animate-pulse' />
+                    <div className='text-xs'>{progress}%</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Action buttons */}
+              {!isUploading && (
+                <div
+                  className='absolute inset-0 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300'
+                  style={{
+                    background: 'rgba(0, 0, 0, 0)',
+                    backdropFilter: 'blur(0px)',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = 'rgba(0, 0, 0, 0.2)'
+                    e.currentTarget.style.backdropFilter = 'blur(4px)'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = 'rgba(0, 0, 0, 0)'
+                    e.currentTarget.style.backdropFilter = 'blur(0px)'
+                  }}
+                >
+                  <div className='flex space-x-2'>
+                    <button
+                      type='button'
+                      onClick={handleClick}
+                      className='p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
+                      title='Change image'
+                    >
+                      <Camera className='w-4 h-4 text-gray-600 dark:text-gray-300' />
+                    </button>
+                    {showRemoveButton && (
+                      <button
+                        type='button'
+                        onClick={handleRemove}
+                        className='p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
+                        title='Remove image'
+                      >
+                        <Trash2 className='w-4 h-4 text-red-600 dark:text-red-400' />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div
+              className={`w-full h-32 p-4 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors ${
+                dragActive
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                  : isUploading
+                    ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 cursor-not-allowed'
+                    : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+              onClick={handleClick}
+            >
+              <div className='flex flex-col items-center space-y-2'>
+                <ImageIcon className='w-6 h-6 text-gray-400 dark:text-gray-500' />
+                <div className='text-center'>
+                  <span className='text-sm text-gray-600 dark:text-gray-300 font-medium block'>
+                    Click to upload banner image
+                  </span>
+                  <span className='text-sm text-gray-500 dark:text-gray-400 block'>
+                    or drag & drop
+                  </span>
+                </div>
+                <span className='text-xs text-gray-500 dark:text-gray-400'>
+                  PNG, JPG up to 10MB
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <p className='text-xs text-gray-500 dark:text-gray-400'>
+          <span className='text-red-500'>Required:</span> Upload a banner image. Recommended: Wide landscape images (16:9 ratio) work best
+        </p>
+      </div>
+
+      {/* URL Field and Active Status Row */}
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6'>
+        {/* URL Field */}
+        <div className='lg:col-span-2'>
+          <label htmlFor='target_url' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
+            Target URL <span className='text-red-500'>*</span>
+          </label>
+          <input
+            type='url'
+            id='target_url'
+            name='target_url'
+            value={formData.target_url || ''}
+            onChange={handleChange}
+            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-300 focus:border-transparent'
+            placeholder='https://example.com/landing-page'
+            required
+          />
+          <p className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
+            Where users will be redirected when they click the banner
+          </p>
+        </div>
+
+        {/* Active Status Toggle */}
+        <div className='lg:col-span-1'>
+          <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
+            Banner Status
+          </label>
+          <div className='flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded-lg h-[42px]'>
+            <div className='flex items-center space-x-3'>
+              <span className='text-sm text-gray-700 dark:text-gray-300'>
+                {formData.is_active ? 'Active' : 'Inactive'}
+              </span>
+              <button
+                type='button'
+                onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400 focus:ring-offset-2 ${
+                  formData.is_active
+                    ? 'bg-teal-600 dark:bg-teal-500'
+                    : 'bg-gray-200 dark:bg-gray-600'
+                }`}
+                role='switch'
+                aria-checked={!!formData.is_active}
+                aria-labelledby='banner-status-label'
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    formData.is_active ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+          <p className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
+            {formData.is_active ? 'Banner is visible to users' : 'Banner is hidden'}
+          </p>
+        </div>
+      </div>
+
+      {/* Action buttons */}
+      <div className='flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700'>
+        <button
+          type='button'
+          onClick={onCancel}
+          className='flex items-center space-x-2 px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
+        >
+          <X className='w-4 h-4' />
+          <span>Cancel</span>
+        </button>
+        <button
+          type='submit'
+          disabled={isUploading || isCreatingImage || !formData.name.trim() || !formData.target_url?.trim() || (!banner && !currentImage && !uploadResult) || (!!banner && !currentImage)}
+          className='flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-gray-900 to-black dark:from-white dark:to-gray-100 text-white dark:text-gray-900 rounded-lg hover:from-black hover:to-gray-900 dark:hover:from-gray-100 dark:hover:to-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+        >
+          {isUploading || isCreatingImage ? (
+            <>
+              <Upload className='w-4 h-4 animate-spin' />
+              <span>Processing...</span>
+            </>
+          ) : banner ? (
+            <>
+              <Save className='w-4 h-4' />
+              <span>Update Banner</span>
+            </>
+          ) : (
+            <>
+              <Plus className='w-4 h-4' />
+              <span>Create Banner</span>
+            </>
+          )}
+        </button>
+      </div>
+    </form>
+  )
+}
+
+export default BannerForm

@@ -16,16 +16,12 @@ import {
 import { useBanners } from '../hooks/useBanners'
 import { useImages } from '../hooks/useImages'
 import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
-import Table from '../components/Table'
-import Modal from '../components/Modal'
-import BannerForm from '../components/BannerForm'
-import ConfirmDialog from '../components/ConfirmDialog'
-import PageLoadingSpinner from '../components/PageLoadingSpinner'
-import RecordImage from '../components/RecordImage'
-import Badge from '../components/Badge'
-
-import FilterDropdown from '../components/FilterDropdown'
-import PaginationSelector from '../components/PaginationSelector'
+import { Table, FilterDropdown } from '../components/data-display'
+import { Modal, Badge, PaginationSelector, Button, Input } from '../components/ui'
+import { BannerForm } from '../components/features/banners'
+import { ConfirmDialog } from '../components/common'
+import { PageLoadingSpinner } from '../components/feedback'
+import { RecordImage } from '../components/features/images'
 import type { Banner, BannerInsert } from '../types'
 
 // Theme imports
@@ -36,8 +32,6 @@ import {
   getTypographyClasses,
   cn
 } from '../utils/theme'
-import Button from '../components/Button'
-import Input from '../components/Input'
 import { formatDateDisplay } from '../utils/format'
 import { FILTER_OPTIONS } from '../constants/components'
 

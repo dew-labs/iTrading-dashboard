@@ -1,5 +1,5 @@
 import React from 'react'
-import AuthForm from '../components/AuthForm'
+import { AuthForm } from '../components/features/auth'
 
 const Login: React.FC = () => {
   return (

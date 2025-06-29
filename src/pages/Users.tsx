@@ -16,17 +16,12 @@ import {
 import { useUsers } from '../hooks/useUsers'
 import { usePermissions } from '../hooks/usePermissions'
 import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
-import Table from '../components/Table'
-import Modal from '../components/Modal'
-import UserForm from '../components/UserForm'
-import PermissionManager from '../components/PermissionManager'
-import ConfirmDialog from '../components/ConfirmDialog'
-import PageLoadingSpinner from '../components/PageLoadingSpinner'
-import TabNavigation from '../components/TabNavigation'
-import FilterDropdown from '../components/FilterDropdown'
-import PaginationSelector from '../components/PaginationSelector'
-import RecordImage from '../components/RecordImage'
-import Badge from '../components/Badge'
+import { Table, FilterDropdown } from '../components/data-display'
+import { Modal, TabNavigation, PaginationSelector, Badge, Input } from '../components/ui'
+import { UserForm, PermissionManager } from '../components/features/users'
+import { RecordImage } from '../components/features/images'
+import { ConfirmDialog } from '../components/common'
+import { PageLoadingSpinner } from '../components/feedback'
 import { USER_ROLES, USER_STATUSES } from '../constants/general'
 import type { DatabaseUser, UserInsert, UserUpdate } from '../types'
 
@@ -39,7 +34,6 @@ import {
   getTypographyClasses,
   cn
 } from '../utils/theme'
-import Input from '../components/Input'
 import { formatDateDisplay } from '../utils/format'
 import { FILTER_OPTIONS } from '../constants/components'
 

@@ -1,16 +1,12 @@
 import React, { useState, useMemo } from 'react'
 import { Plus, Search, Edit2, Trash2, Eye, Package, Calendar, Tag, TrendingUp } from 'lucide-react'
 import { useProducts } from '../hooks/useProducts'
-
 import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
-import Table from '../components/Table'
-import Modal from '../components/Modal'
-import ProductForm from '../components/ProductForm'
-import ConfirmDialog from '../components/ConfirmDialog'
-import PageLoadingSpinner from '../components/PageLoadingSpinner'
-import FilterDropdown from '../components/FilterDropdown'
-import PaginationSelector from '../components/PaginationSelector'
-import Badge from '../components/Badge'
+import { Table, FilterDropdown } from '../components/data-display'
+import { Modal, Badge, PaginationSelector, Button, Input } from '../components/ui'
+import { ProductForm } from '../components/features/products'
+import { ConfirmDialog } from '../components/common'
+import { PageLoadingSpinner } from '../components/feedback'
 import { stripHtmlAndTruncate } from '../utils/textUtils'
 import type { Product, ProductInsert } from '../types'
 
@@ -22,8 +18,6 @@ import {
   getTypographyClasses,
   cn
 } from '../utils/theme'
-import Button from '../components/Button'
-import Input from '../components/Input'
 import { formatDateDisplay } from '../utils/format'
 import { FILTER_OPTIONS } from '../constants/components'
 

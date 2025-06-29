@@ -12,19 +12,14 @@ import {
   Grid3X3,
   List
 } from 'lucide-react'
-import Button from '../components/Button'
-import Input from '../components/Input'
+import { Button, Input, Modal, PaginationSelector } from '../components/ui'
 import { useBrokers } from '../hooks/useBrokers'
 import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
-import Table from '../components/Table'
-import Modal from '../components/Modal'
-import BrokerForm from '../components/BrokerForm'
-import BrokerViewModal from '../components/BrokerViewModal'
-import ConfirmDialog from '../components/ConfirmDialog'
-import PageLoadingSpinner from '../components/PageLoadingSpinner'
+import { Table } from '../components/data-display'
+import { BrokerForm, BrokerViewModal } from '../components/features/brokers'
+import { ConfirmDialog } from '../components/common'
+import { PageLoadingSpinner } from '../components/feedback'
 import { stripHtmlAndTruncate } from '../utils'
-
-import PaginationSelector from '../components/PaginationSelector'
 import type { Broker, BrokerInsert } from '../types'
 
 // Theme imports
