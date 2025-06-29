@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import { Image as ImageIcon, Upload, Camera, Trash2, X, Save, Plus } from 'lucide-react'
+import React, { useState } from 'react'
+import { Image as ImageIcon, Upload, Camera, Trash2, X, Save, Plus, Link } from 'lucide-react'
 import type { Banner, BannerInsert } from '../../../types'
+import { useFormValidation } from '../../../hooks/useFormValidation'
+import { FormField } from '../../atoms'
 import { useImages } from '../../../hooks/useImages'
 import { useFileUpload } from '../../../hooks/useFileUpload'
 import { toast } from '../../../utils/toast'
@@ -17,10 +19,44 @@ interface BannerFormProps {
 }
 
 const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) => {
-  const [formData, setFormData] = useState<BannerInsert>({
-    name: '',
-    target_url: '',
-    is_active: false
+  // Enhanced form validation with our new hook
+  const {
+    data: formData,
+    errors,
+    isValidating,
+    updateField,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    reset
+  } = useFormValidation({
+    schema: {
+      name: {
+        required: true,
+        minLength: 2,
+        maxLength: 100,
+        message: 'Banner name must be between 2 and 100 characters'
+      },
+      target_url: {
+        required: true,
+        custom: (value: string) => {
+          try {
+            new URL(value)
+            return true
+          } catch {
+            return false
+          }
+        },
+        message: 'Please enter a valid URL'
+      }
+    },
+    initialData: {
+      name: '',
+      target_url: '',
+      is_active: false
+    },
+    validateOnBlur: true,
+    validateOnChange: false
   })
 
   const [imageUrl, setImageUrl] = useState<string | null>(null)
@@ -39,12 +75,12 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
   // Load existing banner image if editing
   const { images: existingImages } = useImages('banners', banner?.id || '')
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (banner) {
-      setFormData({
+      reset({
         name: banner.name || '',
         target_url: banner.target_url || '',
-        is_active: banner.is_active
+        is_active: !!banner.is_active
       })
 
       // Load existing image
@@ -52,48 +88,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
         setImageUrl(existingImages[0].image_url)
       }
     }
-  }, [banner, existingImages])
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    // Validate required fields
-    if (!formData.name.trim()) {
-      toast.error('Please enter a banner name')
-      return
-    }
-
-    if (!formData.target_url?.trim()) {
-      toast.error('Please enter a target URL')
-      return
-    }
-
-    // Validate that image is provided
-    if (!banner && !currentImage && !uploadResult) {
-      toast.error('Please upload a banner image')
-      return
-    }
-
-    if (banner && !currentImage) {
-      toast.error('Please upload a banner image')
-      return
-    }
-
-    try {
-      // Create/update the banner and pass image upload result for new banners
-      await onSubmit(formData, uploadResult || undefined)
-    } catch (error) {
-      console.error('Failed to save banner:', error)
-    }
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    })
-  }
+  }, [banner, existingImages, reset])
 
   // Handle file selection
   const handleFileSelect = async (file: File) => {
@@ -203,30 +198,45 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
     document.getElementById('banner-file-input')?.click()
   }
 
+  const handleFormSubmit = async (data: typeof formData) => {
+    // Validate that image is provided
+    if (!banner && !currentImage && !uploadResult) {
+      toast.error('Please upload a banner image')
+      return
+    }
+
+    if (banner && !currentImage) {
+      toast.error('Please upload a banner image')
+      return
+    }
+
+    try {
+      // Create/update the banner and pass image upload result for new banners
+      await onSubmit(data, uploadResult || undefined)
+    } catch (error) {
+      console.error('Failed to save banner:', error)
+    }
+  }
+
   const currentImage = preview || imageUrl
   const showRemoveButton = currentImage && !isUploading
 
   return (
-    <form onSubmit={handleSubmit} className='space-y-6'>
-      {/* Banner Name */}
-      <div>
-        <label htmlFor='name' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
-          Banner Name <span className='text-red-500'>*</span>
-        </label>
-        <input
-          type='text'
-          id='name'
-          name='name'
-          value={formData.name}
-          onChange={handleChange}
-          className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-300 focus:border-transparent'
-          placeholder='Enter a descriptive name for this banner'
-          required
-        />
-        <p className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
-          A clear name to identify this banner in your dashboard
-        </p>
-      </div>
+    <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
+      {/* Banner Name using enhanced FormField */}
+      <FormField
+        label='Banner Name'
+        name='name'
+        value={formData.name}
+        onChange={handleChange('name')}
+        onBlur={handleBlur('name')}
+        placeholder='Enter a descriptive name for this banner'
+        required
+        disabled={isValidating || isUploading || isCreatingImage}
+        {...(errors.name && { error: errors.name })}
+        icon={<ImageIcon className='w-5 h-5' />}
+        helperText='A clear name to identify this banner in your dashboard'
+      />
 
       {/* Image Upload Section */}
       <div className='space-y-2'>
@@ -352,24 +362,22 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
 
       {/* URL Field and Active Status Row */}
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6'>
-        {/* URL Field */}
+        {/* URL Field using enhanced FormField */}
         <div className='lg:col-span-2'>
-          <label htmlFor='target_url' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
-            Target URL <span className='text-red-500'>*</span>
-          </label>
-          <input
+          <FormField
+            label='Target URL'
             type='url'
-            id='target_url'
             name='target_url'
             value={formData.target_url || ''}
-            onChange={handleChange}
-            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-300 focus:border-transparent'
+            onChange={handleChange('target_url')}
+            onBlur={handleBlur('target_url')}
             placeholder='https://example.com/landing-page'
             required
+            disabled={isValidating || isUploading || isCreatingImage}
+            {...(errors.target_url && { error: errors.target_url })}
+            icon={<Link className='w-5 h-5' />}
+            helperText='Where users will be redirected when they click the banner'
           />
-          <p className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
-            Where users will be redirected when they click the banner
-          </p>
         </div>
 
         {/* Active Status Toggle */}
@@ -384,7 +392,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
               </span>
               <button
                 type='button'
-                onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
+                onClick={() => updateField('is_active', !formData.is_active)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400 focus:ring-offset-2 ${
                   formData.is_active
                     ? 'bg-teal-600 dark:bg-teal-500'
@@ -420,7 +428,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
         </button>
         <button
           type='submit'
-          disabled={isUploading || isCreatingImage || !formData.name.trim() || !formData.target_url?.trim() || (!banner && !currentImage && !uploadResult) || (!!banner && !currentImage)}
+          disabled={isValidating || isUploading || isCreatingImage || !formData.name.trim() || !formData.target_url?.trim() || (!banner && !currentImage && !uploadResult) || (!!banner && !currentImage)}
           className='flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-gray-900 to-black dark:from-white dark:to-gray-100 text-white dark:text-gray-900 rounded-lg hover:from-black hover:to-gray-900 dark:hover:from-gray-100 dark:hover:to-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
         >
           {isUploading || isCreatingImage ? (

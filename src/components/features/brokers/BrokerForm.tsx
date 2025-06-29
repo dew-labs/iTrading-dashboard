@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { X, Save, Plus, AlertCircle, Building2, Calendar, MapPin } from 'lucide-react'
 import type { Broker, BrokerInsert } from '../../../types'
+import { useFormValidation } from '../../../hooks/useFormValidation'
+import { FormField } from '../../atoms'
 import { RichTextEditor } from '../posts'
 import { MainImageUpload } from '../images'
 import { useFormTranslation, useTranslation } from '../../../hooks/useTranslation'
@@ -11,31 +13,63 @@ interface BrokerFormProps {
   onCancel: () => void
 }
 
-interface FormErrors {
-  name?: string
-  established_in?: string
-  headquarter?: string
-  description?: string
-}
-
 const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) => {
   const { t: tForm } = useFormTranslation()
   const { t } = useTranslation()
 
-  const [formData, setFormData] = useState<BrokerInsert>({
-    name: '',
-    established_in: null,
-    headquarter: '',
-    description: '',
-    logo_url: null
+  // Enhanced form validation with our new hook
+  const {
+    data: formData,
+    errors,
+    isValidating,
+    updateField,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    reset
+  } = useFormValidation<{
+    name: string
+    established_in: number | null
+    headquarter: string
+    description: string
+    logo_url: string | null
+  }>({
+    schema: {
+      name: {
+        required: true,
+        minLength: 2,
+        maxLength: 100,
+        message: 'Broker name must be between 2 and 100 characters'
+      },
+      established_in: {
+        min: 1800,
+        max: new Date().getFullYear(),
+        custom: (value: number | null) => !value || (value >= 1800 && value <= new Date().getFullYear()),
+        message: 'Please enter a valid year between 1800 and current year'
+      },
+      headquarter: {
+        maxLength: 100,
+        message: 'Headquarter must be less than 100 characters'
+      },
+      description: {
+        minLength: 10,
+        message: 'Description must be at least 10 characters'
+      }
+    },
+    initialData: {
+      name: '',
+      established_in: null,
+      headquarter: '',
+      description: '',
+      logo_url: null
+    },
+    validateOnBlur: true,
+    validateOnChange: false
   })
 
-  const [errors, setErrors] = useState<FormErrors>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  useEffect(() => {
+  React.useEffect(() => {
     if (broker) {
-      setFormData({
+      reset({
         name: broker.name,
         established_in: broker.established_in || null,
         headquarter: broker.headquarter || '',
@@ -43,129 +77,37 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
         logo_url: broker.logo_url || null
       })
     }
-  }, [broker])
+  }, [broker, reset])
 
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {}
-
-    // Name validation
-    if (!formData.name.trim()) {
-      newErrors.name = 'Broker name is required'
-    } else if (formData.name.length < 2) {
-      newErrors.name = 'Broker name must be at least 2 characters long'
-    } else if (formData.name.length > 100) {
-      newErrors.name = 'Broker name must be less than 100 characters'
-    }
-
-    // Established year validation
-    if (formData.established_in !== null && formData.established_in !== undefined) {
-      const currentYear = new Date().getFullYear()
-      if (formData.established_in < 1800) {
-        newErrors.established_in = 'Year must be after 1800'
-      } else if (formData.established_in > currentYear) {
-        newErrors.established_in = 'Year cannot be in the future'
-      }
-    }
-
-    // Headquarter validation
-    if (formData.headquarter && formData.headquarter.length > 100) {
-      newErrors.headquarter = 'Headquarter must be less than 100 characters'
-    }
-
-    // Description validation
-    if (formData.description && formData.description.length < 10) {
-      newErrors.description = 'Description must be at least 10 characters long'
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+  const handleDescriptionChange = (description: string) => {
+    updateField('description', description)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!validateForm()) {
-      return
-    }
-
-    setIsSubmitting(true)
-
-    try {
-      // Prepare data for submission
-      const submitData: BrokerInsert = {
-        name: formData.name.trim(),
-        established_in: formData.established_in || null,
-        headquarter: formData.headquarter?.trim() || null,
-        description: formData.description?.trim() || null,
-        logo_url: formData.logo_url || null
-      }
-
-      await onSubmit(submitData)
-    } catch (error) {
-      console.error('Form submission error:', error)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData({
-      ...formData,
-      [name]: value
-    })
-
-    // Clear errors when user starts typing
-    if (errors[name as keyof FormErrors]) {
-      setErrors({
-        ...errors,
-        [name]: undefined
-      })
-    }
+  const handleLogoUpload = (url: string | null) => {
+    updateField('logo_url', url)
   }
 
   const handleEstablishedYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
-    setFormData({
-      ...formData,
-      established_in: value ? parseInt(value) : null
-    })
-
-    // Clear errors when user starts typing
-    if (errors.established_in) {
-      const newErrors = { ...errors }
-      delete newErrors.established_in
-      setErrors(newErrors)
-    }
+    updateField('established_in', value ? parseInt(value) : null)
   }
 
   return (
-    <form onSubmit={handleSubmit} className='space-y-6'>
-      {/* Broker name field - full width for emphasis */}
-      <div>
-        <label htmlFor='name' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
-          <Building2 className='w-4 h-4 inline mr-1' />
-          {tForm('labels.name')} *
-        </label>
-        <input
-          type='text'
-          id='name'
-          name='name'
-          value={formData.name}
-          onChange={handleChange}
-          className={`w-full px-3 py-2 border ${
-            errors.name ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
-          } rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-300 focus:border-transparent`}
-          placeholder={tForm('placeholders.enterBrokerName')}
-          disabled={isSubmitting}
-        />
-        {errors.name && (
-          <div className='flex items-center mt-1 text-sm text-red-600'>
-            <AlertCircle className='w-4 h-4 mr-1' />
-            {errors.name}
-          </div>
-        )}
-      </div>
+    <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+      {/* Broker name field - full width for emphasis using enhanced FormField */}
+      <FormField
+        label={tForm('labels.name')}
+        name='name'
+        value={formData.name}
+        onChange={handleChange('name')}
+        onBlur={handleBlur('name')}
+        placeholder={tForm('placeholders.enterBrokerName')}
+        required
+        disabled={isValidating}
+        {...(errors.name && { error: errors.name })}
+        icon={<Building2 className='w-5 h-5' />}
+        helperText='Enter the official name of the brokerage'
+      />
 
       {/* Enhanced layout for better organization */}
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
@@ -176,93 +118,74 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
             <MainImageUpload
               label={tForm('labels.logo')}
               imageUrl={formData.logo_url || null}
-              onChange={(url) => setFormData({ ...formData, logo_url: url })}
+              onChange={handleLogoUpload}
               bucket='brokers'
               folder='logos'
               size='lg'
-              disabled={isSubmitting}
+              disabled={isValidating}
               recommendationText={tForm('hints.logoRecommendation')}
               alt='Broker logo'
             />
           </div>
 
-          {/* Basic info fields */}
+          {/* Basic info fields using enhanced FormField components */}
           <div className='space-y-4'>
-            <div>
-              <label htmlFor='established_in' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
-                <Calendar className='w-4 h-4 inline mr-1' />
-                {tForm('labels.establishedYear')}
-              </label>
-              <input
-                type='number'
-                id='established_in'
-                name='established_in'
-                value={formData.established_in || ''}
-                onChange={handleEstablishedYearChange}
-                className={`w-full px-3 py-2 border ${
-                  errors.established_in ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
-                } rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-300 focus:border-transparent`}
-                placeholder={tForm('placeholders.enterEstablishedYear')}
-                min='1800'
-                max={new Date().getFullYear()}
-                disabled={isSubmitting}
-              />
-              {errors.established_in && (
-                <div className='flex items-center mt-1 text-sm text-red-600'>
-                  <AlertCircle className='w-4 h-4 mr-1' />
-                  {errors.established_in}
-                </div>
-              )}
-            </div>
+            <FormField
+              label={tForm('labels.establishedYear')}
+              type='number'
+              name='established_in'
+              value={formData.established_in?.toString() || ''}
+              onChange={handleEstablishedYearChange}
+              onBlur={handleBlur('established_in')}
+              placeholder={tForm('placeholders.enterEstablishedYear')}
+              min={1800}
+              max={new Date().getFullYear()}
+              disabled={isValidating}
+              {...(errors.established_in && { error: errors.established_in })}
+              icon={<Calendar className='w-5 h-5' />}
+              helperText='Year the brokerage was founded'
+            />
 
-            <div>
-              <label htmlFor='headquarter' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
-                <MapPin className='w-4 h-4 inline mr-1' />
-                {tForm('labels.headquarter')}
-              </label>
-              <input
-                type='text'
-                id='headquarter'
-                name='headquarter'
-                value={formData.headquarter || ''}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border ${
-                  errors.headquarter ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
-                } rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-300 focus:border-transparent`}
-                placeholder={tForm('placeholders.enterHeadquarter')}
-                disabled={isSubmitting}
-              />
-              {errors.headquarter && (
-                <div className='flex items-center mt-1 text-sm text-red-600'>
-                  <AlertCircle className='w-4 h-4 mr-1' />
-                  {errors.headquarter}
-                </div>
-              )}
-            </div>
+            <FormField
+              label={tForm('labels.headquarter')}
+              name='headquarter'
+              value={formData.headquarter || ''}
+              onChange={handleChange('headquarter')}
+              onBlur={handleBlur('headquarter')}
+              placeholder={tForm('placeholders.enterHeadquarter')}
+              disabled={isValidating}
+              {...(errors.headquarter && { error: errors.headquarter })}
+              icon={<MapPin className='w-5 h-5' />}
+              helperText='Primary business location'
+            />
           </div>
         </div>
 
         {/* Right column - Description editor */}
         <div className='lg:col-span-2'>
-          <RichTextEditor
-            label={tForm('labels.description')}
-            content={formData.description || ''}
-            onChange={(description) => {
-              setFormData({ ...formData, description })
-              // Clear errors when user starts typing
-              if (errors.description) {
-                const newErrors = { ...errors }
-                delete newErrors.description
-                setErrors(newErrors)
-              }
-            }}
-            placeholder={tForm('placeholders.brokerDescriptionPlaceholder')}
-            error={errors.description}
-            disabled={isSubmitting}
-            height={500}
-            bucket='brokers'
-            folder='images'
-          />
+          <div className='space-y-2'>
+            <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+              {tForm('labels.description')}
+            </label>
+            <RichTextEditor
+              content={formData.description || ''}
+              onChange={handleDescriptionChange}
+              placeholder={tForm('placeholders.brokerDescriptionPlaceholder')}
+              disabled={isValidating}
+              height={500}
+              bucket='brokers'
+              folder='images'
+            />
+            {errors.description && (
+              <div className='flex items-center space-x-1 text-sm text-red-600 dark:text-red-400'>
+                <AlertCircle className='w-4 h-4 flex-shrink-0' />
+                <span>{errors.description}</span>
+              </div>
+            )}
+            <p className='text-xs text-gray-500 dark:text-gray-400'>
+              Describe the broker's services, history, regulations, trading platforms, and key features
+            </p>
+          </div>
         </div>
       </div>
 
@@ -272,17 +195,17 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
           type='button'
           onClick={onCancel}
           className='px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center'
-          disabled={isSubmitting}
+          disabled={isValidating}
         >
           <X className='w-4 h-4 mr-2' />
           {t('actions.cancel')}
         </button>
         <button
           type='submit'
-          disabled={isSubmitting}
+          disabled={isValidating}
           className='px-6 py-2 bg-gradient-to-r from-gray-900 to-black dark:from-white dark:to-gray-100 text-white dark:text-gray-900 rounded-lg hover:from-black hover:to-gray-900 dark:hover:from-gray-100 dark:hover:to-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center'
         >
-          {isSubmitting ? (
+          {isValidating ? (
             <>
               <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white dark:border-b-gray-900 mr-2'></div>
               {broker ? 'Updating...' : 'Creating...'}

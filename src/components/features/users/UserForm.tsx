@@ -1,11 +1,12 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { User, Shield, Sparkles, X, Save, Mail, Camera } from 'lucide-react'
 import type { DatabaseUser, UserInsert, UserRole } from '../../../types'
 import { usePermissions } from '../../../hooks/usePermissions'
 import { useTranslation } from '../../../hooks/useTranslation'
-import { validators } from '../../../utils/format'
+import { useFormValidation } from '../../../hooks/useFormValidation'
+import { formSchemas } from '../../../utils/validation'
 import { USER_ROLES } from '../../../constants/general'
-import { Input } from '../../atoms'
+import { FormField } from '../../atoms'
 import { Select } from '../../molecules'
 import { MainImageUpload } from '../images'
 
@@ -18,97 +19,54 @@ interface UserFormProps {
 const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
   const { t } = useTranslation()
   const { isSuperAdmin } = usePermissions()
-  const [formData, setFormData] = useState<Omit<UserInsert, 'id'>>({
-    email: user?.email || '',
-    full_name: user?.full_name || '',
-    phone: user?.phone || '',
-    role: user?.role || 'user',
-    status: 'invited', // Always set to invited for new users
-    avatar_url: user?.avatar_url ?? null
+
+  // Enhanced form validation with our new hook
+  const {
+    data: formData,
+    errors,
+    isValidating,
+    updateField,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    reset
+  } = useFormValidation({
+    schema: {
+      ...formSchemas.user,
+      // Add custom validation for confirm password matching
+      role: {
+        required: true,
+        custom: (value: UserRole) => Object.values(USER_ROLES).includes(value),
+        message: 'Please select a valid role'
+      }
+    },
+    initialData: {
+      email: user?.email || '',
+      full_name: user?.full_name || '',
+      phone: user?.phone || '',
+      role: user?.role || 'user',
+      status: 'invited' as const, // Always set to invited for new users
+      avatar_url: user?.avatar_url ?? null
+    },
+    validateOnBlur: true,
+    validateOnChange: false
   })
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {}
-
-    if (!validators.required(formData.email)) {
-      newErrors.email = t('userForm.emailRequired')
-    } else if (!validators.email(formData.email)) {
-      newErrors.email = t('userForm.emailInvalidFormat')
+  React.useEffect(() => {
+    if (user) {
+      reset({
+        email: user.email,
+        full_name: user.full_name || '',
+        phone: user.phone || '',
+        role: user.role,
+        status: 'invited',
+        avatar_url: user.avatar_url ?? null
+      })
     }
-
-    if (!validators.required(formData.full_name)) {
-      newErrors.full_name = t('userForm.fullNameRequired')
-    }
-
-    if (formData.phone && !validators.phone(formData.phone)) {
-      newErrors.phone = t('userForm.phoneInvalidFormat')
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (validateForm()) {
-      setIsSubmitting(true)
-      try {
-        await onSubmit(formData)
-      } finally {
-        setIsSubmitting(false)
-      }
-    }
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }))
-    }
-  }
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    const newErrors: Record<string, string> = { ...errors }
-
-    // Validate specific field on blur
-    switch (name) {
-    case 'email':
-      if (!validators.required(value)) {
-        newErrors.email = t('userForm.emailRequired')
-      } else if (!validators.email(value)) {
-        newErrors.email = t('userForm.emailInvalidFormat')
-      } else {
-        delete newErrors.email
-      }
-      break
-
-    case 'full_name':
-      if (!validators.required(value)) {
-        newErrors.full_name = t('userForm.fullNameRequired')
-      } else {
-        delete newErrors.full_name
-      }
-      break
-
-    case 'phone':
-      if (value && !validators.phone(value)) {
-        newErrors.phone = t('userForm.phoneInvalidFormat')
-      } else {
-        delete newErrors.phone
-      }
-      break
-    }
-
-    setErrors(newErrors)
-  }
+  }, [user, reset])
 
   const handleAvatarUpload = (url: string | null) => {
-    setFormData(prev => ({ ...prev, avatar_url: url }))
+    updateField('avatar_url', url)
   }
 
   const roleOptions = [
@@ -134,7 +92,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
   ]
 
   return (
-    <form onSubmit={handleSubmit} className='space-y-6'>
+    <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
       {/* Avatar Upload Section */}
       <div className='bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border border-gray-200 dark:border-gray-700'>
         <div className='flex items-center space-x-4 mb-4'>
@@ -160,7 +118,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
             alt={`${formData.full_name || formData.email} avatar`}
             label=''
             size='md'
-            disabled={isSubmitting}
+            disabled={isValidating}
             className='flex-shrink-0'
           />
           <div className='flex-1 space-y-2'>
@@ -176,43 +134,47 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
         </div>
       </div>
 
-      {/* Basic information in grid */}
+      {/* Basic information in grid using enhanced FormField */}
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-        <Input
+        <FormField
           label={t('forms:labels.emailAddress')}
           type='email'
           name='email'
           value={formData.email}
-          onChange={handleChange}
-          onBlur={handleBlur}
+          onChange={handleChange('email')}
+          onBlur={handleBlur('email')}
           placeholder='user@example.com'
           required
-          disabled={!!user}
+          disabled={!!user || isValidating}
           {...(errors.email && { error: errors.email })}
           {...(!user && { helperText: t('userForm.emailInviteHelpText') })}
+          icon={<Mail className='w-5 h-5' />}
         />
 
-        <Input
+        <FormField
           label={t('forms:labels.fullName')}
           name='full_name'
           value={formData.full_name || ''}
-          onChange={handleChange}
-          onBlur={handleBlur}
+          onChange={handleChange('full_name')}
+          onBlur={handleBlur('full_name')}
           placeholder={t('forms:placeholders.fullNamePlaceholder')}
           required
+          disabled={isValidating}
           {...(errors.full_name && { error: errors.full_name })}
+          icon={<User className='w-5 h-5' />}
         />
       </div>
 
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-        <Input
+        <FormField
           label={t('forms:labels.phoneNumber')}
           type='tel'
           name='phone'
           value={formData.phone || ''}
-          onChange={handleChange}
-          onBlur={handleBlur}
+          onChange={handleChange('phone')}
+          onBlur={handleBlur('phone')}
           placeholder='+1 (555) 123-4567'
+          disabled={isValidating}
           {...(errors.phone && { error: errors.phone })}
           helperText={t('userForm.phoneHelpText')}
         />
@@ -221,9 +183,9 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
           label={t('userForm.userRolePermissions')}
           required
           value={formData.role || 'user'}
-          onChange={value => setFormData(prev => ({ ...prev, role: value as UserRole }))}
+          onChange={value => updateField('role', value as UserRole)}
           options={roleOptions}
-          disabled={isSubmitting}
+          disabled={isValidating}
         />
       </div>
 
@@ -232,7 +194,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
         <button
           type='button'
           onClick={onCancel}
-          disabled={isSubmitting}
+          disabled={isValidating}
           className='px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center'
         >
           <X className='w-4 h-4 mr-2' />
@@ -240,10 +202,10 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
         </button>
         <button
           type='submit'
-          disabled={isSubmitting}
+          disabled={isValidating}
           className='px-6 py-2 bg-gradient-to-r from-gray-900 to-black dark:from-white dark:to-gray-100 text-white dark:text-gray-900 rounded-lg hover:from-black hover:to-gray-900 dark:hover:from-gray-100 dark:hover:to-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center'
         >
-          {isSubmitting ? (
+          {isValidating ? (
             <>
               <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2'></div>
               {user ? t('userForm.updating') : t('userForm.sendingInvite')}

@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { AlertCircle, FileText, Calendar, Scale, Lock, Clock, CheckCircle, Save, X, Plus } from 'lucide-react'
 import type { PostInsert } from '../../../types'
 import type { PostWithAuthor } from '../../../hooks/usePosts'
+import { useFormValidation } from '../../../hooks/useFormValidation'
+import { FormField } from '../../atoms'
 import { Select } from '../../molecules'
 import RichTextEditor from './RichTextEditor'
 import { MainImageUpload } from '../images'
@@ -13,31 +15,57 @@ interface PostFormProps {
   onCancel: () => void
 }
 
-interface FormErrors {
-  title?: string
-  content?: string
-  type?: string
-}
-
 const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
   const { user } = useAuth()
 
-  const [formData, setFormData] = useState<PostInsert>({
-    title: '',
-    content: '',
-    type: 'news',
-    status: 'draft',
-    author_id: user?.id || null,
-    thumbnail_url: null,
-    views: 0
+  // Enhanced form validation with our new hook
+  const {
+    data: formData,
+    errors,
+    isValidating,
+    updateField,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    reset
+  } = useFormValidation<{
+    title: string
+    content: string
+    type: PostWithAuthor['type']
+    status: PostWithAuthor['status']
+    author_id: string | null
+    thumbnail_url: string | null
+    views: number
+  }>({
+    schema: {
+      title: {
+        required: true,
+        minLength: 3,
+        maxLength: 200,
+        message: 'Title must be between 3 and 200 characters'
+      },
+      content: {
+        required: true,
+        minLength: 10,
+        message: 'Content must be at least 10 characters'
+      }
+    },
+    initialData: {
+      title: '',
+      content: '',
+      type: 'news',
+      status: 'draft',
+      author_id: user?.id || null,
+      thumbnail_url: null,
+      views: 0
+    },
+    validateOnBlur: true,
+    validateOnChange: false
   })
 
-  const [errors, setErrors] = useState<FormErrors>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  useEffect(() => {
+  React.useEffect(() => {
     if (post) {
-      setFormData({
+      reset({
         title: post.title,
         type: post.type,
         content: post.content || '',
@@ -47,76 +75,14 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
         views: post.views || 0
       })
     }
-  }, [post, user?.id])
+  }, [post, user?.id, reset])
 
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {}
-
-    // Title validation
-    if (!formData.title.trim()) {
-      newErrors.title = 'Title is required'
-    } else if (formData.title.length < 3) {
-      newErrors.title = 'Title must be at least 3 characters long'
-    } else if (formData.title.length > 200) {
-      newErrors.title = 'Title must be less than 200 characters'
-    }
-
-    // Content validation
-    if (!formData.content?.trim()) {
-      newErrors.content = 'Content is required'
-    } else if (formData.content.length < 10) {
-      newErrors.content = 'Content must be at least 10 characters long'
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+  const handleContentChange = (content: string) => {
+    updateField('content', content)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!validateForm()) {
-      return
-    }
-
-    setIsSubmitting(true)
-
-    try {
-      // Prepare data for submission
-      const submitData: PostInsert = {
-        title: formData.title.trim(),
-        content: formData.content?.trim() || '',
-        type: formData.type || 'news',
-        status: formData.status || 'draft',
-        author_id: formData.author_id || user?.id || null,
-        thumbnail_url: formData.thumbnail_url || null,
-        views: formData.views || 0
-      }
-
-      await onSubmit(submitData)
-    } catch (error) {
-      console.error('Form submission error:', error)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target
-    setFormData({
-      ...formData,
-      [name]: value
-    })
-
-    // Clear errors when user starts typing
-    if (errors[name as keyof FormErrors]) {
-      setErrors({
-        ...errors,
-        [name]: undefined
-      })
-    }
+  const handleThumbnailChange = (url: string | null) => {
+    updateField('thumbnail_url', url)
   }
 
   // Create type options with Badge component icons
@@ -158,31 +124,21 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
   ]
 
   return (
-    <form onSubmit={handleSubmit} className='space-y-6'>
-      {/* Title field - full width for emphasis */}
-      <div>
-        <label htmlFor='title' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
-          Title *
-        </label>
-        <input
-          type='text'
-          id='title'
-          name='title'
-          value={formData.title}
-          onChange={handleChange}
-          className={`w-full px-3 py-2 border ${
-            errors.title ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
-          } rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-300 focus:border-transparent`}
-          placeholder='Enter a compelling title...'
-          disabled={isSubmitting}
-        />
-        {errors.title && (
-          <div className='flex items-center mt-1 text-sm text-red-600'>
-            <AlertCircle className='w-4 h-4 mr-1' />
-            {errors.title}
-          </div>
-        )}
-      </div>
+    <form onSubmit={handleSubmit((data) => onSubmit(data as PostInsert))} className='space-y-6'>
+      {/* Title field - full width for emphasis using enhanced FormField */}
+      <FormField
+        label='Title'
+        name='title'
+        value={formData.title}
+        onChange={handleChange('title')}
+        onBlur={handleBlur('title')}
+        placeholder='Enter a compelling title...'
+        required
+        disabled={isValidating}
+        {...(errors.title && { error: errors.title })}
+        icon={<FileText className='w-5 h-5' />}
+        helperText='Choose a clear, descriptive title that accurately represents your content'
+      />
 
       {/* Enhanced layout for larger modal */}
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
@@ -194,18 +150,18 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
               label='Type'
               required
               value={formData.type || 'news'}
-              onChange={value => setFormData({ ...formData, type: value as PostWithAuthor['type'] })}
+              onChange={value => updateField('type', value as PostWithAuthor['type'])}
               options={typeOptions}
-              disabled={isSubmitting}
+              disabled={isValidating}
             />
 
             <Select
               label='Status'
               required
               value={formData.status || 'draft'}
-              onChange={value => setFormData({ ...formData, status: value as PostWithAuthor['status'] })}
+              onChange={value => updateField('status', value as PostWithAuthor['status'])}
               options={statusOptions}
-              disabled={isSubmitting}
+              disabled={isValidating}
             />
           </div>
 
@@ -214,11 +170,11 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
             <MainImageUpload
               label='Thumbnail Image'
               imageUrl={formData.thumbnail_url || null}
-              onChange={(url) => setFormData({ ...formData, thumbnail_url: url })}
+              onChange={handleThumbnailChange}
               bucket='posts'
               folder='thumbnails'
               size='lg'
-              disabled={isSubmitting}
+              disabled={isValidating}
               recommendationText='Use high-quality images (1200x630px) for best social sharing results'
               alt='Post thumbnail'
             />
@@ -227,26 +183,29 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
 
         {/* Right column - Content editor */}
         <div className='lg:col-span-2'>
-          <RichTextEditor
-            label='Content'
-            required
-            content={formData.content || ''}
-            onChange={content => {
-              setFormData({ ...formData, content })
-              // Clear errors when user starts typing
-              if (errors.content) {
-                const newErrors = { ...errors }
-                delete newErrors.content
-                setErrors(newErrors)
-              }
-            }}
-            placeholder='Write your post content here - use the rich editor tools to format your text...'
-            error={errors.content}
-            disabled={isSubmitting}
-            height={500}
-            bucket='posts'
-            folder='images'
-          />
+          <div className='space-y-2'>
+            <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+              Content <span className='text-red-500'>*</span>
+            </label>
+            <RichTextEditor
+              content={formData.content || ''}
+              onChange={handleContentChange}
+              placeholder='Write your post content here - use the rich editor tools to format your text...'
+              disabled={isValidating}
+              height={500}
+              bucket='posts'
+              folder='images'
+            />
+            {errors.content && (
+              <div className='flex items-center space-x-1 text-sm text-red-600 dark:text-red-400'>
+                <AlertCircle className='w-4 h-4 flex-shrink-0' />
+                <span>{errors.content}</span>
+              </div>
+            )}
+            <p className='text-xs text-gray-500 dark:text-gray-400'>
+              Use the rich editor to format your content with headings, lists, links, and media
+            </p>
+          </div>
         </div>
       </div>
 
@@ -256,17 +215,17 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
           type='button'
           onClick={onCancel}
           className='px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center'
-          disabled={isSubmitting}
+          disabled={isValidating}
         >
           <X className='w-4 h-4 mr-2' />
           Cancel
         </button>
         <button
           type='submit'
-          disabled={isSubmitting}
+          disabled={isValidating}
           className='px-6 py-2 bg-gradient-to-r from-gray-900 to-black dark:from-white dark:to-gray-100 text-white dark:text-gray-900 rounded-lg hover:from-black hover:to-gray-900 dark:hover:from-gray-100 dark:hover:to-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center'
         >
-          {isSubmitting ? (
+          {isValidating ? (
             <>
               <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white dark:border-b-gray-900 mr-2'></div>
               {post ? 'Updating...' : 'Creating...'}
