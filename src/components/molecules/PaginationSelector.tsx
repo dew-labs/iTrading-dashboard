@@ -16,7 +16,7 @@ import React from 'react'
 import { API } from '../../constants/theme'
 import { cn } from '../../utils/theme'
 import { useTranslation } from '../../hooks/useTranslation'
-import { Select } from '../ui'
+import { Select } from '../molecules'
 
 interface PaginationSelectorProps {
   /** Current number of items per page */

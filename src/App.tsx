@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from './store/authStore'
 import { ErrorBoundary, EnhancedLoadingScreen } from './components/feedback'
 import { ProtectedRoute } from './components/common'
-import { DashboardLayout } from './components/layout'
+import { DashboardLayout } from './components'
 import Login from './pages/Login'
 import Unauthorized from './pages/Unauthorized'
 

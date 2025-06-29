@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import { useTranslation, usePageTranslation } from '../../../hooks/useTranslation'
 import { formatDateDisplay } from '../../../utils/format'
-import { Badge, Button } from '../../ui'
+import { Badge, Button } from '../../atoms'
 import { RichTextRenderer } from '../../common'
 import { RecordImage } from '../images'
 import type { PostWithAuthor } from '../../../hooks/usePosts'

@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 import { useTranslation, useNotificationTranslation } from '../../hooks/useTranslation'
-import { Badge } from '../ui'
+import { Badge } from '../atoms'
 import { Avatar } from '../features/users'
 
 interface HeaderProps {

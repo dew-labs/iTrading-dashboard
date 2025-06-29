@@ -1,54 +1,44 @@
-import React, { useState, useMemo } from 'react'
-import {
-  Plus,
-  Search,
-  Edit2,
-  Trash2,
-  Image,
-  Eye,
-  EyeOff,
-  Calendar,
-  Link,
-  Activity,
-  CheckCircle,
-  XCircle
-} from 'lucide-react'
+import React, { useState } from 'react'
+import { Plus, Search } from 'lucide-react'
 import { useBanners } from '../hooks/useBanners'
+import { useBannersFiltering } from '../hooks/useBannersFiltering'
 import { useImages } from '../hooks/useImages'
 import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
-import { Table, FilterDropdown } from '../components/data-display'
-import { Modal, Badge, PaginationSelector, Button, Input } from '../components/ui'
+import { FilterDropdown, BannersTable, BannersStats, Modal, PaginationSelector, Button, Input } from '../components'
 import { BannerForm } from '../components/features/banners'
 import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
-import { RecordImage } from '../components/features/images'
 import type { Banner, BannerInsert } from '../types'
 
 // Theme imports
 import {
   getPageLayoutClasses,
-  getStatsCardProps,
-  getIconClasses,
   getTypographyClasses,
   cn
 } from '../utils/theme'
-import { formatDateDisplay } from '../utils/format'
-import { FILTER_OPTIONS } from '../constants/components'
 
 const Banners: React.FC = () => {
   const { banners, loading, createBanner, updateBanner, deleteBanner, isDeleting } = useBanners()
   const { createImageFromUpload } = useImages()
   const { t } = usePageTranslation() // Page-specific content
   const { t: tCommon } = useTranslation() // Common actions and terms
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filterStatus, setFilterStatus] = useState<string>('all')
+
+  // Use the filtering hook for all business logic
+  const {
+    filterState,
+    filteredAndSortedBanners,
+    paginatedBanners,
+    totalPages,
+    setSearchTerm,
+    setFilterStatus,
+    setItemsPerPage,
+    setPageInputValue,
+    handleSort,
+    handlePageChange
+  } = useBannersFiltering({ banners })
+
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null)
-  const [sortColumn, setSortColumn] = useState<keyof Banner | null>('created_at')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
-  const [pageInputValue, setPageInputValue] = useState('1')
 
   // Confirm dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -63,66 +53,6 @@ const Banners: React.FC = () => {
 
   // Theme classes
   const layout = getPageLayoutClasses()
-
-  // Enhanced filtering and sorting
-  const filteredAndSortedBanners = useMemo(() => {
-    const filtered = banners.filter(banner => {
-      const matchesSearch = searchTerm === '' ||
-        banner.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (banner.target_url && banner.target_url.toLowerCase().includes(searchTerm.toLowerCase()))
-
-      const matchesStatus =
-        filterStatus === 'all' ||
-        (filterStatus === 'active' && banner.is_active) ||
-        (filterStatus === 'inactive' && !banner.is_active)
-
-      return matchesSearch && matchesStatus
-    })
-
-    // Sort banners
-    filtered.sort((a, b) => {
-      if (!sortColumn) return 0
-
-      let aValue: string | number | boolean
-      let bValue: string | number | boolean
-
-      switch (sortColumn) {
-      case 'name':
-        aValue = a.name.toLowerCase()
-        bValue = b.name.toLowerCase()
-        break
-      case 'target_url':
-        aValue = (a.target_url || '').toLowerCase()
-        bValue = (b.target_url || '').toLowerCase()
-        break
-      case 'is_active':
-        aValue = a.is_active ? 1 : 0
-        bValue = b.is_active ? 1 : 0
-        break
-      case 'created_at':
-        aValue = new Date(a.created_at || 0).getTime()
-        bValue = new Date(b.created_at || 0).getTime()
-        break
-      default:
-        return 0
-      }
-
-      if (sortDirection === 'asc') {
-        return aValue > bValue ? 1 : -1
-      } else {
-        return aValue < bValue ? 1 : -1
-      }
-    })
-
-    return filtered
-  }, [banners, searchTerm, filterStatus, sortColumn, sortDirection])
-
-  // Pagination
-  const totalPages = Math.ceil(filteredAndSortedBanners.length / itemsPerPage)
-  const paginatedBanners = filteredAndSortedBanners.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
 
   const handleEdit = (banner: Banner) => {
     setEditingBanner(banner)
@@ -143,8 +73,8 @@ const Banners: React.FC = () => {
     try {
       await deleteBanner(confirmDialog.bannerId)
       // Reset to first page if current page becomes empty
-      if (paginatedBanners.length === 1 && currentPage > 1) {
-        setCurrentPage(currentPage - 1)
+      if (paginatedBanners.length === 1 && filterState.currentPage > 1) {
+        handlePageChange(filterState.currentPage - 1)
       }
     } finally {
       setConfirmDialog({
@@ -201,7 +131,7 @@ const Banners: React.FC = () => {
         }
 
         // Go to first page to see the new banner
-        setCurrentPage(1)
+        handlePageChange(1)
       }
       handleCloseModal()
     } catch (error) {
@@ -209,146 +139,12 @@ const Banners: React.FC = () => {
     }
   }
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-    setPageInputValue(page.toString())
-  }
-
-  // Use predefined filter options from constants
-  const statusOptions = [...FILTER_OPTIONS.bannerStatus]
-
-  const handleSort = (column: keyof Banner) => {
-    if (column === sortColumn) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
-    } else {
-      setSortColumn(column)
-      setSortDirection('desc')
-    }
-  }
-
-  const columns = [
-    {
-      header: t('banners.bannerDetails'),
-      accessor: 'name' as keyof Banner,
-      sortable: true,
-      render: (value: unknown, row: Banner) => {
-        return (
-          <div className='flex items-center space-x-3'>
-            <div className='flex-shrink-0'>
-              <RecordImage
-                tableName='banners'
-                recordId={row.id}
-                className='w-12 h-12 rounded-lg object-cover border border-gray-200'
-                fallbackClassName='w-12 h-12 rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center'
-                alt={`Banner ${row.id.slice(0, 8)} image`}
-                fallbackIcon={<Image className='w-4 h-4 text-white' />}
-              />
-            </div>
-            <div className='flex-1 min-w-0'>
-              <div className={cn(getTypographyClasses('h4'), 'truncate')}>
-                {row.name || 'Untitled Banner'}
-              </div>
-              <div className='flex items-center space-x-2 mt-2'>
-                <Badge variant={row.is_active ? 'active' : 'inactive'} size='sm' showIcon>
-                  {tCommon(row.is_active ? 'status.active' : 'status.inactive')}
-                </Badge>
-              </div>
-            </div>
-          </div>
-        )
-      }
-    },
-    {
-      header: t('banners.targetUrl'),
-      accessor: 'id' as keyof Banner,
-      render: (value: unknown, row: Banner) => {
-        return (
-          <div className={getTypographyClasses('small')}>
-            {row.target_url ? (
-              <div className='flex items-center text-blue-600 hover:text-blue-800'>
-                <Link className='w-4 h-4 mr-1' />
-                <a
-                  href={row.target_url}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='underline truncate max-w-xs'
-                >
-                  {row.target_url}
-                </a>
-              </div>
-            ) : (
-              <div className='flex items-center text-gray-500'>
-                <Link className='w-4 h-4 mr-1' />
-                <span>{t('banners.noUrlSet')}</span>
-              </div>
-            )}
-          </div>
-        )
-      }
-    },
-    {
-      header: t('banners.createdDate'),
-      accessor: 'created_at' as keyof Banner,
-      sortable: true,
-      render: (value: unknown) => {
-        return (
-          <div className={cn(getTypographyClasses('small'), 'text-gray-900')}>
-            <div className='flex items-center'>
-              <Calendar className='w-4 h-4 mr-1 text-gray-400' />
-              <span>{formatDateDisplay(value as string)}</span>
-            </div>
-          </div>
-        )
-      }
-    },
-    {
-      header: t('banners.actions'),
-      accessor: 'id' as keyof Banner,
-      render: (value: unknown, row: Banner) => (
-        <div className='flex space-x-1'>
-          <button
-            onClick={() => handleToggleStatus(row)}
-            className='p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors'
-            title={
-              row.is_active
-                ? t('banners.tooltips.deactivateBanner')
-                : t('banners.tooltips.activateBanner')
-            }
-          >
-            {row.is_active ? (
-              <Eye className={getIconClasses('action')} />
-            ) : (
-              <EyeOff className={getIconClasses('action')} />
-            )}
-          </button>
-          <button
-            onClick={() => handleEdit(row)}
-            className='p-2 text-gray-600 dark:text-gray-300 hover:text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded transition-colors'
-            title={t('banners.tooltips.editBanner')}
-          >
-            <Edit2 className={getIconClasses('action')} />
-          </button>
-          <button
-            onClick={() => handleDelete(row)}
-            className='p-2 text-gray-600 dark:text-gray-300 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors'
-            title={t('banners.tooltips.deleteBanner')}
-          >
-            <Trash2 className={getIconClasses('action')} />
-          </button>
-        </div>
-      )
-    }
+  // Use predefined filter options
+  const statusOptions = [
+    { value: 'all', label: tCommon('general.all') },
+    { value: 'active', label: tCommon('status.active') },
+    { value: 'inactive', label: tCommon('status.inactive') }
   ]
-
-  // Stats calculations
-  const activeBanners = banners.filter(b => b.is_active).length
-  const inactiveBanners = banners.filter(b => !b.is_active).length
-  const activeRate = banners.length > 0 ? (activeBanners / banners.length) * 100 : 0
-
-  const totalBannersProps = getStatsCardProps('banners')
-  const activeProps = getStatsCardProps('banners')
-  const inactiveProps = getStatsCardProps('banners')
-  const rateProps = getStatsCardProps('banners')
 
   if (loading) {
     return (
@@ -382,55 +178,7 @@ const Banners: React.FC = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className={layout.grid}>
-          <div className={totalBannersProps.cardClasses}>
-            <div className='flex items-center'>
-              <div className={getIconClasses('stats', 'banners')}>
-                <Image className='w-6 h-6 text-white' />
-              </div>
-              <div className='ml-4'>
-                <div className={totalBannersProps.valueClasses}>{banners.length}</div>
-                <div className={totalBannersProps.labelClasses}>{t('banners.totalBanners')}</div>
-              </div>
-            </div>
-          </div>
-
-          <div className={activeProps.cardClasses}>
-            <div className='flex items-center'>
-              <div className={getIconClasses('stats', 'posts')}>
-                <CheckCircle className='w-6 h-6 text-white' />
-              </div>
-              <div className='ml-4'>
-                <div className={activeProps.valueClasses}>{activeBanners}</div>
-                <div className={activeProps.labelClasses}>{tCommon('status.active')}</div>
-              </div>
-            </div>
-          </div>
-
-          <div className={inactiveProps.cardClasses}>
-            <div className='flex items-center'>
-              <div className={getIconClasses('stats', 'users')}>
-                <XCircle className='w-6 h-6 text-white' />
-              </div>
-              <div className='ml-4'>
-                <div className={inactiveProps.valueClasses}>{inactiveBanners}</div>
-                <div className={inactiveProps.labelClasses}>{tCommon('status.inactive')}</div>
-              </div>
-            </div>
-          </div>
-
-          <div className={rateProps.cardClasses}>
-            <div className='flex items-center'>
-              <div className={getIconClasses('stats', 'products')}>
-                <Activity className='w-6 h-6 text-white' />
-              </div>
-              <div className='ml-4'>
-                <div className={rateProps.valueClasses}>{activeRate.toFixed(0)}%</div>
-                <div className={rateProps.labelClasses}>{t('banners.activeRate')}</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <BannersStats banners={banners} />
 
         {/* Banners Content */}
         <div className='bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm'>
@@ -441,7 +189,7 @@ const Banners: React.FC = () => {
                 <Input
                   type='text'
                   placeholder={tCommon('placeholders.searchBannersPlaceholder')}
-                  value={searchTerm}
+                  value={filterState.searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   leftIcon={Search}
                   variant='search'
@@ -451,10 +199,10 @@ const Banners: React.FC = () => {
               <div className='flex items-center space-x-3'>
                 <FilterDropdown
                   options={statusOptions}
-                  value={filterStatus}
+                  value={filterState.filterStatus}
                   onChange={value => {
                     setFilterStatus(value)
-                    setCurrentPage(1)
+                    handlePageChange(1)
                   }}
                   label={tCommon('general.status')}
                 />
@@ -462,30 +210,32 @@ const Banners: React.FC = () => {
             </div>
 
             {/* Table */}
-            <Table
-              data={paginatedBanners}
-              columns={columns}
-              sortColumn={sortColumn}
-              sortDirection={sortDirection}
+            <BannersTable
+              banners={paginatedBanners}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onToggleStatus={handleToggleStatus}
               onSort={handleSort}
+              sortColumn={filterState.sortColumn}
+              sortDirection={filterState.sortDirection}
             />
 
             {/* Pagination */}
             <div className='flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 py-3'>
               <div className='flex items-center space-x-6'>
                 <PaginationSelector
-                  value={itemsPerPage}
+                  value={filterState.itemsPerPage}
                   onChange={value => {
                     setItemsPerPage(value)
-                    setCurrentPage(1) // Reset to first page when changing items per page
+                    handlePageChange(1) // Reset to first page when changing items per page
                   }}
                 />
                 <div className='flex items-center'>
                   <span className='text-sm text-gray-700 dark:text-gray-300'>
                     {tCommon('pagination.showingRows', {
-                      startItem: (currentPage - 1) * itemsPerPage + 1,
+                      startItem: (filterState.currentPage - 1) * filterState.itemsPerPage + 1,
                       endItem: Math.min(
-                        currentPage * itemsPerPage,
+                        filterState.currentPage * filterState.itemsPerPage,
                         filteredAndSortedBanners.length
                       ),
                       total: filteredAndSortedBanners.length
@@ -497,8 +247,8 @@ const Banners: React.FC = () => {
               {totalPages > 1 && (
                 <div className='flex items-center space-x-2'>
                   <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(filterState.currentPage - 1)}
+                    disabled={filterState.currentPage === 1}
                     className='p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                   >
                     <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -516,7 +266,7 @@ const Banners: React.FC = () => {
                   <div className='flex items-center space-x-1'>
                     <input
                       type='text'
-                      value={pageInputValue}
+                      value={filterState.pageInputValue}
                       onChange={e => {
                         setPageInputValue(e.target.value)
                       }}
@@ -524,17 +274,13 @@ const Banners: React.FC = () => {
                         const page = parseInt(e.target.value)
                         if (!isNaN(page) && page >= 1 && page <= totalPages) {
                           handlePageChange(page)
-                        } else {
-                          setPageInputValue(currentPage.toString())
                         }
                       }}
                       onKeyDown={e => {
                         if (e.key === 'Enter') {
-                          const page = parseInt(pageInputValue)
+                          const page = parseInt(filterState.pageInputValue)
                           if (!isNaN(page) && page >= 1 && page <= totalPages) {
                             handlePageChange(page)
-                          } else {
-                            setPageInputValue(currentPage.toString())
                           }
                         }
                       }}
@@ -545,8 +291,8 @@ const Banners: React.FC = () => {
                     </span>
                   </div>
                   <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
+                    onClick={() => handlePageChange(filterState.currentPage + 1)}
+                    disabled={filterState.currentPage === totalPages}
                     className='p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                   >
                     <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>

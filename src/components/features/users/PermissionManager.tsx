@@ -17,7 +17,8 @@ import { getUserPermissions, grantPermission, revokePermission } from '../../../
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { DatabaseUser, Permission } from '../../../types'
 import { LoadingSpinner } from '../../feedback'
-import { Select, Badge } from '../../ui'
+import { Select } from '../../molecules'
+import { Badge } from '../../atoms'
 import { useToast } from '../../../hooks/useToast'
 import { getButtonClasses, getTypographyClasses, cn } from '../../../utils/theme'
 

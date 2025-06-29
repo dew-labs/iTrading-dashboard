@@ -5,7 +5,8 @@ import { usePermissions } from '../../../hooks/usePermissions'
 import { useTranslation } from '../../../hooks/useTranslation'
 import { validators } from '../../../utils/format'
 import { USER_ROLES } from '../../../constants/general'
-import { Input, Select } from '../../ui'
+import { Input } from '../../atoms'
+import { Select } from '../../molecules'
 import { MainImageUpload } from '../images'
 
 interface UserFormProps {

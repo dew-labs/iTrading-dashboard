@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { usePageTranslation, useTranslation, useFormTranslation } from '../hooks/useTranslation'
 import { getTypographyClasses } from '../utils/theme'
-import { Input, Button, Select } from '../components/ui'
+import { Input, Button, Select } from '../components'
 import { useThemeStore } from '../store/themeStore'
 import { useChangePassword } from '../hooks/useChangePassword'
 

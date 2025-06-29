@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import Sidebar from './Sidebar'
-import Header from './Header'
+import Sidebar from '../layout/Sidebar'
+import Header from '../layout/Header'
 import { ProtectedRoute } from '../common'
 import Dashboard from '../../pages/Dashboard'
 import Posts from '../../pages/Posts'
@@ -32,8 +32,7 @@ const DashboardLayout: React.FC = () => {
         <main className='flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900 p-6'>
           <Routes>
             <Route path='/' element={<Dashboard />} />
-            {/* Analytics page hidden - route commented out */}
-            {/* <Route path='/analytics' element={<Analytics />} /> */}
+
             <Route
               path='/posts'
               element={
@@ -76,8 +75,7 @@ const DashboardLayout: React.FC = () => {
               }
             />
             <Route path='/settings' element={<Settings />} />
-            {/* Help page hidden - route commented out */}
-            {/* <Route path='/help' element={<Help />} /> */}
+
             <Route path='/unauthorized' element={<Unauthorized />} />
           </Routes>
         </main>

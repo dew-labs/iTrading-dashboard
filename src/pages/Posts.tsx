@@ -1,42 +1,29 @@
 import React, { useState, useMemo } from 'react'
-import {
-  Plus,
-  Search,
-  Edit2,
-  Trash2,
-  Eye,
-  Clock,
-  User,
-  Tag,
-  FileText,
-  Bookmark,
-  TrendingUp
-} from 'lucide-react'
-import { usePosts, type PostWithAuthor } from '../hooks/usePosts'
+import { Plus, Search } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
-import { Table, FilterDropdown } from '../components/data-display'
-import { Modal, TabNavigation, PaginationSelector, Badge, Button, Input } from '../components/ui'
-import { PostForm, PostViewModal } from '../components/features/posts'
+import {
+  usePosts,
+  usePostsFiltering,
+  PostsTable,
+  PostsStats,
+  PostForm,
+  PostViewModal,
+  type PostWithAuthor
+} from '../features/posts'
+import { FilterDropdown, Modal, TabNavigation, PaginationSelector, Button, Input } from '../components'
 import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
-import { RecordImage } from '../components/features/images'
-import { POST_STATUSES, POST_TYPES } from '../constants/general'
+import { POST_TYPES } from '../constants/general'
 import type { PostInsert } from '../types'
 
 // Theme imports
 import {
   getPageLayoutClasses,
-  getStatsCardProps,
-  getIconClasses,
   getTypographyClasses,
   cn
 } from '../utils/theme'
-import { formatDateDisplay } from '../utils/format'
 import { FILTER_OPTIONS } from '../constants/components'
-
-// Use PostWithAuthor which includes all the fields we need
-type ExtendedPost = PostWithAuthor
 
 // Tab configuration keys
 const POST_TAB_CONFIGS = [
@@ -72,14 +59,21 @@ const Posts: React.FC = () => {
   const { user } = useAuthStore()
   const { t } = usePageTranslation() // Page-specific content
   const { t: tCommon } = useTranslation() // Common actions and terms
-  const [searchTerm, setSearchTerm] = useState('')
-  const [activeTab, setActiveTab] = useState<string>('all')
-  const [filterStatus, setFilterStatus] = useState<'all' | 'draft' | 'published'>('all')
-  const [sortColumn, setSortColumn] = useState<keyof PostWithAuthor | null>('created_at')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
-  const [pageInputValue, setPageInputValue] = useState('1')
+
+  // Use our new filtering hook to replace all the filtering/sorting/pagination logic
+  const {
+    filterState,
+    paginatedPosts,
+    totalPages,
+    setSearchTerm,
+    setFilterStatus,
+    setItemsPerPage,
+    setPageInputValue,
+    handleSort,
+    handlePageChange,
+    handleTabChange
+  } = usePostsFiltering({ posts })
+
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingPost, setEditingPost] = useState<PostWithAuthor | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<{
@@ -105,55 +99,6 @@ const Posts: React.FC = () => {
       count: tab.id === 'all' ? posts.length : posts.filter(post => post.type === tab.id).length
     }))
   }, [posts, t])
-
-  // Enhanced filtering and sorting
-  const filteredAndSortedPosts = useMemo(() => {
-    const filtered = posts.filter(post => {
-      const extendedPost = post as ExtendedPost
-      const matchesSearch =
-        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (post.content && post.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (extendedPost.author?.full_name &&
-          extendedPost.author.full_name.toLowerCase().includes(searchTerm.toLowerCase()))
-
-      const matchesType = activeTab === 'all' || post.type === activeTab
-      const matchesStatus = filterStatus === 'all' || post.status === filterStatus
-
-      return matchesSearch && matchesType && matchesStatus
-    })
-
-    // Sort posts
-    filtered.sort((a, b) => {
-      let aValue: string | number
-      let bValue: string | number
-
-      switch (sortColumn) {
-      case 'title':
-        aValue = a.title.toLowerCase()
-        bValue = b.title.toLowerCase()
-        break
-      case 'created_at':
-      default:
-        aValue = new Date(a.created_at || 0).getTime()
-        bValue = new Date(b.created_at || 0).getTime()
-      }
-
-      if (sortDirection === 'asc') {
-        return aValue > bValue ? 1 : -1
-      } else {
-        return aValue < bValue ? 1 : -1
-      }
-    })
-
-    return filtered
-  }, [posts, searchTerm, activeTab, filterStatus, sortColumn, sortDirection])
-
-  // Pagination
-  const totalPages = Math.ceil(filteredAndSortedPosts.length / itemsPerPage)
-  const paginatedPosts = filteredAndSortedPosts.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
 
   const handleView = (post: PostWithAuthor) => {
     setViewingPost(post)
@@ -187,8 +132,8 @@ const Posts: React.FC = () => {
       await deletePost(deleteConfirm.post.id)
       setDeleteConfirm({ isOpen: false, post: null, isDeleting: false })
       // Reset to first page if current page becomes empty
-      if (paginatedPosts.length === 1 && currentPage > 1) {
-        setCurrentPage(currentPage - 1)
+      if (paginatedPosts.length === 1 && filterState.currentPage > 1) {
+        handlePageChange(filterState.currentPage - 1)
       }
     } catch (error) {
       console.error('Failed to delete post:', error)
@@ -208,7 +153,7 @@ const Posts: React.FC = () => {
       } else {
         await createPost(data)
         // Go to first page to see the new post
-        setCurrentPage(1)
+        handlePageChange(1)
       }
       handleCloseModal()
     } catch (error) {
@@ -216,157 +161,8 @@ const Posts: React.FC = () => {
     }
   }
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-    setPageInputValue(page.toString())
-  }
-
-  const handleTabChange = (tabId: string) => {
-    setActiveTab(tabId)
-    setCurrentPage(1) // Reset to first page when changing tabs
-  }
-
   // Use predefined filter options from constants
   const statusOptions = [...FILTER_OPTIONS.postStatus]
-
-  const handleSort = (column: keyof PostWithAuthor) => {
-    if (column === sortColumn) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
-    } else {
-      setSortColumn(column as keyof PostWithAuthor)
-      setSortDirection('desc')
-    }
-  }
-
-  const columns = [
-    {
-      header: t('posts.postDetails'),
-      accessor: 'title' as keyof PostWithAuthor,
-      sortable: true,
-      render: (value: unknown, row: PostWithAuthor) => {
-        return (
-          <div className='flex items-center space-x-3'>
-            <div className='flex-shrink-0'>
-              <RecordImage
-                tableName='posts'
-                recordId={row.id.toString()}
-                className='w-12 h-12 rounded-lg object-cover border border-gray-200'
-                fallbackClassName='w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center'
-                alt={`${value as string} post image`}
-                fallbackIcon={<Tag className='w-4 h-4 text-white' />}
-              />
-            </div>
-            <div className='flex-1 min-w-0'>
-              <div className={cn(getTypographyClasses('h4'), 'truncate')}>{value as string}</div>
-              <div className='flex items-center space-x-2 mt-1'>
-                <Badge
-                  variant={row.type as 'news' | 'event' | 'terms_of_use' | 'privacy_policy'}
-                  size='sm'
-                  showIcon
-                >
-                  {tCommon(
-                    row.type === 'terms_of_use'
-                      ? 'content.termsOfUse'
-                      : row.type === 'privacy_policy'
-                        ? 'content.privacyPolicy'
-                        : `content.${row.type}`
-                  )}
-                </Badge>
-              </div>
-            </div>
-          </div>
-        )
-      }
-    },
-    {
-      header: t('posts.status'),
-      accessor: 'id' as keyof PostWithAuthor,
-      render: (value: unknown, row: PostWithAuthor) => {
-        return (
-          <Badge variant={row.status as 'published' | 'draft'} size='sm' showIcon>
-            {tCommon(`status.${row.status}`)}
-          </Badge>
-        )
-      }
-    },
-    {
-      header: t('posts.authorAndDates'),
-      accessor: 'created_at' as keyof PostWithAuthor,
-      sortable: true,
-      render: (value: unknown, row: PostWithAuthor) => {
-        const extendedRow = row as ExtendedPost
-        return (
-          <div className={getTypographyClasses('small')}>
-            <div className='flex items-center text-gray-900 dark:text-gray-100 mb-1'>
-              <User className='w-4 h-4 mr-1 text-gray-400 dark:text-gray-500' />
-              <span>{extendedRow.author?.full_name || t('posts.unknownAuthor')}</span>
-            </div>
-            <div className='flex items-center text-gray-500 dark:text-gray-400'>
-              <Clock className='w-4 h-4 mr-1' />
-              <span>{formatDateDisplay(value as string)}</span>
-            </div>
-
-          </div>
-        )
-      }
-    },
-    {
-      header: t('posts.engagement'),
-      accessor: 'id' as keyof PostWithAuthor,
-      render: (value: unknown, row: PostWithAuthor) => {
-        const extendedRow = row as ExtendedPost
-        return (
-          <div className={cn(getTypographyClasses('small'), 'text-gray-900 dark:text-gray-100')}>
-            <div className='flex items-center space-x-4'>
-              <div className='text-center'>
-                <div className='font-medium'>{extendedRow.views?.toLocaleString() || 0}</div>
-                <div className='text-xs text-gray-500 dark:text-gray-400'>{t('posts.views')}</div>
-              </div>
-            </div>
-          </div>
-        )
-      }
-    },
-    {
-      header: t('posts.actions'),
-      accessor: 'id' as keyof PostWithAuthor,
-      render: (value: unknown, row: PostWithAuthor) => (
-        <div className='flex space-x-1'>
-          <button
-            onClick={() => handleView(row)}
-            className='p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors'
-            title={t('posts.tooltips.viewPost')}
-          >
-            <Eye className={getIconClasses('action')} />
-          </button>
-          <button
-            onClick={() => handleEdit(row)}
-            className='p-2 text-gray-600 dark:text-gray-300 hover:text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded transition-colors'
-            title={t('posts.tooltips.editPost')}
-          >
-            <Edit2 className={getIconClasses('action')} />
-          </button>
-          <button
-            onClick={() => handleDelete(row)}
-            className='p-2 text-gray-600 dark:text-gray-300 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors'
-            title={t('posts.tooltips.deletePost')}
-          >
-            <Trash2 className={getIconClasses('action')} />
-          </button>
-        </div>
-      )
-    }
-  ]
-
-  // Stats calculations
-  const publishedPosts = posts.filter(p => p.status === POST_STATUSES.PUBLISHED).length
-  const draftPosts = posts.filter(p => p.status === POST_STATUSES.DRAFT).length
-  const totalViews = posts.reduce((sum, p) => sum + ((p as ExtendedPost).views || 0), 0)
-
-  const totalPostsProps = getStatsCardProps('posts')
-  const publishedProps = getStatsCardProps('posts')
-  const draftsProps = getStatsCardProps('posts')
-  const viewsProps = getStatsCardProps('posts')
 
   if (loading) {
     return (
@@ -405,59 +201,11 @@ const Posts: React.FC = () => {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className={layout.grid}>
-          <div className={totalPostsProps.cardClasses}>
-            <div className='flex items-center'>
-              <div className={getIconClasses('stats', 'posts')}>
-                <FileText className='w-6 h-6 text-white' />
-              </div>
-              <div className='ml-4'>
-                <div className={totalPostsProps.valueClasses}>{posts.length}</div>
-                <div className={totalPostsProps.labelClasses}>{t('posts.totalPosts')}</div>
-              </div>
-            </div>
-          </div>
-
-          <div className={publishedProps.cardClasses}>
-            <div className='flex items-center'>
-              <div className={getIconClasses('stats', 'posts')}>
-                <Bookmark className='w-6 h-6 text-white' />
-              </div>
-              <div className='ml-4'>
-                <div className={publishedProps.valueClasses}>{publishedPosts}</div>
-                <div className={publishedProps.labelClasses}>{t('posts.published')}</div>
-              </div>
-            </div>
-          </div>
-
-          <div className={draftsProps.cardClasses}>
-            <div className='flex items-center'>
-              <div className={getIconClasses('stats', 'banners')}>
-                <Edit2 className='w-6 h-6 text-white' />
-              </div>
-              <div className='ml-4'>
-                <div className={draftsProps.valueClasses}>{draftPosts}</div>
-                <div className={draftsProps.labelClasses}>{t('posts.drafts')}</div>
-              </div>
-            </div>
-          </div>
-
-          <div className={viewsProps.cardClasses}>
-            <div className='flex items-center'>
-              <div className={getIconClasses('stats', 'users')}>
-                <TrendingUp className='w-6 h-6 text-white' />
-              </div>
-              <div className='ml-4'>
-                <div className={viewsProps.valueClasses}>{totalViews.toLocaleString()}</div>
-                <div className={viewsProps.labelClasses}>{t('posts.totalViews')}</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Stats Cards - Now using our PostsStats component */}
+        <PostsStats posts={posts} />
 
         {/* Tabs with Content Inside */}
-        <TabNavigation tabs={tabsWithCounts} activeTab={activeTab} onTabChange={handleTabChange}>
+        <TabNavigation tabs={tabsWithCounts} activeTab={filterState.activeTab} onTabChange={handleTabChange}>
           {/* Enhanced Filters */}
           <div className='p-6 space-y-4'>
             {/* Search and filters row */}
@@ -466,7 +214,7 @@ const Posts: React.FC = () => {
                 <Input
                   type='text'
                   placeholder={tCommon('placeholders.searchPostsPlaceholder')}
-                  value={searchTerm}
+                  value={filterState.searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   leftIcon={Search}
                   variant='search'
@@ -476,22 +224,24 @@ const Posts: React.FC = () => {
               <div className='flex items-center space-x-3'>
                 <FilterDropdown
                   options={statusOptions}
-                  value={filterStatus}
+                  value={filterState.filterStatus}
                   onChange={value => {
                     setFilterStatus(value as 'all' | 'draft' | 'published')
-                    setCurrentPage(1)
+                    handlePageChange(1)
                   }}
                   label={tCommon('general.status')}
                 />
               </div>
             </div>
 
-            {/* Table */}
-            <Table<PostWithAuthor>
-              data={paginatedPosts}
-              columns={columns}
-              sortColumn={sortColumn}
-              sortDirection={sortDirection}
+            {/* Table - Now using our PostsTable component */}
+            <PostsTable
+              posts={paginatedPosts}
+              onView={handleView}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              sortColumn={filterState.sortColumn}
+              sortDirection={filterState.sortDirection}
               onSort={handleSort}
             />
 
@@ -499,18 +249,18 @@ const Posts: React.FC = () => {
             <div className='flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 py-3'>
               <div className='flex items-center space-x-6'>
                 <PaginationSelector
-                  value={itemsPerPage}
+                  value={filterState.itemsPerPage}
                   onChange={value => {
                     setItemsPerPage(value)
-                    setCurrentPage(1) // Reset to first page when changing items per page
+                    handlePageChange(1) // Reset to first page when changing items per page
                   }}
                 />
                 <div className='flex items-center'>
                   <span className='text-sm text-gray-700 dark:text-gray-300'>
                     {tCommon('pagination.showingRows', {
-                      startItem: (currentPage - 1) * itemsPerPage + 1,
-                      endItem: Math.min(currentPage * itemsPerPage, filteredAndSortedPosts.length),
-                      total: filteredAndSortedPosts.length
+                      startItem: (filterState.currentPage - 1) * filterState.itemsPerPage + 1,
+                      endItem: Math.min(filterState.currentPage * filterState.itemsPerPage, posts.length),
+                      total: posts.length
                     })}
                   </span>
                 </div>
@@ -519,8 +269,8 @@ const Posts: React.FC = () => {
               {totalPages > 1 && (
                 <div className='flex items-center space-x-2'>
                   <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(filterState.currentPage - 1)}
+                    disabled={filterState.currentPage === 1}
                     className='p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                   >
                     <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -538,7 +288,7 @@ const Posts: React.FC = () => {
                   <div className='flex items-center space-x-1'>
                     <input
                       type='text'
-                      value={pageInputValue}
+                      value={filterState.pageInputValue}
                       onChange={e => {
                         setPageInputValue(e.target.value)
                       }}
@@ -547,16 +297,16 @@ const Posts: React.FC = () => {
                         if (!isNaN(page) && page >= 1 && page <= totalPages) {
                           handlePageChange(page)
                         } else {
-                          setPageInputValue(currentPage.toString())
+                          setPageInputValue(filterState.currentPage.toString())
                         }
                       }}
                       onKeyDown={e => {
                         if (e.key === 'Enter') {
-                          const page = parseInt(pageInputValue)
+                          const page = parseInt(filterState.pageInputValue)
                           if (!isNaN(page) && page >= 1 && page <= totalPages) {
                             handlePageChange(page)
                           } else {
-                            setPageInputValue(currentPage.toString())
+                            setPageInputValue(filterState.currentPage.toString())
                           }
                         }
                       }}
@@ -567,8 +317,8 @@ const Posts: React.FC = () => {
                     </span>
                   </div>
                   <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
+                    onClick={() => handlePageChange(filterState.currentPage + 1)}
+                    disabled={filterState.currentPage === totalPages}
                     className='p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                   >
                     <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>

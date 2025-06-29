@@ -1,7 +1,7 @@
 import React from 'react'
 import { Image as ImageIcon } from 'lucide-react'
 import { useImages } from '../../hooks/useImages'
-import { Modal } from '../ui'
+import { Modal } from '../atoms'
 
 interface DetailViewModalProps {
   isOpen: boolean

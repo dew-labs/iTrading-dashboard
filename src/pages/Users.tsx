@@ -1,41 +1,23 @@
 import React, { useState, useMemo } from 'react'
-import {
-  Plus,
-  Search,
-  Edit2,
-  Trash2,
-  Users as UsersIcon,
-  UserCheck,
-  UserX,
-  Shield,
-  Key,
-  Calendar,
-  User,
-  Clock
-} from 'lucide-react'
+import { Plus, Search } from 'lucide-react'
 import { useUsers } from '../hooks/useUsers'
+import { useUsersFiltering } from '../hooks/useUsersFiltering'
 import { usePermissions } from '../hooks/usePermissions'
 import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
-import { Table, FilterDropdown } from '../components/data-display'
-import { Modal, TabNavigation, PaginationSelector, Badge, Input } from '../components/ui'
+import { FilterDropdown, UsersTable, UsersStats, Modal, TabNavigation, PaginationSelector, Input } from '../components'
 import { UserForm, PermissionManager } from '../components/features/users'
-import { RecordImage } from '../components/features/images'
 import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
-import { USER_ROLES, USER_STATUSES } from '../constants/general'
+import { USER_ROLES } from '../constants/general'
 import type { DatabaseUser, UserInsert, UserUpdate } from '../types'
 
 // Theme imports
 import {
   getPageLayoutClasses,
   getButtonClasses,
-  getStatsCardProps,
-  getIconClasses,
   getTypographyClasses,
   cn
 } from '../utils/theme'
-import { formatDateDisplay } from '../utils/format'
-import { FILTER_OPTIONS } from '../constants/components'
 
 const Users: React.FC = () => {
   const { t } = usePageTranslation() // Page-specific content
@@ -43,18 +25,25 @@ const Users: React.FC = () => {
   const { users, loading, createUser, updateUser, deleteUser, isDeleting } = useUsers()
   const { isSuperAdmin } = usePermissions()
 
-  const [searchTerm, setSearchTerm] = useState('')
-  const [activeTab, setActiveTab] = useState<string>('all')
-  const [filterStatus, setFilterStatus] = useState<string>('all')
-  const [filterRole, setFilterRole] = useState<string>('all')
+  // Use the filtering hook for all business logic
+  const {
+    filterState,
+    filteredAndSortedUsers,
+    paginatedUsers,
+    totalPages,
+    setSearchTerm,
+    setFilterStatus,
+    setFilterRole,
+    setItemsPerPage,
+    setPageInputValue,
+    handleSort,
+    handlePageChange,
+    handleTabChange
+  } = useUsersFiltering({ users })
+
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<DatabaseUser | null>(null)
   const [managingPermissionsFor, setManagingPermissionsFor] = useState<DatabaseUser | null>(null)
-  const [sortColumn, setSortColumn] = useState<keyof DatabaseUser | null>('created_at')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
-  const [pageInputValue, setPageInputValue] = useState('1')
 
   // Confirm dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -113,71 +102,6 @@ const Users: React.FC = () => {
     }))
   }, [users, t, tCommon])
 
-  // Enhanced filtering and sorting
-  const filteredAndSortedUsers = useMemo(() => {
-    const filtered = users.filter(user => {
-      const matchesSearch =
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (user.full_name && user.full_name.toLowerCase().includes(searchTerm.toLowerCase()))
-      const matchesTab = activeTab === 'all' || user.role === activeTab
-      const matchesStatus = filterStatus === 'all' || user.status === filterStatus
-      const matchesRole = filterRole === 'all' || user.role === filterRole
-      return matchesSearch && matchesTab && matchesStatus && matchesRole
-    })
-
-    // Sort users
-    filtered.sort((a, b) => {
-      if (!sortColumn) return 0
-
-      let aValue: string | number | null
-      let bValue: string | number | null
-
-      switch (sortColumn) {
-      case 'email':
-        aValue = a.email.toLowerCase()
-        bValue = b.email.toLowerCase()
-        break
-      case 'full_name':
-        aValue = (a.full_name || '').toLowerCase()
-        bValue = (b.full_name || '').toLowerCase()
-        break
-      case 'role':
-        aValue = a.role
-        bValue = b.role
-        break
-      case 'status':
-        aValue = a.status
-        bValue = b.status
-        break
-      case 'last_login':
-        aValue = a.last_login ? new Date(a.last_login).getTime() : 0
-        bValue = b.last_login ? new Date(b.last_login).getTime() : 0
-        break
-      case 'created_at':
-        aValue = a.created_at ? new Date(a.created_at).getTime() : 0
-        bValue = b.created_at ? new Date(b.created_at).getTime() : 0
-        break
-      default:
-        return 0
-      }
-
-      if (sortDirection === 'asc') {
-        return aValue > bValue ? 1 : -1
-      } else {
-        return aValue < bValue ? 1 : -1
-      }
-    })
-
-    return filtered
-  }, [users, searchTerm, activeTab, filterStatus, filterRole, sortColumn, sortDirection])
-
-  // Pagination
-  const totalPages = Math.ceil(filteredAndSortedUsers.length / itemsPerPage)
-  const paginatedUsers = filteredAndSortedUsers.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
-
   const handleEdit = (user: DatabaseUser) => {
     setEditingUser(user)
     setIsModalOpen(true)
@@ -197,8 +121,8 @@ const Users: React.FC = () => {
     try {
       await deleteUser(confirmDialog.userId)
       // Reset to first page if current page becomes empty
-      if (paginatedUsers.length === 1 && currentPage > 1) {
-        setCurrentPage(currentPage - 1)
+      if (paginatedUsers.length === 1 && filterState.currentPage > 1) {
+        handlePageChange(filterState.currentPage - 1)
       }
     } finally {
       setConfirmDialog({
@@ -243,7 +167,7 @@ const Users: React.FC = () => {
         }
         await createUser(createData)
         // Go to first page to see the new user
-        setCurrentPage(1)
+        handlePageChange(1)
       }
       handleCloseModal()
     } catch (error) {
@@ -251,163 +175,20 @@ const Users: React.FC = () => {
     }
   }
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-    setPageInputValue(page.toString())
-  }
-
-  const handleTabChange = (tabId: string) => {
-    setActiveTab(tabId)
-    setCurrentPage(1) // Reset to first page when changing tabs
-  }
-
   // Use predefined filter options from constants
-  const statusOptions = [...FILTER_OPTIONS.userStatus]
-  const roleOptions = [...FILTER_OPTIONS.userRole]
-
-  const handleSort = (column: keyof DatabaseUser) => {
-    if (column === sortColumn) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
-    } else {
-      setSortColumn(column)
-      setSortDirection('desc')
-    }
-  }
-
-  const columns = [
-    {
-      header: t('users.userDetails'),
-      accessor: 'email' as keyof DatabaseUser,
-      sortable: true,
-      render: (value: unknown, row: DatabaseUser) => {
-        return (
-          <div className='flex items-center space-x-3'>
-            <div className='flex-shrink-0'>
-              {row.avatar_url ? (
-                <img
-                  src={row.avatar_url}
-                  alt={`${row.full_name || tCommon('roles.user')} ${tCommon('ui.avatar')}`}
-                  className='w-12 h-12 rounded-lg object-cover border border-gray-200'
-                  onError={e => {
-                    // If avatar fails to load, show fallback
-                    const target = e.target as HTMLImageElement
-                    target.style.display = 'none'
-                    const parent = target.parentElement
-                    if (parent) {
-                      const fallback = document.createElement('div')
-                      fallback.className =
-                        'w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center'
-                      fallback.innerHTML =
-                        '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-white"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>'
-                      parent.appendChild(fallback)
-                    }
-                  }}
-                />
-              ) : (
-                <RecordImage
-                  tableName='users'
-                  recordId={row.id}
-                  className='w-12 h-12 rounded-lg object-cover border border-gray-200'
-                  fallbackClassName='w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center'
-                  alt={`${row.full_name || tCommon('roles.user')} ${tCommon('ui.profileImage')}`}
-                  fallbackIcon={<User className='w-4 h-4 text-white' />}
-                />
-              )}
-            </div>
-            <div className='flex-1 min-w-0'>
-              <div className={cn(getTypographyClasses('h4'), 'truncate')}>
-                {row.full_name || t('users.noName')}
-              </div>
-              <div className={cn(getTypographyClasses('small'), 'truncate')}>{value as string}</div>
-              <div className='flex items-center space-x-2 mt-1'>
-                <Badge variant={row.role as 'admin' | 'user' | 'super_admin'} size='sm' showIcon>
-                  {tCommon(row.role === 'super_admin' ? 'roles.superAdmin' : `roles.${row.role}`)}
-                </Badge>
-              </div>
-            </div>
-          </div>
-        )
-      }
-    },
-    {
-      header: tCommon('general.status'),
-      accessor: 'id' as keyof DatabaseUser,
-      render: (value: unknown, row: DatabaseUser) => {
-        return (
-          <Badge variant={row.status as 'active' | 'inactive' | 'invited'} size='sm' showIcon>
-            {tCommon(`status.${row.status}`)}
-          </Badge>
-        )
-      }
-    },
-    {
-      header: t('users.loginDates'),
-      accessor: 'created_at' as keyof DatabaseUser,
-      sortable: true,
-      render: (value: unknown, row: DatabaseUser) => {
-        return (
-          <div className={getTypographyClasses('small')}>
-            <div className='flex items-center text-gray-900 dark:text-gray-100 mb-1'>
-              <Clock className='w-4 h-4 mr-1 text-gray-400 dark:text-gray-500' />
-              <span>
-                {t('users.last')}:{' '}
-                {row.last_login ? formatDateDisplay(row.last_login) : t('users.never')}
-              </span>
-            </div>
-            <div className='flex items-center text-gray-500 dark:text-gray-400'>
-              <Calendar className='w-4 h-4 mr-1' />
-              <span>
-                {t('users.joined')}: {formatDateDisplay(value as string)}
-              </span>
-            </div>
-          </div>
-        )
-      }
-    },
-    {
-      header: t('users.actions'),
-      accessor: 'id' as keyof DatabaseUser,
-      render: (value: unknown, row: DatabaseUser) => (
-        <div className='flex space-x-1'>
-          <button
-            onClick={() => handleEdit(row)}
-            className='p-2 text-gray-600 dark:text-gray-300 hover:text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded transition-colors'
-            title={t('users.editUser')}
-          >
-            <Edit2 className={getIconClasses('action')} />
-          </button>
-          {isSuperAdmin() && row.role !== 'user' && (
-            <button
-              onClick={() => setManagingPermissionsFor(row)}
-              className='p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors'
-              title={t('users.managePermissions')}
-            >
-              <Key className={getIconClasses('action')} />
-            </button>
-          )}
-          <button
-            onClick={() => handleDelete(row)}
-            className='p-2 text-gray-600 dark:text-gray-300 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors'
-            title={t('users.deleteUser')}
-          >
-            <Trash2 className={getIconClasses('action')} />
-          </button>
-        </div>
-      )
-    }
+  const statusOptions = [
+    { value: 'all', label: tCommon('general.all') },
+    { value: 'active', label: tCommon('status.active') },
+    { value: 'inactive', label: tCommon('status.inactive') },
+    { value: 'invited', label: tCommon('status.invited') }
   ]
 
-  // Stats calculations
-  const activeUsers = users.filter(u => u.status === USER_STATUSES.ACTIVE).length
-  const invitedUsers = users.filter(u => u.status === USER_STATUSES.INVITED).length
-  const adminUsers = users.filter(
-    u => u.role === USER_ROLES.ADMIN || u.role === USER_ROLES.SUPER_ADMIN
-  ).length
-
-  const totalUsersProps = getStatsCardProps('users')
-  const activeUsersProps = getStatsCardProps('users')
-  const adminUsersProps = getStatsCardProps('users')
-  const invitedUsersProps = getStatsCardProps('users')
+  const roleOptions = [
+    { value: 'all', label: tCommon('general.all') },
+    { value: 'user', label: tCommon('roles.user') },
+    { value: 'admin', label: tCommon('roles.admin') },
+    { value: 'super_admin', label: tCommon('roles.superAdmin') }
+  ]
 
   if (loading) {
     return (
@@ -442,60 +223,10 @@ const Users: React.FC = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className={layout.grid}>
-          <div className={totalUsersProps.cardClasses}>
-            <div className='flex items-center'>
-              <div className={getIconClasses('stats', 'users')}>
-                <UsersIcon className='w-6 h-6 text-white' />
-              </div>
-              <div className='ml-4'>
-                <div className={totalUsersProps.valueClasses}>{users.length}</div>
-                <div className={totalUsersProps.labelClasses}>{tCommon('entities.users')}</div>
-              </div>
-            </div>
-          </div>
-
-          <div className={activeUsersProps.cardClasses}>
-            <div className='flex items-center'>
-              <div className={getIconClasses('stats', 'posts')}>
-                <UserCheck className='w-6 h-6 text-white' />
-              </div>
-              <div className='ml-4'>
-                <div className={activeUsersProps.valueClasses}>{activeUsers}</div>
-                <div className={activeUsersProps.labelClasses}>
-                  {tCommon('status.active')} {tCommon('entities.users')}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={adminUsersProps.cardClasses}>
-            <div className='flex items-center'>
-              <div className={getIconClasses('stats', 'products')}>
-                <Shield className='w-6 h-6 text-white' />
-              </div>
-              <div className='ml-4'>
-                <div className={adminUsersProps.valueClasses}>{adminUsers}</div>
-                <div className={adminUsersProps.labelClasses}>{t('users.adminUsers')}</div>
-              </div>
-            </div>
-          </div>
-
-          <div className={invitedUsersProps.cardClasses}>
-            <div className='flex items-center'>
-              <div className={getIconClasses('stats', 'banners')}>
-                <UserX className='w-6 h-6 text-white' />
-              </div>
-              <div className='ml-4'>
-                <div className={invitedUsersProps.valueClasses}>{invitedUsers}</div>
-                <div className={invitedUsersProps.labelClasses}>{t('users.pendingInvites')}</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <UsersStats users={users} />
 
         {/* Tabs with Content Inside */}
-        <TabNavigation tabs={tabsWithCounts} activeTab={activeTab} onTabChange={handleTabChange}>
+        <TabNavigation tabs={tabsWithCounts} activeTab={filterState.activeTab} onTabChange={handleTabChange}>
           {/* Enhanced Filters */}
           <div className='p-6 space-y-4'>
             {/* Search and filters row */}
@@ -504,7 +235,7 @@ const Users: React.FC = () => {
                 <Input
                   type='text'
                   placeholder={tCommon('placeholders.searchUsersPlaceholder')}
-                  value={searchTerm}
+                  value={filterState.searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   leftIcon={Search}
                   variant='search'
@@ -514,19 +245,19 @@ const Users: React.FC = () => {
               <div className='flex items-center space-x-3'>
                 <FilterDropdown
                   options={statusOptions}
-                  value={filterStatus}
+                  value={filterState.filterStatus}
                   onChange={value => {
                     setFilterStatus(value)
-                    setCurrentPage(1)
+                    handlePageChange(1)
                   }}
                   label={tCommon('general.status')}
                 />
                 <FilterDropdown
                   options={roleOptions}
-                  value={filterRole}
+                  value={filterState.filterRole}
                   onChange={value => {
                     setFilterRole(value)
-                    setCurrentPage(1)
+                    handlePageChange(1)
                   }}
                   label={tCommon('general.role')}
                 />
@@ -534,29 +265,31 @@ const Users: React.FC = () => {
             </div>
 
             {/* Table */}
-            <Table
-              columns={columns}
-              data={paginatedUsers}
+            <UsersTable
+              users={paginatedUsers}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onManagePermissions={setManagingPermissionsFor}
               onSort={handleSort}
-              sortColumn={sortColumn}
-              sortDirection={sortDirection}
+              sortColumn={filterState.sortColumn}
+              sortDirection={filterState.sortDirection}
             />
 
             {/* Pagination */}
             <div className='flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 py-3'>
               <div className='flex items-center space-x-6'>
                 <PaginationSelector
-                  value={itemsPerPage}
+                  value={filterState.itemsPerPage}
                   onChange={value => {
                     setItemsPerPage(value)
-                    setCurrentPage(1) // Reset to first page when changing items per page
+                    handlePageChange(1) // Reset to first page when changing items per page
                   }}
                 />
                 <div className='flex items-center'>
                   <span className='text-sm text-gray-700 dark:text-gray-300'>
                     {tCommon('pagination.showingRows', {
-                      startItem: (currentPage - 1) * itemsPerPage + 1,
-                      endItem: Math.min(currentPage * itemsPerPage, filteredAndSortedUsers.length),
+                      startItem: (filterState.currentPage - 1) * filterState.itemsPerPage + 1,
+                      endItem: Math.min(filterState.currentPage * filterState.itemsPerPage, filteredAndSortedUsers.length),
                       total: filteredAndSortedUsers.length
                     })}
                   </span>
@@ -565,8 +298,8 @@ const Users: React.FC = () => {
 
               <div className='flex items-center space-x-2'>
                 <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(filterState.currentPage - 1)}
+                  disabled={filterState.currentPage === 1}
                   className='p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                 >
                   <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -584,7 +317,7 @@ const Users: React.FC = () => {
                 <div className='flex items-center space-x-1'>
                   <input
                     type='text'
-                    value={pageInputValue}
+                    value={filterState.pageInputValue}
                     onChange={e => {
                       setPageInputValue(e.target.value)
                     }}
@@ -592,17 +325,13 @@ const Users: React.FC = () => {
                       const page = parseInt(e.target.value)
                       if (!isNaN(page) && page >= 1 && page <= totalPages) {
                         handlePageChange(page)
-                      } else {
-                        setPageInputValue(currentPage.toString())
                       }
                     }}
                     onKeyDown={e => {
                       if (e.key === 'Enter') {
-                        const page = parseInt(pageInputValue)
+                        const page = parseInt(filterState.pageInputValue)
                         if (!isNaN(page) && page >= 1 && page <= totalPages) {
                           handlePageChange(page)
-                        } else {
-                          setPageInputValue(currentPage.toString())
                         }
                       }
                     }}
@@ -613,8 +342,8 @@ const Users: React.FC = () => {
                   </span>
                 </div>
                 <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
+                  onClick={() => handlePageChange(filterState.currentPage + 1)}
+                  disabled={filterState.currentPage === totalPages}
                   className='p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                 >
                   <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>

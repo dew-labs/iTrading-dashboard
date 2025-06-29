@@ -1,7 +1,7 @@
 import React from 'react'
 import { AlertTriangle, Trash2, AlertCircle, X, Check } from 'lucide-react'
 import { getTypographyClasses, cn } from '../../utils/theme'
-import { Button } from '../ui'
+import { Button } from '../atoms'
 
 interface ConfirmDialogProps {
   isOpen: boolean

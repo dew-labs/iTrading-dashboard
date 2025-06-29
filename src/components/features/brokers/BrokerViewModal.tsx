@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { usePageTranslation } from '../../../hooks/useTranslation'
 import { formatDateDisplay } from '../../../utils/format'
-import { Button } from '../../ui'
+import { Button } from '../../atoms'
 import { RichTextRenderer } from '../../common'
 import type { Broker } from '../../../types'
 import { getTypographyClasses, cn } from '../../../utils/theme'
