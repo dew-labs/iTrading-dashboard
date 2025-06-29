@@ -112,7 +112,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
             type='checkbox'
             id='subscription'
             name='subscription'
-            checked={formData.subscription}
+            checked={formData.subscription ?? false}
             onChange={handleChange}
             className='h-4 w-4 text-gray-900 dark:text-white focus:ring-gray-900 dark:focus:ring-gray-300 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700'
           />

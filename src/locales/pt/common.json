@@ -174,7 +174,11 @@
     "permissionUsers": "Usuários",
     "permissionNotifications": "Notificações",
     "permissionPermissions": "Permissões",
-    "permissionProfile": "Perfil"
+    "permissionProfile": "Perfil",
+    "permissionImages": "Imagens",
+    "permissionUserPermissions": "Permissões de Usuário",
+    "permissionRolePermissions": "Permissões de Função",
+    "permissionUserNotifications": "Notificações de Usuário"
   },
   "userForm": {
     "basicInformation": "Informações Básicas",

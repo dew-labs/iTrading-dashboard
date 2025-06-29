@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, memo, useMemo, useRef } from 'react'
 import {
   Shield,
   Plus,
@@ -14,7 +14,6 @@ import {
   X
 } from 'lucide-react'
 import { getUserPermissions, grantPermission, revokePermission } from '../services/userService'
-import { usePermissions } from '../hooks/usePermissions'
 import { useTranslation } from '../hooks/useTranslation'
 import type { DatabaseUser, Permission } from '../types'
 import LoadingSpinner from './LoadingSpinner'
@@ -26,19 +25,20 @@ import { getButtonClasses, getTypographyClasses, cn } from '../utils/theme'
 interface PermissionManagerProps {
   user: DatabaseUser
   onClose: () => void
+  isSuperAdmin: boolean
 }
 
-const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _onClose }) => {
+const PermissionManager: React.FC<PermissionManagerProps> = memo(({ user, onClose: _onClose, isSuperAdmin }) => {
   const { t } = useTranslation()
-  const { isSuperAdmin } = usePermissions()
   const toast = useToast()
   const [permissions, setPermissions] = useState<Permission[]>([])
   const [loading, setLoading] = useState(true)
   const [newResource, setNewResource] = useState('')
   const [newAction, setNewAction] = useState('read')
   const [isAdding, setIsAdding] = useState(false)
+  const hasLoadedRef = useRef(false)
 
-  const allResources = [
+  const allResources = useMemo(() => [
     {
       value: 'posts',
       label: t('permissionModal.permissionPosts'),
@@ -79,9 +79,9 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
       label: t('permissionModal.permissionProfile'),
       icon: <Users className='w-4 h-4' />
     }
-  ]
+  ], [t])
 
-  const allActions =
+  const allActions = useMemo(() =>
     user.role === 'user'
       ? [{ value: 'read', label: t('permissions.read'), icon: <FileText className='w-3.5 h-3.5' /> }]
       : [
@@ -93,7 +93,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
           label: t('permissions.delete'),
           icon: <Trash2 className='w-3.5 h-3.5' />
         }
-      ]
+      ], [user.role, t])
 
   // Filter available resources - only show those that have available actions
   const availableResources = allResources.filter(resource => {
@@ -115,20 +115,28 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
     : allActions
 
   const fetchPermissions = useCallback(async () => {
+    if (hasLoadedRef.current) return // Prevent duplicate calls
+
     setLoading(true)
+    hasLoadedRef.current = true
     try {
       const userPermissions = await getUserPermissions(user.id)
       setPermissions(userPermissions)
     } catch (_error) {
       toast.error(null, null, t('permissionModal.failedToLoadPermissions'))
+      hasLoadedRef.current = false // Reset on error to allow retry
     } finally {
       setLoading(false)
     }
   }, [user.id, t, toast])
 
   useEffect(() => {
-    fetchPermissions()
-  }, [fetchPermissions])
+    // Only fetch permissions when component mounts and user ID is available
+    if (user.id && isSuperAdmin && !hasLoadedRef.current) {
+      fetchPermissions()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.id, isSuperAdmin]) // fetchPermissions intentionally excluded to prevent infinite loop
 
   // Reset selected resource if it's no longer available
   useEffect(() => {
@@ -161,7 +169,8 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
 
     const { success, error } = await grantPermission(user.id, newResource, newAction)
     if (success) {
-      await fetchPermissions()
+      // Update local state optimistically to avoid additional API call
+      setPermissions(prev => [...prev, { resource: newResource, action: newAction }])
       setNewResource('')
       setNewAction('read')
       setIsAdding(false)
@@ -174,12 +183,38 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
   const handleRevoke = async (resource: string, action: string) => {
     const { success, error } = await revokePermission(user.id, resource, action)
     if (success) {
-      await fetchPermissions()
+      // Update local state optimistically to avoid additional API call
+      setPermissions(prev => prev.filter(p => !(p.resource === resource && p.action === action)))
       toast.success('revoked', 'permission')
     } else {
       toast.error(null, null, error || 'Failed to revoke permission')
     }
   }
+
+  // Convert resource name to proper translation key (handle underscores)
+  const getResourceTranslationKey = useCallback((resource: string) => {
+    // Convert snake_case to camelCase and capitalize first letter
+    const camelCased = resource.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
+    const capitalized = camelCased.charAt(0).toUpperCase() + camelCased.slice(1)
+    return `permissionModal.permission${capitalized}`
+  }, [])
+
+  // Get localized resource name with fallback
+  const getResourceDisplayName = useCallback((resource: string) => {
+    const translationKey = getResourceTranslationKey(resource)
+    const translated = t(translationKey)
+
+    // If translation is the same as the key (meaning it wasn't found),
+    // return a formatted version of the resource name
+    if (translated === translationKey) {
+      return resource
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+    }
+
+    return translated
+  }, [t, getResourceTranslationKey])
 
   const getResourceIcon = (resource: string) => {
     const iconMap: Record<string, React.ReactNode> = {
@@ -190,7 +225,11 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
       users: <Users className='w-4 h-4' />,
       notifications: <Bell className='w-4 h-4' />,
       permissions: <Shield className='w-4 h-4' />,
-      profile: <Users className='w-4 h-4' />
+      profile: <Users className='w-4 h-4' />,
+      images: <Package className='w-4 h-4' />,
+      user_permissions: <Shield className='w-4 h-4' />,
+      role_permissions: <Shield className='w-4 h-4' />,
+      user_notifications: <Bell className='w-4 h-4' />
     }
     return iconMap[resource] || <Key className='w-4 h-4' />
   }
@@ -217,7 +256,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
     {} as Record<string, Permission[]>
   )
 
-  if (!isSuperAdmin()) {
+  if (!isSuperAdmin) {
     return (
       <div className='p-8 text-center'>
         <div className='flex flex-col items-center space-y-4'>
@@ -390,9 +429,7 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
                             'font-medium text-gray-900 dark:text-white capitalize'
                           )}
                         >
-                          {t(
-                            `permissionModal.permission${resource.charAt(0).toUpperCase() + resource.slice(1)}`
-                          ) || resource}
+                          {getResourceDisplayName(resource)}
                         </h5>
                         <p className={cn(getTypographyClasses('small'), 'text-gray-500 dark:text-gray-400')}>
                           {resourcePermissions.length} {t('entities.permissions')}
@@ -435,6 +472,8 @@ const PermissionManager: React.FC<PermissionManagerProps> = ({ user, onClose: _o
       )}
     </div>
   )
-}
+})
+
+PermissionManager.displayName = 'PermissionManager'
 
 export default PermissionManager

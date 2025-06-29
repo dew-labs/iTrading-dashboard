@@ -10,8 +10,7 @@ import {
   MapPin,
   FileText,
   Grid3X3,
-  List,
-  X
+  List
 } from 'lucide-react'
 import Button from '../components/Button'
 import Input from '../components/Input'
@@ -20,6 +19,7 @@ import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import BrokerForm from '../components/BrokerForm'
+import BrokerViewModal from '../components/BrokerViewModal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import PageLoadingSpinner from '../components/PageLoadingSpinner'
 import { stripHtmlAndTruncate } from '../utils'
@@ -705,125 +705,17 @@ const Brokers: React.FC = () => {
           <BrokerForm broker={editingBroker} onSubmit={handleSubmit} onCancel={handleCloseModal} />
         </Modal>
 
-        {/* Modal for viewing broker details */}
+        {/* Enhanced Modal for viewing broker details */}
         {viewingBroker && (
-          <Modal
+          <BrokerViewModal
             isOpen={!!viewingBroker}
             onClose={() => setViewingBroker(null)}
-            title={`${t('brokers.brokerDetails')}: ${viewingBroker.name}`}
-          >
-            <div className='space-y-6'>
-              {/* Header Section with Logo, Company Info, and System Info */}
-              <div className='bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl p-6'>
-                <div className='flex flex-col xl:flex-row items-start xl:items-center space-y-6 xl:space-y-0 xl:space-x-8'>
-                  {/* Left side: Logo and Company Information */}
-                  <div className='flex flex-col lg:flex-row items-start lg:items-center space-y-4 lg:space-y-0 lg:space-x-6 flex-1'>
-                    {/* Logo */}
-                    <div className='flex-shrink-0'>
-                      {viewingBroker.logo_url ? (
-                        <img
-                          src={viewingBroker.logo_url}
-                          alt={`${viewingBroker.name} logo`}
-                          className='w-24 h-24 lg:w-32 lg:h-32 object-contain rounded-xl border border-gray-200 bg-white shadow-sm'
-                        />
-                      ) : (
-                        <div className='w-24 h-24 lg:w-32 lg:h-32 rounded-xl bg-gradient-to-br from-gray-900 to-black flex items-center justify-center shadow-sm'>
-                          <Building2 className='w-12 h-12 lg:w-16 lg:h-16 text-white' />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Company Information */}
-                    <div className='flex-1 min-w-0'>
-                      <h2 className='text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2'>
-                        {viewingBroker.name}
-                      </h2>
-
-                      <div className='space-y-2'>
-                        {viewingBroker.headquarter && (
-                          <div className='flex items-center text-gray-600 dark:text-gray-300'>
-                            <MapPin className='w-5 h-5 mr-2 text-gray-400 dark:text-gray-500' />
-                            <span className='text-lg'>{viewingBroker.headquarter}</span>
-                          </div>
-                        )}
-
-                        {viewingBroker.established_in && (
-                          <div className='flex items-center text-gray-600 dark:text-gray-300'>
-                            <Calendar className='w-5 h-5 mr-2 text-gray-400 dark:text-gray-500' />
-                            <span className='text-lg'>
-                              {t('brokers.establishedIn')} {viewingBroker.established_in}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right side: System Information */}
-                  <div className='flex-shrink-0 w-full xl:w-60'>
-                    <div className='space-y-3'>
-                      <h3 className='text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide'>
-                        {t('brokers.systemInformation')}
-                      </h3>
-
-                      <div className='space-y-2'>
-                        <div className='flex justify-between items-center'>
-                          <span className='text-xs text-gray-400 dark:text-gray-500'>{t('brokers.added')}</span>
-                          <span className='text-xs text-gray-600 dark:text-gray-300'>
-                            {formatDateDisplay(viewingBroker.created_at || new Date().toISOString())}
-                          </span>
-                        </div>
-
-                        <div className='flex justify-between items-center'>
-                          <span className='text-xs text-gray-400 dark:text-gray-500'>{t('brokers.updated')}</span>
-                          <span className='text-xs text-gray-600 dark:text-gray-300'>
-                            {formatDateDisplay(viewingBroker.created_at || new Date().toISOString())}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Description Section */}
-              {viewingBroker.description && (
-                <div className='space-y-4'>
-                  <h3 className='text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2'>
-                    {t('brokers.description')}
-                  </h3>
-                  <div className='bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl p-6'>
-                    <div className='prose prose-sm max-w-none text-gray-700 dark:text-gray-300'>
-                      <div dangerouslySetInnerHTML={{ __html: viewingBroker.description }} />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Action Buttons */}
-              <div className='flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700'>
-                <Button
-                  variant='secondary'
-                  size='md'
-                  leftIcon={Edit2}
-                  onClick={() => {
-                    setViewingBroker(null)
-                    handleEdit(viewingBroker)
-                  }}
-                >
-                  {tCommon('actions.edit')} {tCommon('entities.brokers')}
-                </Button>
-                <Button
-                  variant='primary'
-                  size='md'
-                  leftIcon={X}
-                  onClick={() => setViewingBroker(null)}
-                >
-                  {t('brokers.close')}
-                </Button>
-              </div>
-            </div>
-          </Modal>
+            broker={viewingBroker}
+            onEdit={() => {
+              setViewingBroker(null)
+              handleEdit(viewingBroker)
+            }}
+          />
         )}
 
         {/* Delete Confirmation Dialog */}

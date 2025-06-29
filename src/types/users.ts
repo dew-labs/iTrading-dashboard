@@ -5,10 +5,11 @@ export type DatabaseUser = Database['public']['Tables']['users']['Row']
 export type UserInsert = Database['public']['Tables']['users']['Insert']
 export type UserUpdate = Database['public']['Tables']['users']['Update']
 
-// User profile types (legacy - for language preference)
-export type UserProfile = Database['public']['Tables']['user_profiles']['Row']
-export type UserProfileInsert = Database['public']['Tables']['user_profiles']['Insert']
-export type UserProfileUpdate = Database['public']['Tables']['user_profiles']['Update']
+// User profile types are now handled by the users table
+// Legacy UserProfile types for backward compatibility
+export type UserProfile = DatabaseUser
+export type UserProfileInsert = UserInsert
+export type UserProfileUpdate = UserUpdate
 
 // Permission types
 export type UserPermission = Database['public']['Tables']['user_permissions']['Row']

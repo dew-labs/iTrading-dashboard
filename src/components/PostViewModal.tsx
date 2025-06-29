@@ -136,7 +136,7 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
           </div>
 
           {/* Content area */}
-          <div className='overflow-y-auto max-h-[calc(95vh-12rem)]'>
+          <div className='overflow-y-auto max-h-[calc(95vh-8rem)]'>
             <div className='px-8 py-6'>
               <div className='grid grid-cols-1 lg:grid-cols-4 gap-8'>
 
@@ -268,30 +268,6 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
             </div>
           </div>
 
-          {/* Enhanced footer with engagement options */}
-          <div className='sticky bottom-0 bg-gradient-to-r from-gray-50/95 to-white/95 dark:from-gray-800/95 dark:to-gray-900/95 backdrop-blur-xl border-t border-gray-200/50 dark:border-gray-700/50 px-8 py-4'>
-            <div className='flex items-center justify-between'>
-              <div className='flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400'>
-                <span>Published on {formatDateDisplay(post.created_at || new Date().toISOString())}</span>
-                {typeof post.views === 'number' && (
-                  <span>•</span>
-                )}
-                {typeof post.views === 'number' && (
-                  <span>{post.views.toLocaleString()} views</span>
-                )}
-              </div>
-              <div className='flex items-center space-x-2'>
-                <Button
-                  variant='secondary'
-                  size='sm'
-                  leftIcon={X}
-                  onClick={onClose}
-                >
-                  {tCommon('actions.close')}
-                </Button>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

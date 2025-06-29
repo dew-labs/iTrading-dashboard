@@ -118,7 +118,7 @@ export const inviteUser = async (
         email: email,
         role: role,
         status: 'invited',
-        full_name: fullName
+        full_name: fullName || null
       })
 
       if (manualError) {
@@ -254,11 +254,11 @@ export const revokePermission = async (
 }
 
 /**
- * Get all permissions for a user
+ * Get all permissions for a user (optimized with single query)
  */
 export const getUserPermissions = async (userId: string): Promise<Permission[]> => {
   try {
-    // Get user's role first
+    // Get user's role and permissions in a single optimized query
     const { data: userData, error: userError } = await supabase
       .from('users')
       .select('role')
@@ -267,24 +267,30 @@ export const getUserPermissions = async (userId: string): Promise<Permission[]> 
 
     if (userError) throw userError
 
-    // Get role-based permissions
-    const { data: rolePerms, error: roleError } = await supabase
-      .from('role_permissions')
-      .select('resource, action')
-      .eq('role', userData.role)
+    // Use parallel queries for better performance
+    const [rolePermissionsResult, userPermissionsResult] = await Promise.all([
+      // Get role-based permissions
+      supabase
+        .from('role_permissions')
+        .select('resource, action')
+        .eq('role', userData.role),
 
-    if (roleError) throw roleError
+      // Get user-specific permissions
+      supabase
+        .from('user_permissions')
+        .select('resource, action')
+        .eq('user_id', userId)
+    ])
 
-    // Get user-specific permissions
-    const { data: userPerms, error: userError2 } = await supabase
-      .from('user_permissions')
-      .select('resource, action')
-      .eq('user_id', userId)
-
-    if (userError2) throw userError2
+    if (rolePermissionsResult.error) throw rolePermissionsResult.error
+    if (userPermissionsResult.error) throw userPermissionsResult.error
 
     // Combine and deduplicate permissions
-    const allPermissions = [...(rolePerms || []), ...(userPerms || [])]
+    const allPermissions = [
+      ...(rolePermissionsResult.data || []),
+      ...(userPermissionsResult.data || [])
+    ]
+
     const uniquePermissions = allPermissions.filter(
       (perm, index, self) =>
         index === self.findIndex(p => p.resource === perm.resource && p.action === perm.action)

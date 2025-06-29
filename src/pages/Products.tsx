@@ -88,8 +88,8 @@ const Products: React.FC = () => {
         break
       case 'created_at':
       default:
-        aValue = new Date(a.created_at).getTime()
-        bValue = new Date(b.created_at).getTime()
+        aValue = a.created_at ? new Date(a.created_at).getTime() : 0
+        bValue = b.created_at ? new Date(b.created_at).getTime() : 0
       }
 
       if (sortDirection === 'asc') {
@@ -561,7 +561,7 @@ const Products: React.FC = () => {
                 <label className='block text-sm font-medium text-gray-700 mb-1'>
                   {tCommon('general.date')}
                 </label>
-                <p className='text-gray-900'>{formatDateDisplay(viewingProduct.created_at)}</p>
+                <p className='text-gray-900'>{viewingProduct.created_at ? formatDateDisplay(viewingProduct.created_at) : 'N/A'}</p>
               </div>
               {viewingProduct.description && (
                 <div>

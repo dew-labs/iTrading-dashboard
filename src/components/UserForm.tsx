@@ -11,14 +11,14 @@ import MainImageUpload from './MainImageUpload'
 
 interface UserFormProps {
   user?: DatabaseUser | null
-  onSubmit: (data: UserInsert) => void
+  onSubmit: (data: Omit<UserInsert, 'id'>) => void
   onCancel: () => void
 }
 
 const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
   const { t } = useTranslation()
   const { isSuperAdmin } = usePermissions()
-  const [formData, setFormData] = useState<UserInsert>({
+  const [formData, setFormData] = useState<Omit<UserInsert, 'id'>>({
     email: user?.email || '',
     full_name: user?.full_name || '',
     phone: user?.phone || '',
