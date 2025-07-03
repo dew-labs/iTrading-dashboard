@@ -152,6 +152,7 @@ export const useImages = (tableName?: string, recordId?: string) => {
       url: string
       path: string
       id: string
+      blurhash?: string
     },
     altText?: string,
     fileSize?: number,
@@ -164,7 +165,8 @@ export const useImages = (tableName?: string, recordId?: string) => {
       storage_object_id: uploadResult.id,
       alt_text: altText || null,
       file_size: fileSize || null,
-      mime_type: mimeType || null
+      mime_type: mimeType || null,
+      ...(uploadResult.blurhash ? { blurhash: uploadResult.blurhash } : {})
     }
 
     return createMutation.mutateAsync(imageData)

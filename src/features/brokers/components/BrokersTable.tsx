@@ -6,9 +6,11 @@ import { formatDateDisplay } from '../../../utils/format'
 import { getTypographyClasses, getIconClasses, cn } from '../../../utils/theme'
 import { stripHtmlAndTruncate } from '../../../utils'
 import type { Broker } from '../../../types'
+import RecordImage from '../../../components/features/images/RecordImage'
 
 interface BrokersTableProps {
   brokers: Broker[]
+  imagesByRecord?: Record<string, import('../../../types').Image[]>
   onView: (broker: Broker) => void
   onEdit: (broker: Broker) => void
   onDelete: (broker: Broker) => void
@@ -20,6 +22,7 @@ interface BrokersTableProps {
 
 const BrokersTable: React.FC<BrokersTableProps> = ({
   brokers,
+  imagesByRecord = {},
   onView,
   onEdit,
   onDelete,
@@ -44,12 +47,8 @@ const BrokersTable: React.FC<BrokersTableProps> = ({
       render: (value: unknown, row: Broker) => (
         <div className='flex items-center space-x-3'>
           <div className='flex-shrink-0'>
-            {row.logo_url ? (
-              <img
-                src={row.logo_url}
-                alt={`${row.name} logo`}
-                className='w-12 h-12 rounded-lg object-cover border border-gray-200'
-              />
+            {imagesByRecord[row.id]?.[0] ? (
+              <RecordImage image={imagesByRecord[row.id][0]} className='w-12 h-12 rounded-lg object-cover border border-gray-200' />
             ) : (
               <div className='w-12 h-12 rounded-lg bg-gradient-to-br from-gray-900 to-black flex items-center justify-center'>
                 <Building2 className='w-4 h-4 text-white' />

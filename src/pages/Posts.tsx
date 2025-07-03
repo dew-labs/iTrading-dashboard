@@ -16,6 +16,9 @@ import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
 import { POST_TYPES } from '../constants/general'
 import type { PostInsert } from '../types'
+import { useQuery } from '@tanstack/react-query'
+import { groupImagesByRecord } from '../utils'
+import { supabase } from '../lib/supabase'
 
 // Theme imports
 import {
@@ -168,6 +171,22 @@ const Posts: React.FC = () => {
     await updatePost(post.id, { is_visible: !post.is_visible })
   }
 
+  const postIds = paginatedPosts.map(post => String(post.id))
+  const { data: images = [] } = useQuery({
+    queryKey: ['images', 'posts', postIds],
+    queryFn: async () => {
+      if (postIds.length === 0) return []
+      const { data } = await supabase
+        .from('images')
+        .select('*')
+        .eq('table_name', 'posts')
+        .in('record_id', postIds)
+      return data || []
+    },
+    enabled: postIds.length > 0
+  })
+  const imagesByRecord = groupImagesByRecord(images)['posts'] || {}
+
   if (loading) {
     return (
       <div className={layout.container}>
@@ -241,6 +260,7 @@ const Posts: React.FC = () => {
             {/* Table - Now using our PostsTable component */}
             <PostsTable
               posts={paginatedPosts}
+              imagesByRecord={imagesByRecord}
               onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDelete}

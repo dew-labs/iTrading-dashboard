@@ -2,7 +2,7 @@ import React from 'react'
 import { Edit2, Trash2, Calendar, Clock, User } from 'lucide-react'
 import { Table } from '../../../components/molecules'
 import { Badge } from '../../../components/atoms'
-import { RecordImage } from '../../../components/features/images'
+import RecordImage from '../../../components/features/images/RecordImage'
 import { usePageTranslation, useTranslation } from '../../../hooks/useTranslation'
 
 import { getTypographyClasses, getIconClasses, cn } from '../../../utils/theme'
@@ -11,6 +11,7 @@ import type { DatabaseUser } from '../../../types'
 
 interface UsersTableProps {
   users: DatabaseUser[]
+  imagesByRecord?: Record<string, import('../../../types').Image[]>
   onEdit: (user: DatabaseUser) => void
   onDelete: (user: DatabaseUser) => void
   onSort: (column: keyof DatabaseUser) => void
@@ -20,6 +21,7 @@ interface UsersTableProps {
 
 const UsersTable: React.FC<UsersTableProps> = ({
   users,
+  imagesByRecord = {},
   onEdit,
   onDelete,
   onSort,
@@ -36,6 +38,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
       accessor: 'email' as keyof DatabaseUser,
       sortable: true,
       render: (value: unknown, row: DatabaseUser) => {
+        const fallbackImage = imagesByRecord[row.id]?.[0]
         return (
           <div className='flex items-center space-x-3'>
             <div className='flex-shrink-0'>
@@ -61,8 +64,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
                 />
               ) : (
                 <RecordImage
-                  tableName='users'
-                  recordId={row.id}
+                  image={fallbackImage}
                   className='w-12 h-12 rounded-lg object-cover border border-gray-200'
                   fallbackClassName='w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center'
                   alt={`${row.full_name || tCommon('roles.user')} ${tCommon('ui.profileImage')}`}

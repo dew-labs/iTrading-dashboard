@@ -7,9 +7,11 @@ import { getTypographyClasses, getIconClasses, cn } from '../../../utils/theme'
 import { formatDateDisplay } from '../../../utils/format'
 import { stripHtmlAndTruncate } from '../../../utils/textUtils'
 import type { Product } from '../../../types'
+import RecordImage from '../../../components/features/images/RecordImage'
 
 interface ProductsTableProps {
   products: Product[]
+  imagesByRecord?: Record<string, import('../../../types').Image[]>
   onView: (product: Product) => void
   onEdit: (product: Product) => void
   onDelete: (product: Product) => void
@@ -20,6 +22,7 @@ interface ProductsTableProps {
 
 const ProductsTable: React.FC<ProductsTableProps> = ({
   products,
+  imagesByRecord = {},
   onView,
   onEdit,
   onDelete,
@@ -36,15 +39,12 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
       accessor: 'name' as keyof Product,
       sortable: true,
       render: (value: unknown, row: Product) => {
+        const image = imagesByRecord[row.id]?.[0]
         return (
           <div className='flex items-center space-x-3'>
             <div className='flex-shrink-0'>
-              {row.featured_image_url ? (
-                <img
-                  src={row.featured_image_url}
-                  alt={`${value as string} product image`}
-                  className='w-12 h-12 rounded-lg object-cover border border-gray-200'
-                />
+              {image ? (
+                <RecordImage image={image} className='w-12 h-12 rounded-lg object-cover border border-gray-200' />
               ) : (
                 <div className='w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center'>
                   <Package className='w-4 h-4 text-white' />

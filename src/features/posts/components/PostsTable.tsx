@@ -2,7 +2,7 @@ import React from 'react'
 import { Edit2, Trash2, Eye, Clock, User, Tag, EyeOff } from 'lucide-react'
 import Table from '../../../components/molecules/Table'
 import { Badge } from '../../../components/atoms'
-import { RecordImage } from '../../../components/features/images'
+import RecordImage from '../../../components/features/images/RecordImage'
 import { useTranslation, usePageTranslation } from '../../../hooks/useTranslation'
 import { formatDateDisplay } from '../../../utils/format'
 import { getTypographyClasses, getIconClasses, cn } from '../../../utils/theme'
@@ -10,6 +10,7 @@ import type { PostWithAuthor } from '../../../hooks/usePosts'
 
 interface PostsTableProps {
   posts: PostWithAuthor[]
+  imagesByRecord?: Record<string, import('../../../types').Image[]>
   onView: (post: PostWithAuthor) => void
   onEdit: (post: PostWithAuthor) => void
   onDelete: (post: PostWithAuthor) => void
@@ -21,6 +22,7 @@ interface PostsTableProps {
 
 const PostsTable: React.FC<PostsTableProps> = ({
   posts,
+  imagesByRecord = {},
   onView,
   onEdit,
   onDelete,
@@ -47,8 +49,7 @@ const PostsTable: React.FC<PostsTableProps> = ({
         <div className='flex items-center space-x-3'>
           <div className='flex-shrink-0'>
             <RecordImage
-              tableName='posts'
-              recordId={row.id.toString()}
+              image={imagesByRecord[row.id]?.[0]}
               className='w-12 h-12 rounded-lg object-cover border border-gray-200'
               fallbackClassName='w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center'
               alt={`${value as string} post image`}

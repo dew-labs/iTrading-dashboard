@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { toast } from '../utils/toast'
+import { encode } from 'blurhash'
 
 interface UploadOptions {
   bucket: string
@@ -19,7 +20,43 @@ export const useFileUpload = () => {
   const [isUploading, setIsUploading] = useState(false)
   const [progress, setProgress] = useState(0)
 
-  const uploadFile = async (file: File, options: UploadOptions): Promise<UploadResult> => {
+  const getImageData = (image: HTMLImageElement): Promise<{data: Uint8ClampedArray, width: number, height: number}> => {
+    const canvas = document.createElement('canvas')
+    canvas.width = image.naturalWidth
+    canvas.height = image.naturalHeight
+    const ctx = canvas.getContext('2d')
+    if (!ctx) throw new Error('Could not get canvas context')
+    ctx.drawImage(image, 0, 0)
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    return Promise.resolve({ data: imageData.data, width: canvas.width, height: canvas.height })
+  }
+
+  const getBlurhashFromFile = (file: File): Promise<string | undefined> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const img = new window.Image()
+        img.onload = async () => {
+          try {
+            const { data, width, height } = await getImageData(img)
+            // Downscale for performance
+            const compX = Math.max(4, Math.round(width / 100))
+            const compY = Math.max(3, Math.round(height / 100))
+            const blurhash = encode(data, width, height, compX, compY)
+            resolve(blurhash)
+          } catch {
+            resolve(undefined)
+          }
+        }
+        img.onerror = () => resolve(undefined)
+        img.src = reader.result as string
+      }
+      reader.onerror = () => resolve(undefined)
+      reader.readAsDataURL(file)
+    })
+  }
+
+  const uploadFile = async (file: File, options: UploadOptions): Promise<UploadResult & { blurhash?: string }> => {
     const {
       bucket = 'posts',
       folder = 'images',
@@ -43,7 +80,10 @@ export const useFileUpload = () => {
     setIsUploading(true)
     setProgress(0)
 
+    let blurhash: string | undefined = undefined
     try {
+      // Generate blurhash before upload
+      blurhash = await getBlurhashFromFile(file)
       // Generate unique filename
       const fileExt = file.name.split('.').pop()
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
@@ -66,11 +106,13 @@ export const useFileUpload = () => {
 
       setProgress(100)
 
-      return {
+      const result: UploadResult & { blurhash?: string } = {
         url: urlData.publicUrl,
         path: filePath,
         id: uploadData.id || fileName
       }
+      if (blurhash) result.blurhash = blurhash
+      return result
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Upload failed'
       toast.error(message)

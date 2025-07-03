@@ -9,6 +9,9 @@ import { BannerForm } from '../components/features/banners'
 import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
 import type { Banner, BannerInsert } from '../types'
+import { useQuery } from '@tanstack/react-query'
+import { groupImagesByRecord } from '../utils'
+import { supabase } from '../lib/supabase'
 
 // Theme imports
 import {
@@ -146,6 +149,22 @@ const Banners: React.FC = () => {
     { value: 'inactive', label: tCommon('status.inactive') }
   ]
 
+  const bannerIds = paginatedBanners.map(banner => String(banner.id))
+  const { data: images = [] } = useQuery({
+    queryKey: ['images', 'banners', bannerIds],
+    queryFn: async () => {
+      if (bannerIds.length === 0) return []
+      const { data } = await supabase
+        .from('images')
+        .select('*')
+        .eq('table_name', 'banners')
+        .in('record_id', bannerIds)
+      return data || []
+    },
+    enabled: bannerIds.length > 0
+  })
+  const imagesByRecord = groupImagesByRecord(images)['banners'] || {}
+
   if (loading) {
     return (
       <div className={layout.container}>
@@ -212,6 +231,7 @@ const Banners: React.FC = () => {
             {/* Table */}
             <BannersTable
               banners={paginatedBanners}
+              imagesByRecord={imagesByRecord}
               onEdit={handleEdit}
               onDelete={handleDelete}
               onToggleStatus={handleToggleStatus}

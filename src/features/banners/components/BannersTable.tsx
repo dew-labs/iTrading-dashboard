@@ -2,7 +2,7 @@ import React from 'react'
 import { Edit2, Trash2, Image, Eye, EyeOff, Calendar, Link } from 'lucide-react'
 import { Table } from '../../../components/molecules'
 import { Badge } from '../../../components/atoms'
-import { RecordImage } from '../../../components/features/images'
+import RecordImage from '../../../components/features/images/RecordImage'
 import { usePageTranslation, useTranslation } from '../../../hooks/useTranslation'
 import { getTypographyClasses, getIconClasses, cn } from '../../../utils/theme'
 import { formatDateDisplay } from '../../../utils/format'
@@ -10,6 +10,7 @@ import type { Banner } from '../../../types'
 
 interface BannersTableProps {
   banners: Banner[]
+  imagesByRecord?: Record<string, import('../../../types').Image[]>
   onEdit: (banner: Banner) => void
   onDelete: (banner: Banner) => void
   onToggleStatus: (banner: Banner) => void
@@ -20,6 +21,7 @@ interface BannersTableProps {
 
 const BannersTable: React.FC<BannersTableProps> = ({
   banners,
+  imagesByRecord = {},
   onEdit,
   onDelete,
   onToggleStatus,
@@ -36,12 +38,12 @@ const BannersTable: React.FC<BannersTableProps> = ({
       accessor: 'name' as keyof Banner,
       sortable: true,
       render: (value: unknown, row: Banner) => {
+        const image = imagesByRecord[row.id]?.[0]
         return (
           <div className='flex items-center space-x-3'>
             <div className='flex-shrink-0'>
               <RecordImage
-                tableName='banners'
-                recordId={row.id}
+                image={image}
                 className='w-12 h-12 rounded-lg object-cover border border-gray-200'
                 fallbackClassName='w-12 h-12 rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center'
                 alt={`Banner ${row.id.slice(0, 8)} image`}

@@ -8,6 +8,9 @@ import { BrokerForm, BrokerViewModal } from '../components/features/brokers'
 import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
 import type { Broker, BrokerInsert } from '../types'
+import { useQuery } from '@tanstack/react-query'
+import { groupImagesByRecord } from '../utils'
+import { supabase } from '../lib/supabase'
 
 // Theme imports
 import { getPageLayoutClasses, getTypographyClasses, cn } from '../utils/theme'
@@ -115,6 +118,22 @@ const Brokers: React.FC = () => {
     }
   }
 
+  const brokerIds = paginatedBrokers.map(broker => String(broker.id))
+  const { data: images = [] } = useQuery({
+    queryKey: ['images', 'brokers', brokerIds],
+    queryFn: async () => {
+      if (brokerIds.length === 0) return []
+      const { data } = await supabase
+        .from('images')
+        .select('*')
+        .eq('table_name', 'brokers')
+        .in('record_id', brokerIds)
+      return data || []
+    },
+    enabled: brokerIds.length > 0
+  })
+  const imagesByRecord = groupImagesByRecord(images)['brokers'] || {}
+
   if (loading) {
     return (
       <div className={layout.container}>
@@ -198,6 +217,7 @@ const Brokers: React.FC = () => {
             {filterState.viewMode === 'list' ? (
               <BrokersTable
                 brokers={paginatedBrokers}
+                imagesByRecord={imagesByRecord}
                 onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}

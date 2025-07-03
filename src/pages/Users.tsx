@@ -10,6 +10,9 @@ import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
 import { USER_ROLES } from '../constants/general'
 import type { DatabaseUser, UserInsert, UserUpdate } from '../types'
+import { useQuery } from '@tanstack/react-query'
+import { groupImagesByRecord } from '../utils'
+import { supabase } from '../lib/supabase'
 
 // Theme imports
 import {
@@ -189,6 +192,22 @@ const Users: React.FC = () => {
     { value: 'moderator', label: tCommon('roles.moderator') }
   ]
 
+  const userIds = paginatedUsers.map(user => String(user.id))
+  const { data: images = [] } = useQuery({
+    queryKey: ['images', 'users', userIds],
+    queryFn: async () => {
+      if (userIds.length === 0) return []
+      const { data } = await supabase
+        .from('images')
+        .select('*')
+        .eq('table_name', 'users')
+        .in('record_id', userIds)
+      return data || []
+    },
+    enabled: userIds.length > 0
+  })
+  const imagesByRecord = groupImagesByRecord(images)['users'] || {}
+
   if (loading) {
     return (
       <div className={layout.container}>
@@ -266,8 +285,9 @@ const Users: React.FC = () => {
             {/* Table */}
             <UsersTable
               users={paginatedUsers}
-                          onEdit={handleEdit}
-            onDelete={handleDelete}
+              imagesByRecord={imagesByRecord}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
               onSort={handleSort}
               sortColumn={filterState.sortColumn}
               sortDirection={filterState.sortDirection}
@@ -366,8 +386,6 @@ const Users: React.FC = () => {
         >
           <UserForm user={editingUser} onSubmit={handleSubmit} onCancel={handleCloseModal} />
         </Modal>
-
-
 
         {/* Confirm dialog for deleting users */}
         <ConfirmDialog

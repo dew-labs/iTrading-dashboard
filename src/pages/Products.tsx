@@ -9,6 +9,9 @@ import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
 import { formatDateDisplay } from '../utils/format'
 import type { Product, ProductInsert } from '../types'
+import { useQuery } from '@tanstack/react-query'
+import { groupImagesByRecord } from '../utils'
+import { supabase } from '../lib/supabase'
 
 // Theme imports
 import {
@@ -113,6 +116,22 @@ const Products: React.FC = () => {
     { value: 'oneTime', label: tCommon('content.oneTime') }
   ]
 
+  const productIds = paginatedProducts.map(product => String(product.id))
+  const { data: images = [] } = useQuery({
+    queryKey: ['images', 'products', productIds],
+    queryFn: async () => {
+      if (productIds.length === 0) return []
+      const { data } = await supabase
+        .from('images')
+        .select('*')
+        .eq('table_name', 'products')
+        .in('record_id', productIds)
+      return data || []
+    },
+    enabled: productIds.length > 0
+  })
+  const imagesByRecord = groupImagesByRecord(images)['products'] || {}
+
   if (loading) {
     return (
       <div className={layout.container}>
@@ -179,6 +198,7 @@ const Products: React.FC = () => {
             {/* Table */}
             <ProductsTable
               products={paginatedProducts}
+              imagesByRecord={imagesByRecord}
               onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDelete}
