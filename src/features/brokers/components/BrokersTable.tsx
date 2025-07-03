@@ -47,8 +47,8 @@ const BrokersTable: React.FC<BrokersTableProps> = ({
       render: (value: unknown, row: Broker) => (
         <div className='flex items-center space-x-3'>
           <div className='flex-shrink-0'>
-            {imagesByRecord[row.id]?.[0] ? (
-              <RecordImage image={imagesByRecord[row.id][0]} className='w-12 h-12 rounded-lg object-cover border border-gray-200' />
+            {imagesByRecord?.[row.id]?.[0] ? (
+              <RecordImage image={imagesByRecord[row.id]?.[0]} className='w-12 h-12 rounded-lg object-cover border border-gray-200' />
             ) : (
               <div className='w-12 h-12 rounded-lg bg-gradient-to-br from-gray-900 to-black flex items-center justify-center'>
                 <Building2 className='w-4 h-4 text-white' />

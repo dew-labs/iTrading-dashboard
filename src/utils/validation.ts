@@ -3,6 +3,8 @@
  * Centralized validation rules with TypeScript support and internationalization
  */
 
+import { COUNTRY_OPTIONS } from '../constants/general'
+
 // Validation rule interface
 export interface ValidationRule<T = unknown> {
   required?: boolean
@@ -304,7 +306,11 @@ export const formSchemas = {
   user: {
     email: commonSchemas.email,
     full_name: commonSchemas.name,
-    phone: commonSchemas.phone
+    phone: commonSchemas.phone,
+    country: {
+      custom: (value: string) => !value || COUNTRY_OPTIONS.some((opt: { value: string; label: string }) => opt.value === value),
+      message: 'Please select a valid country'
+    }
   },
 
   post: {

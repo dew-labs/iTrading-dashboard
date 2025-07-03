@@ -123,7 +123,7 @@ export const usePosts = () => {
   // Create post mutation
   const createMutation = useMutation({
     mutationFn: createPostMutation,
-    onMutate: async newPost => {
+    onMutate: async (newPost: PostInsert & { is_visible?: boolean }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.posts() })
 
       const previousPosts = queryClient.getQueryData<PostWithAuthor[]>(queryKeys.posts())
@@ -140,7 +140,9 @@ export const usePosts = () => {
         views: 0,
         published_at: newPost.status === 'published' ? new Date().toISOString() : '',
         created_at: new Date().toISOString(),
-        author: null
+        author: null,
+        is_visible: typeof newPost.is_visible === 'boolean' ? newPost.is_visible : true,
+        reading_time: null
       }
 
       queryClient.setQueryData<PostWithAuthor[]>(queryKeys.posts(), (old = []) => [optimisticPost, ...old])

@@ -65,7 +65,8 @@ export const useBrokers = () => {
         headquarter: newBroker.headquarter || null,
         description: newBroker.description || null,
         logo_url: newBroker.logo_url || null,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        is_visible: newBroker.is_visible || true
       }
 
       queryClient.setQueryData<Broker[]>(queryKeys.brokers(), (old = []) => [

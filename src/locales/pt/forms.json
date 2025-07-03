@@ -91,7 +91,8 @@
     "bannerUrl": "https://exemplo.com/pagina-destino",
     "productName": "Digite o nome do produto",
     "productPrice": "0,00",
-    "productDescription": "Descreva as características, benefícios e detalhes do seu produto..."
+    "productDescription": "Descreva as características, benefícios e detalhes do seu produto...",
+    "country": "Selecione o país"
   },
   "validation": {
     "required": "Este campo é obrigatório",

@@ -158,7 +158,8 @@ const Users: React.FC = () => {
           phone: data.phone || null,
           role: data.role || 'user',
           status: data.status || 'active',
-          avatar_url: data.avatar_url ?? null
+          avatar_url: data.avatar_url ?? null,
+          country: data.country || null
         }
         await updateUser(editingUser.id, updateData)
       } else {

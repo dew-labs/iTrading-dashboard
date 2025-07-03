@@ -50,7 +50,7 @@ export const useBanners = () => {
   // Create banner mutation
   const createMutation = useMutation({
     mutationFn: createBannerMutation,
-    onMutate: async newBanner => {
+    onMutate: async (newBanner: BannerInsert & { is_visible?: boolean | null }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.banners() })
 
       const previousBanners = queryClient.getQueryData<Banner[]>(queryKeys.banners())
@@ -60,7 +60,7 @@ export const useBanners = () => {
         id: crypto.randomUUID(), // Temporary ID
         name: newBanner.name || 'New Banner',
         target_url: newBanner.target_url || null,
-        is_visible: newBanner.is_visible || false,
+        is_visible: typeof newBanner.is_visible === 'boolean' ? newBanner.is_visible : true,
         created_at: new Date().toISOString()
       }
 

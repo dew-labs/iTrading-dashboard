@@ -5,7 +5,7 @@ import { usePermissions } from '../../../hooks/usePermissions'
 import { useTranslation, useFormTranslation } from '../../../hooks/useTranslation'
 import { useFormValidation } from '../../../hooks/useFormValidation'
 import { formSchemas } from '../../../utils/validation'
-import { USER_ROLES } from '../../../constants/general'
+import { USER_ROLES, COUNTRY_OPTIONS } from '../../../constants/general'
 import { FormField } from '../../atoms'
 import { Select } from '../../molecules'
 import { MainImageUpload } from '../images'
@@ -37,6 +37,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
     email: '',
     full_name: '',
     phone: '',
+    country: '',
     role: 'user' as UserRole,
     status: 'invited' as const,
     avatar_url: null as string | null
@@ -65,6 +66,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
         email: user.email,
         full_name: user.full_name || '',
         phone: user.phone || '',
+        country: user.country || '',
         role: user.role,
         status: 'invited',
         avatar_url: user.avatar_url ?? null
@@ -197,6 +199,19 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
           onChange={value => updateField('role', value as UserRole)}
           options={roleOptions}
           disabled={isValidating}
+        />
+      </div>
+
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+        <Select
+          label={t('forms:labels.country')}
+          value={formData.country || ''}
+          onChange={value => updateField('country', value)}
+          options={COUNTRY_OPTIONS}
+          disabled={isValidating}
+          required={false}
+          error={errors.country ?? ''}
+          placeholder={tForm('placeholders.country')}
         />
       </div>
 

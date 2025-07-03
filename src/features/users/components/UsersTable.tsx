@@ -8,6 +8,7 @@ import { usePageTranslation, useTranslation } from '../../../hooks/useTranslatio
 import { getTypographyClasses, getIconClasses, cn } from '../../../utils/theme'
 import { formatDateDisplay } from '../../../utils/format'
 import type { DatabaseUser } from '../../../types'
+import { COUNTRY_OPTIONS } from '../../../constants/general'
 
 interface UsersTableProps {
   users: DatabaseUser[]
@@ -95,6 +96,19 @@ const UsersTable: React.FC<UsersTableProps> = ({
           <Badge variant={row.status as 'active' | 'inactive' | 'invited'} size='sm' showIcon>
             {tCommon(`status.${row.status}`)}
           </Badge>
+        )
+      }
+    },
+    {
+      header: t('forms:labels.country'),
+      accessor: 'country' as keyof DatabaseUser,
+      sortable: true,
+      render: (value: unknown, row: DatabaseUser) => {
+        const country = COUNTRY_OPTIONS.find(opt => opt.value === row.country)
+        return (
+          <span className='block truncate' title={country?.label || row.country || ''} aria-label={country?.label || row.country || t('users.noCountry')}>
+            {country?.label || row.country || <span className='text-gray-400'>{t('users.noCountry')}</span>}
+          </span>
         )
       }
     },

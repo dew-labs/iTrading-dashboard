@@ -56,7 +56,7 @@
     "enterAddress": "Enter address",
     "enterCity": "Enter city",
     "selectState": "Select state",
-    "selectCountry": "Select country",
+    "country": "Select country",
     "enterPostalCode": "Enter postal code",
     "selectRole": "Select role",
     "selectStatus": "Select status",
