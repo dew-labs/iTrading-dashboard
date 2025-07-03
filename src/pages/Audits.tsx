@@ -20,7 +20,7 @@ import {
 
 const Audits: React.FC = () => {
   const { auditLogs, loading, deleteAuditLog, deleteOldAuditLogs, canDelete } = useAuditLogs()
-  const { isSuperAdmin } = usePermissions()
+  const { isAdmin } = usePermissions()
   const { t } = usePageTranslation()
   const { t: tCommon } = useTranslation()
 
@@ -195,7 +195,7 @@ const Audits: React.FC = () => {
             >
               {t('audits.exportData')}
             </Button>
-            {isSuperAdmin() && (
+            {isAdmin() && (
               <Button
                 variant='danger'
                 size='md'

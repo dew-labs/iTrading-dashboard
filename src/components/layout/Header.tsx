@@ -237,15 +237,11 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 <div className='flex items-center justify-end'>
                   {profile?.role && (
                     <Badge
-                      variant={profile.role as 'admin' | 'user' | 'super_admin'}
+                      variant={profile.role as 'admin' | 'moderator' | 'user'}
                       size='sm'
                       showIcon
                     >
-                      {t(
-                        profile.role === 'super_admin'
-                          ? 'roles.superAdmin'
-                          : `roles.${profile.role}`
-                      )}
+                      {t(`roles.${profile.role}`)}
                     </Badge>
                   )}
                 </div>
@@ -289,15 +285,11 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                       <div className='mt-1'>
                         {profile?.role && (
                           <Badge
-                            variant={profile.role as 'admin' | 'user' | 'super_admin'}
+                            variant={profile.role as 'admin' | 'moderator' | 'user'}
                             size='md'
                             showIcon
                           >
-                            {t(
-                              profile.role === 'super_admin'
-                                ? 'roles.superAdmin'
-                                : `roles.${profile.role}`
-                            )}
+                            {t(`roles.${profile.role}`)}
                           </Badge>
                         )}
                       </div>

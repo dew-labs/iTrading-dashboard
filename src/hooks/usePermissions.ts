@@ -2,37 +2,15 @@ import { useQuery } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import { supabase, queryKeys, supabaseHelpers } from '../lib/supabase'
 import { useAuthStore } from '../store/authStore'
-import type { Permission, UserRole, RolePermission } from '../types'
+import type { UserRole, RolePermission } from '../types'
 
 interface UsePermissionsReturn {
-  permissions: Permission[]
   loading: boolean
   can: (resource: string, action: string) => boolean
   hasRole: (role: UserRole) => boolean
   isAdmin: () => boolean
-  isSuperAdmin: () => boolean
-}
-
-// Fetch functions
-const fetchUserPermissions = async (userId: string): Promise<Permission[]> => {
-  try {
-    return supabaseHelpers.fetchData(
-      supabase.from('user_permissions').select('resource, action').eq('user_id', userId)
-    )
-  } catch (error) {
-    // Handle deleted user case - return empty permissions instead of throwing
-    const errorMessage =
-      error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase()
-    if (
-      errorMessage.includes('no rows found') ||
-      errorMessage.includes('unauthorized') ||
-      errorMessage.includes('forbidden')
-    ) {
-      console.warn('User permissions not accessible, returning empty permissions:', userId)
-      return []
-    }
-    throw error
-  }
+  isModerator: () => boolean
+  isAdminOrModerator: () => boolean
 }
 
 const fetchRolePermissions = async (role: UserRole): Promise<RolePermission[]> => {
@@ -46,33 +24,7 @@ const fetchRolePermissions = async (role: UserRole): Promise<RolePermission[]> =
 }
 
 export const usePermissions = (): UsePermissionsReturn => {
-  const { user, profile } = useAuthStore()
-
-  // Fetch user-specific permissions
-  const {
-    data: userPermissions = [],
-    isLoading: userPermissionsLoading,
-    error: userPermissionsError
-  } = useQuery({
-    queryKey: queryKeys.userPermissions(user?.id || ''),
-    queryFn: () => fetchUserPermissions(user!.id),
-    enabled: !!user?.id && !!profile, // Only fetch if profile exists
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
-    retry: (failureCount, error) => {
-      // Don't retry if it's an auth/user error
-      const errorMessage =
-        error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase()
-      if (
-        errorMessage.includes('unauthorized') ||
-        errorMessage.includes('forbidden') ||
-        errorMessage.includes('no rows found')
-      ) {
-        return false
-      }
-      return failureCount < 3
-    }
-  })
+  const { profile } = useAuthStore()
 
   // Fetch role-based permissions
   const {
@@ -91,12 +43,9 @@ export const usePermissions = (): UsePermissionsReturn => {
     }
   })
 
-  const loading = userPermissionsLoading || rolePermissionsLoading
+  const loading = rolePermissionsLoading
 
   // Log errors for debugging but don't throw
-  if (userPermissionsError) {
-    console.warn('User permissions error:', userPermissionsError)
-  }
   if (rolePermissionsError) {
     console.warn('Role permissions error:', rolePermissionsError)
   }
@@ -105,15 +54,8 @@ export const usePermissions = (): UsePermissionsReturn => {
     (resource: string, action: string): boolean => {
       if (!profile) return false
 
-      // Super admins have all permissions
-      if (profile.role === 'super_admin') return true
-
-      // Check user-specific permissions
-      const hasUserPermission = userPermissions.some(
-        p => p.resource === resource && p.action === action
-      )
-
-      if (hasUserPermission) return true
+      // Admins have all permissions
+      if (profile.role === 'admin') return true
 
       // Check role-based permissions
       const hasRolePermission = rolePermissions.some(
@@ -122,7 +64,7 @@ export const usePermissions = (): UsePermissionsReturn => {
 
       return hasRolePermission
     },
-    [profile, userPermissions, rolePermissions]
+    [profile, rolePermissions]
   )
 
   const hasRole = useCallback(
@@ -133,19 +75,23 @@ export const usePermissions = (): UsePermissionsReturn => {
   )
 
   const isAdmin = useCallback((): boolean => {
-    return profile?.role === 'admin' || profile?.role === 'super_admin'
+    return profile?.role === 'admin'
   }, [profile?.role])
 
-  const isSuperAdmin = useCallback((): boolean => {
-    return profile?.role === 'super_admin'
+  const isModerator = useCallback((): boolean => {
+    return profile?.role === 'moderator'
+  }, [profile?.role])
+
+  const isAdminOrModerator = useCallback((): boolean => {
+    return profile?.role === 'admin' || profile?.role === 'moderator'
   }, [profile?.role])
 
   return {
-    permissions: userPermissions,
     loading,
     can,
     hasRole,
     isAdmin,
-    isSuperAdmin
+    isModerator,
+    isAdminOrModerator
   }
 }

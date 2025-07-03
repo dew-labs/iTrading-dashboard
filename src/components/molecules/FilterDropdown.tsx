@@ -59,7 +59,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
         )
       ) {
         return t(`common:content.${option.labelKey}`)
-      } else if (['user', 'admin', 'superAdmin'].includes(option.labelKey)) {
+      } else if (['user', 'admin', 'moderator'].includes(option.labelKey)) {
         return t(`common:roles.${option.labelKey}`)
       } else {
         // Try without namespace first, then fallback to direct key

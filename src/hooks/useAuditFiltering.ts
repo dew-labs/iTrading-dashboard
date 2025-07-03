@@ -152,7 +152,7 @@ export const useAuditFiltering = (auditLogs: AuditLog[]) => {
     if (selectedTable !== 'all') filters.table_name = selectedTable
     if (selectedAction !== 'all') filters.action = selectedAction as 'INSERT' | 'UPDATE' | 'DELETE'
     if (selectedUser !== 'all') filters.user_email = selectedUser
-    if (selectedRole !== 'all') filters.user_role = selectedRole as 'admin' | 'super_admin'
+    if (selectedRole !== 'all') filters.user_role = selectedRole as 'admin' | 'moderator'
     if (dateFrom) filters.date_from = dateFrom
     if (dateTo) filters.date_to = dateTo + 'T23:59:59'
 

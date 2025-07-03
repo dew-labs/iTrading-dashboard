@@ -19,7 +19,7 @@ BEGIN
   RETURN EXISTS (
     SELECT 1 FROM public.users
     WHERE id = user_id
-    AND role IN ('admin', 'super_admin')
+    AND role = 'admin'
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -69,7 +69,7 @@ BEGIN
         NEW.id,
         NEW.email,
         CASE
-            WHEN COALESCE(NEW.raw_user_meta_data->>'role', 'user') IN ('user', 'admin', 'super_admin')
+            WHEN COALESCE(NEW.raw_user_meta_data->>'role', 'user') IN ('user', 'moderator', 'admin')
             THEN COALESCE(NEW.raw_user_meta_data->>'role', 'user')::user_role
             ELSE 'user'::user_role
         END,
@@ -158,9 +158,9 @@ CREATE POLICY "Allow user creation via trigger and admins"
     OR auth.uid() IS NULL
   );
 
-CREATE POLICY "Super admins can delete users"
+CREATE POLICY "Admins can delete users"
   ON users FOR DELETE
-  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'super_admin'));
+  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin'));
 
 -- Posts table policies
 CREATE POLICY "Posts are viewable by everyone"
@@ -260,9 +260,9 @@ CREATE POLICY "Admins can view all permissions"
   ON user_permissions FOR SELECT
   USING (public.is_admin(auth.uid()));
 
-CREATE POLICY "Super admins can manage permissions"
+CREATE POLICY "Admins can manage permissions"
   ON user_permissions FOR ALL
-  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'super_admin'));
+  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin'));
 
 -- Role permissions table policies
 CREATE POLICY "Everyone can view role permissions"
@@ -270,9 +270,9 @@ CREATE POLICY "Everyone can view role permissions"
   TO authenticated
   USING (true);
 
-CREATE POLICY "Super admins can manage role permissions"
+CREATE POLICY "Admins can manage role permissions"
   ON role_permissions FOR ALL
-  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'super_admin'));
+  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin'));
 
 -- Images table policies
 CREATE POLICY "Images are viewable by everyone"
@@ -425,9 +425,9 @@ BEGIN
     -- Update existing user
     UPDATE public.users
     SET
-      role = 'super_admin',
+      role = 'admin',
       status = 'active',
-      full_name = 'Super Admin',
+      full_name = 'Admin',
       updated_at = now()
     WHERE email = admin_email;
   ELSE
@@ -444,8 +444,8 @@ BEGIN
     ) VALUES (
       admin_user_id,
       admin_email,
-      'Super Admin',
-      'super_admin',
+      'Admin',
+      'admin',
       'active',
       'en',
       now(),
@@ -456,7 +456,7 @@ BEGIN
   RAISE NOTICE '✅ Created confirmed admin user: %', admin_email;
   RAISE NOTICE '📧 Login email: %', admin_email;
   RAISE NOTICE '🔑 Password: %', admin_password;
-  RAISE NOTICE '🎯 Role: super_admin';
+  RAISE NOTICE '🎯 Role: admin';
   RAISE NOTICE '✔️  Status: confirmed and active';
 
 EXCEPTION

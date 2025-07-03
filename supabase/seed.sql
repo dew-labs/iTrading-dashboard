@@ -3,7 +3,7 @@
 
   This file contains realistic seed data that works with hosted Supabase.
   Uses the existing admin user for relationships and provides comprehensive
-  sample data for all resources.
+  sample data for all resources (without images for cleaner setup).
 */
 
 -- ===============================================
@@ -28,56 +28,56 @@ INSERT INTO brokers (name, established_in, headquarter, description, logo_url) V
   1971,
   'Westlake, Texas, USA',
   'Charles Schwab Corporation is a leading provider of financial services, offering a wide range of investment, advisory, banking and retirement plan services to individual investors and independent investment advisors.',
-  'https://images.pexels.com/photos/3760067/pexels-photo-3760067.jpeg'
+  NULL
 ),
 (
   'Interactive Brokers',
   1978,
   'Greenwich, Connecticut, USA',
   'Interactive Brokers is an automated global electronic broker and market maker that specializes in routing orders and executing and processing trades in securities, futures and foreign exchange instruments.',
-  'https://images.pexels.com/photos/3182773/pexels-photo-3182773.jpeg'
+  NULL
 ),
 (
   'TD Ameritrade',
   1975,
   'Omaha, Nebraska, USA',
   'TD Ameritrade is an American online broker that offers an electronic trading platform for the trade of financial securities to retail investors.',
-  'https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg'
+  NULL
 ),
 (
   'E*TRADE',
   1991,
   'Arlington, Virginia, USA',
   'E*TRADE Financial Corporation offers an electronic trading platform to trade financial securities. The company provides online investing services to retail investors.',
-  'https://images.pexels.com/photos/534216/pexels-photo-534216.jpeg'
+  NULL
 ),
 (
   'Robinhood',
   2013,
   'Menlo Park, California, USA',
   'Robinhood is an American financial services company offering commission-free stock trading through a mobile app and website.',
-  'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg'
+  NULL
 ),
 (
   'Fidelity Investments',
   1946,
   'Boston, Massachusetts, USA',
   'Fidelity Investments is an American multinational financial services corporation offering fund management, fund distribution, investment advice, retirement services, wealth management, securities execution and clearance.',
-  'https://images.pexels.com/photos/4386321/pexels-photo-4386321.jpeg'
+  NULL
 ),
 (
   'Vanguard',
   1975,
   'Malvern, Pennsylvania, USA',
   'The Vanguard Group is an American registered investment advisor based in Malvern, Pennsylvania, with over $7 trillion in global assets under management.',
-  'https://images.pexels.com/photos/210742/pexels-photo-210742.jpeg'
+  NULL
 ),
 (
   'Merrill Lynch',
   1914,
   'New York City, New York, USA',
   'Merrill Lynch is an American investment management and wealth management division of Bank of America that offers a broad range of brokerage, investment advisory and other financial services.',
-  'https://images.pexels.com/photos/3760067/pexels-photo-3760067.jpeg'
+  NULL
 );
 
 -- ===============================================
@@ -89,56 +89,56 @@ INSERT INTO products (name, price, description, featured_image_url, subscription
   'Premium Trading Platform',
   49.99,
   'Advanced trading platform with real-time market data, advanced charting tools, portfolio analytics, and priority customer support. Perfect for active traders who need professional-grade tools.',
-  'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg',
+  NULL,
   true
 ),
 (
   'Market Research Pro',
   29.99,
   'Comprehensive market research and analysis tools including sector analysis, earnings forecasts, technical indicators, and expert market insights updated daily.',
-  'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg',
+  NULL,
   true
 ),
 (
   'Algorithmic Trading Suite',
   199.99,
   'Complete algorithmic trading solution with backtesting capabilities, strategy development tools, and automated execution. Includes popular trading algorithms and custom strategy builder.',
-  'https://images.pexels.com/photos/3182773/pexels-photo-3182773.jpeg',
+  NULL,
   false
 ),
 (
   'Risk Management Dashboard',
   79.99,
   'Professional risk management tools with portfolio risk assessment, Value at Risk (VaR) calculations, stress testing, and real-time risk monitoring for your investments.',
-  'https://images.pexels.com/photos/590041/pexels-photo-590041.jpeg',
+  NULL,
   true
 ),
 (
   'Mobile Trading App Pro',
   19.99,
   'Enhanced mobile trading experience with advanced order types, real-time alerts, mobile charts, and seamless synchronization across all your devices.',
-  'https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg',
+  NULL,
   true
 ),
 (
   'Educational Trading Course',
   149.99,
   'Comprehensive online trading course covering fundamentals, technical analysis, risk management, and advanced trading strategies. Includes video lessons, quizzes, and certification.',
-  'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg',
+  NULL,
   false
 ),
 (
   'Portfolio Analytics Pro',
   39.99,
   'Advanced portfolio analysis with performance attribution, benchmark comparison, asset allocation tracking, and detailed reporting tools for serious investors.',
-  'https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg',
+  NULL,
   true
 ),
 (
   'Options Trading Tools',
   89.99,
   'Specialized options trading platform with options chain analysis, volatility modeling, Greeks calculator, and strategy analyzer for options traders.',
-  'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg',
+  NULL,
   true
 );
 
@@ -153,7 +153,7 @@ INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views
   'news',
   'published',
   (SELECT id FROM users WHERE email = 'admin@admin.com'),
-  'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg',
+  NULL,
   2847
 ),
 (
@@ -162,7 +162,7 @@ INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views
   'news',
   'published',
   (SELECT id FROM users WHERE email = 'admin@admin.com'),
-  'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg',
+  NULL,
   1924
 ),
 (
@@ -171,7 +171,7 @@ INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views
   'event',
   'published',
   (SELECT id FROM users WHERE email = 'admin@admin.com'),
-  'https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg',
+  NULL,
   856
 ),
 (
@@ -180,7 +180,7 @@ INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views
   'news',
   'published',
   (SELECT id FROM users WHERE email = 'admin@admin.com'),
-  'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg',
+  NULL,
   3421
 ),
 (
@@ -189,7 +189,7 @@ INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views
   'news',
   'published',
   (SELECT id FROM users WHERE email = 'admin@admin.com'),
-  'https://images.pexels.com/photos/590041/pexels-photo-590041.jpeg',
+  NULL,
   1677
 ),
 (
@@ -198,7 +198,7 @@ INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views
   'privacy_policy',
   'published',
   (SELECT id FROM users WHERE email = 'admin@admin.com'),
-  'https://images.pexels.com/photos/4386321/pexels-photo-4386321.jpeg',
+  NULL,
   654
 ),
 (
@@ -207,7 +207,7 @@ INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views
   'terms_of_use',
   'published',
   (SELECT id FROM users WHERE email = 'admin@admin.com'),
-  'https://images.pexels.com/photos/210742/pexels-photo-210742.jpeg',
+  NULL,
   432
 ),
 (
@@ -216,7 +216,7 @@ INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views
   'news',
   'draft',
   (SELECT id FROM users WHERE email = 'admin@admin.com'),
-  'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg',
+  NULL,
   0
 );
 
@@ -243,82 +243,7 @@ INSERT INTO notifications (title, description, user_id) VALUES
 ('Market Data Provider Update', 'We''ve upgraded our market data feeds for faster and more accurate real-time quotes. You may notice improved response times across the platform.', NULL),
 ('Educational Webinar Series', 'Join our free webinar series "Advanced Trading Strategies" every Thursday at 2 PM EST. Register now to secure your spot for expert insights.', NULL);
 
--- ===============================================
--- IMAGES (Centralized Image Management)
--- ===============================================
 
--- Product images
-INSERT INTO images (table_name, record_id, image_url, alt_text, mime_type, file_size) VALUES
-('products', '1', 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg', 'Premium Trading Platform Dashboard', 'image/jpeg', 245760),
-('products', '2', 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg', 'Market Research Analytics', 'image/jpeg', 198340),
-('products', '3', 'https://images.pexels.com/photos/3182773/pexels-photo-3182773.jpeg', 'Algorithmic Trading Interface', 'image/jpeg', 302150),
-('products', '4', 'https://images.pexels.com/photos/590041/pexels-photo-590041.jpeg', 'Risk Management Dashboard', 'image/jpeg', 156890),
-('products', '5', 'https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg', 'Mobile Trading App Screenshot', 'image/jpeg', 128450),
-('products', '6', 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg', 'Trading Education Course', 'image/jpeg', 234670),
-('products', '7', 'https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg', 'Portfolio Analytics Interface', 'image/jpeg', 187520),
-('products', '8', 'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg', 'Options Trading Tools', 'image/jpeg', 167840);
-
--- Broker images (logos)
-INSERT INTO images (table_name, record_id, image_url, alt_text, mime_type, file_size) VALUES
-('brokers', '1', 'https://images.pexels.com/photos/3760067/pexels-photo-3760067.jpeg', 'Charles Schwab Logo', 'image/jpeg', 89320),
-('brokers', '2', 'https://images.pexels.com/photos/3182773/pexels-photo-3182773.jpeg', 'Interactive Brokers Logo', 'image/jpeg', 76540),
-('brokers', '3', 'https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg', 'TD Ameritrade Logo', 'image/jpeg', 82150),
-('brokers', '4', 'https://images.pexels.com/photos/534216/pexels-photo-534216.jpeg', 'E*TRADE Logo', 'image/jpeg', 78920),
-('brokers', '5', 'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg', 'Robinhood Logo', 'image/jpeg', 65780),
-('brokers', '6', 'https://images.pexels.com/photos/4386321/pexels-photo-4386321.jpeg', 'Fidelity Investments Logo', 'image/jpeg', 94330),
-('brokers', '7', 'https://images.pexels.com/photos/210742/pexels-photo-210742.jpeg', 'Vanguard Logo', 'image/jpeg', 71240),
-('brokers', '8', 'https://images.pexels.com/photos/3760067/pexels-photo-3760067.jpeg', 'Merrill Lynch Logo', 'image/jpeg', 88650);
-
--- Post thumbnail images
-INSERT INTO images (table_name, record_id, image_url, alt_text, mime_type, file_size) VALUES
-('posts', '1', 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg', 'Q1 2024 Market Analysis Chart', 'image/jpeg', 156780),
-('posts', '2', 'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg', 'Options Trading Illustration', 'image/jpeg', 143290),
-('posts', '3', 'https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg', 'Virtual Trading Conference Banner', 'image/jpeg', 289340),
-('posts', '4', 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg', 'New Platform Features', 'image/jpeg', 198760),
-('posts', '5', 'https://images.pexels.com/photos/590041/pexels-photo-590041.jpeg', 'Risk Management Illustration', 'image/jpeg', 167430),
-('posts', '6', 'https://images.pexels.com/photos/4386321/pexels-photo-4386321.jpeg', 'Privacy Policy Document', 'image/jpeg', 134520),
-('posts', '7', 'https://images.pexels.com/photos/210742/pexels-photo-210742.jpeg', 'Terms of Service Agreement', 'image/jpeg', 145780),
-('posts', '8', 'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg', 'Cryptocurrency Trading', 'image/jpeg', 178290);
-
--- Banner images (using UUIDs for banner record_id)
-DO $$
-DECLARE
-    banner_record RECORD;
-    image_urls text[] := ARRAY[
-        'https://images.pexels.com/photos/1303081/pexels-photo-1303081.jpeg',
-        'https://images.pexels.com/photos/586996/pexels-photo-586996.jpeg',
-        'https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg',
-        'https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg',
-        'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg',
-        'https://images.pexels.com/photos/590041/pexels-photo-590041.jpeg',
-        'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg'
-    ];
-    alt_texts text[] := ARRAY[
-        'Welcome New Traders Banner',
-        'Premium Features Upgrade Banner',
-        'Trading Conference 2024 Banner',
-        'Mobile App Download Banner',
-        'Educational Resources Banner',
-        'Risk Management Guide Banner',
-        'Options Trading Course Banner'
-    ];
-    counter int := 1;
-BEGIN
-    FOR banner_record IN
-        SELECT id, name FROM banners ORDER BY created_at
-    LOOP
-        INSERT INTO images (table_name, record_id, image_url, alt_text, mime_type, file_size)
-        VALUES (
-            'banners',
-            banner_record.id::text,
-            image_urls[counter],
-            alt_texts[counter],
-            'image/jpeg',
-            200000 + (random() * 100000)::int
-        );
-        counter := counter + 1;
-    END LOOP;
-END $$;
 
 -- ===============================================
 -- SEED DATA SUMMARY REPORT
@@ -332,7 +257,6 @@ DECLARE
     total_brokers int;
     total_banners int;
     total_notifications int;
-    total_images int;
     admin_user_exists boolean;
 BEGIN
     -- Count all seeded data
@@ -342,23 +266,21 @@ BEGIN
     SELECT count(*) INTO total_brokers FROM brokers;
     SELECT count(*) INTO total_banners FROM banners;
     SELECT count(*) INTO total_notifications FROM notifications;
-    SELECT count(*) INTO total_images FROM images;
     SELECT exists(SELECT 1 FROM users WHERE email = 'admin@admin.com') INTO admin_user_exists;
 
     -- Generate report
     RAISE NOTICE '';
     RAISE NOTICE '🎉 =======================================';
-    RAISE NOTICE '🎉 SIMPLIFIED SEED DATA COMPLETE!';
+    RAISE NOTICE '🎉 CLEAN SEED DATA COMPLETE!';
     RAISE NOTICE '🎉 =======================================';
     RAISE NOTICE '';
     RAISE NOTICE '📊 SEEDED DATA SUMMARY:';
     RAISE NOTICE '👥 Users: % (admin only)', total_users;
     RAISE NOTICE '📝 Posts: % (with admin as author)', total_posts;
-    RAISE NOTICE '🛍️  Products: % (with featured images)', total_products;
+    RAISE NOTICE '🛍️  Products: % (without images)', total_products;
     RAISE NOTICE '🏢 Brokers: % (major trading brokers)', total_brokers;
     RAISE NOTICE '🖼️  Banners: % (promotional banners)', total_banners;
     RAISE NOTICE '🔔 Notifications: % (system notifications)', total_notifications;
-    RAISE NOTICE '📷 Images: % (across all resources)', total_images;
     RAISE NOTICE '';
 
     IF admin_user_exists THEN
@@ -372,6 +294,8 @@ BEGIN
     RAISE NOTICE '   2. Supabase Auth dashboard';
     RAISE NOTICE '   3. Auth API calls';
     RAISE NOTICE '';
-    RAISE NOTICE '🚀 Your application is ready with realistic sample data!';
+    RAISE NOTICE '🚀 Your application is ready with clean sample data!';
+    RAISE NOTICE '   ✨ No placeholder images - perfect for development';
+    RAISE NOTICE '   🎯 Add your own images through the application UI';
     RAISE NOTICE '';
 END $$;

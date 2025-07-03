@@ -1,6 +1,5 @@
 import React from 'react'
 import {
-  Shield,
   User,
   CheckCircle,
   XCircle,
@@ -12,7 +11,8 @@ import {
   Lock,
   Zap,
   Package,
-  Sparkles
+  Gavel,
+  Shield
 } from 'lucide-react'
 import { cn } from '../../utils/theme'
 import { type BadgeVariant, getLabel, getBadgeStyle } from '../../constants/general'
@@ -47,12 +47,12 @@ const Badge: React.FC<BadgeProps> = ({
 
     switch (variant) {
     // User Roles
-    case 'super_admin':
-      return <Sparkles className={iconSize} />
+    case 'moderator':
+      return <Gavel className={iconSize} aria-label="Moderator" />
     case 'admin':
-      return <Shield className={iconSize} />
+      return <Shield className={iconSize} aria-label="Admin" />
     case 'user':
-      return <User className={iconSize} />
+      return <User className={iconSize} aria-label="User" />
 
       // User Statuses
     case 'active':

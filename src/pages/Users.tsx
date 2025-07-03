@@ -5,7 +5,7 @@ import { useUsersFiltering } from '../hooks/useUsersFiltering'
 import { usePermissions } from '../hooks/usePermissions'
 import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
 import { FilterDropdown, UsersTable, UsersStats, Modal, TabNavigation, PaginationSelector, Input } from '../components'
-import { UserForm, PermissionManager } from '../components/features/users'
+import { UserForm } from '../components/features/users'
 import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
 import { USER_ROLES } from '../constants/general'
@@ -23,7 +23,7 @@ const Users: React.FC = () => {
   const { t } = usePageTranslation() // Page-specific content
   const { t: tCommon } = useTranslation() // Common actions and terms
   const { users, loading, createUser, updateUser, deleteUser, isDeleting } = useUsers()
-  const { isSuperAdmin } = usePermissions()
+  const { isAdmin } = usePermissions()
 
   // Use the filtering hook for all business logic
   const {
@@ -43,7 +43,6 @@ const Users: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<DatabaseUser | null>(null)
-  const [managingPermissionsFor, setManagingPermissionsFor] = useState<DatabaseUser | null>(null)
 
   // Confirm dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -82,10 +81,10 @@ const Users: React.FC = () => {
         descriptionKey: 'users.administratorUsers'
       },
       {
-        id: USER_ROLES.SUPER_ADMIN,
-        labelKey: 'users.superAdmins',
+        id: USER_ROLES.MODERATOR,
+        labelKey: 'users.moderators',
         count: 0,
-        descriptionKey: 'users.superAdministratorUsers'
+        descriptionKey: 'users.moderatorUsers'
       }
     ]
 
@@ -187,7 +186,7 @@ const Users: React.FC = () => {
     { value: 'all', label: tCommon('general.all') },
     { value: 'user', label: tCommon('roles.user') },
     { value: 'admin', label: tCommon('roles.admin') },
-    { value: 'super_admin', label: tCommon('roles.superAdmin') }
+    { value: 'moderator', label: tCommon('roles.moderator') }
   ]
 
   if (loading) {
@@ -209,7 +208,7 @@ const Users: React.FC = () => {
               {t('users.description')}
             </p>
           </div>
-          {isSuperAdmin() && (
+          {isAdmin() && (
             <div className='mt-4 sm:mt-0 flex items-center space-x-3'>
               <button
                 onClick={() => setIsModalOpen(true)}
@@ -267,9 +266,8 @@ const Users: React.FC = () => {
             {/* Table */}
             <UsersTable
               users={paginatedUsers}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onManagePermissions={setManagingPermissionsFor}
+                          onEdit={handleEdit}
+            onDelete={handleDelete}
               onSort={handleSort}
               sortColumn={filterState.sortColumn}
               sortDirection={filterState.sortDirection}
@@ -369,22 +367,7 @@ const Users: React.FC = () => {
           <UserForm user={editingUser} onSubmit={handleSubmit} onCancel={handleCloseModal} />
         </Modal>
 
-        {/* Modal for managing permissions */}
-        {managingPermissionsFor && (
-          <Modal
-            isOpen={!!managingPermissionsFor}
-            onClose={() => setManagingPermissionsFor(null)}
-            title={t('users.managePermissionsTitle', {
-              userName: managingPermissionsFor.full_name || managingPermissionsFor.email
-            })}
-          >
-            <PermissionManager
-              user={managingPermissionsFor}
-              onClose={() => setManagingPermissionsFor(null)}
-              isSuperAdmin={isSuperAdmin()}
-            />
-          </Modal>
-        )}
+
 
         {/* Confirm dialog for deleting users */}
         <ConfirmDialog

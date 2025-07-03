@@ -246,8 +246,8 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({
             <InfoItem
               label={t('audits.role')}
               value={
-                <Badge variant={auditLog.user_role as 'super_admin' | 'admin'} showIcon>
-                  {auditLog.user_role === 'super_admin' ? t('audits.superAdmin') : t('audits.admin')}
+                <Badge variant={auditLog.user_role as 'moderator' | 'admin'} showIcon>
+                  {auditLog.user_role === 'moderator' ? t('audits.moderator') : t('audits.admin')}
                 </Badge>
               }
               icon={Tag}

@@ -1,10 +1,10 @@
 import React from 'react'
-import { Edit2, Trash2, Key, Calendar, Clock, User } from 'lucide-react'
+import { Edit2, Trash2, Calendar, Clock, User } from 'lucide-react'
 import { Table } from '../../../components/molecules'
 import { Badge } from '../../../components/atoms'
 import { RecordImage } from '../../../components/features/images'
 import { usePageTranslation, useTranslation } from '../../../hooks/useTranslation'
-import { usePermissions } from '../../../hooks/usePermissions'
+
 import { getTypographyClasses, getIconClasses, cn } from '../../../utils/theme'
 import { formatDateDisplay } from '../../../utils/format'
 import type { DatabaseUser } from '../../../types'
@@ -13,7 +13,6 @@ interface UsersTableProps {
   users: DatabaseUser[]
   onEdit: (user: DatabaseUser) => void
   onDelete: (user: DatabaseUser) => void
-  onManagePermissions: (user: DatabaseUser) => void
   onSort: (column: keyof DatabaseUser) => void
   sortColumn: keyof DatabaseUser | null
   sortDirection: 'asc' | 'desc'
@@ -23,14 +22,13 @@ const UsersTable: React.FC<UsersTableProps> = ({
   users,
   onEdit,
   onDelete,
-  onManagePermissions,
   onSort,
   sortColumn,
   sortDirection
 }) => {
   const { t } = usePageTranslation()
   const { t: tCommon } = useTranslation()
-  const { isSuperAdmin } = usePermissions()
+
 
   const columns = [
     {
@@ -78,8 +76,8 @@ const UsersTable: React.FC<UsersTableProps> = ({
               </div>
               <div className={cn(getTypographyClasses('small'), 'truncate')}>{value as string}</div>
               <div className='flex items-center space-x-2 mt-1'>
-                <Badge variant={row.role as 'admin' | 'user' | 'super_admin'} size='sm' showIcon>
-                  {tCommon(row.role === 'super_admin' ? 'roles.superAdmin' : `roles.${row.role}`)}
+                <Badge variant={row.role as 'admin' | 'moderator' | 'user'} size='sm' showIcon>
+                  {tCommon(`roles.${row.role}`)}
                 </Badge>
               </div>
             </div>
@@ -134,15 +132,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
           >
             <Edit2 className={getIconClasses('action')} />
           </button>
-          {isSuperAdmin() && row.role !== 'user' && (
-            <button
-              onClick={() => onManagePermissions(row)}
-              className='p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors'
-              title={t('users.managePermissions')}
-            >
-              <Key className={getIconClasses('action')} />
-            </button>
-          )}
+
           <button
             onClick={() => onDelete(row)}
             className='p-2 text-gray-600 dark:text-gray-300 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors'

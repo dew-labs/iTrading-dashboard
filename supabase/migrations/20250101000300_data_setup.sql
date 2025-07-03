@@ -14,7 +14,7 @@
 
 -- Insert default permissions for different roles
 INSERT INTO role_permissions (role, resource, action) VALUES
--- User role permissions (read-only access to most content)
+-- User role permissions (read-only access to most content - users sign up themselves)
 ('user', 'posts', 'read'),
 ('user', 'products', 'read'),
 ('user', 'brokers', 'read'),
@@ -24,7 +24,31 @@ INSERT INTO role_permissions (role, resource, action) VALUES
 ('user', 'user_notifications', 'create'),
 ('user', 'user_notifications', 'update'),
 
--- Admin role permissions (full CRUD on content, limited user management)
+-- Moderator role permissions (CRUD on posts, banners, brokers + view users - can be invited)
+('moderator', 'posts', 'read'),
+('moderator', 'posts', 'create'),
+('moderator', 'posts', 'update'),
+('moderator', 'posts', 'delete'),
+('moderator', 'banners', 'read'),
+('moderator', 'banners', 'create'),
+('moderator', 'banners', 'update'),
+('moderator', 'banners', 'delete'),
+('moderator', 'brokers', 'read'),
+('moderator', 'brokers', 'create'),
+('moderator', 'brokers', 'update'),
+('moderator', 'brokers', 'delete'),
+('moderator', 'users', 'read'),
+('moderator', 'products', 'read'),
+('moderator', 'notifications', 'read'),
+('moderator', 'user_notifications', 'read'),
+('moderator', 'user_notifications', 'create'),
+('moderator', 'user_notifications', 'update'),
+('moderator', 'images', 'read'),
+('moderator', 'images', 'create'),
+('moderator', 'images', 'update'),
+('moderator', 'images', 'delete'),
+
+-- Admin role permissions (full access to everything - can be invited)
 ('admin', 'posts', 'read'),
 ('admin', 'posts', 'create'),
 ('admin', 'posts', 'update'),
@@ -42,7 +66,17 @@ INSERT INTO role_permissions (role, resource, action) VALUES
 ('admin', 'banners', 'update'),
 ('admin', 'banners', 'delete'),
 ('admin', 'users', 'read'),
+('admin', 'users', 'create'),
 ('admin', 'users', 'update'),
+('admin', 'users', 'delete'),
+('admin', 'user_permissions', 'read'),
+('admin', 'user_permissions', 'create'),
+('admin', 'user_permissions', 'update'),
+('admin', 'user_permissions', 'delete'),
+('admin', 'role_permissions', 'read'),
+('admin', 'role_permissions', 'create'),
+('admin', 'role_permissions', 'update'),
+('admin', 'role_permissions', 'delete'),
 ('admin', 'notifications', 'read'),
 ('admin', 'notifications', 'create'),
 ('admin', 'notifications', 'update'),
@@ -54,49 +88,7 @@ INSERT INTO role_permissions (role, resource, action) VALUES
 ('admin', 'images', 'read'),
 ('admin', 'images', 'create'),
 ('admin', 'images', 'update'),
-('admin', 'images', 'delete'),
-
--- Super admin role permissions (full access to everything)
-('super_admin', 'posts', 'read'),
-('super_admin', 'posts', 'create'),
-('super_admin', 'posts', 'update'),
-('super_admin', 'posts', 'delete'),
-('super_admin', 'products', 'read'),
-('super_admin', 'products', 'create'),
-('super_admin', 'products', 'update'),
-('super_admin', 'products', 'delete'),
-('super_admin', 'brokers', 'read'),
-('super_admin', 'brokers', 'create'),
-('super_admin', 'brokers', 'update'),
-('super_admin', 'brokers', 'delete'),
-('super_admin', 'banners', 'read'),
-('super_admin', 'banners', 'create'),
-('super_admin', 'banners', 'update'),
-('super_admin', 'banners', 'delete'),
-('super_admin', 'users', 'read'),
-('super_admin', 'users', 'create'),
-('super_admin', 'users', 'update'),
-('super_admin', 'users', 'delete'),
-('super_admin', 'user_permissions', 'read'),
-('super_admin', 'user_permissions', 'create'),
-('super_admin', 'user_permissions', 'update'),
-('super_admin', 'user_permissions', 'delete'),
-('super_admin', 'role_permissions', 'read'),
-('super_admin', 'role_permissions', 'create'),
-('super_admin', 'role_permissions', 'update'),
-('super_admin', 'role_permissions', 'delete'),
-('super_admin', 'notifications', 'read'),
-('super_admin', 'notifications', 'create'),
-('super_admin', 'notifications', 'update'),
-('super_admin', 'notifications', 'delete'),
-('super_admin', 'user_notifications', 'read'),
-('super_admin', 'user_notifications', 'create'),
-('super_admin', 'user_notifications', 'update'),
-('super_admin', 'user_notifications', 'delete'),
-('super_admin', 'images', 'read'),
-('super_admin', 'images', 'create'),
-('super_admin', 'images', 'update'),
-('super_admin', 'images', 'delete')
+('admin', 'images', 'delete')
 ON CONFLICT (role, resource, action) DO NOTHING;
 
 -- ===============================================
@@ -112,7 +104,7 @@ BEGIN
   -- Try to find the first admin user
   SELECT id INTO admin_user_id
   FROM users
-  WHERE role IN ('admin', 'super_admin')
+  WHERE role = 'admin'
   ORDER BY created_at
   LIMIT 1;
 
@@ -152,7 +144,7 @@ BEGIN
     -- Get admin user for authorship
     SELECT id INTO admin_user_id
     FROM users
-    WHERE role IN ('admin', 'super_admin')
+    WHERE role = 'admin'
     ORDER BY created_at
     LIMIT 1;
 
@@ -234,7 +226,7 @@ BEGIN
   SELECT count(*) INTO total_brokers FROM brokers;
   SELECT count(*) INTO total_banners FROM banners;
   SELECT count(*) INTO total_permissions FROM role_permissions;
-  SELECT count(*) INTO admin_users FROM users WHERE role IN ('admin', 'super_admin');
+  SELECT count(*) INTO admin_users FROM users WHERE role = 'admin';
 
   -- Generate report
   RAISE NOTICE '';

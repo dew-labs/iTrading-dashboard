@@ -68,7 +68,7 @@ const updateLastLoginMutation = async (id: string): Promise<void> => {
 
 export const useUsers = () => {
   const queryClient = useQueryClient()
-  const { can, isSuperAdmin } = usePermissions()
+  const { can, isAdmin } = usePermissions()
   const toast = useToast()
 
   // Main query for users list
@@ -95,7 +95,7 @@ export const useUsers = () => {
   // Create user mutation - restricted to super admins only
   const createMutation = useMutation({
     mutationFn: async (user: UserInsert) => {
-      if (!isSuperAdmin()) {
+      if (!isAdmin()) {
         throw new Error('Only super admins can create users')
       }
 

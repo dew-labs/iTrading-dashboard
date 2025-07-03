@@ -8,7 +8,7 @@
  *    const adminUsers = users.filter(u => u.role === USER_ROLES.ADMIN)
  *
  * 2. In Badge components:
- *    <Badge variant={USER_ROLES.SUPER_ADMIN} />
+ *    <Badge variant={USER_ROLES.MODERATOR} />
  *
  * 3. In conditionals:
  *    if (user.status === USER_STATUSES.ACTIVE) { ... }
@@ -19,8 +19,8 @@
 
 // User Roles
 export const USER_ROLES = {
-  SUPER_ADMIN: 'super_admin',
   ADMIN: 'admin',
+  MODERATOR: 'moderator',
   USER: 'user'
 } as const
 
@@ -89,8 +89,8 @@ export type BadgeVariant = (typeof ALL_BADGE_VARIANTS)[keyof typeof ALL_BADGE_VA
 // Labels mapping for display
 export const LABELS = {
   // User Roles
-  [USER_ROLES.SUPER_ADMIN]: 'Super Admin',
   [USER_ROLES.ADMIN]: 'Admin',
+  [USER_ROLES.MODERATOR]: 'Moderator',
   [USER_ROLES.USER]: 'User',
 
   // User Statuses
@@ -117,12 +117,12 @@ export const LABELS = {
 // Color schemes for different variants with light and dark theme support
 export const BADGE_STYLES = {
   // User Roles
-  [USER_ROLES.SUPER_ADMIN]: {
+  [USER_ROLES.ADMIN]: {
     background: 'bg-purple-100 dark:bg-purple-900/30',
     text: 'text-purple-800 dark:text-purple-300',
     border: 'border-purple-200 dark:border-purple-700/50'
   },
-  [USER_ROLES.ADMIN]: {
+  [USER_ROLES.MODERATOR]: {
     background: 'bg-blue-100 dark:bg-blue-900/30',
     text: 'text-blue-800 dark:text-blue-300',
     border: 'border-blue-200 dark:border-blue-700/50'

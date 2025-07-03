@@ -203,7 +203,7 @@ FOR INSERT WITH CHECK (
   AND EXISTS (
     SELECT 1 FROM public.users
     WHERE id = auth.uid()
-    AND role IN ('admin', 'super_admin')
+    AND role = 'admin'
   )
 );
 
@@ -222,7 +222,7 @@ FOR UPDATE USING (
   AND EXISTS (
     SELECT 1 FROM public.users
     WHERE id = auth.uid()
-    AND role IN ('admin', 'super_admin')
+    AND role = 'admin'
   )
 );
 
@@ -241,7 +241,7 @@ FOR DELETE USING (
   AND EXISTS (
     SELECT 1 FROM public.users
     WHERE id = auth.uid()
-    AND role IN ('admin', 'super_admin')
+    AND role = 'admin'
   )
 );
 

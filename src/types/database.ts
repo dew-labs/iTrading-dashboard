@@ -450,7 +450,7 @@ export type Database = {
     Enums: {
       post_status: "draft" | "published"
       post_type: "news" | "event" | "terms_of_use" | "privacy_policy"
-      user_role: "user" | "admin" | "super_admin"
+      user_role: "user" | "moderator" | "admin"
       user_status: "invited" | "active" | "inactive" | "suspended"
     }
     CompositeTypes: {
@@ -572,7 +572,7 @@ export const Constants = {
     Enums: {
       post_status: ["draft", "published"],
       post_type: ["news", "event", "terms_of_use", "privacy_policy"],
-      user_role: ["user", "admin", "super_admin"],
+      user_role: ["user", "moderator", "admin"],
       user_status: ["invited", "active", "inactive", "suspended"],
     },
   },

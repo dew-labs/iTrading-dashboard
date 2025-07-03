@@ -149,11 +149,11 @@
   },
   "roles": {
     "user": "Usuário",
+    "moderator": "Moderador",
     "admin": "Administrador",
-    "superAdmin": "Super Administrador",
-    "userRoleDescription": "Acesso padrão com permissões básicas",
-    "adminRoleDescription": "Acesso aprimorado com recursos de gerenciamento",
-    "superAdminRoleDescription": "Controle completo do sistema e gerenciamento de usuários"
+    "userRoleDescription": "Acesso padrão com permissões básicas (somente leitura)",
+    "moderatorRoleDescription": "Capacidades de gerenciamento de conteúdo para posts, banners e corretoras",
+    "adminRoleDescription": "Controle completo do sistema e gerenciamento de usuários"
   },
   "permissions": {
     "read": "Ler",
@@ -161,41 +161,7 @@
     "update": "Atualizar",
     "delete": "Excluir"
   },
-  "permissionModal": {
-    "accessRestricted": "Acesso Restrito",
-    "onlySuperAdminsCanManage": "Apenas super administradores podem gerenciar permissões",
-    "roleBasedPermissions": "Permissões Baseadas em Função",
-    "regularUsersReadOnly": "Usuários regulares têm acesso apenas de leitura a todos os recursos por padrão. Apenas administradores podem ter permissões adicionais.",
-    "userInheritsPermissions": "Os usuários também herdam permissões de sua função ({{role}}). Permissões personalizadas são adicionais às permissões baseadas em função.",
-    "addPermission": "Adicionar Permissão",
-    "grantPermission": "Conceder Permissão",
-    "revokePermission": "Revogar permissão",
-    "customPermissions": "Permissões Personalizadas",
-    "noCustomPermissions": "Nenhuma permissão personalizada atribuída",
-    "addPermissionsToCustomize": "Adicione permissões personalizadas para substituir ou estender o acesso baseado em função.",
-    "allPermissionsGranted": "Todas as Permissões Concedidas",
-    "userHasAllAvailablePermissions": "Este usuário tem todas as permissões de leitura disponíveis",
-    "userHasAllPossiblePermissions": "Este usuário tem todas as permissões possíveis para cada recurso",
-    "resource": "Recurso",
-    "action": "Ação",
-    "permissionAlreadyExists": "A permissão já existe",
-    "failedToLoadPermissions": "Falha ao carregar permissões",
-    "permissionGrantedSuccessfully": "Permissão concedida com sucesso",
-    "permissionRevokedSuccessfully": "Permissão revogada com sucesso",
-    "pleaseSelectResource": "Por favor, selecione um recurso",
-    "permissionPosts": "Posts",
-    "permissionProducts": "Produtos",
-    "permissionBanners": "Banners",
-    "permissionBrokers": "Corretores",
-    "permissionUsers": "Usuários",
-    "permissionNotifications": "Notificações",
-    "permissionPermissions": "Permissões",
-    "permissionProfile": "Perfil",
-    "permissionImages": "Imagens",
-    "permissionUserPermissions": "Permissões de Usuário",
-    "permissionRolePermissions": "Permissões de Função",
-    "permissionUserNotifications": "Notificações de Usuário"
-  },
+
   "userForm": {
     "basicInformation": "Informações Básicas",
     "userRolePermissions": "Função do Usuário e Permissões",
@@ -305,11 +271,11 @@
   "pendingInvites": "Convites Pendentes",
   "allUsers": "Todos os Usuários",
   "admins": "Administradores",
-  "superAdmins": "Super Administradores",
+
   "allRegisteredUsers": "Todos os usuários registrados",
   "regularUsers": "Usuários regulares",
   "administratorUsers": "Usuários administradores",
-  "superAdministratorUsers": "Usuários super administradores",
+
   "userDetails": "Detalhes do Usuário",
   "loginDates": "Login e Datas",
   "noName": "Sem nome",
@@ -333,7 +299,7 @@
   "allTypes": "Todos os Tipos",
   "invited": "Convidado",
   "suspended": "Suspenso",
-  "superAdmin": "Super Administrador",
+
   "admin": "Administrador",
   "user": "Usuário",
   "usersTab": "Usuários",
@@ -342,7 +308,7 @@
 
   "userRoleDescription": "Acesso padrão com permissões básicas",
   "adminRoleDescription": "Acesso aprimorado com recursos de gerenciamento",
-  "superAdminRoleDescription": "Controle completo do sistema e gerenciamento de usuários",
+
   "subscription": "Assinatura",
   "oneTime": "Único",
   "news": "Notícias",

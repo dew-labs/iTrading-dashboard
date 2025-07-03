@@ -38,7 +38,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = memo(
     // Check role-based access
     if (requiredRole && !hasRole(requiredRole)) {
       // If user doesn't have the required role, check if they're an admin
-      if (requiredRole !== 'super_admin' && (hasRole('admin') || hasRole('super_admin'))) {
+      if (requiredRole !== 'admin' && hasRole('admin')) {
         // Admins and super admins can access most things
       } else {
         return <Navigate to='/unauthorized' replace />

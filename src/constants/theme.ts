@@ -301,7 +301,7 @@ export const PATTERNS = {
   roleBadges: {
     user: COMPONENTS.badge.gray,
     admin: COMPONENTS.badge.purple,
-    super_admin: COMPONENTS.badge.error
+    moderator: COMPONENTS.badge.warning
   },
 
   // Feature color mapping

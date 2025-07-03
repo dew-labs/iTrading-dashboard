@@ -28,7 +28,7 @@ END $$;
 -- Create custom types
 CREATE TYPE post_type AS ENUM ('news', 'event', 'terms_of_use', 'privacy_policy');
 CREATE TYPE post_status AS ENUM ('draft', 'published');
-CREATE TYPE user_role AS ENUM ('user', 'admin', 'super_admin');
+CREATE TYPE user_role AS ENUM ('user', 'moderator', 'admin');
 CREATE TYPE user_status AS ENUM ('invited', 'active', 'inactive', 'suspended');
 
 -- ===============================================

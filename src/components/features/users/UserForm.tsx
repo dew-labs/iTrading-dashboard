@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from 'react'
-import { User, Shield, Sparkles, X, Save, Mail, Camera } from 'lucide-react'
+import { User, Shield, X, Save, Mail, Camera, Gavel } from 'lucide-react'
 import type { DatabaseUser, UserInsert, UserRole } from '../../../types'
 import { usePermissions } from '../../../hooks/usePermissions'
 import { useTranslation, useFormTranslation } from '../../../hooks/useTranslation'
@@ -30,7 +30,7 @@ interface UserFormProps {
 const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
   const { t } = useTranslation()
   const { t: tForm } = useFormTranslation()
-  const { isSuperAdmin } = usePermissions()
+  const { isAdmin } = usePermissions()
 
   // Memoize initial data to prevent re-renders
   const initialData = useMemo(() => ({
@@ -83,20 +83,20 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
       icon: <User className='w-4 h-4' />
     },
     {
-      value: USER_ROLES.ADMIN,
-      label: t('roles.admin'),
-      icon: <Shield className='w-4 h-4' />
+      value: USER_ROLES.MODERATOR,
+      label: t('roles.moderator'),
+      icon: <Gavel className='w-4 h-4' />
     },
-    ...(isSuperAdmin()
+    ...(isAdmin()
       ? [
         {
-          value: USER_ROLES.SUPER_ADMIN,
-          label: t('roles.superAdmin'),
-          icon: <Sparkles className='w-4 h-4' />
+          value: USER_ROLES.ADMIN,
+          label: t('roles.admin'),
+          icon: <Shield className='w-4 h-4' />
         }
       ]
       : [])
-  ], [t, isSuperAdmin])
+  ], [t, isAdmin])
 
   const handleFormSubmit = useCallback((data: typeof formData) => {
     onSubmit(data)
@@ -187,7 +187,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
           placeholder={tForm('placeholders.userPhone')}
           disabled={isValidating}
           {...(errors.phone && { error: errors.phone })}
-          helperText={t('userForm.phoneOptional')}
+          helperText={t('userForm.phoneHelpText')}
         />
 
         <Select

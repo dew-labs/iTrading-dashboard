@@ -112,7 +112,7 @@ export const BADGE_VARIANTS = {
     user: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800',
     admin:
       'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800',
-    super_admin:
+    moderator:
       'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800'
   },
 
@@ -226,7 +226,7 @@ export const FILTER_OPTIONS = {
   // User role filters
   userRole: [
     { value: 'all', labelKey: 'allRoles' },
-    { value: 'super_admin', labelKey: 'superAdmin' },
+    { value: 'moderator', labelKey: 'moderator' },
     { value: 'admin', labelKey: 'admin' },
     { value: 'user', labelKey: 'user' }
   ],

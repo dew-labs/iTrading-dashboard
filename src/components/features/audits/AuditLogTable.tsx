@@ -92,8 +92,8 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
             {value as string || t('audits.unknown')}
           </div>
           {row.user_role && (
-            <Badge variant={row.user_role as 'super_admin' | 'admin'} size="sm" showIcon>
-              {row.user_role === 'super_admin' ? t('audits.superAdmin') : t('audits.admin')}
+                            <Badge variant={row.user_role as 'moderator' | 'admin'} size="sm" showIcon>
+                  {row.user_role === 'moderator' ? t('audits.moderator') : t('audits.admin')}
             </Badge>
           )}
         </div>

@@ -12,7 +12,7 @@ export interface AuditFilters {
   date_from?: string
   date_to?: string
   search?: string
-  user_role?: 'admin' | 'super_admin'
+  user_role?: 'admin' | 'moderator'
 }
 
 export interface AuditStats {

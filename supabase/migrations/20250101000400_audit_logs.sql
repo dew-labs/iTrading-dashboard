@@ -69,19 +69,19 @@ CREATE POLICY "Admins can view all audit logs"
     EXISTS (
       SELECT 1 FROM users
       WHERE id = auth.uid()
-      AND role IN ('admin', 'super_admin')
+      AND role = 'admin'
     )
   );
 
--- Super admins can manage audit logs (delete old ones, etc.)
-CREATE POLICY "Super admins can manage audit logs"
+-- Admins can manage audit logs (delete old ones, etc.)
+CREATE POLICY "Admins can manage audit logs"
   ON audit_logs FOR ALL
   TO authenticated
   USING (
     EXISTS (
       SELECT 1 FROM users
       WHERE id = auth.uid()
-      AND role = 'super_admin'
+      AND role = 'admin'
     )
   );
 
@@ -105,8 +105,8 @@ BEGIN
   FROM users
   WHERE id = auth.uid();
 
-  -- Only audit if user is admin or super_admin
-  IF current_user_record.role NOT IN ('admin', 'super_admin') THEN
+  -- Only audit if user is admin or moderator
+  IF current_user_record.role NOT IN ('admin', 'moderator') THEN
     RETURN COALESCE(NEW, OLD);
   END IF;
 
@@ -317,19 +317,16 @@ GRANT EXECUTE ON FUNCTION get_audit_stats() TO authenticated;
 
 -- Add audit permissions to role_permissions table
 INSERT INTO role_permissions (role, resource, action) VALUES
--- Admin can view audit logs
+-- Admin can view and manage audit logs
 ('admin', 'audit_logs', 'read'),
-
--- Super admin can manage audit logs
-('super_admin', 'audit_logs', 'read'),
-('super_admin', 'audit_logs', 'delete')
+('admin', 'audit_logs', 'delete')
 ON CONFLICT (role, resource, action) DO NOTHING;
 
 -- ===============================================
 -- TABLE COMMENTS
 -- ===============================================
 
-COMMENT ON TABLE audit_logs IS 'Comprehensive audit trail for admin and super admin activities';
+COMMENT ON TABLE audit_logs IS 'Comprehensive audit trail for admin and moderator activities';
 COMMENT ON COLUMN audit_logs.user_id IS 'User who performed the action';
 COMMENT ON COLUMN audit_logs.user_email IS 'Email of user who performed the action (for historical record)';
 COMMENT ON COLUMN audit_logs.user_role IS 'Role of user at time of action';
@@ -358,7 +355,7 @@ BEGIN
   RAISE NOTICE '✅ Proper permissions and RLS configured';
   RAISE NOTICE '';
   RAISE NOTICE '📋 Features:';
-  RAISE NOTICE '  • Tracks admin/super admin activities';
+  RAISE NOTICE '  • Tracks admin/moderator activities';
   RAISE NOTICE '  • Records before/after values';
   RAISE NOTICE '  • Identifies changed fields';
   RAISE NOTICE '  • Provides detailed statistics';

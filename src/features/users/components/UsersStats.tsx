@@ -26,7 +26,7 @@ const UsersStats: React.FC<UsersStatsProps> = ({ users }) => {
     const activeUsers = users.filter(u => u.status === USER_STATUSES.ACTIVE).length
     const invitedUsers = users.filter(u => u.status === USER_STATUSES.INVITED).length
     const adminUsers = users.filter(
-      u => u.role === USER_ROLES.ADMIN || u.role === USER_ROLES.SUPER_ADMIN
+      u => u.role === USER_ROLES.ADMIN
     ).length
 
     return {

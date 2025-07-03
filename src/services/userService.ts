@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase'
-import type { UserRole, Permission, DatabaseUser } from '../types'
+import type { UserRole, DatabaseUser } from '../types'
 
 /**
  * Generate a secure temporary password
@@ -208,100 +208,7 @@ export const grantDefaultPermissions = async (
   }
 }
 
-/**
- * Grant a specific permission to a user
- */
-export const grantPermission = async (
-  userId: string,
-  resource: string,
-  action: string
-): Promise<{success: boolean; error?: string}> => {
-  try {
-    const { error } = await supabase
-      .from('user_permissions')
-      .insert({ user_id: userId, resource, action })
 
-    if (error) throw error
-
-    return { success: true }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Failed to grant permission'
-    return { success: false, error: errorMessage }
-  }
-}
-
-/**
- * Revoke a specific permission from a user
- */
-export const revokePermission = async (
-  userId: string,
-  resource: string,
-  action: string
-): Promise<{success: boolean; error?: string}> => {
-  try {
-    const { error } = await supabase
-      .from('user_permissions')
-      .delete()
-      .match({ user_id: userId, resource, action })
-
-    if (error) throw error
-
-    return { success: true }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Failed to revoke permission'
-    return { success: false, error: errorMessage }
-  }
-}
-
-/**
- * Get all permissions for a user (optimized with single query)
- */
-export const getUserPermissions = async (userId: string): Promise<Permission[]> => {
-  try {
-    // Get user's role and permissions in a single optimized query
-    const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', userId)
-      .single()
-
-    if (userError) throw userError
-
-    // Use parallel queries for better performance
-    const [rolePermissionsResult, userPermissionsResult] = await Promise.all([
-      // Get role-based permissions
-      supabase
-        .from('role_permissions')
-        .select('resource, action')
-        .eq('role', userData.role),
-
-      // Get user-specific permissions
-      supabase
-        .from('user_permissions')
-        .select('resource, action')
-        .eq('user_id', userId)
-    ])
-
-    if (rolePermissionsResult.error) throw rolePermissionsResult.error
-    if (userPermissionsResult.error) throw userPermissionsResult.error
-
-    // Combine and deduplicate permissions
-    const allPermissions = [
-      ...(rolePermissionsResult.data || []),
-      ...(userPermissionsResult.data || [])
-    ]
-
-    const uniquePermissions = allPermissions.filter(
-      (perm, index, self) =>
-        index === self.findIndex(p => p.resource === perm.resource && p.action === perm.action)
-    )
-
-    return uniquePermissions
-  } catch (error) {
-    console.error('Error fetching user permissions:', error)
-    return []
-  }
-}
 
 /**
  * Bulk update user status
