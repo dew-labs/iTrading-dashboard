@@ -46,7 +46,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
   const initialData = useMemo(() => ({
     name: '',
     target_url: '',
-    is_active: false
+    is_visible: false
   }), [])
 
   // Enhanced form validation with our new hook
@@ -99,7 +99,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
       reset({
         name: banner.name || '',
         target_url: banner.target_url || '',
-        is_active: !!banner.is_active
+        is_visible: !!banner.is_visible
       })
     }
   }, [banner, reset])
@@ -411,30 +411,30 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
           <div className='flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded-lg h-[42px]'>
             <div className='flex items-center space-x-3'>
               <span className='text-sm text-gray-700 dark:text-gray-300'>
-                {formData.is_active ? 'Active' : 'Inactive'}
+                {formData.is_visible ? 'Active' : 'Inactive'}
               </span>
               <button
                 type='button'
-                onClick={() => updateField('is_active', !formData.is_active)}
+                onClick={() => updateField('is_visible', !formData.is_visible)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400 focus:ring-offset-2 ${
-                  formData.is_active
+                  formData.is_visible
                     ? 'bg-teal-600 dark:bg-teal-500'
                     : 'bg-gray-200 dark:bg-gray-600'
                 }`}
                 role='switch'
-                aria-checked={!!formData.is_active}
+                aria-checked={!!formData.is_visible}
                 aria-labelledby='banner-status-label'
               >
                 <span
                   className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    formData.is_active ? 'translate-x-6' : 'translate-x-1'
+                    formData.is_visible ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
               </button>
             </div>
           </div>
           <p className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
-            {formData.is_active ? 'Banner is visible to users' : 'Banner is hidden'}
+            {formData.is_visible ? 'Banner is visible to users' : 'Banner is hidden'}
           </p>
         </div>
       </div>

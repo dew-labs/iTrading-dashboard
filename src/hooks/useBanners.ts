@@ -60,7 +60,7 @@ export const useBanners = () => {
         id: crypto.randomUUID(), // Temporary ID
         name: newBanner.name || 'New Banner',
         target_url: newBanner.target_url || null,
-        is_active: newBanner.is_active || false,
+        is_visible: newBanner.is_visible || false,
         created_at: new Date().toISOString()
       }
 

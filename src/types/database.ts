@@ -97,21 +97,21 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
-          is_active: boolean | null
+          is_visible: boolean | null
           name: string
           target_url: string | null
         }
         Insert: {
           created_at?: string | null
           id?: string
-          is_active?: boolean | null
+          is_visible?: boolean | null
           name: string
           target_url?: string | null
         }
         Update: {
           created_at?: string | null
           id?: string
-          is_active?: boolean | null
+          is_visible?: boolean | null
           name?: string
           target_url?: string | null
         }
@@ -126,6 +126,7 @@ export type Database = {
           id: number
           logo_url: string | null
           name: string
+          is_visible: boolean
         }
         Insert: {
           created_at?: string | null
@@ -135,6 +136,7 @@ export type Database = {
           id?: never
           logo_url?: string | null
           name: string
+          is_visible?: boolean
         }
         Update: {
           created_at?: string | null
@@ -144,6 +146,7 @@ export type Database = {
           id?: never
           logo_url?: string | null
           name?: string
+          is_visible?: boolean
         }
         Relationships: []
       }
@@ -227,6 +230,8 @@ export type Database = {
           title: string
           type: Database["public"]["Enums"]["post_type"]
           views: number
+          is_visible: boolean
+          reading_time: number | null
         }
         Insert: {
           author_id?: string | null
@@ -239,6 +244,8 @@ export type Database = {
           title: string
           type?: Database["public"]["Enums"]["post_type"]
           views?: number
+          is_visible?: boolean
+          reading_time?: number | null
         }
         Update: {
           author_id?: string | null
@@ -251,6 +258,8 @@ export type Database = {
           title?: string
           type?: Database["public"]["Enums"]["post_type"]
           views?: number
+          is_visible?: boolean
+          reading_time?: number | null
         }
         Relationships: [
           {

@@ -16,6 +16,7 @@ interface TableProps<T> {
   sortColumn?: keyof T | null
   sortDirection?: SortDirection
   onSort?: (column: keyof T) => void
+  onRowClick?: (row: T) => void
 }
 
 function Table<T extends Record<string, unknown>> ({
@@ -23,7 +24,8 @@ function Table<T extends Record<string, unknown>> ({
   columns,
   sortColumn,
   sortDirection,
-  onSort
+  onSort,
+  onRowClick
 }: TableProps<T>) {
   const handleSort = (column: Column<T>) => {
     if (column.sortable && onSort) {
@@ -97,23 +99,41 @@ function Table<T extends Record<string, unknown>> ({
                 </td>
               </tr>
             ) : (
-              data.map((row, rowIndex) => (
-                <tr
-                  key={rowIndex}
-                  className='hover:bg-gradient-to-r hover:from-gray-50/50 hover:to-transparent dark:hover:from-gray-700/20 dark:hover:to-transparent transition-all duration-200 group'
-                >
-                  {columns.map((column, colIndex) => (
-                    <td
-                      key={colIndex}
-                      className='px-8 py-6 text-sm text-gray-900 dark:text-gray-100 group-hover:text-gray-900 dark:group-hover:text-gray-100'
-                    >
-                      {column.render
-                        ? column.render(row[column.accessor], row)
-                        : String(row[column.accessor])}
-                    </td>
-                  ))}
-                </tr>
-              ))
+              data.map((row, rowIndex) => {
+                const handleRowClick = (e: React.MouseEvent) => {
+                  // Prevent row click if the target is a button or link
+                  if (
+                    (e.target as HTMLElement).closest('button, a, input, [role="button"], [role="link"]')
+                  ) return
+                  if (onRowClick) onRowClick(row)
+                }
+                return (
+                  <tr
+                    key={rowIndex}
+                    className={`hover:bg-gradient-to-r hover:from-gray-50/50 hover:to-transparent dark:hover:from-gray-700/20 dark:hover:to-transparent transition-all duration-200 group ${onRowClick ? 'cursor-pointer' : ''}`}
+                    tabIndex={onRowClick ? 0 : undefined}
+                    aria-label={onRowClick ? 'View details' : undefined}
+                    onClick={onRowClick ? handleRowClick : undefined}
+                    onKeyDown={onRowClick ? (e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        if (onRowClick) onRowClick(row)
+                      }
+                    } : undefined}
+                  >
+                    {columns.map((column, colIndex) => (
+                      <td
+                        key={colIndex}
+                        className='px-8 py-6 text-sm text-gray-900 dark:text-gray-100 group-hover:text-gray-900 dark:group-hover:text-gray-100'
+                      >
+                        {column.render
+                          ? column.render(row[column.accessor], row)
+                          : String(row[column.accessor])}
+                      </td>
+                    ))}
+                  </tr>
+                )
+              })
             )}
           </tbody>
         </table>

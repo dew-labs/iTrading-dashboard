@@ -22,8 +22,8 @@ const BannersStats: React.FC<BannersStatsProps> = ({ banners }) => {
 
   // Calculate stats
   const stats: StatsData = React.useMemo(() => {
-    const activeBanners = banners.filter(b => b.is_active).length
-    const inactiveBanners = banners.filter(b => !b.is_active).length
+    const activeBanners = banners.filter(b => b.is_visible).length
+    const inactiveBanners = banners.filter(b => !b.is_visible).length
     const activeRate = banners.length > 0 ? (activeBanners / banners.length) * 100 : 0
 
     return {

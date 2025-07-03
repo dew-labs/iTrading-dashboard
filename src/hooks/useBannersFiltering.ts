@@ -58,8 +58,8 @@ export const useBannersFiltering = ({
 
       const matchesStatus =
         filterStatus === 'all' ||
-        (filterStatus === 'active' && banner.is_active) ||
-        (filterStatus === 'inactive' && !banner.is_active)
+        (filterStatus === 'active' && banner.is_visible) ||
+        (filterStatus === 'inactive' && !banner.is_visible)
 
       return matchesSearch && matchesStatus
     })
@@ -80,9 +80,9 @@ export const useBannersFiltering = ({
         aValue = (a.target_url || '').toLowerCase()
         bValue = (b.target_url || '').toLowerCase()
         break
-      case 'is_active':
-        aValue = a.is_active ? 1 : 0
-        bValue = b.is_active ? 1 : 0
+      case 'is_visible':
+        aValue = a.is_visible ? 1 : 0
+        bValue = b.is_visible ? 1 : 0
         break
       case 'created_at':
         aValue = new Date(a.created_at || 0).getTime()

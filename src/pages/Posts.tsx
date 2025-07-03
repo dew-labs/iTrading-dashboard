@@ -164,6 +164,10 @@ const Posts: React.FC = () => {
   // Use predefined filter options from constants
   const statusOptions = [...FILTER_OPTIONS.postStatus]
 
+  const handleToggleVisible = async (post: PostWithAuthor) => {
+    await updatePost(post.id, { is_visible: !post.is_visible })
+  }
+
   if (loading) {
     return (
       <div className={layout.container}>
@@ -240,6 +244,7 @@ const Posts: React.FC = () => {
               onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              onToggleVisible={handleToggleVisible}
               sortColumn={filterState.sortColumn}
               sortDirection={filterState.sortDirection}
               onSort={handleSort}

@@ -53,8 +53,8 @@ const BannersTable: React.FC<BannersTableProps> = ({
                 {row.name || 'Untitled Banner'}
               </div>
               <div className='flex items-center space-x-2 mt-2'>
-                <Badge variant={row.is_active ? 'active' : 'inactive'} size='sm' showIcon>
-                  {tCommon(row.is_active ? 'status.active' : 'status.inactive')}
+                <Badge variant={row.is_visible ? 'active' : 'inactive'} size='sm' showIcon>
+                  {tCommon(row.is_visible ? 'status.active' : 'status.inactive')}
                 </Badge>
               </div>
             </div>
@@ -114,12 +114,12 @@ const BannersTable: React.FC<BannersTableProps> = ({
             onClick={() => onToggleStatus(row)}
             className='p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors'
             title={
-              row.is_active
+              row.is_visible
                 ? t('banners.tooltips.deactivateBanner')
                 : t('banners.tooltips.activateBanner')
             }
           >
-            {row.is_active ? (
+            {row.is_visible ? (
               <Eye className={getIconClasses('action')} />
             ) : (
               <EyeOff className={getIconClasses('action')} />

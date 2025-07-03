@@ -240,8 +240,11 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
                           <Clock className='w-4 h-4 mr-2' />
                           Read Time
                         </span>
-                        <span className='font-semibold text-gray-900 dark:text-white'>
-                          {Math.max(1, Math.ceil((post.content ? post.content.replace(/<[^>]*>/g, '').split(' ').length : 0) / 200))} min
+                        <span className='font-semibold text-gray-900 dark:text-white' aria-live='polite'>
+                          {typeof post.reading_time === 'number' && post.reading_time > 0
+                            ? post.reading_time
+                            : Math.max(1, Math.ceil((post.content ? post.content.replace(/<[^>]*>/g, '').split(' ').length : 0) / 200))
+                          } min
                         </span>
                       </div>
                     </div>

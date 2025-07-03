@@ -8,6 +8,7 @@ import { FormField } from '../../atoms'
 import { Select } from '../../molecules'
 import RichTextEditor from './RichTextEditor'
 import { MainImageUpload } from '../images'
+import { stripHtml } from '../../../utils/textUtils'
 
 // Move schema outside component to prevent re-renders
 const POST_FORM_SCHEMA = {
@@ -28,6 +29,13 @@ interface PostFormProps {
   post?: PostWithAuthor | null
   onSubmit: (data: PostInsert) => void
   onCancel: () => void
+}
+
+// Utility to calculate reading time (words/200, rounded up)
+function calculateReadingTime(content: string): number {
+  const plainText = stripHtml(content || '')
+  const words = plainText.trim().split(/\s+/).filter(Boolean).length
+  return Math.max(1, Math.ceil(words / 200))
 }
 
 const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
@@ -61,6 +69,10 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
     validateOnChange: false
   })
 
+  const [readingTime, setReadingTime] = React.useState<number>(
+    post?.reading_time ?? calculateReadingTime(post?.content ?? '')
+  )
+
   React.useEffect(() => {
     if (post) {
       reset({
@@ -72,8 +84,13 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
         thumbnail_url: post.thumbnail_url || null,
         views: post.views || 0
       })
+      setReadingTime(calculateReadingTime(post.content || ''))
     }
   }, [post, reset])
+
+  React.useEffect(() => {
+    setReadingTime(calculateReadingTime(formData.content || ''))
+  }, [formData.content])
 
   const handleContentChange = useCallback((content: string) => {
     updateField('content', content)
@@ -122,7 +139,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
   ], [])
 
   const handleFormSubmit = useCallback((data: typeof formData) => {
-    onSubmit(data as PostInsert)
+    onSubmit({ ...data, reading_time: calculateReadingTime(data.content || '') } as PostInsert)
   }, [onSubmit])
 
   return (
@@ -165,6 +182,15 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
               options={statusOptions}
               disabled={isValidating}
             />
+          </div>
+
+          {/* Reading time display */}
+          <div className='flex items-center space-x-2 mt-4' aria-live='polite'>
+            <Clock className='w-4 h-4 text-gray-500 dark:text-gray-400' aria-hidden='true' />
+            <span className='text-sm text-gray-700 dark:text-gray-300'>
+              Estimated reading time:
+            </span>
+            <span className='font-semibold text-gray-900 dark:text-white'>{readingTime} min</span>
           </div>
 
           {/* Thumbnail upload section */}

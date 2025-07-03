@@ -65,6 +65,10 @@ const Brokers: React.FC = () => {
     })
   }
 
+  const handleToggleVisible = async (broker: Broker) => {
+    await updateBroker(broker.id, { is_visible: !broker.is_visible })
+  }
+
   const handleConfirmDelete = async () => {
     if (!confirmDialog.brokerId) return
 
@@ -197,6 +201,7 @@ const Brokers: React.FC = () => {
                 onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onToggleVisible={handleToggleVisible}
                 sortColumn={filterState.sortColumn}
                 sortDirection={filterState.sortDirection}
                 onSort={handleSort}

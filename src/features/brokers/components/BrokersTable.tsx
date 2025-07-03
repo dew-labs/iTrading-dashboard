@@ -1,5 +1,5 @@
 import React from 'react'
-import { Edit2, Trash2, Eye, Building2, Calendar, FileText } from 'lucide-react'
+import { Edit2, Trash2, Eye, Building2, Calendar, FileText, EyeOff } from 'lucide-react'
 import Table from '../../../components/molecules/Table'
 import { usePageTranslation } from '../../../hooks/useTranslation'
 import { formatDateDisplay } from '../../../utils/format'
@@ -12,6 +12,7 @@ interface BrokersTableProps {
   onView: (broker: Broker) => void
   onEdit: (broker: Broker) => void
   onDelete: (broker: Broker) => void
+  onToggleVisible?: (broker: Broker) => Promise<void>
   sortColumn: keyof Broker | null
   sortDirection: 'asc' | 'desc'
   onSort: (column: keyof Broker) => void
@@ -22,11 +23,18 @@ const BrokersTable: React.FC<BrokersTableProps> = ({
   onView,
   onEdit,
   onDelete,
+  onToggleVisible,
   sortColumn,
   sortDirection,
   onSort
 }) => {
   const { t } = usePageTranslation()
+
+  const handleToggleVisible = async (broker: Broker) => {
+    if (typeof onToggleVisible === 'function') {
+      await onToggleVisible(broker)
+    }
+  }
 
   const columns = [
     {
@@ -98,11 +106,15 @@ const BrokersTable: React.FC<BrokersTableProps> = ({
       render: (value: unknown, row: Broker) => (
         <div className='flex space-x-1'>
           <button
-            onClick={() => onView(row)}
+            onClick={e => { e.stopPropagation(); handleToggleVisible(row) }}
             className='p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors'
-            title={t('brokers.tooltips.viewBroker')}
+            title={row.is_visible ? t('banners.tooltips.deactivateBanner') : t('banners.tooltips.activateBanner')}
           >
-            <Eye className={getIconClasses('action')} />
+            {row.is_visible ? (
+              <Eye className={getIconClasses('action')} />
+            ) : (
+              <EyeOff className={getIconClasses('action')} />
+            )}
           </button>
           <button
             onClick={() => onEdit(row)}
@@ -130,6 +142,7 @@ const BrokersTable: React.FC<BrokersTableProps> = ({
       sortColumn={sortColumn}
       sortDirection={sortDirection}
       onSort={onSort}
+      onRowClick={onView}
     />
   )
 }

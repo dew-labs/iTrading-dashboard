@@ -1,5 +1,5 @@
 import React from 'react'
-import { Edit2, Trash2, Eye, Clock, User, Tag } from 'lucide-react'
+import { Edit2, Trash2, Eye, Clock, User, Tag, EyeOff } from 'lucide-react'
 import Table from '../../../components/molecules/Table'
 import { Badge } from '../../../components/atoms'
 import { RecordImage } from '../../../components/features/images'
@@ -13,6 +13,7 @@ interface PostsTableProps {
   onView: (post: PostWithAuthor) => void
   onEdit: (post: PostWithAuthor) => void
   onDelete: (post: PostWithAuthor) => void
+  onToggleVisible?: (post: PostWithAuthor) => Promise<void>
   sortColumn: keyof PostWithAuthor | null
   sortDirection: 'asc' | 'desc'
   onSort: (column: keyof PostWithAuthor) => void
@@ -23,12 +24,19 @@ const PostsTable: React.FC<PostsTableProps> = ({
   onView,
   onEdit,
   onDelete,
+  onToggleVisible,
   sortColumn,
   sortDirection,
   onSort
 }) => {
   const { t } = usePageTranslation()
   const { t: tCommon } = useTranslation()
+
+  const handleToggleVisible = async (post: PostWithAuthor) => {
+    if (typeof onToggleVisible === 'function') {
+      await onToggleVisible(post)
+    }
+  }
 
   const columns = [
     {
@@ -118,11 +126,15 @@ const PostsTable: React.FC<PostsTableProps> = ({
       render: (value: unknown, row: PostWithAuthor) => (
         <div className='flex space-x-1'>
           <button
-            onClick={() => onView(row)}
+            onClick={e => { e.stopPropagation(); handleToggleVisible(row) }}
             className='p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors'
-            title={t('posts.tooltips.viewPost')}
+            title={row.is_visible ? t('banners.tooltips.deactivateBanner') : t('banners.tooltips.activateBanner')}
           >
-            <Eye className={getIconClasses('action')} />
+            {row.is_visible ? (
+              <Eye className={getIconClasses('action')} />
+            ) : (
+              <EyeOff className={getIconClasses('action')} />
+            )}
           </button>
           <button
             onClick={() => onEdit(row)}
@@ -150,6 +162,7 @@ const PostsTable: React.FC<PostsTableProps> = ({
       sortColumn={sortColumn}
       sortDirection={sortDirection}
       onSort={onSort}
+      onRowClick={onView}
     />
   )
 }

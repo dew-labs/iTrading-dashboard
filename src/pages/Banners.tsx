@@ -94,7 +94,7 @@ const Banners: React.FC = () => {
   }
 
   const handleToggleStatus = async (banner: Banner) => {
-    await updateBanner(banner.id, { is_active: !banner.is_active })
+    await updateBanner(banner.id, { is_visible: !banner.is_visible })
   }
 
   const handleCloseModal = () => {
