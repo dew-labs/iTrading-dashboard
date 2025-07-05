@@ -1,5 +1,5 @@
 import React from 'react'
-import { Edit2, Trash2, Calendar, Clock, User } from 'lucide-react'
+import { Edit2, Trash2, Calendar, Clock, User, MapPin } from 'lucide-react'
 import { Table } from '../../../components/molecules'
 import { Badge } from '../../../components/atoms'
 import RecordImage from '../../../components/features/images/RecordImage'
@@ -100,15 +100,33 @@ const UsersTable: React.FC<UsersTableProps> = ({
       }
     },
     {
-      header: t('forms:labels.country'),
+      header: t('forms:labels.location'),
       accessor: 'country' as keyof DatabaseUser,
       sortable: true,
       render: (value: unknown, row: DatabaseUser) => {
         const country = COUNTRY_OPTIONS.find(opt => opt.value === row.country)
+        const hasLocation = row.country || row.city
+
         return (
-          <span className='block truncate' title={country?.label || row.country || ''} aria-label={country?.label || row.country || t('users.noCountry')}>
-            {country?.label || row.country || <span className='text-gray-400'>{t('users.noCountry')}</span>}
-          </span>
+          <div className={getTypographyClasses('small')}>
+            {hasLocation ? (
+              <>
+                {row.city && (
+                  <div className='flex items-center text-gray-900 dark:text-gray-100 mb-1'>
+                    <MapPin className='w-4 h-4 mr-1 text-gray-400 dark:text-gray-500' />
+                    <span className='truncate'>{row.city}</span>
+                  </div>
+                )}
+                {country?.label && (
+                  <div className='text-gray-500 dark:text-gray-400 truncate'>
+                    {country.label}
+                  </div>
+                )}
+              </>
+            ) : (
+              <span className='text-gray-400'>{t('users.noLocation')}</span>
+            )}
+          </div>
         )
       }
     },

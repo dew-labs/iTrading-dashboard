@@ -40,7 +40,9 @@
     "establishedDate": "Established Date",
     "name": "Name",
     "logo": "Logo",
-    "establishedYear": "Established Year"
+    "establishedYear": "Established Year",
+    "bio": "Bio",
+    "location": "Location"
   },
   "placeholders": {
     "enterFirstName": "Enter first name",
@@ -86,13 +88,16 @@
     "userEmail": "user@example.com",
     "userPhone": "+1 (555) 123-4567",
     "imageDescription": "Describe the image for accessibility",
-    "postTitle": "Enter a compelling title...",
-    "postContent": "Write your post content here - use the rich editor tools to format your text...",
+    "postTitle": "Enter post title",
+    "postExcerpt": "Enter a short summary or excerpt",
+    "postContent": "Write your post content here",
     "bannerName": "Enter a descriptive name for this banner",
     "bannerUrl": "https://example.com/landing-page",
     "productName": "Enter product name",
     "productPrice": "0.00",
-    "productDescription": "Describe your product features, benefits, and details..."
+    "productDescription": "Describe your product features, benefits, and details...",
+    "bio": "Tell us about yourself - your background, interests, and experience...",
+    "city": "Enter city"
   },
   "validation": {
     "required": "{{field}} is required",

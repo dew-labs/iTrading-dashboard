@@ -40,7 +40,9 @@
     "establishedDate": "Data de Fundação",
     "name": "Nome",
     "logo": "Logo",
-    "establishedYear": "Ano de Fundação"
+    "establishedYear": "Ano de Fundação",
+    "bio": "Bio",
+    "location": "Localização"
   },
   "placeholders": {
     "enterFirstName": "Digite o nome",
@@ -85,14 +87,17 @@
     "userEmail": "usuario@exemplo.com",
     "userPhone": "+55 (11) 12345-6789",
     "imageDescription": "Descreva a imagem para acessibilidade",
-    "postTitle": "Digite um título atrativo...",
-    "postContent": "Escreva o conteúdo do seu post aqui - use as ferramentas do editor para formatar seu texto...",
+    "postTitle": "Inserir título da publicação",
+    "postExcerpt": "Inserir um breve resumo ou excerto",
+    "postContent": "Escreva o conteúdo da sua publicação aqui",
     "bannerName": "Digite um nome descritivo para este banner",
     "bannerUrl": "https://exemplo.com/pagina-destino",
-    "productName": "Digite o nome do produto",
+    "productName": "Inserir nome do produto",
     "productPrice": "0,00",
     "productDescription": "Descreva as características, benefícios e detalhes do seu produto...",
-    "country": "Selecione o país"
+    "country": "Selecione o país",
+    "bio": "Conte-nos sobre você - sua formação, interesses e experiência...",
+    "city": "Digite a cidade"
   },
   "validation": {
     "required": "Este campo é obrigatório",

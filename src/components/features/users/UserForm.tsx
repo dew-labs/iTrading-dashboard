@@ -38,6 +38,8 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
     full_name: '',
     phone: '',
     country: '',
+    city: '',
+    bio: '',
     role: 'user' as UserRole,
     status: 'invited' as const,
     avatar_url: null as string | null
@@ -67,6 +69,8 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
         full_name: user.full_name || '',
         phone: user.phone || '',
         country: user.country || '',
+        city: user.city || '',
+        bio: user.bio || '',
         role: user.role,
         status: 'invited',
         avatar_url: user.avatar_url ?? null
@@ -203,6 +207,16 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
       </div>
 
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+        <FormField
+          label={t('forms:labels.city')}
+          name='city'
+          value={formData.city || ''}
+          onChange={handleChange('city')}
+          onBlur={handleBlur('city')}
+          placeholder={tForm('placeholders.enterCity')}
+          disabled={isValidating}
+          {...(errors.city && { error: errors.city })}
+        />
         <Select
           label={t('forms:labels.country')}
           value={formData.country || ''}
@@ -213,6 +227,27 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
           error={errors.country ?? ''}
           placeholder={tForm('placeholders.country')}
         />
+      </div>
+
+      {/* Bio field */}
+      <div className='space-y-2'>
+        <label htmlFor='bio' className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+          {t('forms:labels.bio')}
+        </label>
+        <textarea
+          id='bio'
+          name='bio'
+          value={formData.bio || ''}
+          onChange={e => updateField('bio', e.target.value)}
+          onBlur={handleBlur('bio')}
+          placeholder={tForm('placeholders.bio')}
+          disabled={isValidating}
+          rows={3}
+          className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-black dark:focus:border-white bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors duration-200 resize-none'
+        />
+        {errors.bio && (
+          <p className='text-sm text-red-600 dark:text-red-400'>{errors.bio}</p>
+        )}
       </div>
 
       {/* Action buttons */}

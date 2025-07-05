@@ -18,6 +18,10 @@ const POST_FORM_SCHEMA = {
     maxLength: 200,
     message: 'Title must be between 3 and 200 characters'
   },
+  excerpt: {
+    maxLength: 300,
+    message: 'Excerpt cannot exceed 300 characters'
+  },
   content: {
     required: true,
     minLength: 10,
@@ -44,6 +48,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
   // Memoize initial data to prevent re-renders
   const initialData = useMemo(() => ({
     title: '',
+    excerpt: '',
     content: '',
     type: 'news' as PostWithAuthor['type'],
     status: 'draft' as PostWithAuthor['status'],
@@ -77,6 +82,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
     if (post) {
       reset({
         title: post.title,
+        excerpt: post.excerpt || '',
         type: post.type,
         content: post.content || '',
         status: post.status,
@@ -151,12 +157,27 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
         value={formData.title}
         onChange={handleChange('title')}
         onBlur={handleBlur('title')}
-                  placeholder={tForm('placeholders.postTitle')}
+        placeholder={tForm('placeholders.postTitle')}
         required
         disabled={isValidating}
         {...(errors.title && { error: errors.title })}
         icon={<FileText className='w-5 h-5' />}
         helperText='Choose a clear, descriptive title that accurately represents your content'
+      />
+
+      {/* Excerpt field - full width for short summary */}
+      <FormField
+        label='Excerpt'
+        name='excerpt'
+        value={formData.excerpt}
+        onChange={handleChange('excerpt')}
+        onBlur={handleBlur('excerpt')}
+        placeholder={tForm('placeholders.postExcerpt')}
+        disabled={isValidating}
+        {...(errors.excerpt && { error: errors.excerpt })}
+        icon={<FileText className='w-5 h-5' />}
+        helperText='A short, enticing summary (max 300 characters) to appear on listing pages'
+        maxLength={300}
       />
 
       {/* Enhanced layout for larger modal */}

@@ -223,6 +223,7 @@ export type Database = {
           author_id: string | null
           content: string | null
           created_at: string | null
+          excerpt: string | null
           id: number
           published_at: string | null
           status: Database["public"]["Enums"]["post_status"]
@@ -230,13 +231,13 @@ export type Database = {
           title: string
           type: Database["public"]["Enums"]["post_type"]
           views: number
-          is_visible: boolean
           reading_time: number | null
         }
         Insert: {
           author_id?: string | null
           content?: string | null
           created_at?: string | null
+          excerpt?: string | null
           id?: never
           published_at?: string | null
           status?: Database["public"]["Enums"]["post_status"]
@@ -244,13 +245,13 @@ export type Database = {
           title: string
           type?: Database["public"]["Enums"]["post_type"]
           views?: number
-          is_visible?: boolean
           reading_time?: number | null
         }
         Update: {
           author_id?: string | null
           content?: string | null
           created_at?: string | null
+          excerpt?: string | null
           id?: never
           published_at?: string | null
           status?: Database["public"]["Enums"]["post_status"]
@@ -258,7 +259,6 @@ export type Database = {
           title?: string
           type?: Database["public"]["Enums"]["post_type"]
           views?: number
-          is_visible?: boolean
           reading_time?: number | null
         }
         Relationships: [
@@ -410,6 +410,8 @@ export type Database = {
           status: Database["public"]["Enums"]["user_status"]
           updated_at: string | null
           country: string | null
+          city: string | null
+          bio: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -424,6 +426,8 @@ export type Database = {
           status?: Database["public"]["Enums"]["user_status"]
           updated_at?: string | null
           country?: string | null
+          city?: string | null
+          bio?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -438,6 +442,8 @@ export type Database = {
           status?: Database["public"]["Enums"]["user_status"]
           updated_at?: string | null
           country?: string | null
+          city?: string | null
+          bio?: string | null
         }
         Relationships: []
       }

@@ -14,6 +14,9 @@ const validatePost = (post: PostInsert): string | null => {
   if (post.title.length > 200) {
     return 'Title must be less than 200 characters'
   }
+  if (post.excerpt && post.excerpt.length > 300) {
+    return 'Excerpt cannot exceed 300 characters'
+  }
   if (!post.content?.trim()) {
     return 'Content is required'
   }
@@ -123,7 +126,7 @@ export const usePosts = () => {
   // Create post mutation
   const createMutation = useMutation({
     mutationFn: createPostMutation,
-    onMutate: async (newPost: PostInsert & { is_visible?: boolean }) => {
+    onMutate: async (newPost: PostInsert) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.posts() })
 
       const previousPosts = queryClient.getQueryData<PostWithAuthor[]>(queryKeys.posts())
@@ -132,6 +135,7 @@ export const usePosts = () => {
       const optimisticPost: PostWithAuthor = {
         id: Date.now(), // Temporary ID
         title: newPost.title,
+        excerpt: newPost.excerpt || null,
         content: newPost.content || null,
         type: newPost.type || 'news',
         status: newPost.status || 'draft',
@@ -141,7 +145,6 @@ export const usePosts = () => {
         published_at: newPost.status === 'published' ? new Date().toISOString() : '',
         created_at: new Date().toISOString(),
         author: null,
-        is_visible: typeof newPost.is_visible === 'boolean' ? newPost.is_visible : true,
         reading_time: null
       }
 

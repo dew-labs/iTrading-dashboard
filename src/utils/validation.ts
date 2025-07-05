@@ -310,7 +310,15 @@ export const formSchemas = {
     country: {
       custom: (value: string) => !value || COUNTRY_OPTIONS.some((opt: { value: string; label: string }) => opt.value === value),
       message: 'Please select a valid country'
-    }
+    },
+    city: {
+      maxLength: 100,
+      message: 'City must be less than 100 characters'
+    } as ValidationRule<string>,
+    bio: {
+      maxLength: 500,
+      message: 'Bio must be less than 500 characters'
+    } as ValidationRule<string>
   },
 
   post: {

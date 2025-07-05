@@ -64,6 +64,8 @@
 
     "noName": "No name",
     "noCountry": "No country",
+    "noLocation": "No location",
+    "noBio": "No bio",
     "last": "Last",
     "never": "Never",
     "joined": "Joined",

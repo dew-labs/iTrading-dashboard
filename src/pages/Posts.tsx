@@ -167,10 +167,6 @@ const Posts: React.FC = () => {
   // Use predefined filter options from constants
   const statusOptions = [...FILTER_OPTIONS.postStatus]
 
-  const handleToggleVisible = async (post: PostWithAuthor) => {
-    await updatePost(post.id, { is_visible: !post.is_visible })
-  }
-
   const postIds = paginatedPosts.map(post => String(post.id))
   const { data: images = [] } = useQuery({
     queryKey: ['images', 'posts', postIds],
@@ -264,7 +260,6 @@ const Posts: React.FC = () => {
               onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDelete}
-              onToggleVisible={handleToggleVisible}
               sortColumn={filterState.sortColumn}
               sortDirection={filterState.sortDirection}
               onSort={handleSort}

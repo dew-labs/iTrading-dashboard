@@ -7,145 +7,84 @@
 */
 
 -- ===============================================
--- ADMIN USER CREATION
--- ===============================================
-
--- Create a confirmed admin user directly
-DO $$
-DECLARE
-  admin_email text := 'admin@admin.com';
-  admin_password text := '123123123';
-  admin_user_id uuid;
-  encrypted_password text;
-  existing_user_id uuid;
-BEGIN
-  -- Check if user already exists in auth.users
-  SELECT id INTO existing_user_id FROM auth.users WHERE email = admin_email;
-
-  IF existing_user_id IS NOT NULL THEN
-    -- User exists, use existing ID
-    admin_user_id := existing_user_id;
-    RAISE NOTICE 'ℹ️  Admin user already exists, updating...';
-
-    -- Update existing user
-    UPDATE auth.users
-    SET
-      encrypted_password = crypt(admin_password, gen_salt('bf')),
-      email_confirmed_at = now(),
-      confirmation_token = '',
-      updated_at = now()
-    WHERE id = admin_user_id;
-  ELSE
-    -- User doesn't exist, create new one
-    admin_user_id := gen_random_uuid();
-    encrypted_password := crypt(admin_password, gen_salt('bf'));
-
-    INSERT INTO auth.users (
-      id,
-      instance_id,
-      email,
-      encrypted_password,
-      email_confirmed_at,
-      confirmation_token,
-      recovery_token,
-      email_change_token_new,
-      email_change,
-      created_at,
-      updated_at,
-      role,
-      aud,
-      confirmation_sent_at,
-      recovery_sent_at,
-      email_change_token_current,
-      email_change_confirm_status,
-      banned_until,
-      reauthentication_token,
-      reauthentication_sent_at,
-      is_sso_user,
-      deleted_at
-    ) VALUES (
-      admin_user_id,
-      '00000000-0000-0000-0000-000000000000',
-      admin_email,
-      encrypted_password,
-      now(),
-      '',
-      '',
-      '',
-      '',
-      now(),
-      now(),
-      'authenticated',
-      'authenticated',
-      null,
-      null,
-      '',
-      0,
-      null,
-      '',
-      null,
-      false,
-      null
-    );
-  END IF;
-
-  -- Handle public.users table
-  IF EXISTS (SELECT 1 FROM public.users WHERE email = admin_email) THEN
-    -- Update existing user
-    UPDATE public.users
-    SET
-      role = 'admin',
-      status = 'active',
-      full_name = 'Admin',
-      updated_at = now()
-    WHERE email = admin_email;
-  ELSE
-    -- Create new user
-    INSERT INTO public.users (
-      id,
-      email,
-      full_name,
-      role,
-      status,
-      language_preference,
-      country,
-      created_at,
-      updated_at
-    ) VALUES (
-      admin_user_id,
-      admin_email,
-      'Admin',
-      'admin',
-      'active',
-      'en',
-      'United States',
-      now(),
-      now()
-    );
-  END IF;
-
-  RAISE NOTICE '✅ Created confirmed admin user: %', admin_email;
-  RAISE NOTICE '📧 Login email: %', admin_email;
-  RAISE NOTICE '🔑 Password: %', admin_password;
-  RAISE NOTICE '🎯 Role: admin';
-  RAISE NOTICE '✔️  Status: confirmed and active';
-
-EXCEPTION
-  WHEN OTHERS THEN
-    RAISE NOTICE '❌ Error creating admin user: % - %', SQLSTATE, SQLERRM;
-END $$;
-
--- ===============================================
 -- CLEAN EXISTING SEED DATA
 -- ===============================================
 
-DELETE FROM user_notifications;
-DELETE FROM notifications WHERE user_id IS NOT NULL;
 DELETE FROM images;
 DELETE FROM banners;
 DELETE FROM products;
 DELETE FROM posts WHERE author_id = (SELECT id FROM users WHERE email = 'admin@admin.com');
 DELETE FROM brokers;
+DELETE FROM role_permissions;
+
+-- ===============================================
+-- DEFAULT ROLE PERMISSIONS
+-- ===============================================
+
+-- Insert default permissions for different roles
+INSERT INTO role_permissions (role, resource, action) VALUES
+-- User role permissions (read-only access to most content - users sign up themselves)
+('user', 'posts', 'read'),
+('user', 'products', 'read'),
+('user', 'brokers', 'read'),
+('user', 'banners', 'read'),
+
+-- Moderator role permissions (CRUD on posts, banners, brokers + view users - can be invited)
+('moderator', 'posts', 'read'),
+('moderator', 'posts', 'create'),
+('moderator', 'posts', 'update'),
+('moderator', 'posts', 'delete'),
+('moderator', 'banners', 'read'),
+('moderator', 'banners', 'create'),
+('moderator', 'banners', 'update'),
+('moderator', 'banners', 'delete'),
+('moderator', 'brokers', 'read'),
+('moderator', 'brokers', 'create'),
+('moderator', 'brokers', 'update'),
+('moderator', 'brokers', 'delete'),
+('moderator', 'users', 'read'),
+('moderator', 'products', 'read'),
+('moderator', 'images', 'read'),
+('moderator', 'images', 'create'),
+('moderator', 'images', 'update'),
+('moderator', 'images', 'delete'),
+
+-- Admin role permissions (full access to everything - can be invited)
+('admin', 'posts', 'read'),
+('admin', 'posts', 'create'),
+('admin', 'posts', 'update'),
+('admin', 'posts', 'delete'),
+('admin', 'products', 'read'),
+('admin', 'products', 'create'),
+('admin', 'products', 'update'),
+('admin', 'products', 'delete'),
+('admin', 'brokers', 'read'),
+('admin', 'brokers', 'create'),
+('admin', 'brokers', 'update'),
+('admin', 'brokers', 'delete'),
+('admin', 'banners', 'read'),
+('admin', 'banners', 'create'),
+('admin', 'banners', 'update'),
+('admin', 'banners', 'delete'),
+('admin', 'users', 'read'),
+('admin', 'users', 'create'),
+('admin', 'users', 'update'),
+('admin', 'users', 'delete'),
+('admin', 'user_permissions', 'read'),
+('admin', 'user_permissions', 'create'),
+('admin', 'user_permissions', 'update'),
+('admin', 'user_permissions', 'delete'),
+('admin', 'role_permissions', 'read'),
+('admin', 'role_permissions', 'create'),
+('admin', 'role_permissions', 'update'),
+('admin', 'role_permissions', 'delete'),
+('admin', 'images', 'read'),
+('admin', 'images', 'create'),
+('admin', 'images', 'update'),
+('admin', 'images', 'delete'),
+('admin', 'audit_logs', 'read'),
+('admin', 'audit_logs', 'delete')
+ON CONFLICT (role, resource, action) DO NOTHING;
 
 -- ===============================================
 -- BROKERS (Realistic Trading Brokers)
@@ -275,9 +214,10 @@ INSERT INTO products (name, price, description, featured_image_url, subscription
 -- POSTS (Trading News & Content) - Using Admin as Author
 -- ===============================================
 
-INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views) VALUES
+INSERT INTO posts (title, excerpt, content, type, status, author_id, thumbnail_url, views) VALUES
 (
   'Market Analysis: Q1 2024 Review',
+  'Comprehensive analysis of Q1 2024 market performance showing 8.2% S&P 500 growth and strong technology sector momentum despite economic uncertainties.',
   '<h2>Q1 2024 Market Performance</h2><p>The first quarter of 2024 has shown remarkable resilience in global markets despite ongoing economic uncertainties. <strong>Key highlights include:</strong></p><ul><li>S&P 500 up 8.2% year-to-date</li><li>Technology sector leading gains with 12.5% growth</li><li>Emerging markets showing strong momentum</li><li>Bond yields stabilizing around historical averages</li></ul><p>Looking ahead, we expect continued volatility as markets navigate through earnings season and evolving monetary policy decisions.</p><h3>Investment Recommendations</h3><p>Our analysis suggests maintaining a diversified portfolio with a slight overweight in technology and healthcare sectors while remaining cautious about interest rate sensitive assets.</p>',
   'news',
   'published',
@@ -287,6 +227,7 @@ INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views
 ),
 (
   'Understanding Options Trading: A Beginner''s Guide',
+  'Learn the fundamentals of options trading including call and put options, key benefits like leverage and hedging, and essential risk management principles for beginners.',
   '<h2>What Are Options?</h2><p>Options are financial contracts that give traders the right, but not the obligation, to buy or sell an underlying asset at a predetermined price within a specific timeframe.</p><h3>Types of Options</h3><ul><li><strong>Call Options:</strong> Give you the right to buy an asset</li><li><strong>Put Options:</strong> Give you the right to sell an asset</li></ul><h3>Key Benefits</h3><p>Options trading offers several advantages:</p><ul><li>Leverage your investment capital</li><li>Hedge existing positions</li><li>Generate additional income</li><li>Limited risk with defined maximum loss</li></ul><p><em>Remember: Options trading involves significant risk and may not be suitable for all investors. Always consult with a financial advisor before making investment decisions.</em></p>',
   'news',
   'published',
@@ -296,6 +237,7 @@ INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views
 ),
 (
   'Virtual Trading Conference 2024',
+  'Join the premier virtual trading event March 15-17, 2024 featuring industry experts, professional traders, and sessions on market trends and advanced strategies.',
   '<h2>Join Us for the Premier Trading Event of the Year</h2><p>We''re excited to announce our <strong>Virtual Trading Conference 2024</strong>, bringing together industry experts, professional traders, and investment enthusiasts from around the world.</p><h3>Event Details</h3><ul><li><strong>Date:</strong> March 15-17, 2024</li><li><strong>Format:</strong> Virtual (Online)</li><li><strong>Duration:</strong> 3 days of intensive sessions</li><li><strong>Registration:</strong> Early bird pricing available</li></ul><h3>Featured Speakers</h3><p>This year''s lineup includes renowned market analysts, successful hedge fund managers, and fintech innovators who will share their insights on:</p><ul><li>Market trends and predictions for 2024</li><li>Advanced trading strategies</li><li>Risk management techniques</li><li>Technology trends in finance</li></ul><p><strong>Register now</strong> and secure your spot at this exclusive event. Limited seats available!</p>',
   'event',
   'published',
@@ -305,6 +247,7 @@ INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views
 ),
 (
   'New Platform Features: Advanced Charting Tools',
+  'Discover our latest platform update featuring 200+ technical indicators, custom drawing tools, multiple timeframes, and real-time data for professional-grade analysis.',
   '<h2>Enhanced Technical Analysis Capabilities</h2><p>We''re thrilled to introduce our latest platform update featuring advanced charting tools designed to empower traders with professional-grade analysis capabilities.</p><h3>New Features Include:</h3><ul><li><strong>200+ Technical Indicators:</strong> From basic moving averages to complex momentum oscillators</li><li><strong>Custom Drawing Tools:</strong> Fibonacci retracements, trend lines, and pattern recognition</li><li><strong>Multiple Timeframes:</strong> Analyze from 1-minute to monthly charts</li><li><strong>Real-time Data:</strong> Lightning-fast market data updates</li><li><strong>Alert System:</strong> Custom price and indicator alerts</li></ul><h3>How to Access</h3><p>All Premium and Pro subscribers can access these features immediately through the updated web platform and mobile app. Free users can explore basic charting tools with limited indicators.</p><p>Our development team has worked tirelessly to ensure these tools meet the highest standards of accuracy and performance.</p>',
   'news',
   'published',
@@ -314,6 +257,7 @@ INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views
 ),
 (
   'Risk Management in Volatile Markets',
+  'Learn essential risk management strategies including position sizing, stop losses, diversification, and quantitative tools to protect your portfolio during market uncertainty.',
   '<h2>Protecting Your Portfolio During Market Uncertainty</h2><p>Recent market volatility has highlighted the critical importance of robust risk management strategies. Here''s how professional traders protect their capital during uncertain times.</p><h3>Essential Risk Management Principles</h3><ol><li><strong>Position Sizing:</strong> Never risk more than 2% of your portfolio on a single trade</li><li><strong>Stop Losses:</strong> Always set predetermined exit points</li><li><strong>Diversification:</strong> Spread risk across different assets and sectors</li><li><strong>Regular Review:</strong> Continuously assess and adjust your strategy</li></ol><h3>Tools for Risk Assessment</h3><p>Modern risk management relies on quantitative tools:</p><ul><li>Value at Risk (VaR) calculations</li><li>Beta analysis for portfolio volatility</li><li>Correlation analysis between holdings</li><li>Stress testing against historical scenarios</li></ul><p><strong>Remember:</strong> The goal isn''t to eliminate risk entirely, but to manage it intelligently while pursuing your investment objectives.</p>',
   'news',
   'published',
@@ -323,6 +267,7 @@ INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views
 ),
 (
   'Privacy Policy Update',
+  'Updated privacy policy effective March 1, 2024 with enhanced data protection, improved cookie management, and expanded user rights for data access and deletion.',
   '<h2>Updated Privacy Policy - Effective March 1, 2024</h2><p>We are committed to protecting your privacy and have updated our privacy policy to provide greater transparency about how we collect, use, and protect your personal information.</p><h3>Key Changes</h3><ul><li><strong>Enhanced Data Protection:</strong> Additional security measures for sensitive financial data</li><li><strong>Cookie Management:</strong> Improved controls for managing website cookies and tracking</li><li><strong>Third-Party Integrations:</strong> Clear disclosure of data sharing with trading partners</li><li><strong>User Rights:</strong> Expanded rights for data access, correction, and deletion</li></ul><h3>Your Data Rights</h3><p>Under our updated policy, you have the right to:</p><ul><li>Access your personal data</li><li>Correct inaccurate information</li><li>Request data deletion (subject to regulatory requirements)</li><li>Opt-out of marketing communications</li><li>Export your data in a portable format</li></ul><p>For questions about this policy update, please contact our privacy team at privacy@trading.com</p>',
   'privacy_policy',
   'published',
@@ -332,6 +277,7 @@ INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views
 ),
 (
   'Platform Terms of Service',
+  'Terms of service agreement covering account requirements, trading rules, risk disclosure, and liability limitations for our trading platform users.',
   '<h2>Terms of Service Agreement</h2><p>By accessing and using our trading platform, you agree to comply with and be bound by the following terms and conditions.</p><h3>Account Requirements</h3><ul><li>Users must be 18 years or older</li><li>Accurate information required for account verification</li><li>Compliance with applicable securities regulations</li><li>Maintenance of account security credentials</li></ul><h3>Trading Rules</h3><p>All trading activities must comply with:</p><ul><li>Market regulations and exchange rules</li><li>Anti-money laundering (AML) requirements</li><li>Pattern day trading regulations where applicable</li><li>Position limits and margin requirements</li></ul><h3>Risk Disclosure</h3><p><strong>Important:</strong> Trading securities involves substantial risk of loss and is not suitable for all investors. Past performance does not guarantee future results. Please read our full risk disclosure before trading.</p><h3>Limitation of Liability</h3><p>Our platform is provided "as is" without warranties. We are not liable for trading losses, system downtime, or market data delays beyond our reasonable control.</p>',
   'terms_of_use',
   'published',
@@ -341,6 +287,7 @@ INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views
 ),
 (
   'Cryptocurrency Integration Coming Soon',
+  'Exciting announcement: Cryptocurrency trading coming Q2 2024 with support for Bitcoin, Ethereum, and other major digital assets with enhanced security protocols.',
   '<h2>Expanding Our Offering: Digital Assets</h2><p>We''re excited to announce that cryptocurrency trading will be available on our platform starting Q2 2024. This expansion represents our commitment to providing comprehensive investment opportunities.</p><h3>Supported Cryptocurrencies</h3><p>Initially, we''ll support major cryptocurrencies including:</p><ul><li>Bitcoin (BTC)</li><li>Ethereum (ETH)</li><li>Cardano (ADA)</li><li>Solana (SOL)</li><li>Polygon (MATIC)</li></ul><h3>Security Measures</h3><p>Cryptocurrency trading will feature enhanced security protocols:</p><ul><li>Cold storage for digital assets</li><li>Multi-signature wallet technology</li><li>Two-factor authentication requirement</li><li>Real-time transaction monitoring</li></ul><p><em>This feature is currently in beta testing. Full rollout expected by June 2024.</em></p>',
   'news',
   'draft',
@@ -353,25 +300,14 @@ INSERT INTO posts (title, content, type, status, author_id, thumbnail_url, views
 -- BANNERS (Promotional Content)
 -- ===============================================
 
-INSERT INTO banners (name, target_url, is_visible) VALUES
-('Welcome New Traders', 'https://trading.com/welcome-bonus', true),
-('Premium Features Upgrade', 'https://trading.com/premium-upgrade', true),
-('Trading Conference 2024', 'https://trading.com/conference-2024', true),
-('Mobile App Download', 'https://trading.com/mobile-app', true),
-('Educational Resources', 'https://trading.com/education', true),
-('Risk Management Guide', 'https://trading.com/risk-management', false),
-('Options Trading Course', 'https://trading.com/options-course', true);
-
--- ===============================================
--- NOTIFICATIONS (System-wide only for now)
--- ===============================================
-
-INSERT INTO notifications (title, description, user_id) VALUES
-('Platform Maintenance Scheduled', 'We will be performing scheduled maintenance on Sunday, March 10th from 2:00 AM to 6:00 AM EST. Trading will be temporarily unavailable during this time.', NULL),
-('New Security Features', 'We''ve enhanced our security with two-factor authentication and biometric login options. Update your security settings in your account preferences.', NULL),
-('Market Data Provider Update', 'We''ve upgraded our market data feeds for faster and more accurate real-time quotes. You may notice improved response times across the platform.', NULL),
-('Educational Webinar Series', 'Join our free webinar series "Advanced Trading Strategies" every Thursday at 2 PM EST. Register now to secure your spot for expert insights.', NULL);
-
+INSERT INTO banners (name, target_url) VALUES
+('Welcome New Traders', 'https://trading.com/welcome-bonus'),
+('Premium Features Upgrade', 'https://trading.com/premium-upgrade'),
+('Trading Conference 2024', 'https://trading.com/conference-2024'),
+('Mobile App Download', 'https://trading.com/mobile-app'),
+('Educational Resources', 'https://trading.com/education'),
+('Risk Management Guide', 'https://trading.com/risk-management'),
+('Options Trading Course', 'https://trading.com/options-course');
 
 
 -- ===============================================
@@ -385,7 +321,6 @@ DECLARE
     total_products int;
     total_brokers int;
     total_banners int;
-    total_notifications int;
     admin_user_exists boolean;
 BEGIN
     -- Count all seeded data
@@ -394,7 +329,6 @@ BEGIN
     SELECT count(*) INTO total_products FROM products;
     SELECT count(*) INTO total_brokers FROM brokers;
     SELECT count(*) INTO total_banners FROM banners;
-    SELECT count(*) INTO total_notifications FROM notifications;
     SELECT exists(SELECT 1 FROM users WHERE email = 'admin@admin.com') INTO admin_user_exists;
 
     -- Generate report
@@ -409,7 +343,6 @@ BEGIN
     RAISE NOTICE '🛍️  Products: % (without images)', total_products;
     RAISE NOTICE '🏢 Brokers: % (major trading brokers)', total_brokers;
     RAISE NOTICE '🖼️  Banners: % (promotional banners)', total_banners;
-    RAISE NOTICE '🔔 Notifications: % (system notifications)', total_notifications;
     RAISE NOTICE '';
 
     IF admin_user_exists THEN
