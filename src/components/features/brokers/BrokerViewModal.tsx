@@ -10,9 +10,9 @@ import {
 import { usePageTranslation } from '../../../hooks/useTranslation'
 import { formatDateDisplay } from '../../../utils/format'
 import { Button } from '../../atoms'
-import { RichTextRenderer } from '../../common'
 import type { Broker } from '../../../types'
 import { getTypographyClasses, cn } from '../../../utils/theme'
+import RecordImage from '../images/RecordImage'
 
 interface BrokerViewModalProps {
   isOpen: boolean
@@ -50,17 +50,13 @@ const BrokerViewModal: React.FC<BrokerViewModalProps> = ({
               <div className='flex-1 mr-6'>
                 {/* Broker title and logo */}
                 <div className='flex items-center space-x-4 mb-4'>
-                  {broker.logo_url ? (
-                    <img
-                      src={broker.logo_url}
-                      alt={`${broker.name} logo`}
-                      className='w-16 h-16 rounded-xl object-cover border-2 border-gray-200 dark:border-gray-700 shadow-sm'
-                    />
-                  ) : (
-                    <div className='w-16 h-16 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-sm'>
-                      <Building2 className='w-8 h-8 text-white' />
-                    </div>
-                  )}
+                  <RecordImage
+                    tableName='brokers'
+                    recordId={broker.id}
+                    fallbackClassName='w-16 h-16 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-sm'
+                    className='w-16 h-16 rounded-xl object-cover border-2 border-gray-200 dark:border-gray-700 shadow-sm'
+                    fallbackIcon={<Building2 className='w-8 h-8 text-white' />}
+                  />
                   <div>
                     <h1 className={cn(
                       getTypographyClasses('h1'),
@@ -125,24 +121,6 @@ const BrokerViewModal: React.FC<BrokerViewModalProps> = ({
             <div className='px-8 py-6'>
               {/* Main content area - full width */}
               <div className='space-y-6'>
-                {/* Logo image (larger view) */}
-                {broker.logo_url && (
-                  <div className='mb-8'>
-                    <div className='relative group overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800 p-8'>
-                      <img
-                        src={broker.logo_url}
-                        alt={`${broker.name} logo`}
-                        className='w-full max-w-md mx-auto h-48 object-contain group-hover:scale-105 transition-transform duration-500'
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement
-                          target.style.display = 'none'
-                        }}
-                      />
-                      <div className='absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
-                    </div>
-                  </div>
-                )}
-
                 {/* Broker description */}
                 <div>
                   <h2 className='text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center'>
@@ -150,7 +128,9 @@ const BrokerViewModal: React.FC<BrokerViewModalProps> = ({
                       About {broker.name}
                   </h2>
                   {broker.description ? (
-                    <RichTextRenderer content={broker.description} />
+                    <div className='prose dark:prose-invert max-w-none whitespace-pre-wrap text-gray-700 dark:text-gray-300'>
+                      {broker.description}
+                    </div>
                   ) : (
                     <div className='text-center py-12 text-gray-500 dark:text-gray-400'>
                       <FileText className='w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600' />

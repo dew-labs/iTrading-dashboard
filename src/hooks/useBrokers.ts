@@ -18,7 +18,7 @@ const updateBrokerMutation = async ({
   id,
   updates
 }: {
-  id: number
+  id: string
   updates: BrokerUpdate
 }): Promise<Broker> => {
   return supabaseHelpers.updateData(
@@ -26,7 +26,7 @@ const updateBrokerMutation = async ({
   )
 }
 
-const deleteBrokerMutation = async (id: number): Promise<void> => {
+const deleteBrokerMutation = async (id: string): Promise<void> => {
   return supabaseHelpers.deleteData(supabase.from('brokers').delete().eq('id', id))
 }
 
@@ -59,14 +59,14 @@ export const useBrokers = () => {
 
       // Optimistically update to the new value
       const optimisticBroker: Broker = {
-        id: Date.now(), // Temporary ID
+        id: crypto.randomUUID(), // Temporary ID
         name: newBroker.name,
         established_in: newBroker.established_in || null,
         headquarter: newBroker.headquarter || null,
         description: newBroker.description || null,
-        logo_url: newBroker.logo_url || null,
         created_at: new Date().toISOString(),
-        is_visible: newBroker.is_visible || true
+        is_visible: newBroker.is_visible || true,
+        updated_at: new Date().toISOString()
       }
 
       queryClient.setQueryData<Broker[]>(queryKeys.brokers(), (old = []) => [
@@ -153,8 +153,8 @@ export const useBrokers = () => {
     loading,
     error: error as Error | null,
     createBroker: (broker: BrokerInsert) => createMutation.mutateAsync(broker),
-    updateBroker: (id: number, updates: BrokerUpdate) => updateMutation.mutateAsync({ id, updates }),
-    deleteBroker: (id: number) => deleteMutation.mutateAsync(id),
+    updateBroker: (id: string, updates: BrokerUpdate) => updateMutation.mutateAsync({ id, updates }),
+    deleteBroker: (id: string) => deleteMutation.mutateAsync(id),
     refetch,
     // Additional states for UI feedback
     isCreating: createMutation.isPending,

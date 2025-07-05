@@ -95,7 +95,6 @@ CREATE TABLE brokers (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   is_visible boolean DEFAULT true,
   name varchar NOT NULL,
-  logo_url text,
   headquarter varchar,
   established_in integer,
   description text,
@@ -129,7 +128,8 @@ CREATE TABLE images (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   table_name varchar NOT NULL,
   record_id text NOT NULL,
-  image_url text NOT NULL,
+  path text NOT NULL,
+  type text,
   blurhash text,
   storage_object_id uuid,
   alt_text text,
@@ -195,8 +195,6 @@ COMMENT ON TABLE audit_logs IS 'Audit log of admin and moderator actions';
 
 -- Column comments for important fields
 COMMENT ON COLUMN brokers.established_in IS 'Year the broker was established (e.g., 1999, 2010)';
-COMMENT ON COLUMN brokers.logo_url IS 'Broker company logo/brand image';
-COMMENT ON COLUMN images.blurhash IS 'Blurhash string for low-res image placeholder.';
 COMMENT ON COLUMN images.blurhash IS 'Blurhash string for low-res image placeholder.';
 COMMENT ON COLUMN posts.author_id IS 'Reference to the user who created this post';
 COMMENT ON COLUMN posts.excerpt IS 'Brief summary or preview of the post content for listings and previews';

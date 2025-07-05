@@ -1,9 +1,10 @@
 import React from 'react'
 import BrokerCard from './BrokerCard'
-import type { Broker } from '../../../types'
+import type { Broker, Image } from '../../../types'
 
 interface BrokerGridProps {
   brokers: Broker[]
+  imagesByRecord?: Record<string, Image[]>
   onView: (broker: Broker) => void
   onEdit: (broker: Broker) => void
   onDelete: (broker: Broker) => void
@@ -11,6 +12,7 @@ interface BrokerGridProps {
 
 const BrokerGrid: React.FC<BrokerGridProps> = ({
   brokers,
+  imagesByRecord = {},
   onView,
   onEdit,
   onDelete
@@ -21,6 +23,7 @@ const BrokerGrid: React.FC<BrokerGridProps> = ({
         <BrokerCard
           key={broker.id}
           broker={broker}
+          image={imagesByRecord[broker.id]?.[0] || null}
           onView={onView}
           onEdit={onEdit}
           onDelete={onDelete}

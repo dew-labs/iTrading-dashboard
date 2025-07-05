@@ -2,16 +2,18 @@ import React from 'react'
 import { Edit2, Trash2, Eye, Building2, Calendar, MapPin, FileText } from 'lucide-react'
 import { usePageTranslation } from '../../../hooks/useTranslation'
 import { formatDateDisplay } from '../../../utils/format'
-import type { Broker } from '../../../types'
+import type { Broker, Image } from '../../../types'
+import RecordImage from '../../../components/features/images/RecordImage'
 
 interface BrokerCardProps {
   broker: Broker
+  image?: Image | null
   onView: (broker: Broker) => void
   onEdit: (broker: Broker) => void
   onDelete: (broker: Broker) => void
 }
 
-const BrokerCard: React.FC<BrokerCardProps> = ({ broker, onView, onEdit, onDelete }) => {
+const BrokerCard: React.FC<BrokerCardProps> = ({ broker, image, onView, onEdit, onDelete }) => {
   const { t } = usePageTranslation()
 
   return (
@@ -21,17 +23,12 @@ const BrokerCard: React.FC<BrokerCardProps> = ({ broker, onView, onEdit, onDelet
         <div className='flex items-start justify-between mb-4'>
           <div className='flex items-center space-x-3'>
             <div className='flex-shrink-0'>
-              {broker.logo_url ? (
-                <img
-                  src={broker.logo_url}
-                  alt={`${broker.headquarter || t('brokers.broker')} logo`}
-                  className='w-12 h-12 rounded-lg object-cover border border-gray-200'
-                />
-              ) : (
-                <div className='w-12 h-12 rounded-lg bg-gradient-to-br from-gray-900 to-black flex items-center justify-center'>
-                  <Building2 className='w-6 h-6 text-white' />
-                </div>
-              )}
+              <RecordImage
+                image={image}
+                fallbackClassName='w-12 h-12 rounded-lg bg-gradient-to-br from-gray-900 to-black flex items-center justify-center'
+                className='w-12 h-12 rounded-lg object-cover border border-gray-200'
+                fallbackIcon={<Building2 className='w-6 h-6 text-white' />}
+              />
             </div>
             <div className='flex-1 min-w-0'>
               <h3 className='text-lg font-semibold text-gray-900 dark:text-white truncate'>

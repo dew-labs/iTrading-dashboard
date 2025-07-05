@@ -7,39 +7,14 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          operationName?: string
-          query?: string
-          variables?: Json
-          extensions?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       audit_logs: {
         Row: {
           action: string
           changed_fields: string[] | null
-          created_at: string | null
-          id: number
+          created_at: string
+          id: string
           ip_address: string | null
           new_values: Json | null
           old_values: Json | null
@@ -54,8 +29,8 @@ export type Database = {
         Insert: {
           action: string
           changed_fields?: string[] | null
-          created_at?: string | null
-          id?: never
+          created_at?: string
+          id?: string
           ip_address?: string | null
           new_values?: Json | null
           old_values?: Json | null
@@ -70,8 +45,8 @@ export type Database = {
         Update: {
           action?: string
           changed_fields?: string[] | null
-          created_at?: string | null
-          id?: never
+          created_at?: string
+          id?: string
           ip_address?: string | null
           new_values?: Json | null
           old_values?: Json | null
@@ -95,171 +70,151 @@ export type Database = {
       }
       banners: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: string
           is_visible: boolean | null
           name: string
           target_url: string | null
+          updated_at: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           is_visible?: boolean | null
           name: string
           target_url?: string | null
+          updated_at?: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           is_visible?: boolean | null
           name?: string
           target_url?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
       brokers: {
         Row: {
-          created_at: string | null
+          created_at: string
           description: string | null
           established_in: number | null
           headquarter: string | null
-          id: number
-          logo_url: string | null
+          id: string
+          is_visible: boolean | null
           name: string
-          is_visible: boolean
+          updated_at: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           established_in?: number | null
           headquarter?: string | null
-          id?: never
-          logo_url?: string | null
+          id?: string
+          is_visible?: boolean | null
           name: string
-          is_visible?: boolean
+          updated_at?: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           established_in?: number | null
           headquarter?: string | null
-          id?: never
-          logo_url?: string | null
+          id?: string
+          is_visible?: boolean | null
           name?: string
-          is_visible?: boolean
+          updated_at?: string
         }
         Relationships: []
       }
       images: {
         Row: {
           alt_text: string | null
-          created_at: string | null
+          blurhash: string | null
+          created_at: string
           file_size: number | null
-          id: number
-          image_url: string
+          id: string
           mime_type: string | null
+          path: string
           record_id: string
           storage_object_id: string | null
           table_name: string
+          type: string | null
         }
         Insert: {
           alt_text?: string | null
-          created_at?: string | null
+          blurhash?: string | null
+          created_at?: string
           file_size?: number | null
-          id?: never
-          image_url: string
+          id?: string
           mime_type?: string | null
+          path: string
           record_id: string
           storage_object_id?: string | null
           table_name: string
+          type?: string | null
         }
         Update: {
           alt_text?: string | null
-          created_at?: string | null
+          blurhash?: string | null
+          created_at?: string
           file_size?: number | null
-          id?: never
-          image_url?: string
+          id?: string
           mime_type?: string | null
+          path?: string
           record_id?: string
           storage_object_id?: string | null
           table_name?: string
+          type?: string | null
         }
         Relationships: []
-      }
-      notifications: {
-        Row: {
-          created_at: string | null
-          description: string
-          id: number
-          title: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description: string
-          id?: never
-          title: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string
-          id?: never
-          title?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "notifications_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       posts: {
         Row: {
           author_id: string | null
           content: string | null
-          created_at: string | null
+          created_at: string
           excerpt: string | null
-          id: number
+          id: string
           published_at: string | null
+          reading_time: number | null
           status: Database["public"]["Enums"]["post_status"]
           thumbnail_url: string | null
           title: string
           type: Database["public"]["Enums"]["post_type"]
+          updated_at: string
           views: number
-          reading_time: number | null
         }
         Insert: {
           author_id?: string | null
           content?: string | null
-          created_at?: string | null
+          created_at?: string
           excerpt?: string | null
-          id?: never
+          id?: string
           published_at?: string | null
+          reading_time?: number | null
           status?: Database["public"]["Enums"]["post_status"]
           thumbnail_url?: string | null
           title: string
           type?: Database["public"]["Enums"]["post_type"]
+          updated_at?: string
           views?: number
-          reading_time?: number | null
         }
         Update: {
           author_id?: string | null
           content?: string | null
-          created_at?: string | null
+          created_at?: string
           excerpt?: string | null
-          id?: never
+          id?: string
           published_at?: string | null
+          reading_time?: number | null
           status?: Database["public"]["Enums"]["post_status"]
           thumbnail_url?: string | null
           title?: string
           type?: Database["public"]["Enums"]["post_type"]
+          updated_at?: string
           views?: number
-          reading_time?: number | null
         }
         Relationships: [
           {
@@ -273,177 +228,109 @@ export type Database = {
       }
       products: {
         Row: {
-          created_at: string | null
+          created_at: string
           description: string | null
           featured_image_url: string | null
-          id: number
+          id: string
           name: string
           price: number
           subscription: boolean | null
+          updated_at: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           featured_image_url?: string | null
-          id?: never
+          id?: string
           name: string
           price: number
           subscription?: boolean | null
+          updated_at?: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           featured_image_url?: string | null
-          id?: never
+          id?: string
           name?: string
           price?: number
           subscription?: boolean | null
+          updated_at?: string
         }
         Relationships: []
       }
       role_permissions: {
         Row: {
           action: string
-          created_at: string | null
-          id: number
+          created_at: string
+          id: string
           resource: string
           role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
         }
         Insert: {
           action: string
-          created_at?: string | null
-          id?: never
+          created_at?: string
+          id?: string
           resource: string
           role: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
         }
         Update: {
           action?: string
-          created_at?: string | null
-          id?: never
+          created_at?: string
+          id?: string
           resource?: string
           role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
         }
         Relationships: []
-      }
-      user_notifications: {
-        Row: {
-          created_at: string | null
-          id: number
-          is_read: boolean | null
-          notification_id: number
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: never
-          is_read?: boolean | null
-          notification_id: number
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: never
-          is_read?: boolean | null
-          notification_id?: number
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_notifications_notification_id_fkey"
-            columns: ["notification_id"]
-            isOneToOne: false
-            referencedRelation: "notifications"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_notifications_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_permissions: {
-        Row: {
-          action: string
-          created_at: string | null
-          id: number
-          resource: string
-          user_id: string
-        }
-        Insert: {
-          action: string
-          created_at?: string | null
-          id?: never
-          resource: string
-          user_id: string
-        }
-        Update: {
-          action?: string
-          created_at?: string | null
-          id?: never
-          resource?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_permissions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       users: {
         Row: {
           avatar_url: string | null
-          created_at: string | null
+          bio: string | null
+          city: string | null
+          country: string | null
+          created_at: string
           email: string
           full_name: string | null
           id: string
-          language_preference: string | null
           last_login: string | null
           phone: string | null
           role: Database["public"]["Enums"]["user_role"]
           status: Database["public"]["Enums"]["user_status"]
-          updated_at: string | null
-          country: string | null
-          city: string | null
-          bio: string | null
+          updated_at: string
         }
         Insert: {
           avatar_url?: string | null
-          created_at?: string | null
+          bio?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
           email: string
           full_name?: string | null
           id: string
-          language_preference?: string | null
           last_login?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           status?: Database["public"]["Enums"]["user_status"]
-          updated_at?: string | null
-          country?: string | null
-          city?: string | null
-          bio?: string | null
+          updated_at?: string
         }
         Update: {
           avatar_url?: string | null
-          created_at?: string | null
+          bio?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
           email?: string
           full_name?: string | null
           id?: string
-          language_preference?: string | null
           last_login?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           status?: Database["public"]["Enums"]["user_status"]
-          updated_at?: string | null
-          country?: string | null
-          city?: string | null
-          bio?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -583,9 +470,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       post_status: ["draft", "published"],

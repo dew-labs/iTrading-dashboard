@@ -2,9 +2,11 @@ import React from 'react'
 import { useRecordImage } from '../../../hooks/useImages'
 import { Image as ImageIcon } from 'lucide-react'
 import { blurhashToDataUri } from '@unpic/placeholder'
+import { getStorageUrl } from '../../../utils/storage'
+import type { Image } from '../../../types'
 
 interface RecordImageProps {
-  image?: import('../../../types').Image | undefined
+  image?: Image | null
   tableName?: string
   recordId?: string
   className?: string
@@ -28,12 +30,17 @@ const RecordImage: React.FC<RecordImageProps> = ({
   showFallback = true,
   fallbackIcon
 }) => {
+  const shouldFetch = !!(!imageProp && tableName && recordId)
   // Always call the hook, but only use its result if imageProp is not provided
-  const recordImageResult = useRecordImage(tableName!, recordId!)
+  const recordImageResult = useRecordImage(tableName, recordId, {
+    enabled: shouldFetch
+  })
   const image = imageProp ?? recordImageResult.image
   const loading = imageProp ? false : recordImageResult.loading
   const error = imageProp ? null : recordImageResult.error
   const [imgLoaded, setImgLoaded] = React.useState(false)
+
+  const imageUrl = image ? getStorageUrl(image.table_name, image.path) : null
 
   if (loading) {
     if (image?.blurhash) {
@@ -55,7 +62,7 @@ const RecordImage: React.FC<RecordImageProps> = ({
     )
   }
 
-  if (error || !image) {
+  if (error || !image || !imageUrl) {
     if (!showFallback) return null
 
     return (
@@ -76,7 +83,7 @@ const RecordImage: React.FC<RecordImageProps> = ({
         />
       )}
       <img
-        src={image.image_url}
+        src={imageUrl}
         alt={image.alt_text || alt}
         className={className}
         style={!imgLoaded && image.blurhash ? { opacity: 0, position: 'absolute', zIndex: 2 } : {}}

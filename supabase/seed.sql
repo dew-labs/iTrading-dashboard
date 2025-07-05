@@ -90,63 +90,90 @@ ON CONFLICT (role, resource, action) DO NOTHING;
 -- BROKERS (Realistic Trading Brokers)
 -- ===============================================
 
-INSERT INTO brokers (name, established_in, headquarter, description, logo_url) VALUES
-(
-  'Charles Schwab',
-  1971,
-  'Westlake, Texas, USA',
-  'Charles Schwab Corporation is a leading provider of financial services, offering a wide range of investment, advisory, banking and retirement plan services to individual investors and independent investment advisors.',
-  NULL
-),
-(
-  'Interactive Brokers',
-  1978,
-  'Greenwich, Connecticut, USA',
-  'Interactive Brokers is an automated global electronic broker and market maker that specializes in routing orders and executing and processing trades in securities, futures and foreign exchange instruments.',
-  NULL
-),
-(
-  'TD Ameritrade',
-  1975,
-  'Omaha, Nebraska, USA',
-  'TD Ameritrade is an American online broker that offers an electronic trading platform for the trade of financial securities to retail investors.',
-  NULL
-),
-(
-  'E*TRADE',
-  1991,
-  'Arlington, Virginia, USA',
-  'E*TRADE Financial Corporation offers an electronic trading platform to trade financial securities. The company provides online investing services to retail investors.',
-  NULL
-),
-(
-  'Robinhood',
-  2013,
-  'Menlo Park, California, USA',
-  'Robinhood is an American financial services company offering commission-free stock trading through a mobile app and website.',
-  NULL
-),
-(
-  'Fidelity Investments',
-  1946,
-  'Boston, Massachusetts, USA',
-  'Fidelity Investments is an American multinational financial services corporation offering fund management, fund distribution, investment advice, retirement services, wealth management, securities execution and clearance.',
-  NULL
-),
-(
-  'Vanguard',
-  1975,
-  'Malvern, Pennsylvania, USA',
-  'The Vanguard Group is an American registered investment advisor based in Malvern, Pennsylvania, with over $7 trillion in global assets under management.',
-  NULL
-),
-(
-  'Merrill Lynch',
-  1914,
-  'New York City, New York, USA',
-  'Merrill Lynch is an American investment management and wealth management division of Bank of America that offers a broad range of brokerage, investment advisory and other financial services.',
-  NULL
-);
+DO $$
+DECLARE
+    broker_id uuid;
+BEGIN
+    -- Charles Schwab
+    INSERT INTO brokers (name, established_in, headquarter, description) VALUES
+    (
+      'Charles Schwab',
+      1971,
+      'Westlake, Texas, USA',
+      'Charles Schwab Corporation is a leading provider of financial services, offering a wide range of investment, advisory, banking and retirement plan services to individual investors and independent investment advisors.'
+    ) RETURNING id INTO broker_id;
+    INSERT INTO images (table_name, record_id, type, path) VALUES ('brokers', broker_id, 'logo', 'logos/charles_schwab.png');
+
+    -- Interactive Brokers
+    INSERT INTO brokers (name, established_in, headquarter, description) VALUES
+    (
+      'Interactive Brokers',
+      1978,
+      'Greenwich, Connecticut, USA',
+      'Interactive Brokers is an automated global electronic broker and market maker that specializes in routing orders and executing and processing trades in securities, futures and foreign exchange instruments.'
+    ) RETURNING id INTO broker_id;
+    INSERT INTO images (table_name, record_id, type, path) VALUES ('brokers', broker_id, 'logo', 'logos/interactive_brokers.png');
+
+    -- TD Ameritrade
+    INSERT INTO brokers (name, established_in, headquarter, description) VALUES
+    (
+      'TD Ameritrade',
+      1975,
+      'Omaha, Nebraska, USA',
+      'TD Ameritrade is an American online broker that offers an electronic trading platform for the trade of financial securities to retail investors.'
+    ) RETURNING id INTO broker_id;
+    INSERT INTO images (table_name, record_id, type, path) VALUES ('brokers', broker_id, 'logo', 'logos/td_ameritrade.png');
+
+    -- E*TRADE
+    INSERT INTO brokers (name, established_in, headquarter, description) VALUES
+    (
+      'E*TRADE',
+      1991,
+      'Arlington, Virginia, USA',
+      'E*TRADE Financial Corporation offers an electronic trading platform to trade financial securities. The company provides online investing services to retail investors.'
+    ) RETURNING id INTO broker_id;
+    INSERT INTO images (table_name, record_id, type, path) VALUES ('brokers', broker_id, 'logo', 'logos/e_trade.png');
+
+    -- Robinhood
+    INSERT INTO brokers (name, established_in, headquarter, description) VALUES
+    (
+      'Robinhood',
+      2013,
+      'Menlo Park, California, USA',
+      'Robinhood is an American financial services company offering commission-free stock trading through a mobile app and website.'
+    ) RETURNING id INTO broker_id;
+    INSERT INTO images (table_name, record_id, type, path) VALUES ('brokers', broker_id, 'logo', 'logos/robinhood.png');
+
+    -- Fidelity Investments
+    INSERT INTO brokers (name, established_in, headquarter, description) VALUES
+    (
+      'Fidelity Investments',
+      1946,
+      'Boston, Massachusetts, USA',
+      'Fidelity Investments is an American multinational financial services corporation offering fund management, fund distribution, investment advice, retirement services, wealth management, securities execution and clearance.'
+    ) RETURNING id INTO broker_id;
+    INSERT INTO images (table_name, record_id, type, path) VALUES ('brokers', broker_id, 'logo', 'logos/fidelity_investments.png');
+
+    -- Vanguard
+    INSERT INTO brokers (name, established_in, headquarter, description) VALUES
+    (
+      'Vanguard',
+      1975,
+      'Malvern, Pennsylvania, USA',
+      'The Vanguard Group is an American registered investment advisor based in Malvern, Pennsylvania, with over $7 trillion in global assets under management.'
+    ) RETURNING id INTO broker_id;
+    INSERT INTO images (table_name, record_id, type, path) VALUES ('brokers', broker_id, 'logo', 'logos/vanguard.png');
+
+    -- Merrill Lynch
+    INSERT INTO brokers (name, established_in, headquarter, description) VALUES
+    (
+      'Merrill Lynch',
+      1914,
+      'New York City, New York, USA',
+      'Merrill Lynch is an American investment management and wealth management division of Bank of America that offers a broad range of brokerage, investment advisory and other financial services.'
+    ) RETURNING id INTO broker_id;
+    INSERT INTO images (table_name, record_id, type, path) VALUES ('brokers', broker_id, 'logo', 'logos/merrill_lynch.png');
+END $$;
 
 -- ===============================================
 -- PRODUCTS (Trading & Investment Products)

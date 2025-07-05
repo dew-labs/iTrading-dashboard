@@ -11,11 +11,6 @@ export type UserProfile = DatabaseUser
 export type UserProfileInsert = UserInsert
 export type UserProfileUpdate = UserUpdate
 
-// Permission types
-export type UserPermission = Database['public']['Tables']['user_permissions']['Row']
-export type UserPermissionInsert = Database['public']['Tables']['user_permissions']['Insert']
-export type UserPermissionUpdate = Database['public']['Tables']['user_permissions']['Update']
-
 export type RolePermission = Database['public']['Tables']['role_permissions']['Row']
 export type RolePermissionInsert = Database['public']['Tables']['role_permissions']['Insert']
 export type RolePermissionUpdate = Database['public']['Tables']['role_permissions']['Update']

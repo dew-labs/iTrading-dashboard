@@ -40,7 +40,7 @@ const Brokers: React.FC = () => {
   // Confirm dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
-    brokerId: number | null
+    brokerId: string | null
     brokerName: string | null
   }>({
     isOpen: false,
@@ -127,6 +127,7 @@ const Brokers: React.FC = () => {
         .from('images')
         .select('*')
         .eq('table_name', 'brokers')
+        .eq('type', 'logo')
         .in('record_id', brokerIds)
       return data || []
     },

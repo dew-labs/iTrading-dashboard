@@ -1,9 +1,8 @@
-import React, { useMemo, useCallback } from 'react'
-import { X, Save, Plus, AlertCircle, Building2, Calendar, MapPin } from 'lucide-react'
-import type { Broker, BrokerInsert } from '../../../types'
+import React, { useMemo, useCallback, useState } from 'react'
+import { X, Save, Plus, Building2, Calendar, MapPin } from 'lucide-react'
+import type { Broker, BrokerInsert, Image } from '../../../types'
 import { useFormValidation } from '../../../hooks/useFormValidation'
-import { FormField } from '../../atoms'
-import { RichTextEditor } from '../posts'
+import { FormField, Textarea } from '../../atoms'
 import { MainImageUpload } from '../images'
 import { useFormTranslation, useTranslation } from '../../../hooks/useTranslation'
 
@@ -33,21 +32,23 @@ const BROKER_FORM_SCHEMA = {
 
 interface BrokerFormProps {
   broker?: Broker | null
-  onSubmit: (data: BrokerInsert) => void
+  onSubmit: (data: BrokerInsert, logoImage?: Partial<Image> | null) => void
   onCancel: () => void
+  images?: Image[] | null
 }
 
-const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) => {
+const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, images }) => {
   const { t: tForm } = useFormTranslation()
   const { t } = useTranslation()
+
+  const [logoImage, setLogoImage] = useState<Partial<Image> | null>(null)
 
   // Memoize initial data to prevent re-renders
   const initialData = useMemo(() => ({
     name: '',
     established_in: null as number | null,
     headquarter: '',
-    description: '',
-    logo_url: null as string | null
+    description: ''
   }), [])
 
   // Enhanced form validation with our new hook
@@ -73,19 +74,34 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
         name: broker.name,
         established_in: broker.established_in || null,
         headquarter: broker.headquarter || '',
-        description: broker.description || '',
-        logo_url: broker.logo_url || null
+        description: broker.description || ''
       })
+      const logo = images?.find(
+        img => img.record_id === broker.id && img.type === 'logo'
+      )
+      if (logo) {
+        setLogoImage(logo)
+      }
     }
-  }, [broker, reset])
+  }, [broker, reset, images])
 
-  const handleDescriptionChange = useCallback((description: string) => {
-    updateField('description', description)
-  }, [updateField])
-
-  const handleLogoUpload = useCallback((url: string | null) => {
-    updateField('logo_url', url)
-  }, [updateField])
+  const handleLogoUpload = useCallback((url: string | null, file?: File) => {
+    if (url && file) {
+      setLogoImage(prev => ({
+        ...prev,
+        path: url,
+        table_name: 'brokers',
+        record_id: broker?.id || '',
+        type: 'logo',
+        alt_text: `${formData.name} logo`,
+        storage_object_id: prev?.storage_object_id || null,
+        file_size: file.size,
+        mime_type: file.type
+      }))
+    } else {
+      setLogoImage(null)
+    }
+  }, [broker?.id, formData.name])
 
   const handleEstablishedYearChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -93,8 +109,8 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
   }, [updateField])
 
   const handleFormSubmit = useCallback((data: typeof formData) => {
-    onSubmit(data)
-  }, [onSubmit])
+    onSubmit(data, logoImage)
+  }, [onSubmit, logoImage])
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
@@ -121,7 +137,7 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
           <div>
             <MainImageUpload
               label={tForm('labels.logo')}
-              imageUrl={formData.logo_url || null}
+              imageUrl={logoImage?.path || null}
               onChange={handleLogoUpload}
               bucket='brokers'
               folder='logos'
@@ -167,29 +183,19 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel }) =
 
         {/* Right column - Description editor */}
         <div className='lg:col-span-2'>
-          <div className='space-y-2'>
-            <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
-              {tForm('labels.description')}
-            </label>
-            <RichTextEditor
-              content={formData.description || ''}
-              onChange={handleDescriptionChange}
-              placeholder={tForm('placeholders.brokerDescriptionPlaceholder')}
-              disabled={isValidating}
-              height={500}
-              bucket='brokers'
-              folder='images'
-            />
-            {errors.description && (
-              <div className='flex items-center space-x-1 text-sm text-red-600 dark:text-red-400'>
-                <AlertCircle className='w-4 h-4 flex-shrink-0' />
-                <span>{errors.description}</span>
-              </div>
-            )}
-            <p className='text-xs text-gray-500 dark:text-gray-400'>
-              Describe the broker's services, history, regulations, trading platforms, and key features
-            </p>
-          </div>
+          <Textarea
+            label={tForm('labels.description')}
+            name='description'
+            value={formData.description || ''}
+            onChange={handleChange('description')}
+            onBlur={handleBlur('description')}
+            placeholder={tForm('placeholders.brokerDescriptionPlaceholder')}
+            disabled={isValidating}
+            rows={12}
+            {...(errors.description && { error: errors.description })}
+            maxLength={5000}
+            helperText="Describe the broker's services, history, regulations, trading platforms, and key features."
+          />
         </div>
       </div>
 

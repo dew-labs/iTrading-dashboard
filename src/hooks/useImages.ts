@@ -39,7 +39,7 @@ const updateImageMutation = async ({
   id,
   updates
 }: {
-  id: number
+  id: string
   updates: ImageUpdate
 }): Promise<Image> => {
   return supabaseHelpers.updateData(
@@ -47,11 +47,15 @@ const updateImageMutation = async ({
   )
 }
 
-const deleteImageMutation = async (id: number): Promise<void> => {
+const deleteImageMutation = async (id: string): Promise<void> => {
   return supabaseHelpers.deleteData(supabase.from('images').delete().eq('id', id))
 }
 
-export const useImages = (tableName?: string, recordId?: string) => {
+export const useImages = (
+  tableName?: string,
+  recordId?: string,
+  options?: { enabled?: boolean }
+) => {
   const queryClient = useQueryClient()
 
   // Main query for images list
@@ -60,7 +64,7 @@ export const useImages = (tableName?: string, recordId?: string) => {
     isLoading: loading,
     error,
     refetch
-  } = useQuery({
+  } = useQuery<Image[]>({
     queryKey:
       tableName && recordId
         ? queryKeys.imagesByRecord(tableName, recordId)
@@ -74,7 +78,8 @@ export const useImages = (tableName?: string, recordId?: string) => {
           ? () => fetchImagesByTable(tableName)
           : fetchImages,
     staleTime: 5 * 60 * 1000, // 5 minutes - images change infrequently
-    gcTime: 15 * 60 * 1000 // Keep in cache for 15 minutes
+    gcTime: 15 * 60 * 1000, // Keep in cache for 15 minutes
+    enabled: options?.enabled ?? true
   })
 
   // Create image mutation
@@ -161,7 +166,7 @@ export const useImages = (tableName?: string, recordId?: string) => {
     const imageData: ImageInsert = {
       table_name: tableName,
       record_id: recordId,
-      image_url: uploadResult.url,
+      path: uploadResult.path,
       storage_object_id: uploadResult.id,
       alt_text: altText || null,
       file_size: fileSize || null,
@@ -178,8 +183,8 @@ export const useImages = (tableName?: string, recordId?: string) => {
     error: error as Error | null,
     createImage: (image: ImageInsert) => createMutation.mutateAsync(image),
     createImageFromUpload,
-    updateImage: (id: number, updates: ImageUpdate) => updateMutation.mutateAsync({ id, updates }),
-    deleteImage: (id: number) => deleteMutation.mutateAsync(id),
+    updateImage: (id: string, updates: ImageUpdate) => updateMutation.mutateAsync({ id, updates }),
+    deleteImage: (id: string) => deleteMutation.mutateAsync(id),
     refetch,
     getImageForRecord,
     getImagesForRecord,
@@ -191,8 +196,12 @@ export const useImages = (tableName?: string, recordId?: string) => {
 }
 
 // Hook specifically for getting a single image for a record
-export const useRecordImage = (tableName: string, recordId: string) => {
-  const { images, loading, error } = useImages(tableName, recordId)
+export const useRecordImage = (
+  tableName?: string,
+  recordId?: string,
+  options?: { enabled?: boolean }
+) => {
+  const { images, loading, error } = useImages(tableName, recordId, options)
 
   return {
     image: images[0] || null,
