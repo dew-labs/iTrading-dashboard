@@ -95,6 +95,40 @@ EXCEPTION
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Function to handle generic record deletion cascade to images and storage
+CREATE OR REPLACE FUNCTION public.handle_record_deletion_cascade_to_images()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  image_paths TEXT[];
+  bucket_name TEXT;
+BEGIN
+  -- The bucket name is assumed to be the same as the table name
+  bucket_name := TG_TABLE_NAME;
+
+  -- Find all image paths associated with the record being deleted
+  SELECT array_agg(path)
+  INTO image_paths
+  FROM public.images
+  WHERE record_id = OLD.id AND table_name = bucket_name;
+
+  -- If there are images, delete them from storage
+  IF image_paths IS NOT NULL AND array_length(image_paths, 1) > 0 THEN
+    PERFORM storage.delete_objects(bucket_name, image_paths);
+    RAISE LOG 'Deleted % images from storage bucket ''%'' for record_id: %', array_length(image_paths, 1), bucket_name, OLD.id;
+  END IF;
+
+  -- Delete the corresponding records from the images table
+  -- This will run regardless of whether files were in storage, to clean up orphaned DB records.
+  DELETE FROM public.images
+  WHERE record_id = OLD.id AND table_name = bucket_name;
+
+  RETURN OLD;
+END;
+$$;
+
 -- Function to handle user deletion cascade to auth.users
 CREATE OR REPLACE FUNCTION public.handle_user_deletion()
 RETURNS TRIGGER
@@ -128,6 +162,27 @@ CREATE TRIGGER on_public_user_deleted
   AFTER DELETE ON public.users
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_user_deletion();
+
+-- Triggers for cascading image deletion
+CREATE TRIGGER on_broker_deleted
+  BEFORE DELETE ON public.brokers
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_record_deletion_cascade_to_images();
+
+CREATE TRIGGER on_post_deleted
+  BEFORE DELETE ON public.posts
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_record_deletion_cascade_to_images();
+
+CREATE TRIGGER on_product_deleted
+  BEFORE DELETE ON public.products
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_record_deletion_cascade_to_images();
+
+CREATE TRIGGER on_user_avatar_deleted
+  BEFORE DELETE ON public.users
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_record_deletion_cascade_to_images();
 
 -- ===============================================
 -- AUDIT TRIGGER FUNCTION & TRIGGERS
