@@ -7,9 +7,9 @@ import {
   Eye,
   Tag,
   FileText,
-  TrendingUp,
-  Globe
+  TrendingUp
 } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
 import { useTranslation, usePageTranslation } from '../../../hooks/useTranslation'
 import { formatDateDisplay } from '../../../utils/format'
 import { Badge, Button } from '../../atoms'
@@ -17,6 +17,7 @@ import { RichTextRenderer } from '../../common'
 import { RecordImage } from '../images'
 import type { PostWithAuthor } from '../../../hooks/usePosts'
 import { getTypographyClasses, cn } from '../../../utils/theme'
+import { supabase } from '../../../lib/supabase'
 
 interface PostViewModalProps {
   isOpen: boolean
@@ -33,6 +34,22 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
 }) => {
   const { t: tCommon } = useTranslation()
   const { t } = usePageTranslation()
+
+  // Fetch images for this specific post
+  const { data: images = [] } = useQuery({
+    queryKey: ['images', 'posts', post.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('images')
+        .select('*')
+        .eq('table_name', 'posts')
+        .eq('record_id', post.id.toString())
+      return data || []
+    },
+    enabled: isOpen // Only fetch when modal is open
+  })
+
+  const hasImages = images.length > 0
 
   if (!isOpen) return null
 
@@ -141,21 +158,16 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
 
                 {/* Main content area */}
                 <div className='lg:col-span-3 space-y-6'>
-                  {/* Thumbnail image */}
-                  {post.thumbnail_url && (
+                  {/* Featured image from images table - only show if images exist */}
+                  {hasImages && (
                     <div className='mb-8'>
-                      <div className='relative group overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800'>
-                        <img
-                          src={post.thumbnail_url}
-                          alt={`${post.title} thumbnail`}
-                          className='w-full h-64 lg:h-80 object-cover group-hover:scale-105 transition-transform duration-500'
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement
-                            target.style.display = 'none'
-                          }}
-                        />
-                        <div className='absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
-                      </div>
+                      <RecordImage
+                        tableName="posts"
+                        recordId={post.id}
+                        className="w-full h-64 lg:h-80 object-cover group-hover:scale-105 transition-transform duration-500 rounded-xl"
+                        fallbackClassName="hidden"
+                        alt={`${post.title} featured image`}
+                      />
                     </div>
                   )}
 
@@ -249,27 +261,10 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
                       </div>
                     </div>
                   </div>
-
-                  {/* Associated images */}
-                  <div className='bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-6 border border-emerald-200/50 dark:border-emerald-700/50'>
-                    <h3 className='font-semibold text-gray-900 dark:text-white mb-4 flex items-center'>
-                      <Globe className='w-5 h-5 mr-2 text-emerald-600 dark:text-emerald-400' />
-                      Resources
-                    </h3>
-                    <div className='space-y-3'>
-                      <RecordImage
-                        tableName="posts"
-                        recordId={post.id.toString()}
-                        className="w-full h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
-                      />
-                    </div>
-                  </div>
-
                 </div>
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>

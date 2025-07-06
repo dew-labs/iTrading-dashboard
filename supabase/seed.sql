@@ -241,7 +241,7 @@ INSERT INTO products (name, price, description, featured_image_url, subscription
 -- POSTS (Trading News & Content) - Using Admin as Author
 -- ===============================================
 
-INSERT INTO posts (title, excerpt, content, type, status, author_id, thumbnail_url, views) VALUES
+INSERT INTO posts (title, excerpt, content, type, status, author_id, views) VALUES
 (
   'Market Analysis: Q1 2024 Review',
   'Comprehensive analysis of Q1 2024 market performance showing 8.2% S&P 500 growth and strong technology sector momentum despite economic uncertainties.',
@@ -249,7 +249,6 @@ INSERT INTO posts (title, excerpt, content, type, status, author_id, thumbnail_u
   'news',
   'published',
   (SELECT id FROM users WHERE email = 'admin@admin.com'),
-  NULL,
   2847
 ),
 (
@@ -259,7 +258,6 @@ INSERT INTO posts (title, excerpt, content, type, status, author_id, thumbnail_u
   'news',
   'published',
   (SELECT id FROM users WHERE email = 'admin@admin.com'),
-  NULL,
   1924
 ),
 (
@@ -269,7 +267,6 @@ INSERT INTO posts (title, excerpt, content, type, status, author_id, thumbnail_u
   'event',
   'published',
   (SELECT id FROM users WHERE email = 'admin@admin.com'),
-  NULL,
   856
 ),
 (
@@ -279,7 +276,6 @@ INSERT INTO posts (title, excerpt, content, type, status, author_id, thumbnail_u
   'news',
   'published',
   (SELECT id FROM users WHERE email = 'admin@admin.com'),
-  NULL,
   3421
 ),
 (
@@ -289,7 +285,6 @@ INSERT INTO posts (title, excerpt, content, type, status, author_id, thumbnail_u
   'news',
   'published',
   (SELECT id FROM users WHERE email = 'admin@admin.com'),
-  NULL,
   1677
 ),
 (
@@ -299,7 +294,6 @@ INSERT INTO posts (title, excerpt, content, type, status, author_id, thumbnail_u
   'privacy_policy',
   'published',
   (SELECT id FROM users WHERE email = 'admin@admin.com'),
-  NULL,
   654
 ),
 (
@@ -309,7 +303,6 @@ INSERT INTO posts (title, excerpt, content, type, status, author_id, thumbnail_u
   'terms_of_use',
   'published',
   (SELECT id FROM users WHERE email = 'admin@admin.com'),
-  NULL,
   432
 ),
 (
@@ -319,9 +312,49 @@ INSERT INTO posts (title, excerpt, content, type, status, author_id, thumbnail_u
   'news',
   'draft',
   (SELECT id FROM users WHERE email = 'admin@admin.com'),
-  NULL,
   0
 );
+
+-- ===============================================
+-- POST IMAGES (Thumbnail Images for Posts)
+-- ===============================================
+
+DO $$
+DECLARE
+    post_id uuid;
+BEGIN
+    -- Market Analysis: Q1 2024 Review
+    SELECT id INTO post_id FROM posts WHERE title = 'Market Analysis: Q1 2024 Review';
+    INSERT INTO images (table_name, record_id, type, path, alt_text) VALUES ('posts', post_id, 'thumbnail', 'thumbnails/market_analysis_q1_2024.jpg', 'Market analysis chart showing Q1 2024 performance');
+
+    -- Understanding Options Trading: A Beginner's Guide
+    SELECT id INTO post_id FROM posts WHERE title = 'Understanding Options Trading: A Beginner''s Guide';
+    INSERT INTO images (table_name, record_id, type, path, alt_text) VALUES ('posts', post_id, 'thumbnail', 'thumbnails/options_trading_guide.jpg', 'Options trading educational diagram');
+
+    -- Virtual Trading Conference 2024
+    SELECT id INTO post_id FROM posts WHERE title = 'Virtual Trading Conference 2024';
+    INSERT INTO images (table_name, record_id, type, path, alt_text) VALUES ('posts', post_id, 'thumbnail', 'thumbnails/virtual_trading_conference_2024.jpg', 'Virtual trading conference promotional image');
+
+    -- New Platform Features: Advanced Charting Tools
+    SELECT id INTO post_id FROM posts WHERE title = 'New Platform Features: Advanced Charting Tools';
+    INSERT INTO images (table_name, record_id, type, path, alt_text) VALUES ('posts', post_id, 'thumbnail', 'thumbnails/advanced_charting_tools.jpg', 'Advanced trading charts and technical indicators');
+
+    -- Risk Management in Volatile Markets
+    SELECT id INTO post_id FROM posts WHERE title = 'Risk Management in Volatile Markets';
+    INSERT INTO images (table_name, record_id, type, path, alt_text) VALUES ('posts', post_id, 'thumbnail', 'thumbnails/risk_management_volatile_markets.jpg', 'Risk management dashboard and portfolio protection');
+
+    -- Privacy Policy Update
+    SELECT id INTO post_id FROM posts WHERE title = 'Privacy Policy Update';
+    INSERT INTO images (table_name, record_id, type, path, alt_text) VALUES ('posts', post_id, 'thumbnail', 'thumbnails/privacy_policy_update.jpg', 'Privacy policy and data protection illustration');
+
+    -- Platform Terms of Service
+    SELECT id INTO post_id FROM posts WHERE title = 'Platform Terms of Service';
+    INSERT INTO images (table_name, record_id, type, path, alt_text) VALUES ('posts', post_id, 'thumbnail', 'thumbnails/platform_terms_of_service.jpg', 'Legal documents and terms of service illustration');
+
+    -- Cryptocurrency Integration Coming Soon
+    SELECT id INTO post_id FROM posts WHERE title = 'Cryptocurrency Integration Coming Soon';
+    INSERT INTO images (table_name, record_id, type, path, alt_text) VALUES ('posts', post_id, 'thumbnail', 'thumbnails/cryptocurrency_integration.jpg', 'Cryptocurrency trading and digital assets illustration');
+END $$;
 
 -- ===============================================
 -- BANNERS (Promotional Content)
@@ -348,6 +381,7 @@ DECLARE
     total_products int;
     total_brokers int;
     total_banners int;
+    total_images int;
     admin_user_exists boolean;
 BEGIN
     -- Count all seeded data
@@ -356,6 +390,7 @@ BEGIN
     SELECT count(*) INTO total_products FROM products;
     SELECT count(*) INTO total_brokers FROM brokers;
     SELECT count(*) INTO total_banners FROM banners;
+    SELECT count(*) INTO total_images FROM images;
     SELECT exists(SELECT 1 FROM users WHERE email = 'admin@admin.com') INTO admin_user_exists;
 
     -- Generate report
@@ -370,6 +405,7 @@ BEGIN
     RAISE NOTICE '🛍️  Products: % (without images)', total_products;
     RAISE NOTICE '🏢 Brokers: % (major trading brokers)', total_brokers;
     RAISE NOTICE '🖼️  Banners: % (promotional banners)', total_banners;
+    RAISE NOTICE '🎨 Images: % (broker logos + post thumbnails)', total_images;
     RAISE NOTICE '';
 
     IF admin_user_exists THEN
@@ -383,8 +419,9 @@ BEGIN
     RAISE NOTICE '   2. Supabase Auth dashboard';
     RAISE NOTICE '   3. Auth API calls';
     RAISE NOTICE '';
-    RAISE NOTICE '🚀 Your application is ready with clean sample data!';
-    RAISE NOTICE '   ✨ No placeholder images - perfect for development';
-    RAISE NOTICE '   🎯 Add your own images through the application UI';
+    RAISE NOTICE '🚀 Your application is ready with sample data!';
+    RAISE NOTICE '   ✨ Includes sample images (broker logos & post thumbnails)';
+    RAISE NOTICE '   🎯 All images stored in centralized images table';
+    RAISE NOTICE '   📁 Post thumbnails: posts/thumbnails/ | Broker logos: brokers/logos/';
     RAISE NOTICE '';
 END $$;

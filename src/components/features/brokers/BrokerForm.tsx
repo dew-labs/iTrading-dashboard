@@ -5,6 +5,8 @@ import { useFormValidation } from '../../../hooks/useFormValidation'
 import { FormField, Textarea } from '../../atoms'
 import { MainImageUpload } from '../images'
 import { useFormTranslation, useTranslation } from '../../../hooks/useTranslation'
+import { supabase } from '../../../lib/supabase'
+import type { UploadResult } from '../../../hooks/useFileUpload'
 
 // Move schema outside component to prevent re-renders
 const BROKER_FORM_SCHEMA = {
@@ -32,7 +34,7 @@ const BROKER_FORM_SCHEMA = {
 
 interface BrokerFormProps {
   broker?: Broker | null
-  onSubmit: (data: BrokerInsert, logoImage?: Partial<Image> | null) => void
+  onSubmit: (data: BrokerInsert, logoImage?: (Partial<Image> & { file?: File }) | null) => void
   onCancel: () => void
   images?: Image[] | null
 }
@@ -41,7 +43,9 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
   const { t: tForm } = useFormTranslation()
   const { t } = useTranslation()
 
-  const [logoImage, setLogoImage] = useState<Partial<Image> | null>(null)
+  const [logoImage, setLogoImage] = useState<
+    (Partial<Image> & { publicUrl?: string; file?: File }) | null
+  >(null)
 
   // Memoize initial data to prevent re-renders
   const initialData = useMemo(() => ({
@@ -76,32 +80,46 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
         headquarter: broker.headquarter || '',
         description: broker.description || ''
       })
-      const logo = images?.find(
+      const existingLogo = images?.find(
         img => img.record_id === broker.id && img.type === 'logo'
       )
-      if (logo) {
-        setLogoImage(logo)
+      if (existingLogo) {
+        const { data: urlData } = supabase.storage
+          .from('brokers')
+          .getPublicUrl(existingLogo.path)
+        setLogoImage({ ...existingLogo, publicUrl: urlData.publicUrl })
+      } else {
+        setLogoImage(null)
       }
-    }
-  }, [broker, reset, images])
-
-  const handleLogoUpload = useCallback((url: string | null, file?: File) => {
-    if (url && file) {
-      setLogoImage(prev => ({
-        ...prev,
-        path: url,
-        table_name: 'brokers',
-        record_id: broker?.id || '',
-        type: 'logo',
-        alt_text: `${formData.name} logo`,
-        storage_object_id: prev?.storage_object_id || null,
-        file_size: file.size,
-        mime_type: file.type
-      }))
     } else {
+      reset(initialData)
       setLogoImage(null)
     }
-  }, [broker?.id, formData.name])
+  }, [broker, reset, images, initialData])
+
+  const handleLogoUpload = useCallback(
+    (uploadResult: UploadResult | null, file?: File) => {
+      if (uploadResult && file) {
+        const { url: publicUrl, path, id: storageObjectId } = uploadResult
+        setLogoImage(prev => ({
+          ...prev,
+          path,
+          publicUrl,
+          storage_object_id: storageObjectId,
+          table_name: 'brokers',
+          record_id: broker?.id || '',
+          type: 'logo',
+          alt_text: `${formData.name} logo`,
+          file_size: file.size,
+          mime_type: file.type,
+          file
+        }))
+      } else {
+        setLogoImage(null)
+      }
+    },
+    [broker?.id, formData.name]
+  )
 
   const handleEstablishedYearChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -137,7 +155,7 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
           <div>
             <MainImageUpload
               label={tForm('labels.logo')}
-              imageUrl={logoImage?.path || null}
+              imageUrl={logoImage?.publicUrl || logoImage?.path || null}
               onChange={handleLogoUpload}
               bucket='brokers'
               folder='logos'

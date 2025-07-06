@@ -7,7 +7,6 @@ import { useFormTranslation } from '../../../hooks/useTranslation'
 import { FormField } from '../../atoms'
 import { Select } from '../../molecules'
 import RichTextEditor from './RichTextEditor'
-import { MainImageUpload } from '../images'
 import { stripHtml } from '../../../utils/textUtils'
 
 // Move schema outside component to prevent re-renders
@@ -53,7 +52,6 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
     type: 'news' as PostWithAuthor['type'],
     status: 'draft' as PostWithAuthor['status'],
     author_id: null as string | null,
-    thumbnail_url: null as string | null,
     views: 0
   }), [])
 
@@ -87,7 +85,6 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
         content: post.content || '',
         status: post.status,
         author_id: post.author_id,
-        thumbnail_url: post.thumbnail_url || null,
         views: post.views || 0
       })
       setReadingTime(calculateReadingTime(post.content || ''))
@@ -102,9 +99,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
     updateField('content', content)
   }, [updateField])
 
-  const handleThumbnailChange = useCallback((url: string | null) => {
-    updateField('thumbnail_url', url)
-  }, [updateField])
+
 
   // Create type options with Badge component icons
   const typeOptions = useMemo(() => [
@@ -214,19 +209,11 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
             <span className='font-semibold text-gray-900 dark:text-white'>{readingTime} min</span>
           </div>
 
-          {/* Thumbnail upload section */}
+          {/* Thumbnail upload will be handled through the centralized images table */}
           <div className='border-t border-gray-200 dark:border-gray-700 pt-6'>
-            <MainImageUpload
-              label='Thumbnail Image'
-              imageUrl={formData.thumbnail_url || null}
-              onChange={handleThumbnailChange}
-              bucket='posts'
-              folder='thumbnails'
-              size='lg'
-              disabled={isValidating}
-              recommendationText='Use high-quality images (1200x630px) for best social sharing results'
-              alt='Post thumbnail'
-            />
+            <p className='text-sm text-gray-500 dark:text-gray-400'>
+              Post images can be added through the rich text editor below or managed through the images section after saving.
+            </p>
           </div>
         </div>
 

@@ -180,7 +180,6 @@ export type Database = {
           published_at: string | null
           reading_time: number | null
           status: Database["public"]["Enums"]["post_status"]
-          thumbnail_url: string | null
           title: string
           type: Database["public"]["Enums"]["post_type"]
           updated_at: string
@@ -195,7 +194,6 @@ export type Database = {
           published_at?: string | null
           reading_time?: number | null
           status?: Database["public"]["Enums"]["post_status"]
-          thumbnail_url?: string | null
           title: string
           type?: Database["public"]["Enums"]["post_type"]
           updated_at?: string
@@ -210,7 +208,6 @@ export type Database = {
           published_at?: string | null
           reading_time?: number | null
           status?: Database["public"]["Enums"]["post_status"]
-          thumbnail_url?: string | null
           title?: string
           type?: Database["public"]["Enums"]["post_type"]
           updated_at?: string

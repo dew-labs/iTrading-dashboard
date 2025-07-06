@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react'
 import { Upload, Image as ImageIcon, Camera, Trash2 } from 'lucide-react'
-import { useFileUpload } from '../../../hooks/useFileUpload'
+import { useFileUpload, type UploadResult } from '../../../hooks/useFileUpload'
 import { useToast } from '../../../hooks/useToast'
 import { useTranslation } from '../../../hooks/useTranslation'
 
@@ -8,7 +8,7 @@ interface MainImageUploadProps {
   /** Current image URL */
   imageUrl?: string | null
   /** Callback when image is uploaded or changed */
-  onChange: (url: string | null) => void
+  onChange: (result: UploadResult | null, file?: File) => void
   /** Storage bucket for uploads */
   bucket: string
   /** Storage folder for uploads */
@@ -104,7 +104,7 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
         maxSizeInMB: 10
       })
         .then(result => {
-          onChange(result.url)
+          onChange(result, file)
           setPreview(null)
           toast.success('uploaded', 'mainImage')
         })

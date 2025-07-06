@@ -1,5 +1,5 @@
 import React from 'react'
-import { Edit2, Trash2, Clock, User, Tag } from 'lucide-react'
+import { Edit2, Trash2, Clock, User } from 'lucide-react'
 import Table from '../../../components/molecules/Table'
 import { Badge } from '../../../components/atoms'
 import RecordImage from '../../../components/features/images/RecordImage'
@@ -42,10 +42,9 @@ const PostsTable: React.FC<PostsTableProps> = ({
           <div className='flex-shrink-0'>
             <RecordImage
               image={imagesByRecord[row.id]?.[0] || null}
-              className='w-12 h-12 rounded-lg object-cover border border-gray-200'
-              fallbackClassName='w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center'
+              className='w-12 h-12 rounded-lg object-cover border border-gray-200 dark:border-gray-700'
               alt={`${value as string} post image`}
-              fallbackIcon={<Tag className='w-4 h-4 text-white' />}
+              showFallback={false}
             />
           </div>
           <div className='flex-1 min-w-0'>

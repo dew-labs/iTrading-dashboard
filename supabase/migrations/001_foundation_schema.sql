@@ -69,7 +69,6 @@ CREATE TABLE posts (
   status post_status NOT NULL DEFAULT 'draft',
   title text NOT NULL,
   excerpt text,
-  thumbnail_url text,
   content text,
   views bigint DEFAULT 0 NOT NULL,
   reading_time integer DEFAULT 1,
@@ -199,6 +198,5 @@ COMMENT ON COLUMN images.blurhash IS 'Blurhash string for low-res image placehol
 COMMENT ON COLUMN posts.author_id IS 'Reference to the user who created this post';
 COMMENT ON COLUMN posts.excerpt IS 'Brief summary or preview of the post content for listings and previews';
 COMMENT ON COLUMN posts.reading_time IS 'Estimated reading time in minutes';
-COMMENT ON COLUMN posts.thumbnail_url IS 'Featured image for post listings and previews';
 COMMENT ON COLUMN posts.views IS 'Number of times this post has been viewed';
 COMMENT ON COLUMN products.featured_image_url IS 'Main product image for display and listings';

@@ -140,7 +140,6 @@ export const usePosts = () => {
         type: newPost.type || 'news',
         status: newPost.status || 'draft',
         author_id: newPost.author_id || null,
-        thumbnail_url: newPost.thumbnail_url || null,
         views: 0,
         published_at: newPost.status === 'published' ? new Date().toISOString() : '',
         created_at: new Date().toISOString(),

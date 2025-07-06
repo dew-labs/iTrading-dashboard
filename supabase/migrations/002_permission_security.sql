@@ -365,6 +365,11 @@ CREATE POLICY "Brokers are viewable by everyone"
   TO public
   USING (is_visible = true);
 
+CREATE POLICY "Authenticated users can view all brokers"
+  ON brokers FOR SELECT
+  TO authenticated
+  USING (true);
+
 CREATE POLICY "Authenticated users can insert brokers"
   ON brokers FOR INSERT
   TO authenticated
@@ -386,7 +391,7 @@ CREATE POLICY "Visible banners are viewable by everyone"
   TO public
   USING (is_visible = true);
 
-CREATE POLICY "All banners are viewable by authenticated users"
+CREATE POLICY "Authenticated users can view all banners"
   ON banners FOR SELECT
   TO authenticated
   USING (true);

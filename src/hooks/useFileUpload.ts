@@ -10,7 +10,7 @@ interface UploadOptions {
   maxSizeInMB?: number
 }
 
-interface UploadResult {
+export interface UploadResult {
   url: string
   path: string
   id: string

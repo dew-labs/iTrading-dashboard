@@ -7,10 +7,12 @@ import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
 import { BrokerForm, BrokerViewModal } from '../components/features/brokers'
 import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
-import type { Broker, BrokerInsert } from '../types'
-import { useQuery } from '@tanstack/react-query'
+import type { Broker, BrokerInsert, Image } from '../types'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { groupImagesByRecord } from '../utils'
-import { supabase } from '../lib/supabase'
+import { supabase, queryKeys } from '../lib/supabase'
+import { useImages } from '../hooks/useImages'
+import { useFileUpload } from '../hooks/useFileUpload'
 
 // Theme imports
 import { getPageLayoutClasses, getTypographyClasses, cn } from '../utils/theme'
@@ -19,6 +21,9 @@ const Brokers: React.FC = () => {
   const { brokers, loading, createBroker, updateBroker, deleteBroker, isDeleting } = useBrokers()
   const { t } = usePageTranslation() // Page-specific content
   const { t: tCommon } = useTranslation() // Common actions and terms
+  const { createImage, deleteImage } = useImages()
+  const { deleteFile } = useFileUpload()
+  const queryClient = useQueryClient()
 
   // Use our new filtering hook to replace all the filtering/sorting/pagination logic
   const {
@@ -103,18 +108,58 @@ const Brokers: React.FC = () => {
     setEditingBroker(null)
   }
 
-  const handleSubmit = async (data: BrokerInsert) => {
+  const handleSubmit = async (
+    data: BrokerInsert,
+    logoImage: (Partial<Image> & { publicUrl?: string; file?: File }) | null | undefined
+  ) => {
     try {
+      let brokerId = editingBroker?.id
+
       if (editingBroker) {
         await updateBroker(editingBroker.id, data)
       } else {
-        await createBroker(data)
+        const newBroker = await createBroker(data)
+        brokerId = newBroker.id
         // Go to first page to see the new broker
         handlePageChange(1)
       }
+
+      if (!brokerId) return
+
+      const existingLogo = images.find(
+        img => img.record_id === brokerId && img.type === 'logo'
+      )
+
+      // Case 1: Logo removed
+      if (!logoImage && existingLogo) {
+        await deleteImage(existingLogo.id)
+        await deleteFile('brokers', existingLogo.path)
+      }
+
+      // Case 2: New logo added or existing logo changed
+      if (logoImage && logoImage.file) {
+        if (existingLogo) {
+          // A logo exists, so we're replacing it. Delete the old one first.
+          await deleteImage(existingLogo.id)
+          await deleteFile('brokers', existingLogo.path)
+        }
+
+        // Create new image record
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { file, publicUrl, ...imageData } = logoImage
+        await createImage({
+          ...imageData,
+          record_id: brokerId
+        } as Image)
+      }
+
       handleCloseModal()
     } catch (error) {
       console.error('Failed to save broker:', error)
+    } finally {
+      // Invalidate queries to refetch brokers and images
+      await queryClient.invalidateQueries({ queryKey: queryKeys.brokers() })
+      await queryClient.invalidateQueries({ queryKey: queryKeys.images() })
     }
   }
 
@@ -232,6 +277,7 @@ const Brokers: React.FC = () => {
                 {paginatedBrokers.length > 0 ? (
                   <BrokerGrid
                     brokers={paginatedBrokers}
+                    imagesByRecord={imagesByRecord}
                     onView={handleView}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
@@ -366,7 +412,12 @@ const Brokers: React.FC = () => {
               : t('brokers.addNewBroker')
           }
         >
-          <BrokerForm broker={editingBroker} onSubmit={handleSubmit} onCancel={handleCloseModal} />
+          <BrokerForm
+            broker={editingBroker}
+            onSubmit={handleSubmit}
+            onCancel={handleCloseModal}
+            images={images}
+          />
         </Modal>
 
         {/* Enhanced Modal for viewing broker details */}

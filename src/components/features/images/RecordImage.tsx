@@ -39,6 +39,7 @@ const RecordImage: React.FC<RecordImageProps> = ({
   const loading = imageProp ? false : recordImageResult.loading
   const error = imageProp ? null : recordImageResult.error
   const [imgLoaded, setImgLoaded] = React.useState(false)
+  const [imageError, setImageError] = React.useState(false)
 
   const imageUrl = image ? getStorageUrl(image.table_name, image.path) : null
 
@@ -62,7 +63,7 @@ const RecordImage: React.FC<RecordImageProps> = ({
     )
   }
 
-  if (error || !image || !imageUrl) {
+  if (error || !image || !imageUrl || imageError) {
     if (!showFallback) return null
 
     return (
@@ -88,11 +89,7 @@ const RecordImage: React.FC<RecordImageProps> = ({
         className={className}
         style={!imgLoaded && image.blurhash ? { opacity: 0, position: 'absolute', zIndex: 2 } : {}}
         onLoad={() => setImgLoaded(true)}
-        onError={e => {
-          const target = e.target as HTMLImageElement
-          target.src =
-            'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIxIDlWN0EyIDIgMCAwIDAgMTkgNUg1QTIgMiAwIDAgMCAzIDdWOE0yMSA5TDEzLjUgMTUuNUMxMy4xIDEzLjMgMTEuNiAxNiA5IDE2SDdNMjEgOVYxOUEyIDIgMCAwIDEgMTkgMjFIOUMxNS40IDIxIDE5IDEyLjQgMTkgOE0zIDhWMTlBMiAyIDAgMCAwIDUgMjFIOSIgc3Ryb2tlPSIjNjM2MzYzIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4K'
-        }}
+        onError={() => setImageError(true)}
       />
     </div>
   )
