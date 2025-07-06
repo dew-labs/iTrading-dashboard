@@ -41,7 +41,7 @@ const PostsTable: React.FC<PostsTableProps> = ({
         <div className='flex items-center space-x-3'>
           <div className='flex-shrink-0'>
             <RecordImage
-              image={imagesByRecord[row.id]?.[0]}
+              image={imagesByRecord[row.id]?.[0] || null}
               className='w-12 h-12 rounded-lg object-cover border border-gray-200'
               fallbackClassName='w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center'
               alt={`${value as string} post image`}

@@ -5,7 +5,7 @@ import { AUDIT_TABLES, AUDIT_ACTIONS, type AuditLog } from '@/types/audits'
 import { usePermissions } from './usePermissions'
 
 interface RecentActivityItem {
-  id: number
+  id: string
   type: string
   action: string
   user: string

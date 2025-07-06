@@ -81,7 +81,7 @@ const updatePostMutation = async ({
   id,
   updates
 }: {
-  id: number
+  id: string
   updates: PostUpdate
 }): Promise<PostWithAuthor> => {
   return supabaseHelpers.updateData(
@@ -97,7 +97,7 @@ const updatePostMutation = async ({
   )
 }
 
-const deletePostMutation = async (id: number): Promise<void> => {
+const deletePostMutation = async (id: string): Promise<void> => {
   return supabaseHelpers.deleteData(supabase.from('posts').delete().eq('id', id))
 }
 
@@ -133,7 +133,7 @@ export const usePosts = () => {
 
       // Optimistically update
       const optimisticPost: PostWithAuthor = {
-        id: Date.now(), // Temporary ID
+        id: `temp-${Date.now()}`, // Temporary ID
         title: newPost.title,
         excerpt: newPost.excerpt || null,
         content: newPost.content || null,
@@ -144,6 +144,7 @@ export const usePosts = () => {
         views: 0,
         published_at: newPost.status === 'published' ? new Date().toISOString() : '',
         created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
         author: null,
         reading_time: null
       }
@@ -222,7 +223,7 @@ export const usePosts = () => {
 
   // Duplicate post mutation
   const duplicateMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       const posts = queryClient.getQueryData<Post[]>(queryKeys.posts()) || []
       const postToDuplicate = posts.find(p => p.id === id)
 
@@ -277,14 +278,18 @@ export const usePosts = () => {
     )
   }
 
+  const getPostById = (id: string) => {
+    return posts.find(p => p.id === id)
+  }
+
   return {
     posts,
     loading,
     error: error as Error | null,
     createPost: (post: PostInsert) => createMutation.mutateAsync(post),
-    updatePost: (id: number, updates: PostUpdate) => updateMutation.mutateAsync({ id, updates }),
-    deletePost: (id: number) => deleteMutation.mutateAsync(id),
-    duplicatePost: (id: number) => duplicateMutation.mutateAsync(id),
+    updatePost: (id: string, updates: PostUpdate) => updateMutation.mutateAsync({ id, updates }),
+    deletePost: (id: string) => deleteMutation.mutateAsync(id),
+    duplicatePost: (id: string) => duplicateMutation.mutateAsync(id),
     incrementViews: (id: number) => incrementViewsMutation.mutate(id),
     refetch,
     // Helper functions
@@ -292,6 +297,7 @@ export const usePosts = () => {
     getPublishedPosts,
     getDraftPosts,
     searchPosts,
+    getPostById,
     // Additional states for UI feedback
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,

@@ -65,7 +65,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
                 />
               ) : (
                 <RecordImage
-                  image={fallbackImage}
+                  image={fallbackImage || null}
                   className='w-12 h-12 rounded-lg object-cover border border-gray-200'
                   fallbackClassName='w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center'
                   alt={`${row.full_name || tCommon('roles.user')} ${tCommon('ui.profileImage')}`}

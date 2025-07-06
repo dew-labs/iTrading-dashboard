@@ -187,14 +187,13 @@ export const grantDefaultPermissions = async (
 
     // Default read permissions for all resources
     const defaultPermissions = [
-      { user_id: userId, resource: 'posts', action: 'read' },
-      { user_id: userId, resource: 'products', action: 'read' },
-      { user_id: userId, resource: 'banners', action: 'read' },
-      { user_id: userId, resource: 'users', action: 'read' },
-      { user_id: userId, resource: 'notifications', action: 'read' }
+      { role, resource: 'posts', action: 'read' },
+      { role, resource: 'products', action: 'read' },
+      { role, resource: 'banners', action: 'read' },
+      { role, resource: 'users', action: 'read' },
     ]
 
-    const { error } = await supabase.from('user_permissions').insert(defaultPermissions)
+    const { error } = await supabase.from('role_permissions').insert(defaultPermissions)
 
     if (error) throw error
 
@@ -207,8 +206,6 @@ export const grantDefaultPermissions = async (
     return { success: false, error: errorMessage }
   }
 }
-
-
 
 /**
  * Bulk update user status

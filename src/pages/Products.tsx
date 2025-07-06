@@ -78,7 +78,7 @@ const Products: React.FC = () => {
     if (!confirmDialog.productId) return
 
     try {
-      await deleteProduct(parseInt(confirmDialog.productId))
+      await deleteProduct(confirmDialog.productId)
       setConfirmDialog({ isOpen: false, productId: null, productName: null })
       // Reset to first page if current page becomes empty
       if (paginatedProducts.length === 1 && filterState.currentPage > 1) {

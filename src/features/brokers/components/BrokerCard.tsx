@@ -24,7 +24,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({ broker, image, onView, onEdit, 
           <div className='flex items-center space-x-3'>
             <div className='flex-shrink-0'>
               <RecordImage
-                image={image}
+                image={image || null}
                 fallbackClassName='w-12 h-12 rounded-lg bg-gradient-to-br from-gray-900 to-black flex items-center justify-center'
                 className='w-12 h-12 rounded-lg object-cover border border-gray-200'
                 fallbackIcon={<Building2 className='w-6 h-6 text-white' />}

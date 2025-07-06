@@ -248,14 +248,10 @@ const Audits: React.FC = () => {
                   <Button
                     variant='ghost'
                     size='sm'
-                    onClick={() => {
-                      clearFilters()
-                      handlePageChange(1)
-                    }}
+                    onClick={clearFilters}
                     leftIcon={X}
-                    className="hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors"
                   >
-                    {t('audits.clearFilters')}
+                    {tCommon('actions.clearFilters', { count: activeFiltersCount })}
                   </Button>
                 )}
               </div>
@@ -271,7 +267,7 @@ const Audits: React.FC = () => {
               totalItems={filteredAuditLogs.length}
               onPageChange={handlePageChange}
               onViewDetails={handleView}
-              onDeleteLog={(id: number) => {
+              onDeleteLog={id => {
                 const log = auditLogs.find(l => l.id === id)
                 if (log) handleDelete(log)
               }}

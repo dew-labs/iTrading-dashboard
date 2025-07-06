@@ -7,6 +7,7 @@ import { useImages } from '../../../hooks/useImages'
 import { useFileUpload } from '../../../hooks/useFileUpload'
 import { useToast } from '../../../hooks/useToast'
 import { useFormTranslation, useTranslation } from '../../../hooks/useTranslation'
+import { getStorageUrl } from '../../../utils/storage'
 
 // Move schema outside component to prevent re-renders
 const BANNER_FORM_SCHEMA = {
@@ -106,10 +107,10 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
 
   // Separate effect for loading existing image to prevent infinite loops
   React.useEffect(() => {
-    if (banner?.id && existingImage?.image_url) {
-      setImageUrl(existingImage.image_url)
+    if (banner?.id && existingImage) {
+      setImageUrl(getStorageUrl(existingImage.table_name, existingImage.path))
     }
-  }, [banner?.id, existingImage?.image_url])
+  }, [banner?.id, existingImage])
 
   // Handle file selection
   const handleFileSelect = useCallback(async (file: File) => {

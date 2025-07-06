@@ -1,5 +1,5 @@
 import React from 'react'
-import { Edit2, Trash2, Image, Eye, EyeOff, Calendar, Link } from 'lucide-react'
+import { Edit2, Trash2, Eye, EyeOff, Calendar, Link } from 'lucide-react'
 import { Table } from '../../../components/molecules'
 import { Badge } from '../../../components/atoms'
 import RecordImage from '../../../components/features/images/RecordImage'
@@ -41,15 +41,12 @@ const BannersTable: React.FC<BannersTableProps> = ({
         const image = imagesByRecord[row.id]?.[0]
         return (
           <div className='flex items-center space-x-3'>
-            <div className='flex-shrink-0'>
-              <RecordImage
-                image={image}
-                className='w-12 h-12 rounded-lg object-cover border border-gray-200'
-                fallbackClassName='w-12 h-12 rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center'
-                alt={`Banner ${row.id.slice(0, 8)} image`}
-                fallbackIcon={<Image className='w-4 h-4 text-white' />}
-              />
-            </div>
+            <RecordImage
+              image={image || null}
+              className='w-16 h-10 rounded-md object-cover'
+              fallbackClassName='w-16 h-10 rounded-md bg-gray-100 flex items-center justify-center'
+              alt={row.name}
+            />
             <div className='flex-1 min-w-0'>
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>
                 {row.name || 'Untitled Banner'}

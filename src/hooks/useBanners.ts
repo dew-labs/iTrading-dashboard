@@ -61,7 +61,8 @@ export const useBanners = () => {
         name: newBanner.name || 'New Banner',
         target_url: newBanner.target_url || null,
         is_visible: typeof newBanner.is_visible === 'boolean' ? newBanner.is_visible : true,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       }
 
       queryClient.setQueryData<Banner[]>(queryKeys.banners(), (old = []) => [

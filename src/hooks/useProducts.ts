@@ -18,7 +18,7 @@ const updateProductMutation = async ({
   id,
   updates
 }: {
-  id: number
+  id: string
   updates: ProductUpdate
 }): Promise<Product> => {
   return supabaseHelpers.updateData(
@@ -26,7 +26,7 @@ const updateProductMutation = async ({
   )
 }
 
-const deleteProductMutation = async (id: number): Promise<void> => {
+const deleteProductMutation = async (id: string): Promise<void> => {
   return supabaseHelpers.deleteData(supabase.from('products').delete().eq('id', id))
 }
 
@@ -59,13 +59,14 @@ export const useProducts = () => {
 
       // Optimistically update to the new value
       const optimisticProduct: Product = {
-        id: Date.now(), // Temporary ID
+        id: `temp-${Date.now()}`, // Temporary ID
         name: newProduct.name,
         description: newProduct.description || null,
         price: newProduct.price,
         subscription: newProduct.subscription || false,
         featured_image_url: newProduct.featured_image_url || null,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       }
 
       queryClient.setQueryData<Product[]>(queryKeys.products(), (old = []) => [
@@ -152,9 +153,9 @@ export const useProducts = () => {
     loading,
     error: error as Error | null,
     createProduct: (product: ProductInsert) => createMutation.mutateAsync(product),
-    updateProduct: (id: number, updates: ProductUpdate) =>
+    updateProduct: (id: string, updates: ProductUpdate) =>
       updateMutation.mutateAsync({ id, updates }),
-    deleteProduct: (id: number) => deleteMutation.mutateAsync(id),
+    deleteProduct: (id: string) => deleteMutation.mutateAsync(id),
     refetch,
     // Additional states for UI feedback
     isCreating: createMutation.isPending,

@@ -66,7 +66,7 @@ const fetchAuditStats = async (): Promise<AuditStats> => {
   return data as unknown as AuditStats
 }
 
-const deleteAuditLogMutation = async (id: number): Promise<void> => {
+const deleteAuditLogMutation = async (id: string): Promise<void> => {
   const { error } = await supabase.from('audit_logs').delete().eq('id', id)
   if (error) {
     throw error
@@ -180,7 +180,7 @@ export const useAuditLogs = (filters?: AuditFilters) => {
     statsLoading,
     error: permissionError ? new Error(permissionError) : (error as Error | null),
     statsError: statsError as Error | null,
-    deleteAuditLog: (id: number) => deleteMutation.mutateAsync(id),
+    deleteAuditLog: (id: string) => deleteMutation.mutateAsync(id),
     deleteOldAuditLogs: (daysToKeep: number) => deleteOldMutation.mutateAsync(daysToKeep),
     refetch,
     // Additional states for UI feedback

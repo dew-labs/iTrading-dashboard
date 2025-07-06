@@ -2,6 +2,7 @@ import React from 'react'
 import { Image as ImageIcon } from 'lucide-react'
 import { useImages } from '../../hooks/useImages'
 import { Modal } from '../atoms'
+import { getStorageUrl } from '../../utils/storage'
 
 interface DetailViewModalProps {
   isOpen: boolean
@@ -49,7 +50,7 @@ const DetailViewModal: React.FC<DetailViewModalProps> = ({
                 <div key={image.id} className='space-y-2'>
                   <div className='aspect-square bg-gray-100 rounded-lg overflow-hidden'>
                     <img
-                      src={image.image_url}
+                      src={getStorageUrl(image.table_name, image.path) || ''}
                       alt={image.alt_text || 'Record image'}
                       className='w-full h-full object-cover hover:scale-105 transition-transform duration-200'
                       onError={e => {

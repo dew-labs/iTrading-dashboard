@@ -16,7 +16,7 @@ interface AuditLogTableProps {
   totalItems: number
   onPageChange: (page: number) => void
   onViewDetails: (auditLog: AuditLog) => void
-  onDeleteLog?: (id: number) => void
+  onDeleteLog?: (id: string) => void
   canDelete?: boolean
   className?: string
 }
