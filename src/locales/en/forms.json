@@ -22,6 +22,10 @@
     "title": "Title",
     "description": "Description",
     "content": "Content",
+    "excerpt": "Excerpt",
+    "type": "Type",
+    "readingTime": "Estimated reading time:",
+    "thumbnail": "Thumbnail",
     "category": "Category",
     "tags": "Tags",
     "image": "Image",
@@ -125,7 +129,8 @@
     "fileSize": "File size exceeds maximum limit"
   },
   "hints": {
-    "logoRecommendation": "Recommended: Square images work best"
+    "logoRecommendation": "Recommended: Square images work best",
+    "thumbnailRecommendation": "Recommended: 16:9 aspect ratio for best display"
   },
   "userForm": {
     "profilePicture": "Profile Picture",

@@ -15,10 +15,12 @@ import { FilterDropdown, Modal, TabNavigation, PaginationSelector, Button, Input
 import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
 import { POST_TYPES } from '../constants/general'
-import type { PostInsert } from '../types'
-import { useQuery } from '@tanstack/react-query'
+import type { PostInsert, Image, ImageInsert } from '../types'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { groupImagesByRecord } from '../utils'
-import { supabase } from '../lib/supabase'
+import { supabase, queryKeys } from '../lib/supabase'
+import { useImages } from '../hooks/useImages'
+import { useFileUpload } from '../hooks/useFileUpload'
 
 // Theme imports
 import {
@@ -62,6 +64,9 @@ const Posts: React.FC = () => {
   const { user } = useAuthStore()
   const { t } = usePageTranslation() // Page-specific content
   const { t: tCommon } = useTranslation() // Common actions and terms
+  const { createImage, deleteImage } = useImages()
+  const { deleteFile } = useFileUpload()
+  const queryClient = useQueryClient()
 
   // Use our new filtering hook to replace all the filtering/sorting/pagination logic
   const {
@@ -149,18 +154,58 @@ const Posts: React.FC = () => {
     setEditingPost(null)
   }
 
-  const handleSubmit = async (data: PostInsert) => {
+  const handleSubmit = async (
+    data: PostInsert,
+    thumbnailImage: (Partial<Image> & { publicUrl?: string; file?: File }) | null | undefined
+  ) => {
     try {
+      let postId = editingPost?.id
+
       if (editingPost) {
         await updatePost(editingPost.id, data)
       } else {
-        await createPost(data)
+        const newPost = await createPost({ ...data, author_id: user?.id ?? '' })
+        postId = newPost.id
         // Go to first page to see the new post
         handlePageChange(1)
       }
+
+      if (!postId) return
+
+      const existingThumbnail = images.find(
+        img => img.record_id === postId && img.type === 'thumbnail'
+      )
+
+      // Case 1: Thumbnail removed
+      if (!thumbnailImage && existingThumbnail) {
+        await deleteImage(existingThumbnail.id)
+        await deleteFile('posts', existingThumbnail.path)
+      }
+
+      // Case 2: New thumbnail added or existing thumbnail changed
+      if (thumbnailImage && thumbnailImage.file) {
+        if (existingThumbnail) {
+          // A thumbnail exists, so we're replacing it. Delete the old one first.
+          await deleteImage(existingThumbnail.id)
+          await deleteFile('posts', existingThumbnail.path)
+        }
+
+        // Create new image record
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { file, publicUrl, ...imageData } = thumbnailImage
+        await createImage({
+          ...imageData,
+          record_id: postId
+        } as ImageInsert)
+      }
+
       handleCloseModal()
     } catch (error) {
       console.error('Failed to save post:', error)
+    } finally {
+      // Invalidate queries to refetch posts and images
+      await queryClient.invalidateQueries({ queryKey: queryKeys.posts() })
+      await queryClient.invalidateQueries({ queryKey: queryKeys.images() })
     }
   }
 
@@ -363,7 +408,12 @@ const Posts: React.FC = () => {
           title={editingPost ? t('posts.editPost') : t('posts.createNewPost')}
           size='xl'
         >
-          <PostForm post={editingPost} onSubmit={handleSubmit} onCancel={handleCloseModal} />
+          <PostForm
+            post={editingPost}
+            onSubmit={handleSubmit}
+            onCancel={handleCloseModal}
+            images={images}
+          />
         </Modal>
 
         {/* Delete Confirmation Dialog */}

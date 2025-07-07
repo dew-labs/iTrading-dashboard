@@ -23,7 +23,6 @@ export const queryKeys = {
   // Users
   users: () => ['users'] as const,
   user: (id: string) => ['users', id] as const,
-  userPermissions: (userId: string) => ['user-permissions', userId] as const,
 
   // Posts
   posts: () => ['posts'] as const,

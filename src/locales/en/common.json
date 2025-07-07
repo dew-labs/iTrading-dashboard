@@ -178,12 +178,17 @@
   },
   "entities": {
     "posts": "Posts",
+    "post": "Post",
     "products": "Products",
     "banners": "Banners",
     "brokers": "Brokers",
     "users": "Users",
     "notifications": "Notifications",
     "permissions": "Permissions"
+  },
+  "feedback": {
+    "creating": "Creating...",
+    "updating": "Updating..."
   },
   "content": {
     "news": "News",

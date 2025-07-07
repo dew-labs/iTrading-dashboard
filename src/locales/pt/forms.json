@@ -22,6 +22,10 @@
     "title": "Título",
     "description": "Descrição",
     "content": "Conteúdo",
+    "excerpt": "Resumo",
+    "type": "Tipo",
+    "readingTime": "Tempo estimado de leitura:",
+    "thumbnail": "Miniatura",
     "category": "Categoria",
     "tags": "Tags",
     "image": "Imagem",
@@ -118,7 +122,8 @@
     "image": "Por favor, selecione um arquivo de imagem válido"
   },
   "hints": {
-    "logoRecommendation": "Recomendado: Imagens quadradas funcionam melhor"
+    "logoRecommendation": "Recomendado: Imagens quadradas funcionam melhor",
+    "thumbnailRecommendation": "Recomendado: Proporção 16:9 para melhor exibição"
   },
   "userForm": {
     "profilePicture": "Foto de Perfil",

@@ -164,7 +164,7 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
                       <RecordImage
                         tableName="posts"
                         recordId={post.id}
-                        className="w-full h-64 lg:h-80 object-cover group-hover:scale-105 transition-transform duration-500 rounded-xl"
+                        className="w-full object-contain group-hover:scale-105 transition-transform duration-500 rounded-xl"
                         fallbackClassName="hidden"
                         alt={`${post.title} featured image`}
                       />

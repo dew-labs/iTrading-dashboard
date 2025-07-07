@@ -369,6 +369,42 @@ INSERT INTO banners (name, target_url) VALUES
 ('Risk Management Guide', 'https://trading.com/risk-management'),
 ('Options Trading Course', 'https://trading.com/options-course');
 
+-- ===============================================
+-- BANNER IMAGES (Promotional Banner Images)
+-- ===============================================
+
+DO $$
+DECLARE
+    banner_id uuid;
+BEGIN
+    -- Welcome New Traders
+    SELECT id INTO banner_id FROM banners WHERE name = 'Welcome New Traders';
+    INSERT INTO images (table_name, record_id, type, path, alt_text) VALUES ('banners', banner_id, NULL, 'images/welcome_new_traders.jpg', 'Promotional banner for new traders');
+
+    -- Premium Features Upgrade
+    SELECT id INTO banner_id FROM banners WHERE name = 'Premium Features Upgrade';
+    INSERT INTO images (table_name, record_id, type, path, alt_text) VALUES ('banners', banner_id, NULL, 'images/premium_features_upgrade.jpg', 'Banner advertising an upgrade to premium features');
+
+    -- Trading Conference 2024
+    SELECT id INTO banner_id FROM banners WHERE name = 'Trading Conference 2024';
+    INSERT INTO images (table_name, record_id, type, path, alt_text) VALUES ('banners', banner_id, NULL, 'images/trading_conference_2024.jpg', 'Banner for the Trading Conference 2024');
+
+    -- Mobile App Download
+    SELECT id INTO banner_id FROM banners WHERE name = 'Mobile App Download';
+    INSERT INTO images (table_name, record_id, type, path, alt_text) VALUES ('banners', banner_id, NULL, 'images/mobile_app_download.jpg', 'Banner prompting to download the mobile app');
+
+    -- Educational Resources
+    SELECT id INTO banner_id FROM banners WHERE name = 'Educational Resources';
+    INSERT INTO images (table_name, record_id, type, path, alt_text) VALUES ('banners', banner_id, NULL, 'images/educational_resources.jpg', 'Banner for educational trading resources');
+
+    -- Risk Management Guide
+    SELECT id INTO banner_id FROM banners WHERE name = 'Risk Management Guide';
+    INSERT INTO images (table_name, record_id, type, path, alt_text) VALUES ('banners', banner_id, NULL, 'images/risk_management_guide.jpg', 'Banner for a risk management guide');
+
+    -- Options Trading Course
+    SELECT id INTO banner_id FROM banners WHERE name = 'Options Trading Course';
+    INSERT INTO images (table_name, record_id, type, path, alt_text) VALUES ('banners', banner_id, NULL, 'images/options_trading_course.jpg', 'Banner for an options trading course');
+END $$;
 
 -- ===============================================
 -- SEED DATA SUMMARY REPORT

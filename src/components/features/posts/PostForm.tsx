@@ -1,13 +1,16 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useState } from 'react'
 import { AlertCircle, FileText, Calendar, Scale, Lock, Clock, CheckCircle, Save, X, Plus } from 'lucide-react'
-import type { PostInsert } from '../../../types'
+import type { PostInsert, Image } from '../../../types'
 import type { PostWithAuthor } from '../../../hooks/usePosts'
 import { useFormValidation } from '../../../hooks/useFormValidation'
-import { useFormTranslation } from '../../../hooks/useTranslation'
+import { useFormTranslation, useTranslation } from '../../../hooks/useTranslation'
 import { FormField } from '../../atoms'
 import { Select } from '../../molecules'
 import RichTextEditor from './RichTextEditor'
 import { stripHtml } from '../../../utils/textUtils'
+import { MainImageUpload } from '../images'
+import { supabase } from '../../../lib/supabase'
+import type { UploadResult } from '../../../hooks/useFileUpload'
 
 // Move schema outside component to prevent re-renders
 const POST_FORM_SCHEMA = {
@@ -30,8 +33,12 @@ const POST_FORM_SCHEMA = {
 
 interface PostFormProps {
   post?: PostWithAuthor | null
-  onSubmit: (data: PostInsert) => void
+  onSubmit: (
+    data: PostInsert,
+    thumbnailImage?: (Partial<Image> & { file?: File }) | null
+  ) => void
   onCancel: () => void
+  images?: Image[] | null
 }
 
 // Utility to calculate reading time (words/200, rounded up)
@@ -41,8 +48,13 @@ function calculateReadingTime(content: string): number {
   return Math.max(1, Math.ceil(words / 200))
 }
 
-const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
+const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images }) => {
   const { t: tForm } = useFormTranslation()
+  const { t: tCommon } = useTranslation()
+
+  const [thumbnailImage, setThumbnailImage] = useState<
+    (Partial<Image> & { publicUrl?: string; file?: File }) | null
+  >(null)
 
   // Memoize initial data to prevent re-renders
   const initialData = useMemo(() => ({
@@ -88,8 +100,23 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
         views: post.views || 0
       })
       setReadingTime(calculateReadingTime(post.content || ''))
+
+      const existingThumbnail = images?.find(
+        img => img.record_id === post.id && img.type === 'thumbnail'
+      )
+      if (existingThumbnail) {
+        const { data: urlData } = supabase.storage
+          .from('posts')
+          .getPublicUrl(existingThumbnail.path)
+        setThumbnailImage({ ...existingThumbnail, publicUrl: urlData.publicUrl })
+      } else {
+        setThumbnailImage(null)
+      }
+    } else {
+      reset(initialData)
+      setThumbnailImage(null)
     }
-  }, [post, reset])
+  }, [post, reset, images, initialData])
 
   React.useEffect(() => {
     setReadingTime(calculateReadingTime(formData.content || ''))
@@ -99,7 +126,29 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
     updateField('content', content)
   }, [updateField])
 
-
+  const handleThumbnailUpload = useCallback(
+    (uploadResult: UploadResult | null, file?: File) => {
+      if (uploadResult && file) {
+        const { url: publicUrl, path, id: storageObjectId } = uploadResult
+        setThumbnailImage(prev => ({
+          ...prev,
+          path,
+          publicUrl,
+          storage_object_id: storageObjectId,
+          table_name: 'posts',
+          record_id: post?.id || '',
+          type: 'thumbnail',
+          alt_text: `${formData.title} thumbnail`,
+          file_size: file.size,
+          mime_type: file.type,
+          file
+        }))
+      } else {
+        setThumbnailImage(null)
+      }
+    },
+    [post?.id, formData.title]
+  )
 
   // Create type options with Badge component icons
   const typeOptions = useMemo(() => [
@@ -140,14 +189,17 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
   ], [])
 
   const handleFormSubmit = useCallback((data: typeof formData) => {
-    onSubmit({ ...data, reading_time: calculateReadingTime(data.content || '') } as PostInsert)
-  }, [onSubmit])
+    onSubmit(
+      { ...data, reading_time: calculateReadingTime(data.content || '') } as PostInsert,
+      thumbnailImage
+    )
+  }, [onSubmit, thumbnailImage])
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
       {/* Title field - full width for emphasis using enhanced FormField */}
       <FormField
-        label='Title'
+        label={tForm('labels.title')}
         name='title'
         value={formData.title}
         onChange={handleChange('title')}
@@ -162,7 +214,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
 
       {/* Excerpt field - full width for short summary */}
       <FormField
-        label='Excerpt'
+        label={tForm('labels.excerpt')}
         name='excerpt'
         value={formData.excerpt}
         onChange={handleChange('excerpt')}
@@ -182,7 +234,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
           {/* Type and Status in vertical layout for better spacing */}
           <div className='space-y-4'>
             <Select
-              label='Type'
+              label={tForm('labels.type')}
               required
               value={formData.type || 'news'}
               onChange={value => updateField('type', value as PostWithAuthor['type'])}
@@ -191,7 +243,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
             />
 
             <Select
-              label='Status'
+              label={tForm('labels.status')}
               required
               value={formData.status || 'draft'}
               onChange={value => updateField('status', value as PostWithAuthor['status'])}
@@ -204,16 +256,24 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
           <div className='flex items-center space-x-2 mt-4' aria-live='polite'>
             <Clock className='w-4 h-4 text-gray-500 dark:text-gray-400' aria-hidden='true' />
             <span className='text-sm text-gray-700 dark:text-gray-300'>
-              Estimated reading time:
+              {tForm('labels.readingTime')}
             </span>
             <span className='font-semibold text-gray-900 dark:text-white'>{readingTime} min</span>
           </div>
 
           {/* Thumbnail upload will be handled through the centralized images table */}
           <div className='border-t border-gray-200 dark:border-gray-700 pt-6'>
-            <p className='text-sm text-gray-500 dark:text-gray-400'>
-              Post images can be added through the rich text editor below or managed through the images section after saving.
-            </p>
+            <MainImageUpload
+              label={tForm('labels.thumbnail')}
+              imageUrl={thumbnailImage?.publicUrl || thumbnailImage?.path || null}
+              onChange={handleThumbnailUpload}
+              bucket='posts'
+              folder='thumbnails'
+              size='lg'
+              disabled={isValidating}
+              recommendationText={tForm('hints.thumbnailRecommendation')}
+              alt='Post thumbnail'
+            />
           </div>
         </div>
 
@@ -221,7 +281,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
         <div className='lg:col-span-2'>
           <div className='space-y-2'>
             <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
-              Content <span className='text-red-500'>*</span>
+              {tForm('labels.content')} <span className='text-red-500'>*</span>
             </label>
             <RichTextEditor
               content={formData.content || ''}
@@ -254,7 +314,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
           disabled={isValidating}
         >
           <X className='w-4 h-4 mr-2' />
-          Cancel
+          {tCommon('actions.cancel')}
         </button>
         <button
           type='submit'
@@ -264,19 +324,19 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel }) => {
           {isValidating ? (
             <>
               <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white dark:border-b-gray-900 mr-2'></div>
-              {post ? 'Updating...' : 'Creating...'}
+              {post ? tCommon('feedback.updating') : tCommon('feedback.creating')}
             </>
           ) : (
             <>
               {post ? (
                 <>
                   <Save className='w-4 h-4 mr-2' />
-                  Update Post
+                  {tCommon('actions.update')} {tCommon('entities.post')}
                 </>
               ) : (
                 <>
                   <Plus className='w-4 h-4 mr-2' />
-                  Create Post
+                  {tCommon('actions.create')} {tCommon('entities.post')}
                 </>
               )}
             </>
