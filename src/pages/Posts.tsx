@@ -236,6 +236,8 @@ const Posts: React.FC = () => {
     )
   }
 
+  const viewingPostImage = viewingPost ? imagesByRecord[viewingPost.id]?.[0] : undefined
+
   return (
     <div className={layout.container}>
       <div className='space-y-6'>
@@ -435,12 +437,13 @@ const Posts: React.FC = () => {
         {/* Enhanced Post Viewer Modal */}
         {viewingPost && (
           <PostViewModal
-            isOpen={true}
+            isOpen={!!viewingPost}
             onClose={() => setViewingPost(null)}
             post={viewingPost}
+            image={viewingPostImage || null}
             onEdit={() => {
-              handleEdit(viewingPost)
               setViewingPost(null)
+              handleEdit(viewingPost)
             }}
           />
         )}

@@ -1,7 +1,7 @@
 import React from 'react'
 import { X, Link, Edit2, Image as ImageIcon } from 'lucide-react'
 import { Button, Badge } from '../../atoms'
-import type { Banner } from '../../../types'
+import type { Banner, Image } from '../../../types'
 import { getTypographyClasses, cn } from '../../../utils/theme'
 import RecordImage from '../images/RecordImage'
 import { useTranslation } from '../../../hooks/useTranslation'
@@ -10,6 +10,7 @@ interface BannerViewModalProps {
   isOpen: boolean
   onClose: () => void
   banner: Banner
+  image?: Image | null
   onEdit?: () => void
 }
 
@@ -17,6 +18,7 @@ const BannerViewModal: React.FC<BannerViewModalProps> = ({
   isOpen,
   onClose,
   banner,
+  image,
   onEdit
 }) => {
   const { t: tCommon } = useTranslation()
@@ -93,8 +95,7 @@ const BannerViewModal: React.FC<BannerViewModalProps> = ({
             <div className='px-8 py-6'>
               <div className='space-y-6'>
                 <RecordImage
-                  tableName='banners'
-                  recordId={banner.id}
+                  image={image || null}
                   fallbackClassName='w-full h-48 rounded-xl bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center shadow-inner'
                   className='w-full rounded-xl object-contain'
                   fallbackIcon={<ImageIcon className='w-12 h-12 text-gray-400' />}

@@ -9,10 +9,12 @@ import { UserForm } from '../components/features/users'
 import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
 import { USER_ROLES } from '../constants/general'
-import type { DatabaseUser, UserInsert, UserUpdate } from '../types'
-import { useQuery } from '@tanstack/react-query'
+import type { DatabaseUser, UserInsert, UserUpdate, Image } from '../types'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { groupImagesByRecord } from '../utils'
-import { supabase } from '../lib/supabase'
+import { supabase, queryKeys } from '../lib/supabase'
+import { useImages } from '../hooks/useImages'
+import { useFileUpload } from '../hooks/useFileUpload'
 
 // Theme imports
 import {
@@ -27,6 +29,9 @@ const Users: React.FC = () => {
   const { t: tCommon } = useTranslation() // Common actions and terms
   const { users, loading, createUser, updateUser, deleteUser, isDeleting } = useUsers()
   const { isAdmin } = usePermissions()
+  const { createImage, deleteImage } = useImages()
+  const { deleteFile } = useFileUpload()
+  const queryClient = useQueryClient()
 
   // Use the filtering hook for all business logic
   const {
@@ -148,8 +153,13 @@ const Users: React.FC = () => {
     setEditingUser(null)
   }
 
-  const handleSubmit = async (data: Omit<UserInsert, 'id'>) => {
+  const handleSubmit = async (
+    data: Omit<UserInsert, 'id'>,
+    avatarImage: (Partial<Image> & { publicUrl?: string; file?: File }) | null | undefined
+  ) => {
     try {
+      let userId = editingUser?.id
+
       if (editingUser) {
         // For updating, use UserUpdate type (omitting id, created_at, updated_at)
         const updateData: UserUpdate = {
@@ -158,7 +168,6 @@ const Users: React.FC = () => {
           phone: data.phone || null,
           role: data.role || 'user',
           status: data.status || 'active',
-          avatar_url: data.avatar_url ?? null,
           country: data.country || null,
           city: data.city || null,
           bio: data.bio || null
@@ -171,12 +180,67 @@ const Users: React.FC = () => {
           id: crypto.randomUUID() // Temporary ID that will be overridden by database
         }
         await createUser(createData)
+
+        // To get the new user's ID, we invalidate the query and refetch it.
+        await queryClient.invalidateQueries({ queryKey: queryKeys.users() })
+        const updatedUsers = await queryClient.fetchQuery<DatabaseUser[]>({
+          queryKey: queryKeys.users()
+        })
+        const newUser = updatedUsers?.find(u => u.email === data.email)
+        if (newUser) {
+          userId = newUser.id
+        }
         // Go to first page to see the new user
         handlePageChange(1)
       }
+
+      if (!userId) {
+        if (!editingUser) {
+          console.warn("Could not determine new user's ID. Avatar can be added by editing the user.")
+          handleCloseModal()
+          return
+        }
+        return
+      }
+
+      const existingAvatar = images.find(
+        img => img.record_id === userId && img.type === 'avatar'
+      )
+
+      // Case 1: Logo removed
+      if (!avatarImage && existingAvatar) {
+        await deleteImage(existingAvatar.id)
+        if (existingAvatar.path) {
+          await deleteFile('users', existingAvatar.path)
+        }
+      }
+
+      // Case 2: New logo added or existing logo changed
+      if (avatarImage && avatarImage.file) {
+        if (existingAvatar) {
+          // A logo exists, so we're replacing it. Delete the old one first.
+          await deleteImage(existingAvatar.id)
+          if (existingAvatar.path) {
+            await deleteFile('users', existingAvatar.path)
+          }
+        }
+
+        // Create new image record
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { file, publicUrl, ...imageData } = avatarImage
+        await createImage({
+          ...imageData,
+          record_id: userId
+        } as Image)
+      }
+
       handleCloseModal()
     } catch (error) {
       console.error('Failed to save user:', error)
+    } finally {
+      // Invalidate queries to refetch brokers and images
+      await queryClient.invalidateQueries({ queryKey: queryKeys.users() })
+      await queryClient.invalidateQueries({ queryKey: queryKeys.images() })
     }
   }
 
@@ -387,7 +451,7 @@ const Users: React.FC = () => {
           onClose={handleCloseModal}
           title={editingUser ? t('users.editUserTitle') : t('users.createNewUser')}
         >
-          <UserForm user={editingUser} onSubmit={handleSubmit} onCancel={handleCloseModal} />
+          <UserForm user={editingUser} onSubmit={handleSubmit} onCancel={handleCloseModal} images={images} />
         </Modal>
 
         {/* Confirm dialog for deleting users */}

@@ -1,6 +1,6 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useState } from 'react'
 import { User, Shield, X, Save, Mail, Camera, Gavel } from 'lucide-react'
-import type { DatabaseUser, UserInsert, UserRole } from '../../../types'
+import type { DatabaseUser, UserInsert, UserRole, Image } from '../../../types'
 import { usePermissions } from '../../../hooks/usePermissions'
 import { useTranslation, useFormTranslation } from '../../../hooks/useTranslation'
 import { useFormValidation } from '../../../hooks/useFormValidation'
@@ -9,6 +9,8 @@ import { USER_ROLES, COUNTRY_OPTIONS } from '../../../constants/general'
 import { FormField } from '../../atoms'
 import { Select } from '../../molecules'
 import { MainImageUpload } from '../images'
+import type { UploadResult } from '../../../hooks/useFileUpload'
+import { supabase } from '../../../lib/supabase'
 
 // Move schema outside component to prevent re-renders
 const USER_FORM_SCHEMA = {
@@ -23,14 +25,22 @@ const USER_FORM_SCHEMA = {
 
 interface UserFormProps {
   user?: DatabaseUser | null
-  onSubmit: (data: Omit<UserInsert, 'id'>) => void
+  onSubmit: (
+    data: Omit<UserInsert, 'id'>,
+    avatarImage?: (Partial<Image> & { publicUrl?: string; file?: File }) | null
+  ) => void
   onCancel: () => void
+  images?: Image[] | null
 }
 
-const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
+const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images }) => {
   const { t } = useTranslation()
   const { t: tForm } = useFormTranslation()
   const { isAdmin } = usePermissions()
+
+  const [avatarImage, setAvatarImage] = useState<
+    (Partial<Image> & { publicUrl?: string; file?: File }) | null
+  >(null)
 
   // Memoize initial data to prevent re-renders
   const initialData = useMemo(() => ({
@@ -41,8 +51,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
     city: '',
     bio: '',
     role: 'user' as UserRole,
-    status: 'invited' as const,
-    avatar_url: null as string | null
+    status: 'invited' as const
   }), [])
 
   // Enhanced form validation with our new hook
@@ -72,15 +81,48 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
         city: user.city || '',
         bio: user.bio || '',
         role: user.role,
-        status: 'invited',
-        avatar_url: user.avatar_url ?? null
+        status: 'invited'
       })
+      const existingAvatar = images?.find(
+        img => img.record_id === user.id && img.type === 'avatar'
+      )
+      if (existingAvatar) {
+        const { data: urlData } = supabase.storage
+          .from('users')
+          .getPublicUrl(existingAvatar.path)
+        setAvatarImage({ ...existingAvatar, publicUrl: urlData.publicUrl })
+      } else {
+        setAvatarImage(null)
+      }
+    } else {
+      reset(initialData)
+      setAvatarImage(null)
     }
-  }, [user, reset])
+  }, [user, reset, images, initialData])
 
-  const handleAvatarUpload = useCallback((url: string | null) => {
-    updateField('avatar_url', url)
-  }, [updateField])
+  const handleAvatarUpload = useCallback(
+    (uploadResult: UploadResult | null, file?: File) => {
+      if (uploadResult && file) {
+        const { url: publicUrl, path, id: storageObjectId } = uploadResult
+        setAvatarImage(prev => ({
+          ...prev,
+          path,
+          publicUrl,
+          storage_object_id: storageObjectId,
+          table_name: 'users',
+          record_id: user?.id || '',
+          type: 'avatar',
+          alt_text: `${formData.full_name || formData.email} avatar`,
+          file_size: file.size,
+          mime_type: file.type,
+          file
+        }))
+      } else {
+        setAvatarImage(null)
+      }
+    },
+    [user?.id, formData.full_name, formData.email]
+  )
 
   const roleOptions = useMemo(() => [
     {
@@ -105,8 +147,8 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
   ], [t, isAdmin])
 
   const handleFormSubmit = useCallback((data: typeof formData) => {
-    onSubmit(data)
-  }, [onSubmit])
+    onSubmit(data, avatarImage)
+  }, [onSubmit, avatarImage])
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
@@ -128,7 +170,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) => {
 
         <div className='flex items-start space-x-6'>
           <MainImageUpload
-            imageUrl={formData.avatar_url ?? null}
+            imageUrl={avatarImage?.publicUrl || avatarImage?.path || null}
             onChange={handleAvatarUpload}
             bucket='users'
             folder='avatars'

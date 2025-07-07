@@ -178,6 +178,8 @@ const Banners: React.FC = () => {
     )
   }
 
+  const viewingBannerImage = viewingBanner ? imagesByRecord[viewingBanner.id]?.[0] : undefined
+
   return (
     <div className={layout.container}>
       <div className='space-y-6'>
@@ -360,6 +362,7 @@ const Banners: React.FC = () => {
             isOpen={!!viewingBanner}
             onClose={() => setViewingBanner(null)}
             banner={viewingBanner}
+            image={viewingBannerImage || null}
             onEdit={() => {
               setViewingBanner(null)
               handleEdit(viewingBanner)

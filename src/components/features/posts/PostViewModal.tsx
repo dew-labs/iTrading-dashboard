@@ -9,20 +9,20 @@ import {
   FileText,
   TrendingUp
 } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
 import { useTranslation, usePageTranslation } from '../../../hooks/useTranslation'
 import { formatDateDisplay } from '../../../utils/format'
 import { Badge, Button } from '../../atoms'
 import { RichTextRenderer } from '../../common'
 import { RecordImage } from '../images'
-import type { PostWithAuthor } from '../../../hooks/usePosts'
+import type { Image } from '../../../types'
+import type { PostWithAuthor } from '../../../features/posts'
 import { getTypographyClasses, cn } from '../../../utils/theme'
-import { supabase } from '../../../lib/supabase'
 
 interface PostViewModalProps {
   isOpen: boolean
   onClose: () => void
   post: PostWithAuthor
+  image?: Image | null
   onEdit?: () => void
 }
 
@@ -30,26 +30,13 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
   isOpen,
   onClose,
   post,
+  image,
   onEdit
 }) => {
   const { t: tCommon } = useTranslation()
   const { t } = usePageTranslation()
 
-  // Fetch images for this specific post
-  const { data: images = [] } = useQuery({
-    queryKey: ['images', 'posts', post.id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('images')
-        .select('*')
-        .eq('table_name', 'posts')
-        .eq('record_id', post.id.toString())
-      return data || []
-    },
-    enabled: isOpen // Only fetch when modal is open
-  })
-
-  const hasImages = images.length > 0
+  const hasImages = !!image
 
   if (!isOpen) return null
 
@@ -162,10 +149,9 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
                   {hasImages && (
                     <div className='mb-8'>
                       <RecordImage
-                        tableName="posts"
-                        recordId={post.id}
-                        className="w-full object-contain group-hover:scale-105 transition-transform duration-500 rounded-xl"
-                        fallbackClassName="hidden"
+                        image={image}
+                        className='w-full object-contain group-hover:scale-105 transition-transform duration-500 rounded-xl'
+                        fallbackClassName='hidden'
                         alt={`${post.title} featured image`}
                       />
                     </div>
@@ -196,17 +182,9 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
                       </h3>
                       <div className='space-y-3'>
                         <div className='flex items-center space-x-3'>
-                          {post.author.avatar_url ? (
-                            <img
-                              src={post.author.avatar_url}
-                              alt={post.author.full_name || 'Author avatar'}
-                              className='w-12 h-12 rounded-full object-cover border-2 border-blue-200 dark:border-blue-700'
-                            />
-                          ) : (
-                            <div className='w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-semibold text-lg'>
-                              {(post.author.full_name || 'U').charAt(0).toUpperCase()}
-                            </div>
-                          )}
+                          <div className='w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-semibold text-lg'>
+                            {(post.author.full_name || 'U').charAt(0).toUpperCase()}
+                          </div>
                           <div>
                             <div className='font-medium text-gray-900 dark:text-white'>
                               {post.author.full_name || 'Unknown'}

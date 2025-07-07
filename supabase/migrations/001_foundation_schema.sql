@@ -52,7 +52,6 @@ CREATE TABLE users (
   role user_role NOT NULL DEFAULT 'user',
   status user_status NOT NULL DEFAULT 'active',
   phone text,
-  avatar_url text,
   country varchar,
   city varchar,
   bio text,

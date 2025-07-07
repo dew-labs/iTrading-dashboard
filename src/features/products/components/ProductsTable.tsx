@@ -1,5 +1,5 @@
 import React from 'react'
-import { Edit2, Trash2, Eye, Package, Calendar } from 'lucide-react'
+import { Edit2, Trash2, Package, Calendar } from 'lucide-react'
 import { Table } from '../../../components/molecules'
 import { Badge } from '../../../components/atoms'
 import { usePageTranslation, useTranslation } from '../../../hooks/useTranslation'
@@ -105,13 +105,6 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
       render: (value: unknown, row: Product) => (
         <div className='flex space-x-1'>
           <button
-            onClick={() => onView(row)}
-            className='p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors'
-            title={t('products.tooltips.viewProduct')}
-          >
-            <Eye className={getIconClasses('action')} />
-          </button>
-          <button
             onClick={() => onEdit(row)}
             className='p-2 text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded transition-colors'
             title={t('products.tooltips.editProduct')}
@@ -137,6 +130,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
       onSort={onSort}
       sortColumn={sortColumn}
       sortDirection={sortDirection}
+      onRowClick={onView}
     />
   )
 }

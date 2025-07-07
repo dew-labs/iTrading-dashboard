@@ -194,18 +194,3 @@ export const useImages = (
     isDeleting: deleteMutation.isPending
   }
 }
-
-// Hook specifically for getting a single image for a record
-export const useRecordImage = (
-  tableName?: string,
-  recordId?: string,
-  options?: { enabled?: boolean }
-) => {
-  const { images, loading, error } = useImages(tableName, recordId, options)
-
-  return {
-    image: images[0] || null,
-    loading,
-    error
-  }
-}

@@ -32,7 +32,6 @@ export interface PostWithAuthor extends Post, Record<string, unknown> {
     id: string
     full_name: string | null
     email: string
-    avatar_url: string | null
   } | null
 }
 
@@ -43,7 +42,7 @@ const fetchPosts = async (): Promise<PostWithAuthor[]> => {
       .from('posts')
       .select(`
         *,
-        author:users(id, full_name, email, avatar_url)
+        author:users(id, full_name, email)
       `)
       .order('created_at', { ascending: false })
   )
@@ -67,7 +66,7 @@ const createPostMutation = async (post: PostInsert): Promise<PostWithAuthor> => 
     ])
     .select(`
       *,
-      author:users(id, full_name, email, avatar_url)
+      author:users(id, full_name, email)
     `)
     .single()
 
@@ -91,7 +90,7 @@ const updatePostMutation = async ({
       .eq('id', id)
       .select(`
         *,
-        author:users(id, full_name, email, avatar_url)
+        author:users(id, full_name, email)
       `)
       .single()
   )

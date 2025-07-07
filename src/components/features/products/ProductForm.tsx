@@ -6,6 +6,7 @@ import { FormField } from '../../atoms'
 import { Select } from '../../molecules'
 import { MainImageUpload } from '../images'
 import { useFormTranslation } from '../../../hooks/useTranslation'
+import type { UploadResult } from '../../../hooks/useFileUpload'
 
 // Move schema outside component to prevent re-renders
 const PRODUCT_FORM_SCHEMA = {
@@ -73,9 +74,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
     updateField('description', e.target.value)
   }, [updateField])
 
-  const handleImageChange = useCallback((url: string | null) => {
-    updateField('featured_image_url', url)
-  }, [updateField])
+  const handleImageChange = useCallback(
+    (result: UploadResult | null) => {
+      updateField('featured_image_url', result?.url ?? null)
+    },
+    [updateField]
+  )
 
   const handlePriceChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value

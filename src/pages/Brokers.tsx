@@ -188,6 +188,8 @@ const Brokers: React.FC = () => {
     )
   }
 
+  const viewingBrokerImage = viewingBroker ? imagesByRecord[viewingBroker.id]?.[0] : undefined
+
   return (
     <div className={layout.container}>
       <div className='space-y-6'>
@@ -426,6 +428,7 @@ const Brokers: React.FC = () => {
             isOpen={!!viewingBroker}
             onClose={() => setViewingBroker(null)}
             broker={viewingBroker}
+            image={viewingBrokerImage || null}
             onEdit={() => {
               setViewingBroker(null)
               handleEdit(viewingBroker)

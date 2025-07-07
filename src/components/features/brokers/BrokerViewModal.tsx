@@ -10,7 +10,7 @@ import {
 import { usePageTranslation } from '../../../hooks/useTranslation'
 import { formatDateDisplay } from '../../../utils/format'
 import { Button } from '../../atoms'
-import type { Broker } from '../../../types'
+import type { Broker, Image } from '../../../types'
 import { getTypographyClasses, cn } from '../../../utils/theme'
 import RecordImage from '../images/RecordImage'
 
@@ -18,6 +18,7 @@ interface BrokerViewModalProps {
   isOpen: boolean
   onClose: () => void
   broker: Broker
+  image?: Image | null
   onEdit?: () => void
 }
 
@@ -25,6 +26,7 @@ const BrokerViewModal: React.FC<BrokerViewModalProps> = ({
   isOpen,
   onClose,
   broker,
+  image,
   onEdit
 }) => {
   const { t } = usePageTranslation()
@@ -51,8 +53,7 @@ const BrokerViewModal: React.FC<BrokerViewModalProps> = ({
                 {/* Broker title and logo */}
                 <div className='flex items-center space-x-4 mb-4'>
                   <RecordImage
-                    tableName='brokers'
-                    recordId={broker.id}
+                    image={image || null}
                     fallbackClassName='w-16 h-16 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-sm'
                     className='w-16 h-16 rounded-xl object-cover border-2 border-gray-200 dark:border-gray-700 shadow-sm'
                     fallbackIcon={<Building2 className='w-8 h-8 text-white' />}
