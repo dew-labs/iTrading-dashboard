@@ -5,7 +5,7 @@ import { useBannersFiltering } from '../hooks/useBannersFiltering'
 import { useImages } from '../hooks/useImages'
 import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
 import { FilterDropdown, BannersTable, BannersStats, Modal, PaginationSelector, Button, Input } from '../components'
-import { BannerForm } from '../components/features/banners'
+import { BannerForm, BannerViewModal } from '../components/features/banners'
 import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
 import type { Banner, BannerInsert } from '../types'
@@ -42,6 +42,7 @@ const Banners: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null)
+  const [viewingBanner, setViewingBanner] = useState<Banner | null>(null)
 
   // Confirm dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -56,6 +57,10 @@ const Banners: React.FC = () => {
 
   // Theme classes
   const layout = getPageLayoutClasses()
+
+  const handleView = (banner: Banner) => {
+    setViewingBanner(banner)
+  }
 
   const handleEdit = (banner: Banner) => {
     setEditingBanner(banner)
@@ -232,6 +237,7 @@ const Banners: React.FC = () => {
             <BannersTable
               banners={paginatedBanners}
               imagesByRecord={imagesByRecord}
+              onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDelete}
               onToggleStatus={handleToggleStatus}
@@ -330,14 +336,36 @@ const Banners: React.FC = () => {
           </div>
         </div>
 
-        {/* Modal */}
+        {/* Modal for creating/editing banners */}
         <Modal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          title={editingBanner ? t('banners.editBanner') : t('banners.createNewBanner')}
+          title={
+            editingBanner
+              ? t('banners.editBanner')
+              : t('banners.createBanner')
+          }
+          size='xl'
         >
-          <BannerForm banner={editingBanner} onSubmit={handleSubmit} onCancel={handleCloseModal} />
+          <BannerForm
+            banner={editingBanner}
+            onSubmit={handleSubmit}
+            onCancel={handleCloseModal}
+          />
         </Modal>
+
+        {/* Modal for viewing banner details */}
+        {viewingBanner && (
+          <BannerViewModal
+            isOpen={!!viewingBanner}
+            onClose={() => setViewingBanner(null)}
+            banner={viewingBanner}
+            onEdit={() => {
+              setViewingBanner(null)
+              handleEdit(viewingBanner)
+            }}
+          />
+        )}
 
         {/* Delete Confirmation Dialog */}
         <ConfirmDialog

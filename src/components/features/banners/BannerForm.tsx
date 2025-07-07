@@ -290,7 +290,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
               <img
                 src={currentImage}
                 alt='Banner preview'
-                className={`w-full h-32 object-cover rounded-lg border-2 border-gray-200 transition-opacity ${
+                className={`w-full object-contain rounded-lg border-2 border-gray-200 transition-opacity ${
                   isUploading ? 'opacity-50' : 'opacity-100'
                 }`}
               />

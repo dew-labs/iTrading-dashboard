@@ -11,6 +11,7 @@ import type { Banner } from '../../../types'
 interface BannersTableProps {
   banners: Banner[]
   imagesByRecord?: Record<string, import('../../../types').Image[]>
+  onView: (banner: Banner) => void
   onEdit: (banner: Banner) => void
   onDelete: (banner: Banner) => void
   onToggleStatus: (banner: Banner) => void
@@ -22,6 +23,7 @@ interface BannersTableProps {
 const BannersTable: React.FC<BannersTableProps> = ({
   banners,
   imagesByRecord = {},
+  onView,
   onEdit,
   onDelete,
   onToggleStatus,
@@ -150,6 +152,7 @@ const BannersTable: React.FC<BannersTableProps> = ({
       onSort={onSort}
       sortColumn={sortColumn}
       sortDirection={sortDirection}
+      onRowClick={onView}
     />
   )
 }
