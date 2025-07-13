@@ -16,9 +16,10 @@ import {
 } from 'lucide-react'
 import { cn } from '../../utils/theme'
 import { type BadgeVariant, getLabel, getBadgeStyle } from '../../constants/general'
+import { BADGE_SIZES, ICON_SIZES, type BadgeSize } from '../../constants/ui'
+import { useTranslation } from '../../hooks/useTranslation'
 
-export type { BadgeVariant }
-export type BadgeSize = 'sm' | 'md' | 'lg'
+export type { BadgeVariant, BadgeSize }
 
 interface BadgeProps {
   variant: BadgeVariant
@@ -31,28 +32,30 @@ interface BadgeProps {
 
 const Badge: React.FC<BadgeProps> = ({
   variant,
-  size = 'md',
+  size = BADGE_SIZES.MD,
   className,
   children,
   showIcon = false,
   icon
 }) => {
+  const { t } = useTranslation()
+
   const getVariantStyles = (variant: BadgeVariant) => {
     const style = getBadgeStyle(variant)
     return `${style.background} ${style.text} ${style.border}`
   }
 
   const getVariantIcon = (variant: BadgeVariant) => {
-    const iconSize = size === 'sm' ? 'w-3 h-3' : size === 'lg' ? 'w-4 h-4' : 'w-3.5 h-3.5'
+    const iconSize = size === BADGE_SIZES.SM ? ICON_SIZES.XS : size === BADGE_SIZES.LG ? ICON_SIZES.SM : ICON_SIZES.XS
 
     switch (variant) {
     // User Roles
     case 'moderator':
-      return <Gavel className={iconSize} aria-label="Moderator" />
+      return <Gavel className={iconSize} aria-label={t('ui.accessibility.moderator')} />
     case 'admin':
-      return <Shield className={iconSize} aria-label="Admin" />
+      return <Shield className={iconSize} aria-label={t('ui.accessibility.admin')} />
     case 'user':
-      return <User className={iconSize} aria-label="User" />
+      return <User className={iconSize} aria-label={t('ui.accessibility.user')} />
 
       // User Statuses
     case 'active':
@@ -93,11 +96,11 @@ const Badge: React.FC<BadgeProps> = ({
 
   const getSizeStyles = (size: BadgeSize) => {
     switch (size) {
-    case 'sm':
+    case BADGE_SIZES.SM:
       return 'px-1.5 py-0.5 text-xs'
-    case 'md':
+    case BADGE_SIZES.MD:
       return 'px-2 py-1 text-xs'
-    case 'lg':
+    case BADGE_SIZES.LG:
       return 'px-3 py-1.5 text-sm'
     default:
       return 'px-2 py-1 text-xs'

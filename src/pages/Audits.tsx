@@ -220,8 +220,8 @@ const Audits: React.FC = () => {
                   placeholder={tCommon('placeholders.searchActivitiesPlaceholder')}
                   value={filterState.searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
+                  variant='default'
                   leftIcon={Search}
-                  variant='search'
                 />
               </div>
 

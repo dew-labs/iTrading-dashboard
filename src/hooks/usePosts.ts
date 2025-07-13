@@ -3,26 +3,16 @@ import { supabase, queryKeys, supabaseHelpers } from '../lib/supabase'
 import type { Post, PostInsert, PostUpdate } from '../types'
 import { useToast } from './useToast'
 
-// Validation function
+// Validation function - simplified since title, excerpt, content are now in translations
 const validatePost = (post: PostInsert): string | null => {
-  if (!post.title?.trim()) {
-    return 'Title is required'
+  // Only validate non-translatable fields
+  if (!post.type) {
+    return 'Post type is required'
   }
-  if (post.title.length < 3) {
-    return 'Title must be at least 3 characters long'
+  if (!post.status) {
+    return 'Post status is required'
   }
-  if (post.title.length > 200) {
-    return 'Title must be less than 200 characters'
-  }
-  if (post.excerpt && post.excerpt.length > 300) {
-    return 'Excerpt cannot exceed 300 characters'
-  }
-  if (!post.content?.trim()) {
-    return 'Content is required'
-  }
-  if (post.content.length < 10) {
-    return 'Content must be at least 10 characters long'
-  }
+  // Title, excerpt, content validation will be handled by translation system
   return null
 }
 
@@ -97,7 +87,38 @@ const updatePostMutation = async ({
 }
 
 const deletePostMutation = async (id: string): Promise<void> => {
-  return supabaseHelpers.deleteData(supabase.from('posts').delete().eq('id', id))
+  // First, get all images associated with this post to delete from storage
+  const { data: images, error: imagesError } = await supabase
+    .from('images')
+    .select('path')
+    .eq('record_id', id)
+    .eq('table_name', 'posts')
+
+  if (imagesError) {
+    console.warn('Failed to fetch images for post deletion:', imagesError)
+  }
+
+  // Delete the post (database trigger will handle image record cleanup)
+  const result = await supabaseHelpers.deleteData(supabase.from('posts').delete().eq('id', id))
+
+  // Clean up storage files if we found any
+  if (images && images.length > 0) {
+    const imagePaths = images.map(img => img.path)
+    try {
+      const { error: storageError } = await supabase.storage
+        .from('posts')
+        .remove(imagePaths)
+
+      if (storageError) {
+        console.warn('Failed to delete some storage files:', storageError)
+        // Don't throw here - the post is already deleted from the database
+      }
+    } catch (error) {
+      console.warn('Error during storage cleanup:', error)
+    }
+  }
+
+  return result
 }
 
 const incrementPostViews = async (id: number): Promise<void> => {
@@ -130,12 +151,9 @@ export const usePosts = () => {
 
       const previousPosts = queryClient.getQueryData<PostWithAuthor[]>(queryKeys.posts())
 
-      // Optimistically update
+      // Optimistically update - only include non-translatable fields
       const optimisticPost: PostWithAuthor = {
         id: `temp-${Date.now()}`, // Temporary ID
-        title: newPost.title,
-        excerpt: newPost.excerpt || null,
-        content: newPost.content || null,
         type: newPost.type || 'news',
         status: newPost.status || 'draft',
         author_id: newPost.author_id || null,
@@ -143,8 +161,7 @@ export const usePosts = () => {
         published_at: newPost.status === 'published' ? new Date().toISOString() : '',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        author: null,
-        reading_time: null
+        author: null
       }
 
       queryClient.setQueryData<PostWithAuthor[]>(queryKeys.posts(), (old = []) => [optimisticPost, ...old])
@@ -219,7 +236,7 @@ export const usePosts = () => {
     }
   })
 
-  // Duplicate post mutation
+  // Duplicate post mutation - simplified since content is now in translations
   const duplicateMutation = useMutation({
     mutationFn: async (id: string) => {
       const posts = queryClient.getQueryData<Post[]>(queryKeys.posts()) || []
@@ -230,9 +247,10 @@ export const usePosts = () => {
       }
 
       const duplicatedPostData: PostInsert = {
-        title: `${postToDuplicate.title} (Copy)`,
-        content: postToDuplicate.content,
-        type: postToDuplicate.type
+        type: postToDuplicate.type,
+        status: 'draft',
+        author_id: postToDuplicate.author_id,
+        views: 0
       }
 
       return createPostMutation(duplicatedPostData)
@@ -267,13 +285,11 @@ export const usePosts = () => {
     return posts.filter(post => post.status === 'draft')
   }
 
-  const searchPosts = (query: string) => {
-    const lowercaseQuery = query.toLowerCase()
-    return posts.filter(
-      post =>
-        post.title.toLowerCase().includes(lowercaseQuery) ||
-        (post.content && post.content.toLowerCase().includes(lowercaseQuery))
-    )
+  // Search functionality removed - this should be handled by components that have access to translations
+  const searchPosts = (_query: string) => {
+    // Search functionality should be implemented in components that have access to translations
+    console.warn('Search functionality moved to components with translation access')
+    return posts
   }
 
   const getPostById = (id: string) => {

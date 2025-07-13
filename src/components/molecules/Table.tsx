@@ -1,5 +1,8 @@
 import React from 'react'
-import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
+import { ChevronUp, ChevronDown } from 'lucide-react'
+import { cn } from '../../utils/theme'
+import { KEYBOARD_KEYS } from '../../constants/ui'
+import { useTranslation } from '../../hooks/useTranslation'
 
 export type SortDirection = 'asc' | 'desc' | null
 
@@ -27,6 +30,8 @@ function Table<T extends Record<string, unknown>> ({
   onSort,
   onRowClick
 }: TableProps<T>) {
+  const { t } = useTranslation()
+
   const handleSort = (column: Column<T>) => {
     if (column.sortable && onSort) {
       onSort(column.accessor)
@@ -37,54 +42,64 @@ function Table<T extends Record<string, unknown>> ({
     if (!column.sortable) return null
 
     const isActive = sortColumn === column.accessor
+    const iconClass = 'w-4 h-4 ml-1 transition-colors'
 
-    if (!isActive) {
-      return <ChevronsUpDown className='w-4 h-4 text-gray-400' />
+    if (isActive) {
+      return sortDirection === 'asc'
+        ? <ChevronUp className={cn(iconClass, 'text-blue-500')} />
+        : <ChevronDown className={cn(iconClass, 'text-blue-500')} />
     }
 
-    return sortDirection === 'asc' ? (
-      <ChevronUp className='w-4 h-4 text-gray-700 dark:text-gray-300' />
-    ) : (
-      <ChevronDown className='w-4 h-4 text-gray-700 dark:text-gray-300' />
-    )
+    return <ChevronUp className={cn(iconClass, 'text-gray-400 group-hover:text-gray-500')} />
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent, column: Column<T>) => {
+    if (e.key === KEYBOARD_KEYS.ENTER || e.key === KEYBOARD_KEYS.SPACE) {
+      e.preventDefault()
+      handleSort(column)
+    }
   }
 
   return (
-    <div className='overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow duration-200'>
+    <div className='w-full overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700'>
       <div className='overflow-x-auto'>
-        <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
-          <thead className='bg-gradient-to-r from-gray-50 to-gray-100/80 dark:from-gray-700 dark:to-gray-700/80'>
+        <table className='w-full'>
+          <thead className='bg-gray-50 dark:bg-gray-800'>
             <tr>
-              {columns.map((column, index) => (
+              {columns.map((column) => (
                 <th
-                  key={index}
-                  className={`px-8 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider ${
-                    column.sortable
-                      ? 'cursor-pointer select-none hover:bg-gray-100/80 dark:hover:bg-gray-600/20 transition-all duration-200'
-                      : ''
-                  }`}
+                  key={String(column.accessor)}
+                  className={cn(
+                    'px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider',
+                    column.sortable && 'cursor-pointer select-none group hover:bg-gray-100 dark:hover:bg-gray-700'
+                  )}
                   onClick={() => handleSort(column)}
+                  onKeyDown={(e) => handleKeyDown(e, column)}
+                  tabIndex={column.sortable ? 0 : -1}
+                  role={column.sortable ? 'button' : undefined}
+                  aria-sort={
+                    sortColumn === column.accessor
+                      ? sortDirection === 'asc'
+                        ? 'ascending'
+                        : 'descending'
+                      : undefined
+                  }
                 >
-                  <div className='flex items-center space-x-1'>
-                    <span>{column.header}</span>
+                  <div className='flex items-center'>
+                    {column.header}
                     {getSortIcon(column)}
                   </div>
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className='bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700'>
+          <tbody className='bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700'>
             {data.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className='px-8 py-16 text-center'>
-                  <div className='flex flex-col items-center space-y-3'>
-                    <div className='w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center'>
-                      <svg
-                        className='w-6 h-6 text-gray-400 dark:text-gray-500'
-                        fill='none'
-                        stroke='currentColor'
-                        viewBox='0 0 24 24'
-                      >
+                <td colSpan={columns.length} className='px-6 py-12 text-center'>
+                  <div className='space-y-2'>
+                    <div className='mx-auto w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center'>
+                      <svg className='w-6 h-6 text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                         <path
                           strokeLinecap='round'
                           strokeLinejoin='round'
@@ -93,8 +108,8 @@ function Table<T extends Record<string, unknown>> ({
                         />
                       </svg>
                     </div>
-                    <p className='text-gray-500 dark:text-gray-400 font-medium'>No data available</p>
-                    <p className='text-gray-400 dark:text-gray-500 text-sm'>Get started by creating your first item</p>
+                    <p className='text-gray-500 dark:text-gray-400 font-medium'>{t('messages.noData')}</p>
+                    <p className='text-gray-400 dark:text-gray-500 text-sm'>{t('messages.emptyState')}</p>
                   </div>
                 </td>
               </tr>
@@ -110,25 +125,20 @@ function Table<T extends Record<string, unknown>> ({
                 return (
                   <tr
                     key={rowIndex}
-                    className={`hover:bg-gradient-to-r hover:from-gray-50/50 hover:to-transparent dark:hover:from-gray-700/20 dark:hover:to-transparent transition-all duration-200 group ${onRowClick ? 'cursor-pointer' : ''}`}
-                    tabIndex={onRowClick ? 0 : undefined}
-                    aria-label={onRowClick ? 'View details' : undefined}
-                    onClick={onRowClick ? handleRowClick : undefined}
-                    onKeyDown={onRowClick ? (e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
-                        if (onRowClick) onRowClick(row)
-                      }
-                    } : undefined}
+                    className={cn(
+                      'hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors',
+                      onRowClick && 'cursor-pointer'
+                    )}
+                    onClick={handleRowClick}
                   >
-                    {columns.map((column, colIndex) => (
+                    {columns.map((column) => (
                       <td
-                        key={colIndex}
-                        className='px-8 py-6 text-sm text-gray-900 dark:text-gray-100 group-hover:text-gray-900 dark:group-hover:text-gray-100'
+                        key={String(column.accessor)}
+                        className='px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100'
                       >
                         {column.render
                           ? column.render(row[column.accessor], row)
-                          : String(row[column.accessor])}
+                          : String(row[column.accessor] || '')}
                       </td>
                     ))}
                   </tr>

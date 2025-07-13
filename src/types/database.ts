@@ -98,7 +98,6 @@ export type Database = {
       brokers: {
         Row: {
           created_at: string
-          description: string | null
           established_in: number | null
           headquarter: string | null
           id: string
@@ -108,7 +107,6 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          description?: string | null
           established_in?: number | null
           headquarter?: string | null
           id?: string
@@ -118,7 +116,6 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          description?: string | null
           established_in?: number | null
           headquarter?: string | null
           id?: string
@@ -173,42 +170,30 @@ export type Database = {
       posts: {
         Row: {
           author_id: string | null
-          content: string | null
           created_at: string
-          excerpt: string | null
           id: string
           published_at: string | null
-          reading_time: number | null
           status: Database["public"]["Enums"]["post_status"]
-          title: string
           type: Database["public"]["Enums"]["post_type"]
           updated_at: string
           views: number
         }
         Insert: {
           author_id?: string | null
-          content?: string | null
           created_at?: string
-          excerpt?: string | null
           id?: string
           published_at?: string | null
-          reading_time?: number | null
           status?: Database["public"]["Enums"]["post_status"]
-          title: string
           type?: Database["public"]["Enums"]["post_type"]
           updated_at?: string
           views?: number
         }
         Update: {
           author_id?: string | null
-          content?: string | null
           created_at?: string
-          excerpt?: string | null
           id?: string
           published_at?: string | null
-          reading_time?: number | null
           status?: Database["public"]["Enums"]["post_status"]
-          title?: string
           type?: Database["public"]["Enums"]["post_type"]
           updated_at?: string
           views?: number
@@ -283,6 +268,123 @@ export type Database = {
         }
         Relationships: []
       }
+      posts_translations: {
+        Row: {
+          id: string
+          post_id: string
+          language_code: string
+          title: string
+          excerpt: string | null
+          content: string | null
+          reading_time: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          post_id: string
+          language_code: string
+          title: string
+          excerpt?: string | null
+          content?: string | null
+          reading_time?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          post_id?: string
+          language_code?: string
+          title?: string
+          excerpt?: string | null
+          content?: string | null
+          reading_time?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_translations_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      products_translations: {
+        Row: {
+          id: string
+          product_id: string
+          language_code: string
+          name: string
+          description: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          product_id: string
+          language_code: string
+          name: string
+          description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          product_id?: string
+          language_code?: string
+          name?: string
+          description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_translations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      brokers_translations: {
+        Row: {
+          id: string
+          broker_id: string
+          language_code: string
+          description: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          broker_id: string
+          language_code: string
+          description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          broker_id?: string
+          language_code?: string
+          description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brokers_translations_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       users: {
         Row: {
           avatar_url: string | null
@@ -333,7 +435,54 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      posts_with_translations: {
+        Row: {
+          id: string
+          author_id: string | null
+          type: Database["public"]["Enums"]["post_type"]
+          status: Database["public"]["Enums"]["post_status"]
+          views: number
+          published_at: string | null
+          created_at: string
+          updated_at: string
+          translations: Json
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
+      products_with_translations: {
+        Row: {
+          id: string
+          subscription: boolean | null
+          name: string
+          featured_image_url: string | null
+          price: number
+          description: string | null
+          created_at: string
+          updated_at: string
+          translations: Json
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
+      brokers_with_translations: {
+        Row: {
+          id: string
+          is_visible: boolean | null
+          name: string
+          headquarter: string | null
+          established_in: number | null
+          description: string | null
+          created_at: string
+          updated_at: string
+          translations: Json
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
     }
     Functions: {
       get_audit_stats: {

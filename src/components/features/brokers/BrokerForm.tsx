@@ -1,14 +1,18 @@
 import React, { useMemo, useCallback, useState } from 'react'
-import { X, Save, Plus, Building2, Calendar, MapPin } from 'lucide-react'
+import { X, Save, Plus, Building2, Calendar, MapPin, Languages } from 'lucide-react'
 import type { Broker, BrokerInsert, Image } from '../../../types'
 import { useFormValidation } from '../../../hooks/useFormValidation'
-import { FormField, Textarea } from '../../atoms'
+import { FormField } from '../../atoms'
 import { MainImageUpload } from '../images'
 import { useFormTranslation, useTranslation } from '../../../hooks/useTranslation'
 import { supabase } from '../../../lib/supabase'
 import type { UploadResult } from '../../../hooks/useFileUpload'
+import TranslationManager from '../translations/TranslationManager'
+import { SUPPORTED_LANGUAGE_CODES } from '../../../constants/languages'
+import type { LanguageCode } from '../../../types/translations'
 
 // Move schema outside component to prevent re-renders
+// Only description is handled in translations now
 const BROKER_FORM_SCHEMA = {
   name: {
     required: true,
@@ -16,19 +20,15 @@ const BROKER_FORM_SCHEMA = {
     maxLength: 100,
     message: 'Broker name must be between 2 and 100 characters'
   },
+  headquarter: {
+    maxLength: 100,
+    message: 'Headquarter must be less than 100 characters'
+  },
   established_in: {
     min: 1800,
     max: new Date().getFullYear(),
     custom: (value: number | null) => !value || (value >= 1800 && value <= new Date().getFullYear()),
     message: 'Please enter a valid year between 1800 and current year'
-  },
-  headquarter: {
-    maxLength: 100,
-    message: 'Headquarter must be less than 100 characters'
-  },
-  description: {
-    minLength: 10,
-    message: 'Description must be at least 10 characters'
   }
 } as const
 
@@ -42,17 +42,18 @@ interface BrokerFormProps {
 const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, images }) => {
   const { t: tForm } = useFormTranslation()
   const { t } = useTranslation()
+  const [_currentLanguage, setCurrentLanguage] = useState<LanguageCode>('en')
 
   const [logoImage, setLogoImage] = useState<
     (Partial<Image> & { publicUrl?: string; file?: File }) | null
   >(null)
 
-  // Memoize initial data to prevent re-renders
+  // Memoize initial data to prevent re-renders (description is handled in translations)
   const initialData = useMemo(() => ({
     name: '',
-    established_in: null as number | null,
     headquarter: '',
-    description: ''
+    established_in: null as number | null,
+    is_visible: true
   }), [])
 
   // Enhanced form validation with our new hook
@@ -76,9 +77,9 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
     if (broker) {
       reset({
         name: broker.name,
-        established_in: broker.established_in || null,
         headquarter: broker.headquarter || '',
-        description: broker.description || ''
+        established_in: broker.established_in || null,
+        is_visible: broker.is_visible !== false
       })
       const existingLogo = images?.find(
         img => img.record_id === broker.id && img.type === 'logo'
@@ -109,7 +110,7 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
           table_name: 'brokers',
           record_id: broker?.id || '',
           type: 'logo',
-          alt_text: `${formData.name} logo`,
+          alt_text: `${broker?.name || 'Broker'} logo`,
           file_size: file.size,
           mime_type: file.type,
           file
@@ -118,7 +119,7 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
         setLogoImage(null)
       }
     },
-    [broker?.id, formData.name]
+    [broker?.id, broker?.name]
   )
 
   const handleEstablishedYearChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -127,30 +128,19 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
   }, [updateField])
 
   const handleFormSubmit = useCallback((data: typeof formData) => {
-    onSubmit(data, logoImage)
+    // Description is now handled by the translation system
+    const brokerData: BrokerInsert = {
+      ...data
+    }
+    onSubmit(brokerData, logoImage)
   }, [onSubmit, logoImage])
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
-      {/* Broker name field - full width for emphasis using enhanced FormField */}
-      <FormField
-        label={tForm('labels.name')}
-        name='name'
-        value={formData.name}
-        onChange={handleChange('name')}
-        onBlur={handleBlur('name')}
-        placeholder={tForm('placeholders.enterBrokerName')}
-        required
-        disabled={isValidating}
-        {...(errors.name && { error: errors.name })}
-        icon={<Building2 className='w-5 h-5' />}
-        helperText='Enter the official name of the brokerage'
-      />
-
       {/* Enhanced layout for better organization */}
-      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+      <div className='grid grid-cols-1 xl:grid-cols-4 gap-6'>
         {/* Left column - Logo and basic info */}
-        <div className='lg:col-span-1 space-y-6'>
+        <div className='xl:col-span-1 space-y-6'>
           {/* Logo upload section */}
           <div>
             <MainImageUpload
@@ -169,19 +159,17 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
           {/* Basic info fields using enhanced FormField components */}
           <div className='space-y-4'>
             <FormField
-              label={tForm('labels.establishedYear')}
-              type='number'
-              name='established_in'
-              value={formData.established_in?.toString() || ''}
-              onChange={handleEstablishedYearChange}
-              onBlur={handleBlur('established_in')}
-              placeholder={tForm('placeholders.enterEstablishedYear')}
-              min={1800}
-              max={new Date().getFullYear()}
+              label={tForm('labels.name')}
+              name='name'
+              value={formData.name}
+              onChange={handleChange('name')}
+              onBlur={handleBlur('name')}
+              placeholder={tForm('placeholders.enterBrokerName')}
+              required
               disabled={isValidating}
-              {...(errors.established_in && { error: errors.established_in })}
-              icon={<Calendar className='w-5 h-5' />}
-              helperText='Year the brokerage was founded'
+              {...(errors.name && { error: errors.name })}
+              icon={<Building2 className='w-5 h-5' />}
+              helperText='Enter the official name of the brokerage'
             />
 
             <FormField
@@ -196,24 +184,94 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
               icon={<MapPin className='w-5 h-5' />}
               helperText='Primary business location'
             />
+
+            <FormField
+              label={tForm('labels.establishedYear')}
+              type='number'
+              name='established_in'
+              value={formData.established_in?.toString() || ''}
+              onChange={handleEstablishedYearChange}
+              onBlur={handleBlur('established_in')}
+              placeholder={tForm('placeholders.enterEstablishedYear')}
+              min={1800}
+              max={new Date().getFullYear()}
+              disabled={isValidating}
+              {...(errors.established_in && { error: errors.established_in })}
+              icon={<Calendar className='w-5 h-5' />}
+              helperText='Year the brokerage was founded'
+            />
           </div>
         </div>
 
-        {/* Right column - Description editor */}
-        <div className='lg:col-span-2'>
-          <Textarea
-            label={tForm('labels.description')}
-            name='description'
-            value={formData.description || ''}
-            onChange={handleChange('description')}
-            onBlur={handleBlur('description')}
-            placeholder={tForm('placeholders.brokerDescriptionPlaceholder')}
-            disabled={isValidating}
-            rows={12}
-            {...(errors.description && { error: errors.description })}
-            maxLength={5000}
-            helperText="Describe the broker's services, history, regulations, trading platforms, and key features."
-          />
+        {/* Right column - Content & Translations */}
+        <div className="xl:col-span-3 space-y-6">
+          {/* Content & Translations Card */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Languages className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Content & Translations</h3>
+                </div>
+                {broker && (
+                  <div id="translation-status-container" className="flex items-center">
+                    {/* Translation status will be rendered here by TranslationManager */}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="p-6">
+              {broker ? (
+                <TranslationManager
+                  contentType="brokers"
+                  contentId={broker.id}
+                  defaultLanguage="en"
+                  requiredLanguages={SUPPORTED_LANGUAGE_CODES}
+                  onLanguageChange={setCurrentLanguage}
+                  className="border-0 p-0 bg-transparent"
+                />
+              ) : (
+                <div className="text-center py-20 px-6">
+                  <div className="relative">
+                    {/* Visual indicator */}
+                    <div className="flex items-center justify-center w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-full">
+                      <Languages className="w-10 h-10 text-blue-600 dark:text-blue-400" />
+                    </div>
+
+                    {/* Main heading */}
+                    <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                      Content & Translation Management
+                    </h4>
+
+                    {/* Description */}
+                    <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto leading-relaxed">
+                      The content editor and translation tools will become available once you save this broker.
+                      You'll be able to create and manage content in multiple languages.
+                    </p>
+
+                    {/* Features preview */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                      <div className="flex items-start space-x-3 text-left">
+                        <div className="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                        <div>
+                          <div className="font-medium text-gray-900 dark:text-white">Multi-language Support</div>
+                          <div className="text-gray-500 dark:text-gray-400">Manage broker description in multiple languages</div>
+                        </div>
+                      </div>
+                      <div className="flex items-start space-x-3 text-left">
+                        <div className="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                        <div>
+                          <div className="font-medium text-gray-900 dark:text-white">Translation Status</div>
+                          <div className="text-gray-500 dark:text-gray-400">Track translation progress and completeness</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 

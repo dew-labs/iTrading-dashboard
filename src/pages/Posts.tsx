@@ -11,6 +11,7 @@ import {
   PostViewModal,
   type PostWithAuthor
 } from '../features/posts'
+import { usePostsWithTranslations } from '../hooks/usePostsWithTranslations'
 import { FilterDropdown, Modal, TabNavigation, PaginationSelector, Button, Input } from '../components'
 import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
@@ -60,6 +61,7 @@ const POST_TAB_CONFIGS = [
 ]
 
 const Posts: React.FC = () => {
+  const { posts: postsWithTranslations, loading: translationsLoading } = usePostsWithTranslations()
   const { posts, loading, createPost, updatePost, deletePost } = usePosts()
   const { user } = useAuthStore()
   const { t } = usePageTranslation() // Page-specific content
@@ -67,6 +69,10 @@ const Posts: React.FC = () => {
   const { createImage, deleteImage } = useImages()
   const { deleteFile } = useFileUpload()
   const queryClient = useQueryClient()
+
+  // Use posts with translations for display, fallback to regular posts for CRUD operations
+  const displayPosts = postsWithTranslations.length > 0 ? postsWithTranslations : posts
+  const isLoading = translationsLoading || loading
 
   // Use our new filtering hook to replace all the filtering/sorting/pagination logic
   const {
@@ -80,7 +86,7 @@ const Posts: React.FC = () => {
     handleSort,
     handlePageChange,
     handleTabChange
-  } = usePostsFiltering({ posts })
+  } = usePostsFiltering({ posts: displayPosts as PostWithAuthor[] })
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingPost, setEditingPost] = useState<PostWithAuthor | null>(null)
@@ -104,9 +110,9 @@ const Posts: React.FC = () => {
       id: tab.id,
       label: t(tab.labelKey),
       description: t(tab.descriptionKey),
-      count: tab.id === 'all' ? posts.length : posts.filter(post => post.type === tab.id).length
+      count: tab.id === 'all' ? displayPosts.length : displayPosts.filter(post => post.type === tab.id).length
     }))
-  }, [posts, t])
+  }, [displayPosts, t])
 
   const handleView = (post: PostWithAuthor) => {
     setViewingPost(post)
@@ -228,7 +234,7 @@ const Posts: React.FC = () => {
   })
   const imagesByRecord = groupImagesByRecord(images)['posts'] || {}
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className={layout.container}>
         <PageLoadingSpinner message={t('posts.loadingPosts')} />
@@ -268,7 +274,7 @@ const Posts: React.FC = () => {
         </div>
 
         {/* Stats Cards - Now using our PostsStats component */}
-        <PostsStats posts={posts} />
+        <PostsStats posts={displayPosts as PostWithAuthor[]} />
 
         {/* Tabs with Content Inside */}
         <TabNavigation tabs={tabsWithCounts} activeTab={filterState.activeTab} onTabChange={handleTabChange}>
@@ -283,7 +289,7 @@ const Posts: React.FC = () => {
                   value={filterState.searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   leftIcon={Search}
-                  variant='search'
+                  variant='default'
                 />
               </div>
 
@@ -302,7 +308,7 @@ const Posts: React.FC = () => {
 
             {/* Table - Now using our PostsTable component */}
             <PostsTable
-              posts={paginatedPosts}
+              posts={paginatedPosts as PostWithAuthor[]}
               imagesByRecord={imagesByRecord}
               onView={handleView}
               onEdit={handleEdit}

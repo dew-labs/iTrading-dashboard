@@ -323,7 +323,7 @@ const Users: React.FC = () => {
                   value={filterState.searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   leftIcon={Search}
-                  variant='search'
+                  variant='default'
                 />
               </div>
 

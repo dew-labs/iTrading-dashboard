@@ -66,11 +66,7 @@ CREATE TABLE posts (
   author_id uuid REFERENCES users(id) ON DELETE SET NULL,
   type post_type NOT NULL DEFAULT 'news',
   status post_status NOT NULL DEFAULT 'draft',
-  title text NOT NULL,
-  excerpt text,
-  content text,
   views bigint DEFAULT 0 NOT NULL,
-  reading_time integer DEFAULT 1,
   published_at timestamptz DEFAULT now(),
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
@@ -95,7 +91,6 @@ CREATE TABLE brokers (
   name varchar NOT NULL,
   headquarter varchar,
   established_in integer,
-  description text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
@@ -125,7 +120,7 @@ CREATE TABLE role_permissions (
 CREATE TABLE images (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   table_name varchar NOT NULL,
-  record_id text NOT NULL,
+  record_id uuid NOT NULL,
   path text NOT NULL,
   type text,
   blurhash text,
@@ -194,8 +189,7 @@ COMMENT ON TABLE audit_logs IS 'Audit log of admin and moderator actions';
 -- Column comments for important fields
 COMMENT ON COLUMN brokers.established_in IS 'Year the broker was established (e.g., 1999, 2010)';
 COMMENT ON COLUMN images.blurhash IS 'Blurhash string for low-res image placeholder.';
+COMMENT ON COLUMN images.record_id IS 'UUID of the record this image belongs to (posts.id, products.id, etc.)';
 COMMENT ON COLUMN posts.author_id IS 'Reference to the user who created this post';
-COMMENT ON COLUMN posts.excerpt IS 'Brief summary or preview of the post content for listings and previews';
-COMMENT ON COLUMN posts.reading_time IS 'Estimated reading time in minutes';
 COMMENT ON COLUMN posts.views IS 'Number of times this post has been viewed';
 COMMENT ON COLUMN products.featured_image_url IS 'Main product image for display and listings';

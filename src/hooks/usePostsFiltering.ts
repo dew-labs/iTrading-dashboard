@@ -53,12 +53,13 @@ export const usePostsFiltering = ({
   const [itemsPerPage, setItemsPerPage] = useState(initialItemsPerPage)
   const [pageInputValue, setPageInputValue] = useState('1')
 
-  // Enhanced filtering and sorting
+  // Enhanced filtering and sorting - simplified since title/content are now in translations
   const filteredAndSortedPosts = useMemo(() => {
     const filtered = posts.filter(post => {
+      // Search functionality removed - title/content are now in translations
+      // Only filter by author name if search is provided
       const matchesSearch =
-        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (post.content && post.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        !searchTerm || // If no search term, match all
         (post.author?.full_name &&
           post.author.full_name.toLowerCase().includes(searchTerm.toLowerCase()))
 
@@ -68,16 +69,12 @@ export const usePostsFiltering = ({
       return matchesSearch && matchesType && matchesStatus
     })
 
-    // Sort posts
+    // Sort posts - simplified since title is no longer available
     filtered.sort((a, b) => {
       let aValue: string | number
       let bValue: string | number
 
       switch (sortColumn) {
-      case 'title':
-        aValue = a.title.toLowerCase()
-        bValue = b.title.toLowerCase()
-        break
       case 'created_at':
       default:
         aValue = new Date(a.created_at || 0).getTime()

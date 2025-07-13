@@ -63,7 +63,6 @@ export const useBrokers = () => {
         name: newBroker.name,
         established_in: newBroker.established_in || null,
         headquarter: newBroker.headquarter || null,
-        description: newBroker.description || null,
         created_at: new Date().toISOString(),
         is_visible: newBroker.is_visible || true,
         updated_at: new Date().toISOString()

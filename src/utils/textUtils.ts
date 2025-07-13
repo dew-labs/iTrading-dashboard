@@ -32,3 +32,24 @@ export const stripHtml = (html: string): string => {
     .replace(/&#39;/g, "'")
     .trim()
 }
+
+/**
+ * Calculate reading time in minutes based on content
+ * @param content - The text content (can include HTML)
+ * @param wordsPerMinute - Average reading speed (default: 200 words/minute)
+ * @returns Reading time in minutes (minimum 1 minute)
+ */
+export const calculateReadingTime = (content: string, wordsPerMinute: number = 200): number => {
+  if (!content || content.trim() === '') {
+    return 1
+  }
+
+  // Strip HTML tags from content
+  const plainText = content.replace(/<[^>]*>/g, '')
+
+  // Count words (split by whitespace and filter out empty strings)
+  const wordCount = plainText.split(/\s+/).filter(word => word.length > 0).length
+
+  // Calculate reading time in minutes, with minimum of 1 minute
+  return Math.max(1, Math.ceil(wordCount / wordsPerMinute))
+}

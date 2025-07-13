@@ -1,23 +1,25 @@
 import React from 'react'
-import { Edit2, Trash2, Eye, Building2, Calendar, FileText, EyeOff } from 'lucide-react'
+import { Edit2, Trash2, Eye, Building2, Calendar, FileText, EyeOff, Languages } from 'lucide-react'
 import Table from '../../../components/molecules/Table'
 import { usePageTranslation } from '../../../hooks/useTranslation'
 import { formatDateDisplay } from '../../../utils/format'
 import { getTypographyClasses, getIconClasses, cn } from '../../../utils/theme'
-import { stripHtmlAndTruncate } from '../../../utils'
+import { TranslationStatusIndicator } from '../../../components/atoms'
 import type { Broker } from '../../../types'
+import type { BrokerWithTranslations } from '../../../types/translations'
 import RecordImage from '../../../components/features/images/RecordImage'
 
 interface BrokersTableProps {
-  brokers: Broker[]
+  brokers: (Broker | BrokerWithTranslations)[]
   imagesByRecord?: Record<string, import('../../../types').Image[]>
-  onView: (broker: Broker) => void
-  onEdit: (broker: Broker) => void
-  onDelete: (broker: Broker) => void
-  onToggleVisible?: (broker: Broker) => Promise<void>
+  onView: (broker: Broker | BrokerWithTranslations) => void
+  onEdit: (broker: Broker | BrokerWithTranslations) => void
+  onDelete: (broker: Broker | BrokerWithTranslations) => void
+  onToggleVisible?: (broker: Broker | BrokerWithTranslations) => Promise<void>
   sortColumn: keyof Broker | null
   sortDirection: 'asc' | 'desc'
   onSort: (column: keyof Broker) => void
+  showTranslationStatus?: boolean
 }
 
 const BrokersTable: React.FC<BrokersTableProps> = ({
@@ -29,46 +31,94 @@ const BrokersTable: React.FC<BrokersTableProps> = ({
   onToggleVisible,
   sortColumn,
   sortDirection,
-  onSort
+  onSort,
+  showTranslationStatus = false
 }) => {
   const { t } = usePageTranslation()
 
-  const handleToggleVisible = async (broker: Broker) => {
+  const handleToggleVisible = async (broker: Broker | BrokerWithTranslations) => {
     if (typeof onToggleVisible === 'function') {
       await onToggleVisible(broker)
     }
   }
+
+  // Helper function to get display content (only description uses translations)
+  const getDisplayContent = (broker: Broker | BrokerWithTranslations) => {
+    let description = null
+    if ('translations' in broker && broker.translations && broker.translations.length > 0) {
+      // Get the first available translation (preferably English)
+      const translation = broker.translations.find(t => t.language_code === 'en') || broker.translations[0]
+      if (translation) {
+        description = translation.description
+      }
+    }
+    return {
+      name: broker.name,
+      headquarter: broker.headquarter,
+      description: description
+    }
+  }
+
+
 
   const columns = [
     {
       header: t('brokers.brokerInformation'),
       accessor: 'name' as keyof Broker,
       sortable: true,
-      render: (value: unknown, row: Broker) => (
-        <div className='flex items-center space-x-3'>
-          <div className='flex-shrink-0'>
-            {imagesByRecord?.[row.id]?.[0] ? (
-              <RecordImage image={imagesByRecord[row.id]?.[0] || null} className='w-12 h-12 rounded-lg object-cover border border-gray-200' />
-            ) : (
-              <div className='w-12 h-12 rounded-lg bg-gradient-to-br from-gray-900 to-black flex items-center justify-center'>
-                <Building2 className='w-4 h-4 text-white' />
+      render: (value: unknown, row: Broker | BrokerWithTranslations) => {
+        const displayContent = getDisplayContent(row)
+        return (
+          <div className='flex items-center space-x-3'>
+            <div className='flex-shrink-0'>
+              {imagesByRecord?.[row.id]?.[0] ? (
+                <RecordImage image={imagesByRecord[row.id]?.[0] || null} className='w-12 h-12 rounded-lg object-cover border border-gray-200' />
+              ) : (
+                <div className='w-12 h-12 rounded-lg bg-gradient-to-br from-gray-900 to-black flex items-center justify-center'>
+                  <Building2 className='w-4 h-4 text-white' />
+                </div>
+              )}
+            </div>
+            <div className='flex-1 min-w-0'>
+              <div className={cn(getTypographyClasses('h4'), 'truncate')}>{displayContent.name}</div>
+              <div className={cn(getTypographyClasses('small'), 'text-gray-600 dark:text-gray-300 truncate')}>
+                {displayContent.headquarter || t('brokers.noHeadquarterInfo')}
               </div>
-            )}
-          </div>
-          <div className='flex-1 min-w-0'>
-            <div className={cn(getTypographyClasses('h4'), 'truncate')}>{row.name}</div>
-            <div className={cn(getTypographyClasses('small'), 'text-gray-600 dark:text-gray-300 truncate')}>
-              {row.headquarter || t('brokers.noHeadquarterInfo')}
-            </div>
-            <div className={cn(getTypographyClasses('small'), 'text-gray-500 dark:text-gray-400 truncate')}>
-              {row.description
-                ? stripHtmlAndTruncate(row.description, 60)
-                : t('brokers.noDescription')}
             </div>
           </div>
-        </div>
-      )
+        )
+      }
     },
+        ...(showTranslationStatus ? [{
+      header: t('brokers.translations'),
+      accessor: 'id' as keyof Broker,
+      render: (value: unknown, row: Broker | BrokerWithTranslations) => {
+        const translationCount = 'translations' in row ? row.translations?.length || 0 : 0
+        const hasTranslations = 'translations' in row && row.translations && row.translations.length > 0
+        const hasEnglish = hasTranslations ? row.translations!.some(t => t.language_code === 'en') : false
+        const hasPortuguese = hasTranslations ? row.translations!.some(t => t.language_code === 'pt') : false
+
+        return (
+          <div className='flex items-center space-x-2'>
+            <Languages className='w-4 h-4 text-gray-400' />
+            <TranslationStatusIndicator
+              hasEnglish={hasEnglish}
+              hasPortuguese={hasPortuguese}
+              hasAnyTranslation={hasTranslations}
+              totalTranslations={translationCount}
+              completedTranslations={translationCount}
+              size='sm'
+              variant='compact'
+            />
+            <span className='text-xs text-gray-500 dark:text-gray-400'>
+              {translationCount === 0 ? t('brokers.noTranslations') :
+               translationCount === 1 ? t('brokers.oneTranslation') :
+               t('brokers.multipleTranslations', { count: translationCount })}
+            </span>
+          </div>
+        )
+      }
+    }] : []),
     {
       header: t('brokers.established'),
       accessor: 'established_in' as keyof Broker,
@@ -102,7 +152,7 @@ const BrokersTable: React.FC<BrokersTableProps> = ({
     {
       header: t('brokers.actions'),
       accessor: 'id' as keyof Broker,
-      render: (value: unknown, row: Broker) => (
+      render: (value: unknown, row: Broker | BrokerWithTranslations) => (
         <div className='flex space-x-1'>
           <button
             onClick={e => { e.stopPropagation(); handleToggleVisible(row) }}
@@ -136,7 +186,7 @@ const BrokersTable: React.FC<BrokersTableProps> = ({
 
   return (
     <Table<Broker>
-      data={brokers}
+      data={brokers as Broker[]}
       columns={columns}
       sortColumn={sortColumn}
       sortDirection={sortDirection}

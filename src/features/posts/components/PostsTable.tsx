@@ -7,6 +7,7 @@ import { useTranslation, usePageTranslation } from '../../../hooks/useTranslatio
 import { formatDateDisplay } from '../../../utils/format'
 import { getTypographyClasses, getIconClasses, cn } from '../../../utils/theme'
 import type { PostWithAuthor } from '../../../hooks/usePosts'
+import type { PostTranslation } from '../../../types/translations'
 
 interface PostsTableProps {
   posts: PostWithAuthor[]
@@ -32,43 +33,58 @@ const PostsTable: React.FC<PostsTableProps> = ({
   const { t } = usePageTranslation()
   const { t: tCommon } = useTranslation()
 
+  // Helper function to get title from translations (English as default)
+  const getPostTitle = (post: PostWithAuthor) => {
+    // Check if post has translations (PostWithTranslations)
+    if ('translations' in post && Array.isArray(post.translations) && post.translations.length > 0) {
+      // Get English translation first, fallback to first available
+      const translation = (post.translations as PostTranslation[]).find((t) => t.language_code === 'en') || post.translations[0] as PostTranslation
+      return translation?.title || t('posts.untitledPost')
+    }
+    // Fallback for PostWithAuthor or posts without translations
+    return t('posts.untitledPost')
+  }
+
   const columns = [
     {
       header: t('posts.postDetails'),
       accessor: 'title' as keyof PostWithAuthor,
       sortable: true,
-      render: (value: unknown, row: PostWithAuthor) => (
-        <div className='flex items-center space-x-3'>
-          <div className='flex-shrink-0'>
-            <RecordImage
-              image={imagesByRecord[row.id]?.[0] || null}
-              className='w-12 h-12 rounded-lg object-cover border border-gray-200 dark:border-gray-700'
-              alt={`${value as string} post image`}
-              showFallback={false}
-            />
-          </div>
-          <div className='flex-1 min-w-0'>
-            <div className={cn(getTypographyClasses('h4'), 'truncate')}>
-              {value as string}
+      render: (value: unknown, row: PostWithAuthor) => {
+        const title = getPostTitle(row)
+        return (
+          <div className='flex items-center space-x-3'>
+            <div className='flex-shrink-0'>
+              <RecordImage
+                image={imagesByRecord[row.id]?.[0] || null}
+                className='w-12 h-12 rounded-lg object-cover border border-gray-200 dark:border-gray-700'
+                alt={`${title} post image`}
+                showFallback={false}
+              />
             </div>
-            <div className='flex items-center space-x-2 mt-1'>
-              <Badge
-                variant={row.type as 'news' | 'event' | 'terms_of_use' | 'privacy_policy'}
-                size='sm'
-                showIcon
-              >
-                {tCommon(
-                  row.type === 'terms_of_use'
-                    ? 'content.termsOfUse'
-                    : row.type === 'privacy_policy'
-                      ? 'content.privacyPolicy'
-                      : `content.${row.type}`
-                )}
-              </Badge>
+            <div className='flex-1 min-w-0'>
+              <div className={cn(getTypographyClasses('h4'), 'truncate')}>
+                {title}
+              </div>
+              <div className='flex items-center space-x-2 mt-1'>
+                <Badge
+                  variant={row.type as 'news' | 'event' | 'terms_of_use' | 'privacy_policy'}
+                  size='sm'
+                  showIcon
+                >
+                  {tCommon(
+                    row.type === 'terms_of_use'
+                      ? 'content.termsOfUse'
+                      : row.type === 'privacy_policy'
+                        ? 'content.privacyPolicy'
+                        : `content.${row.type}`
+                  )}
+                </Badge>
+              </div>
             </div>
           </div>
-        </div>
-      )
+        )
+      }
     },
     {
       header: t('posts.status'),

@@ -3,6 +3,7 @@ import { Upload, Image as ImageIcon, Camera, Trash2 } from 'lucide-react'
 import { useFileUpload, type UploadResult } from '../../../hooks/useFileUpload'
 import { useToast } from '../../../hooks/useToast'
 import { useTranslation } from '../../../hooks/useTranslation'
+import { useImageValidation } from '../../../hooks/useImageValidation'
 
 interface MainImageUploadProps {
   /** Current image URL */
@@ -45,6 +46,9 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
   const { uploadFile, isUploading, progress } = useFileUpload()
   const toast = useToast()
   const { t: tCommon } = useTranslation()
+
+  // Validate the provided image URL
+  const { isValid: isImageValid } = useImageValidation(imageUrl)
 
   // Size configurations
   const sizeConfig = {
@@ -178,7 +182,7 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
     fileInputRef.current?.click()
   }, [disabled, isUploading])
 
-  const currentImage = preview || imageUrl
+  const currentImage = preview || (isImageValid ? imageUrl : null)
   const showRemoveButton = currentImage && !isUploading
 
   return (
@@ -211,6 +215,16 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
               className={`${config.container} object-cover rounded-lg border-2 border-gray-200 transition-opacity ${
                 isUploading ? 'opacity-50' : 'opacity-100'
               }`}
+              onError={(e) => {
+                // Hide broken images by setting display to none
+                e.currentTarget.style.display = 'none'
+                // Optionally, you could also call onChange(null) to clear the broken image
+                // onChange(null)
+              }}
+              onLoad={(e) => {
+                // Ensure image is visible when it loads successfully
+                e.currentTarget.style.display = 'block'
+              }}
             />
 
             {/* Upload progress overlay */}

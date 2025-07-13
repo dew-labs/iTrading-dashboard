@@ -1,16 +1,15 @@
 import React, { useMemo, useCallback, useState } from 'react'
-import { FileText, Calendar, Scale, Lock, CheckCircle, Save, X, Plus, Languages, Edit2, PenTool } from 'lucide-react'
+import { FileText, Calendar, Scale, Lock, CheckCircle, Save, X, Plus, Languages, PenTool } from 'lucide-react'
 import type { PostInsert, Image } from '../../../types'
 import type { PostWithAuthor } from '../../../hooks/usePosts'
 import { useFormValidation } from '../../../hooks/useFormValidation'
 import { useFormTranslation, useTranslation } from '../../../hooks/useTranslation'
-import { useImageValidation } from '../../../hooks/useImageValidation'
 import { Button } from '../../atoms'
 import { Select } from '../../molecules'
 import { MainImageUpload } from '../images'
 import { supabase } from '../../../lib/supabase'
 import type { UploadResult } from '../../../hooks/useFileUpload'
-import TranslationManager from '../translations/TranslationManager'
+import PostTranslationManager from '../translations/PostTranslationManager'
 import { SUPPORTED_LANGUAGE_CODES } from '../../../constants/languages'
 import type { LanguageCode } from '../../../types/translations'
 
@@ -24,7 +23,14 @@ interface PostFormProps {
   post?: PostWithAuthor | null
   onSubmit: (
     data: PostInsert,
-    thumbnailImage?: (Partial<Image> & { file?: File }) | null
+    thumbnailImage?: (Partial<Image> & { file?: File }) | null,
+    translations?: Array<{
+      language_code: LanguageCode
+      title: string
+      excerpt: string
+      content: string
+      reading_time: number
+    }>
   ) => void
   onCancel: () => void
   images?: Image[] | null
@@ -36,13 +42,17 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
   const { t: tForm } = useFormTranslation()
   const { t: tCommon } = useTranslation()
   const [_currentLanguage, setCurrentLanguage] = useState<LanguageCode>('en')
+  const [postTranslations, setPostTranslations] = useState<Array<{
+    language_code: LanguageCode
+    title: string
+    excerpt: string
+    content: string
+    reading_time: number
+  }>>([])
 
   const [thumbnailImage, setThumbnailImage] = useState<
     (Partial<Image> & { publicUrl?: string; file?: File }) | null
   >(null)
-
-  // Validate thumbnail image URL
-  const { isValid: isThumbnailValid } = useImageValidation(thumbnailImage?.publicUrl)
 
   // Memoize initial data to prevent re-renders (only non-translatable fields)
   const initialData = useMemo(() => ({
@@ -81,17 +91,11 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
       const existingThumbnail = images?.find(
         img => img.record_id === post.id && img.type === 'thumbnail'
       )
-      if (existingThumbnail?.path) {
+      if (existingThumbnail) {
         const { data: urlData } = supabase.storage
           .from('posts')
           .getPublicUrl(existingThumbnail.path)
-
-        // Only set the thumbnail if we have a valid path and URL
-        if (urlData.publicUrl) {
-          setThumbnailImage({ ...existingThumbnail, publicUrl: urlData.publicUrl })
-        } else {
-          setThumbnailImage(null)
-        }
+        setThumbnailImage({ ...existingThumbnail, publicUrl: urlData.publicUrl })
       } else {
         setThumbnailImage(null)
       }
@@ -166,9 +170,10 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
   const handleFormSubmit = useCallback((data: typeof formData) => {
     onSubmit(
       data as PostInsert,
-      thumbnailImage
+      thumbnailImage,
+      postTranslations
     )
-  }, [onSubmit, thumbnailImage])
+  }, [onSubmit, thumbnailImage, postTranslations])
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8">
@@ -219,7 +224,13 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
 
             <MainImageUpload
               label=""
-              imageUrl={isThumbnailValid ? (thumbnailImage?.publicUrl || thumbnailImage?.path || null) : null}
+              imageUrl={
+                thumbnailImage?.publicUrl && thumbnailImage.publicUrl.trim() !== ''
+                  ? thumbnailImage.publicUrl
+                  : thumbnailImage?.path && thumbnailImage.path.trim() !== ''
+                    ? thumbnailImage.path
+                    : null
+              }
               onChange={handleThumbnailUpload}
               bucket="posts"
               folder="thumbnails"
@@ -251,67 +262,14 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
             </div>
 
             <div className="p-6">
-              {post ? (
-                <TranslationManager
-                  contentType="posts"
-                  contentId={post.id}
-                  defaultLanguage="en"
-                  requiredLanguages={SUPPORTED_LANGUAGE_CODES}
-                  onLanguageChange={setCurrentLanguage}
-                  className="border-0 p-0 bg-transparent"
-                />
-              ) : (
-                <div className="text-center py-20 px-6">
-                  <div className="relative">
-                    {/* Visual indicator */}
-                    <div className="flex items-center justify-center w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-full">
-                      <Languages className="w-10 h-10 text-blue-600 dark:text-blue-400" />
-                    </div>
-
-                    {/* Main heading */}
-                    <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                      Content & Translation Management
-                    </h4>
-
-                    {/* Description */}
-                    <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto leading-relaxed">
-                      The content editor and translation tools will become available once you save this post.
-                      You'll be able to create and manage content in multiple languages.
-                    </p>
-
-                    {/* Features preview */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-lg mx-auto mb-8">
-                      <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        <div className="flex-shrink-0 w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-                          <Edit2 className="w-4 h-4 text-green-600 dark:text-green-400" />
-                        </div>
-                        <div className="text-left">
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">Rich Content Editor</div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">Title, excerpt & content</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-                          <Languages className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <div className="text-left">
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">Multi-language Support</div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">English & Portuguese</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Call to action */}
-                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                      <div className="flex items-center justify-center space-x-2 text-blue-800 dark:text-blue-200">
-                        <CheckCircle className="w-5 h-5" />
-                        <span className="font-medium">Complete the post settings above, then save to enable content editing</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+              <PostTranslationManager
+                postId={post?.id || null}
+                defaultLanguage="en"
+                requiredLanguages={SUPPORTED_LANGUAGE_CODES}
+                onLanguageChange={setCurrentLanguage}
+                onTranslationsReady={setPostTranslations}
+                className="border-0 p-0 bg-transparent"
+              />
             </div>
           </div>
         </div>

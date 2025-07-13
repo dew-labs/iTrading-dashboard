@@ -95,37 +95,44 @@ EXCEPTION
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Function to handle generic record deletion cascade to images and storage
+-- Function to handle generic record deletion cascade to images
 CREATE OR REPLACE FUNCTION public.handle_record_deletion_cascade_to_images()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 DECLARE
-  image_paths TEXT[];
+  image_count INTEGER;
   bucket_name TEXT;
 BEGIN
   -- The bucket name is assumed to be the same as the table name
   bucket_name := TG_TABLE_NAME;
 
-  -- Find all image paths associated with the record being deleted
-  SELECT array_agg(path)
-  INTO image_paths
+  -- Count images associated with the record being deleted
+  SELECT COUNT(*)
+  INTO image_count
   FROM public.images
   WHERE record_id = OLD.id AND table_name = bucket_name;
 
-  -- If there are images, delete them from storage
-  IF image_paths IS NOT NULL AND array_length(image_paths, 1) > 0 THEN
-    PERFORM storage.delete_objects(bucket_name, image_paths);
-    RAISE LOG 'Deleted % images from storage bucket ''%'' for record_id: %', array_length(image_paths, 1), bucket_name, OLD.id;
-  END IF;
-
   -- Delete the corresponding records from the images table
-  -- This will run regardless of whether files were in storage, to clean up orphaned DB records.
+  -- Note: Storage files should be deleted by the application layer
+  -- to handle proper error handling and cleanup
   DELETE FROM public.images
   WHERE record_id = OLD.id AND table_name = bucket_name;
 
+  -- Log the cleanup
+  IF image_count > 0 THEN
+    RAISE LOG 'Cleaned up % image records from table for record_id: % (table: %)',
+      image_count, OLD.id, bucket_name;
+  END IF;
+
   RETURN OLD;
+EXCEPTION
+  WHEN OTHERS THEN
+    -- Log the error but don't fail the main deletion
+    RAISE WARNING 'Error in handle_record_deletion_cascade_to_images for record_id %: % - %',
+      OLD.id, SQLSTATE, SQLERRM;
+    RETURN OLD;
 END;
 $$;
 

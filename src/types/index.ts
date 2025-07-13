@@ -7,6 +7,7 @@ export * from './users'
 export * from './images'
 export * from './brokers'
 export * from './audits'
+export * from './translations'
 
 // Keep the main Database interface export
 export type { Database } from './database'

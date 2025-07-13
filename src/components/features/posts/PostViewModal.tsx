@@ -1,21 +1,23 @@
-import React from 'react'
+import React, { useMemo, useState } from 'react'
 import {
   X,
   Calendar,
   User,
   Clock,
   Eye,
-  Tag,
   FileText,
   TrendingUp
 } from 'lucide-react'
 import { useTranslation, usePageTranslation } from '../../../hooks/useTranslation'
+import { useContentTranslation } from '../../../hooks/useContentTranslation'
 import { formatDateDisplay } from '../../../utils/format'
-import { Badge, Button } from '../../atoms'
+import { Badge, Button, LanguageBadgeSelector } from '../../atoms'
 import { RichTextRenderer } from '../../common'
 import { RecordImage } from '../images'
+import { SUPPORTED_LANGUAGE_CODES } from '../../../constants/languages'
 import type { Image } from '../../../types'
 import type { PostWithAuthor } from '../../../features/posts'
+import type { LanguageCode } from '../../../types/translations'
 import { getTypographyClasses, cn } from '../../../utils/theme'
 
 interface PostViewModalProps {
@@ -33,8 +35,34 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
   image,
   onEdit
 }) => {
-  const { t: tCommon } = useTranslation()
+  const { t: tCommon, i18n } = useTranslation()
   const { t } = usePageTranslation()
+  const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(i18n.language as LanguageCode)
+
+  // Get translations for this post
+  const { translations } = useContentTranslation(
+    'posts',
+    post.id,
+    {
+      enabled: true,
+      defaultLanguage: selectedLanguage,
+      requiredLanguages: SUPPORTED_LANGUAGE_CODES
+    }
+  )
+
+  // Get current translation data
+  const currentTranslation = useMemo(() => {
+    if (!translations || translations.length === 0) return null
+    const translation = translations.find(t => t.language_code === selectedLanguage) || translations[0]
+    // Cast to PostTranslation since we know this is for posts
+    return translation as { id: string; language_code: string; title: string; excerpt?: string; content?: string; reading_time: number }
+  }, [translations, selectedLanguage])
+
+  // Get available languages for this post
+  const availableLanguages = useMemo(() => {
+    if (!translations || translations.length === 0) return []
+    return translations.map(t => t.language_code as LanguageCode)
+  }, [translations])
 
   const hasImages = !!image
 
@@ -51,13 +79,13 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
       {/* Modal container */}
       <div className='flex min-h-full items-center justify-center p-4'>
         {/* Enhanced modal with better dimensions for content reading */}
-        <div className='relative bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 dark:border-gray-700/50 w-full max-w-6xl max-h-[95vh] overflow-hidden transform transition-all duration-300 ease-out scale-100'>
+        <div className='relative bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 dark:border-gray-700/50 w-full max-w-6xl max-h-[90vh] overflow-hidden transform transition-all duration-300 ease-out scale-100 flex flex-col'>
 
           {/* Enhanced Header with gradient and post meta */}
-          <div className='sticky top-0 z-10 bg-gradient-to-r from-gray-50/95 to-white/95 dark:from-gray-800/95 dark:to-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 px-8 py-6'>
+          <div className='flex-shrink-0 bg-gradient-to-r from-gray-50/95 to-white/95 dark:from-gray-800/95 dark:to-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 px-8 py-6'>
             <div className='flex items-start justify-between'>
               <div className='flex-1 mr-6'>
-                {/* Post badges */}
+                                {/* Post badges */}
                 <div className='flex items-center space-x-3 mb-3'>
                   <Badge
                     variant={post.status as 'published' | 'draft'}
@@ -71,7 +99,6 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
                     size='sm'
                     showIcon
                   >
-                    <Tag className='w-3 h-3 mr-1' />
                     {tCommon(
                       post.type === 'terms_of_use'
                         ? 'content.termsOfUse'
@@ -82,12 +109,23 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
                   </Badge>
                 </div>
 
+                {/* Language selector */}
+                <LanguageBadgeSelector
+                  availableLanguages={availableLanguages}
+                  selectedLanguage={selectedLanguage}
+                  onLanguageChange={setSelectedLanguage}
+                  size='sm'
+                  showLabel={false}
+                  compact={false}
+                  className='mb-4'
+                />
+
                 {/* Post title */}
                 <h1 className={cn(
                   getTypographyClasses('h1'),
                   'text-2xl lg:text-3xl leading-tight mb-4 text-gray-900 dark:text-white'
                 )}>
-                  {post.title}
+                  {currentTranslation?.title || 'Untitled Post'}
                 </h1>
 
                 {/* Author and meta info */}
@@ -139,7 +177,7 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
           </div>
 
           {/* Content area */}
-          <div className='overflow-y-auto max-h-[calc(95vh-8rem)]'>
+          <div className='flex-1 overflow-y-auto min-h-0'>
             <div className='px-8 py-6'>
               <div className='grid grid-cols-1 lg:grid-cols-4 gap-8'>
 
@@ -147,24 +185,24 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
                 <div className='lg:col-span-3 space-y-6'>
                   {/* Featured image from images table - only show if images exist */}
                   {hasImages && (
-                    <div className='mb-8'>
+                    <div>
                       <RecordImage
                         image={image}
                         className='w-full object-contain group-hover:scale-105 transition-transform duration-500 rounded-xl'
                         fallbackClassName='hidden'
-                        alt={`${post.title} featured image`}
+                        alt={`${currentTranslation?.title || 'Post'} featured image`}
                       />
                     </div>
                   )}
 
                   {/* Post content */}
-                  <div>
-                    {post.content ? (
-                      <RichTextRenderer content={post.content} />
+                  <div className={!hasImages ? 'mt-6' : ''}>
+                    {currentTranslation?.content ? (
+                      <RichTextRenderer content={currentTranslation.content} />
                     ) : (
                       <div className='text-center py-12 text-gray-500 dark:text-gray-400'>
                         <FileText className='w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600' />
-                        <p>No content available for this post.</p>
+                        <p>No content available for this post in {availableLanguages.find(lang => lang === selectedLanguage) ? 'this language' : 'the selected language'}.</p>
                       </div>
                     )}
                   </div>
@@ -222,7 +260,7 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
                           Word Count
                         </span>
                         <span className='font-semibold text-gray-900 dark:text-white'>
-                          {post.content ? post.content.replace(/<[^>]*>/g, '').split(' ').length : 0}
+                          {currentTranslation?.content ? currentTranslation.content.replace(/<[^>]*>/g, '').split(' ').length : 0}
                         </span>
                       </div>
                       <div className='flex items-center justify-between'>
@@ -231,10 +269,7 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
                           Read Time
                         </span>
                         <span className='font-semibold text-gray-900 dark:text-white' aria-live='polite'>
-                          {typeof post.reading_time === 'number' && post.reading_time > 0
-                            ? post.reading_time
-                            : Math.max(1, Math.ceil((post.content ? post.content.replace(/<[^>]*>/g, '').split(' ').length : 0) / 200))
-                          } min
+                          {currentTranslation?.reading_time || 1} min
                         </span>
                       </div>
                     </div>

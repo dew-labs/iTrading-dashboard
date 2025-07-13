@@ -19,7 +19,7 @@ import {
 import { useAuthStore } from '../../store/authStore'
 import { useTranslation, useNotificationTranslation } from '../../hooks/useTranslation'
 import { useRecentActivity } from '../../hooks/useRecentActivity'
-import { Badge } from '../atoms'
+import { Badge, LanguageSelector } from '../atoms'
 import { Avatar } from '../features/users'
 
 interface HeaderProps {
@@ -220,6 +220,13 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               </div>
             )}
           </div>
+
+          {/* Language Selector */}
+          <LanguageSelector
+            variant='compact'
+            size='md'
+            className='ml-2'
+          />
 
           {/* Divider */}
           <div className='w-px h-8 bg-gray-200 dark:bg-gray-700 mx-4'></div>

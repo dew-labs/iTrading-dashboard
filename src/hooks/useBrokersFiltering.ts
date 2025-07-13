@@ -55,8 +55,7 @@ export const useBrokersFiltering = ({
       const matchesSearch =
         (broker.headquarter &&
           broker.headquarter.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (broker.name && broker.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (broker.description && broker.description.toLowerCase().includes(searchTerm.toLowerCase()))
+        (broker.name && broker.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
       return matchesSearch
     })
