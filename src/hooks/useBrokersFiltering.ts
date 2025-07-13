@@ -1,12 +1,8 @@
 import { useState, useMemo } from 'react'
 import type { Broker } from '../types'
+import { DEFAULT_VALUES } from '../constants/ui'
 
-interface UseBrokersFilteringProps {
-  brokers: Broker[]
-  itemsPerPage?: number
-}
-
-interface FilterState {
+export interface FilterState {
   searchTerm: string
   sortColumn: keyof Broker | null
   sortDirection: 'asc' | 'desc'
@@ -16,21 +12,21 @@ interface FilterState {
   viewMode: 'list' | 'card'
 }
 
-interface UseBrokersFilteringReturn {
-  // State
-  filterState: FilterState
+export interface UseBrokersFilteringProps {
+  brokers: Broker[]
+  itemsPerPage?: number
+}
 
-  // Computed data
+export interface UseBrokersFilteringReturn {
+  filterState: FilterState
   filteredAndSortedBrokers: Broker[]
   paginatedBrokers: Broker[]
   totalPages: number
-
-  // Actions
   setSearchTerm: (term: string) => void
   setSortColumn: (column: keyof Broker | null) => void
   setSortDirection: (direction: 'asc' | 'desc') => void
   setCurrentPage: (page: number) => void
-  setItemsPerPage: (itemsPerPage: number) => void
+  setItemsPerPage: (items: number) => void
   setPageInputValue: (value: string) => void
   setViewMode: (mode: 'list' | 'card') => void
   handleSort: (column: keyof Broker) => void
@@ -39,7 +35,7 @@ interface UseBrokersFilteringReturn {
 
 export const useBrokersFiltering = ({
   brokers,
-  itemsPerPage: initialItemsPerPage = 12
+  itemsPerPage: initialItemsPerPage = DEFAULT_VALUES.BROKERS_PAGINATION_LIMIT
 }: UseBrokersFilteringProps): UseBrokersFilteringReturn => {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortColumn, setSortColumn] = useState<keyof Broker | null>('created_at')

@@ -2,24 +2,22 @@ import React, { useMemo, useCallback } from 'react'
 import { Lock, CheckCircle, AlertCircle, X } from 'lucide-react'
 import { useFormValidation } from '../../../hooks/useFormValidation'
 import { useChangePassword } from '../../../hooks/useChangePassword'
-import { useTranslation } from '../../../hooks/useTranslation'
+import { useTranslation, useFormTranslation } from '../../../hooks/useTranslation'
 import { FormField } from '../../atoms'
 import { cn, getTypographyClasses } from '../../../utils/theme'
-
-
+import { VALIDATION } from '../../../constants/ui'
 
 // Move schema outside component to prevent re-renders
 const CHANGE_PASSWORD_SCHEMA = {
   currentPassword: {
-    required: true,
-    message: 'Current password is required'
+    required: true
   },
   newPassword: {
     required: true,
-    minLength: 8,
+    minLength: VALIDATION.PASSWORD_MIN_LENGTH,
     custom: (value: string): boolean | string => {
       const errors = []
-      if (value.length < 8) errors.push('at least 8 characters')
+      if (value.length < VALIDATION.PASSWORD_MIN_LENGTH) errors.push(`at least ${VALIDATION.PASSWORD_MIN_LENGTH} characters`)
       if (!/[a-z]/.test(value)) errors.push('one lowercase letter')
       if (!/[A-Z]/.test(value)) errors.push('one uppercase letter')
       if (!/\d/.test(value)) errors.push('one number')
@@ -32,8 +30,7 @@ const CHANGE_PASSWORD_SCHEMA = {
     }
   },
   confirmNewPassword: {
-    required: true,
-    message: 'Please confirm your new password'
+    required: true
   }
 } as const
 
@@ -44,6 +41,7 @@ interface ChangePasswordFormProps {
 
 const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ onSuccess, onCancel }) => {
   const { t } = useTranslation()
+  const { t: tForm } = useFormTranslation()
   const { changePassword, loading } = useChangePassword()
 
   // Memoize initial data to prevent re-renders
@@ -116,33 +114,33 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ onSuccess, onCa
     if (!password) return { score: 0, label: '', color: '' }
 
     let score = 0
-    if (password.length >= 8) score++
+    if (password.length >= VALIDATION.PASSWORD_MIN_LENGTH) score++
     if (/[a-z]/.test(password)) score++
     if (/[A-Z]/.test(password)) score++
     if (/\d/.test(password)) score++
     if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score++
 
     const strength = [
-      { label: 'Very Weak', color: 'bg-red-500' },
-      { label: 'Weak', color: 'bg-red-400' },
-      { label: 'Fair', color: 'bg-orange-500' },
-      { label: 'Good', color: 'bg-yellow-500' },
-      { label: 'Strong', color: 'bg-green-500' }
+      { label: tForm('passwordStrength.veryWeak'), color: 'bg-red-500' },
+      { label: tForm('passwordStrength.weak'), color: 'bg-red-400' },
+      { label: tForm('passwordStrength.fair'), color: 'bg-orange-500' },
+      { label: tForm('passwordStrength.good'), color: 'bg-yellow-500' },
+      { label: tForm('passwordStrength.strong'), color: 'bg-green-500' }
     ]
 
-    const strengthData = strength[score] || { label: 'Very Weak', color: 'bg-red-500' }
+    const strengthData = strength[score] || { label: tForm('passwordStrength.veryWeak'), color: 'bg-red-500' }
     return { score, ...strengthData }
-  }, [])
+  }, [tForm])
 
   const passwordStrength = useMemo(() => getPasswordStrength(formData.newPassword), [formData.newPassword, getPasswordStrength])
 
   const passwordRequirements = useMemo(() => [
-    { text: 'At least 8 characters', met: formData.newPassword.length >= 8 },
-    { text: 'One lowercase letter', met: /[a-z]/.test(formData.newPassword) },
-    { text: 'One uppercase letter', met: /[A-Z]/.test(formData.newPassword) },
-    { text: 'One number', met: /\d/.test(formData.newPassword) },
-    { text: 'One special character', met: /[!@#$%^&*(),.?":{}|<>]/.test(formData.newPassword) }
-  ], [formData.newPassword])
+    { text: tForm('passwordRequirements.minLength', { min: VALIDATION.PASSWORD_MIN_LENGTH }), met: formData.newPassword.length >= VALIDATION.PASSWORD_MIN_LENGTH },
+    { text: tForm('passwordRequirements.lowercase'), met: /[a-z]/.test(formData.newPassword) },
+    { text: tForm('passwordRequirements.uppercase'), met: /[A-Z]/.test(formData.newPassword) },
+    { text: tForm('passwordRequirements.number'), met: /\d/.test(formData.newPassword) },
+    { text: tForm('passwordRequirements.specialChar'), met: /[!@#$%^&*(),.?":{}|<>]/.test(formData.newPassword) }
+  ], [formData.newPassword, tForm])
 
   return (
     <div className="space-y-6">
@@ -154,7 +152,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ onSuccess, onCa
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6" noValidate>
         {/* Current Password */}
         <FormField
           label={t('forms.labels.currentPassword')}
@@ -195,7 +193,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ onSuccess, onCa
           {formData.newPassword && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Password Strength:</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{tForm('passwordStrength.title', { defaultValue: 'Password Strength' })}:</span>
                 <span className={`text-sm font-medium ${
                   passwordStrength.score >= 3 ? 'text-green-600' :
                   passwordStrength.score >= 2 ? 'text-yellow-600' : 'text-red-600'
@@ -215,7 +213,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ onSuccess, onCa
           {/* Password Requirements */}
           {formData.newPassword && (
             <div className="space-y-2">
-              <p className="text-sm text-gray-600 dark:text-gray-400">Password Requirements:</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{tForm('passwordRequirements.title')}:</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                 {passwordRequirements.map((req, index) => (
                   <div key={index} className="flex items-center space-x-2">

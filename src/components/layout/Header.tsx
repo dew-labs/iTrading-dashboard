@@ -14,19 +14,20 @@ import {
   Building,
   Image,
   Shield,
-  ShieldCheck
+  ShieldCheck,
+  Sun,
+  Moon
 } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 import { useTranslation, useNotificationTranslation } from '../../hooks/useTranslation'
 import { useRecentActivity } from '../../hooks/useRecentActivity'
-import { Badge, LanguageSelector } from '../atoms'
+import { Badge, LanguageSelector, Button } from '../atoms'
 import { Avatar } from '../features/users'
+import { useThemeStore } from '../../store/themeStore'
 
 interface HeaderProps {
   onToggleSidebar: () => void
 }
-
-
 
 const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const { user, profile, signOut } = useAuthStore()
@@ -221,13 +222,6 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             )}
           </div>
 
-          {/* Language Selector */}
-          <LanguageSelector
-            variant='compact'
-            size='md'
-            className='ml-2'
-          />
-
           {/* Divider */}
           <div className='w-px h-8 bg-gray-200 dark:bg-gray-700 mx-4'></div>
 
@@ -236,6 +230,9 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             <button
               onClick={() => setShowProfileDropdown(!showProfileDropdown)}
               className='flex items-center space-x-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 py-3 px-4 group'
+              aria-haspopup='menu'
+              aria-expanded={showProfileDropdown}
+              aria-label={t('ui.profile')}
             >
               <div className='hidden sm:block text-right min-w-0'>
                 <p className='text-sm font-medium text-gray-900 dark:text-white truncate group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors'>
@@ -304,6 +301,27 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                   </div>
                 </div>
 
+                {/* Grouped Language & Theme Selection */}
+                <div className='px-4 py-3 border-b border-gray-100 dark:border-gray-700'>
+                  <div className='flex flex-col gap-3'>
+                    {/* Language Selector */}
+                    <div>
+                      <span className='block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1'>
+                        {t('ui.language')}
+                      </span>
+                      <LanguageSelector
+                        variant='default'
+                        size='md'
+                        showFlag={true}
+                        showText={true}
+                        className='w-full'
+                      />
+                    </div>
+                    {/* Theme Selector */}
+                    <ThemeSelectorDropdown />
+                  </div>
+                </div>
+
                 {/* Account Settings */}
                 <div className='px-2 py-2'>
                   <NavLink
@@ -312,7 +330,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                     className='w-full flex items-center px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors'
                   >
                     <Settings className='w-4 h-4 mr-3' />
-                    Account Settings
+                    {t('ui.accountSettings')}
                   </NavLink>
                 </div>
 
@@ -339,3 +357,41 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
 }
 
 export default Header
+
+const ThemeSelectorDropdown: React.FC = () => {
+  const { theme, setTheme } = useThemeStore()
+  const { t } = useTranslation()
+  return (
+    <div>
+      <span className='block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1'>
+        {t('ui.theme.title')}
+      </span>
+      <div className='flex gap-2' role='radiogroup' aria-label={t('ui.theme.title')}>
+        <Button
+          type='button'
+          variant={theme === 'light' ? 'primary' : 'secondary'}
+          size='sm'
+          aria-pressed={theme === 'light'}
+          aria-label={t('ui.theme.light')}
+          onClick={() => setTheme('light')}
+          className='flex-1 flex items-center justify-center'
+        >
+          <Sun className='w-4 h-4 mr-1' />
+          {t('ui.theme.light')}
+        </Button>
+        <Button
+          type='button'
+          variant={theme === 'dark' ? 'primary' : 'secondary'}
+          size='sm'
+          aria-pressed={theme === 'dark'}
+          aria-label={t('ui.theme.dark')}
+          onClick={() => setTheme('dark')}
+          className='flex-1 flex items-center justify-center'
+        >
+          <Moon className='w-4 h-4 mr-1' />
+          {t('ui.theme.dark')}
+        </Button>
+      </div>
+    </div>
+  )
+}

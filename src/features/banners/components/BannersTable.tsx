@@ -51,7 +51,7 @@ const BannersTable: React.FC<BannersTableProps> = ({
             />
             <div className='flex-1 min-w-0'>
               <div className={cn(getTypographyClasses('h4'), 'truncate')}>
-                {row.name || 'Untitled Banner'}
+                {row.name || tCommon('content.untitledBanner')}
               </div>
               <div className='flex items-center space-x-2 mt-2'>
                 <Badge variant={row.is_visible ? 'active' : 'inactive'} size='sm' showIcon>

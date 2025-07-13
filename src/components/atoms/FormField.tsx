@@ -6,6 +6,7 @@
 import React from 'react'
 import { AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { cn } from '../../utils/theme'
+import { useTranslation } from '../../hooks/useTranslation'
 
 export interface FormFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   label?: string
@@ -47,6 +48,7 @@ const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(({
 }, ref) => {
   const [showPassword, setShowPassword] = React.useState(false)
   const [isFocused, setIsFocused] = React.useState(false)
+  const { t: tCommon } = useTranslation()
 
   const generatedId = React.useId()
   const inputId = id || `field-${generatedId}`
@@ -162,7 +164,7 @@ const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(({
             onClick={handleTogglePassword}
             disabled={disabled}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none focus:text-gray-600 dark:focus:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            aria-label={showPassword ? tCommon('ui.accessibility.hidePassword') : tCommon('ui.accessibility.showPassword')}
           >
             {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
           </button>

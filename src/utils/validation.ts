@@ -4,8 +4,11 @@
  */
 
 import { COUNTRY_OPTIONS } from '../constants/general'
+import { VALIDATION } from '../constants/ui'
 
-// Validation rule interface
+/**
+ * Validation types and interfaces
+ */
 export interface ValidationRule<T = unknown> {
   required?: boolean
   minLength?: number
@@ -17,16 +20,14 @@ export interface ValidationRule<T = unknown> {
   message?: string
 }
 
-// Validation result interface
-export interface ValidationResult {
-  isValid: boolean
-  errors: string[]
-}
-
-// Field validation result
 export interface FieldValidationResult {
   isValid: boolean
   error?: string
+}
+
+export interface FormValidationResult {
+  isValid: boolean
+  errors: Record<string, string>
 }
 
 // Form validation schema
@@ -42,7 +43,7 @@ export const validators = {
    * Validates email format using RFC 5322 compliant regex
    */
   email: (email: string): boolean => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    return VALIDATION.EMAIL_REGEX.test(email)
   },
 
   /**
@@ -56,7 +57,7 @@ export const validators = {
   /**
    * Validates password strength
    */
-  password: (password: string, minLength = 8): {
+  password: (password: string, minLength = VALIDATION.PASSWORD_MIN_LENGTH): {
     isValid: boolean
     score: number
     requirements: Array<{ met: boolean; text: string }>
@@ -145,6 +146,49 @@ export const validators = {
 }
 
 /**
+ * Get a user-friendly field label for validation messages
+ */
+const getFieldLabel = (fieldName: string, t?: (key: string, params?: Record<string, unknown>) => string): string => {
+  if (!t) return fieldName
+
+  // Try to get field label from forms namespace
+  const labelKey = `labels.${fieldName}`
+  try {
+    const label = t(labelKey, { defaultValue: labelKey })
+    if (label !== labelKey) {
+      return label
+    }
+  } catch {
+    // Fall back to field name processing
+  }
+
+  // Convert field names to readable labels
+  const fieldLabelMap: Record<string, string> = {
+    'established_in': 'Established Year',
+    'full_name': 'Full Name',
+    'phone': 'Phone Number',
+    'target_url': 'Target URL',
+    'featured_image_url': 'Featured Image URL',
+    'is_visible': 'Visibility',
+    'is_active': 'Active Status',
+    'currentPassword': 'Current Password',
+    'newPassword': 'New Password',
+    'confirmNewPassword': 'Confirm New Password',
+    'confirmPassword': 'Confirm Password'
+  }
+
+  if (fieldLabelMap[fieldName]) {
+    return fieldLabelMap[fieldName]
+  }
+
+  // Convert snake_case to Title Case
+  return fieldName
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
+/**
  * Validates a single field against a validation rule
  */
 export const validateField = <T>(
@@ -155,10 +199,31 @@ export const validateField = <T>(
   t?: (key: string, params?: any) => string
 ): FieldValidationResult => {
   const errors: string[] = []
+  const fieldLabel = getFieldLabel(fieldName, t)
 
   // Required validation
   if (rule.required && !validators.required(value)) {
-    errors.push(rule.message || t?.('validation.required', { field: fieldName }) || `${fieldName} is required`)
+    // Try specific field validation message first, then fall back to generic
+    const specificKey = `validation.${fieldName}`
+    const genericKey = 'validation.required'
+
+    if (rule.message) {
+      errors.push(rule.message)
+    } else if (t) {
+      // Try specific field message first
+      try {
+        const specificMessageCheck = t(specificKey, { field: fieldLabel, defaultValue: specificKey })
+        if (specificMessageCheck !== specificKey && !specificMessageCheck.includes('{{')) {
+          errors.push(specificMessageCheck)
+        } else {
+          errors.push(t(genericKey, { field: fieldLabel }))
+        }
+      } catch {
+        errors.push(t(genericKey, { field: fieldLabel }))
+      }
+    } else {
+      errors.push(`${fieldLabel} is required`)
+    }
   }
 
   // Skip other validations if field is empty and not required
@@ -170,25 +235,73 @@ export const validateField = <T>(
   if (typeof value === 'string') {
     // Min length
     if (rule.minLength && value.length < rule.minLength) {
-      errors.push(
-        rule.message ||
-        t?.('validation.minLength', { field: fieldName, min: rule.minLength }) ||
-        `${fieldName} must be at least ${rule.minLength} characters`
-      )
+      const specificKey = `validation.${fieldName}`
+      const genericKey = 'validation.minLength'
+
+      if (rule.message) {
+        errors.push(rule.message)
+      } else if (t) {
+        try {
+          // Try specific field message first (without interpolation to check if it exists)
+          const specificMessageCheck = t(specificKey, { field: fieldLabel, min: rule.minLength, max: rule.maxLength, defaultValue: specificKey })
+          if (specificMessageCheck !== specificKey && !specificMessageCheck.includes('{{')) {
+            errors.push(specificMessageCheck)
+          } else {
+            errors.push(t(genericKey, { field: fieldLabel, min: rule.minLength }))
+          }
+        } catch {
+          errors.push(t(genericKey, { field: fieldLabel, min: rule.minLength }))
+        }
+      } else {
+        errors.push(`${fieldLabel} must be at least ${rule.minLength} characters`)
+      }
     }
 
     // Max length
     if (rule.maxLength && value.length > rule.maxLength) {
-      errors.push(
-        rule.message ||
-        t?.('validation.maxLength', { field: fieldName, max: rule.maxLength }) ||
-        `${fieldName} must be less than ${rule.maxLength} characters`
-      )
+      const specificKey = `validation.${fieldName}`
+      const genericKey = 'validation.maxLength'
+
+      if (rule.message) {
+        errors.push(rule.message)
+      } else if (t) {
+        try {
+          // Try specific field message first (without interpolation to check if it exists)
+          const specificMessageCheck = t(specificKey, { field: fieldLabel, min: rule.minLength, max: rule.maxLength, defaultValue: specificKey })
+          if (specificMessageCheck !== specificKey && !specificMessageCheck.includes('{{')) {
+            errors.push(specificMessageCheck)
+          } else {
+            errors.push(t(genericKey, { field: fieldLabel, max: rule.maxLength }))
+          }
+        } catch {
+          errors.push(t(genericKey, { field: fieldLabel, max: rule.maxLength }))
+        }
+      } else {
+        errors.push(`${fieldLabel} must be less than ${rule.maxLength} characters`)
+      }
     }
 
     // Pattern validation
     if (rule.pattern && !rule.pattern.test(value)) {
-      errors.push(rule.message || t?.('validation.pattern', { field: fieldName }) || `${fieldName} format is invalid`)
+      const specificKey = `validation.${fieldName}`
+      const genericKey = 'validation.pattern'
+
+      if (rule.message) {
+        errors.push(rule.message)
+      } else if (t) {
+        try {
+          const specificMessageCheck = t(specificKey, { field: fieldLabel, defaultValue: specificKey })
+          if (specificMessageCheck !== specificKey && !specificMessageCheck.includes('{{')) {
+            errors.push(specificMessageCheck)
+          } else {
+            errors.push(t(genericKey, { field: fieldLabel }))
+          }
+        } catch {
+          errors.push(t(genericKey, { field: fieldLabel }))
+        }
+      } else {
+        errors.push(`${fieldLabel} format is invalid`)
+      }
     }
   }
 
@@ -196,20 +309,50 @@ export const validateField = <T>(
   if (typeof value === 'number') {
     // Min value
     if (rule.min !== undefined && value < rule.min) {
-      errors.push(
-        rule.message ||
-        t?.('validation.min', { field: fieldName, min: rule.min }) ||
-        `${fieldName} must be at least ${rule.min}`
-      )
+      const specificKey = `validation.${fieldName}`
+      const genericKey = 'validation.min'
+
+      if (rule.message) {
+        errors.push(rule.message)
+      } else if (t) {
+        try {
+          // Try specific field message first (without interpolation to check if it exists)
+          const specificMessageCheck = t(specificKey, { field: fieldLabel, min: rule.min, max: rule.max, defaultValue: specificKey })
+          if (specificMessageCheck !== specificKey && !specificMessageCheck.includes('{{')) {
+            errors.push(specificMessageCheck)
+          } else {
+            errors.push(t(genericKey, { field: fieldLabel, min: rule.min }))
+          }
+        } catch {
+          errors.push(t(genericKey, { field: fieldLabel, min: rule.min }))
+        }
+      } else {
+        errors.push(`${fieldLabel} must be at least ${rule.min}`)
+      }
     }
 
     // Max value
     if (rule.max !== undefined && value > rule.max) {
-      errors.push(
-        rule.message ||
-        t?.('validation.max', { field: fieldName, max: rule.max }) ||
-        `${fieldName} must be less than ${rule.max}`
-      )
+      const specificKey = `validation.${fieldName}`
+      const genericKey = 'validation.max'
+
+      if (rule.message) {
+        errors.push(rule.message)
+      } else if (t) {
+        try {
+          // Try specific field message first (without interpolation to check if it exists)
+          const specificMessageCheck = t(specificKey, { field: fieldLabel, min: rule.min, max: rule.max, defaultValue: specificKey })
+          if (specificMessageCheck !== specificKey && !specificMessageCheck.includes('{{')) {
+            errors.push(specificMessageCheck)
+          } else {
+            errors.push(t(genericKey, { field: fieldLabel, max: rule.max }))
+          }
+        } catch {
+          errors.push(t(genericKey, { field: fieldLabel, max: rule.max }))
+        }
+      } else {
+        errors.push(`${fieldLabel} must be less than ${rule.max}`)
+      }
     }
   }
 
@@ -219,7 +362,25 @@ export const validateField = <T>(
     if (typeof customResult === 'string') {
       errors.push(customResult)
     } else if (!customResult) {
-      errors.push(rule.message || t?.('validation.custom', { field: fieldName }) || `${fieldName} is invalid`)
+      const specificKey = `validation.${fieldName}`
+      const genericKey = 'validation.custom'
+
+      if (rule.message) {
+        errors.push(rule.message)
+      } else if (t) {
+        try {
+          const specificMessageCheck = t(specificKey, { field: fieldLabel, defaultValue: specificKey })
+          if (specificMessageCheck !== specificKey && !specificMessageCheck.includes('{{')) {
+            errors.push(specificMessageCheck)
+          } else {
+            errors.push(t(genericKey, { field: fieldLabel }))
+          }
+        } catch {
+          errors.push(t(genericKey, { field: fieldLabel }))
+        }
+      } else {
+        errors.push(`${fieldLabel} is invalid`)
+      }
     }
   }
 
@@ -237,15 +398,15 @@ export const validateForm = <T extends Record<string, unknown>>(
   schema: ValidationSchema<T>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   t?: (key: string, params?: any) => string
-): { isValid: boolean; errors: Partial<Record<keyof T, string>> } => {
-  const errors: Partial<Record<keyof T, string>> = {}
+): FormValidationResult => {
+  const errors: Record<string, string> = {}
 
   for (const field in schema) {
     const rule = schema[field]
     if (rule) {
       const result = validateField(data[field], rule, field as string, t)
       if (!result.isValid && result.error) {
-        errors[field] = result.error
+        errors[field as string] = result.error
       }
     }
   }
@@ -262,40 +423,34 @@ export const validateForm = <T extends Record<string, unknown>>(
 export const commonSchemas = {
   email: {
     required: true,
-    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    message: 'Please enter a valid email address'
+    pattern: VALIDATION.EMAIL_REGEX
   } as ValidationRule<string>,
 
   password: {
     required: true,
-    minLength: 8,
-    custom: (value: string) => validators.password(value).isValid,
-    message: 'Password must meet security requirements'
+    minLength: VALIDATION.PASSWORD_MIN_LENGTH,
+    custom: (value: string) => validators.password(value).isValid
   } as ValidationRule<string>,
 
   phone: {
-    pattern: /^\+\d{7,15}$/,
-    custom: (value: string) => !value || validators.phone(value),
-    message: 'Please enter a valid phone number with country code (e.g., +1234567890)'
+    pattern: VALIDATION.PHONE_REGEX,
+    custom: (value: string) => !value || validators.phone(value)
   } as ValidationRule<string>,
 
   url: {
-    custom: (value: string) => !value || validators.url(value),
-    message: 'Please enter a valid URL'
+    custom: (value: string) => !value || validators.url(value)
   } as ValidationRule<string>,
 
   name: {
     required: true,
-    minLength: 2,
-    maxLength: 100,
-    message: 'Name must be between 2 and 100 characters'
+    minLength: VALIDATION.NAME_MIN_LENGTH,
+    maxLength: VALIDATION.NAME_MAX_LENGTH
   } as ValidationRule<string>,
 
   year: {
-    min: 1800,
-    max: new Date().getFullYear(),
-    custom: (value: number) => !value || validators.year(value),
-    message: 'Please enter a valid year'
+    min: VALIDATION.YEAR_MIN,
+    max: VALIDATION.YEAR_MAX,
+    custom: (value: number) => !value || validators.year(value)
   } as ValidationRule<number>
 }
 
@@ -308,30 +463,25 @@ export const formSchemas = {
     full_name: commonSchemas.name,
     phone: commonSchemas.phone,
     country: {
-      custom: (value: string) => !value || COUNTRY_OPTIONS.some((opt: { value: string; label: string }) => opt.value === value),
-      message: 'Please select a valid country'
+      custom: (value: string) => !value || COUNTRY_OPTIONS.some((opt: { value: string; label: string }) => opt.value === value)
     },
     city: {
-      maxLength: 100,
-      message: 'City must be less than 100 characters'
+      maxLength: VALIDATION.CITY_MAX_LENGTH
     } as ValidationRule<string>,
     bio: {
-      maxLength: 500,
-      message: 'Bio must be less than 500 characters'
+      maxLength: VALIDATION.BIO_MAX_LENGTH
     } as ValidationRule<string>
   },
 
   post: {
     title: {
       required: true,
-      minLength: 3,
-      maxLength: 200,
-      message: 'Title must be between 3 and 200 characters'
+      minLength: VALIDATION.TITLE_MIN_LENGTH,
+      maxLength: VALIDATION.TITLE_MAX_LENGTH
     } as ValidationRule<string>,
     content: {
       required: true,
-      minLength: 10,
-      message: 'Content must be at least 10 characters'
+      minLength: VALIDATION.CONTENT_MIN_LENGTH
     } as ValidationRule<string>
   },
 
@@ -339,52 +489,44 @@ export const formSchemas = {
     name: commonSchemas.name,
     established_in: commonSchemas.year,
     headquarter: {
-      maxLength: 100,
-      message: 'Headquarter must be less than 100 characters'
+      maxLength: VALIDATION.HEADQUARTER_MAX_LENGTH
     } as ValidationRule<string>,
     description: {
-      minLength: 10,
-      message: 'Description must be at least 10 characters'
+      minLength: VALIDATION.DESCRIPTION_MIN_LENGTH
     } as ValidationRule<string>
   },
 
   banner: {
     name: {
       required: true,
-      minLength: 2,
-      maxLength: 100,
-      message: 'Banner name must be between 2 and 100 characters'
+      minLength: VALIDATION.BANNER_NAME_MIN_LENGTH,
+      maxLength: VALIDATION.BANNER_NAME_MAX_LENGTH
     } as ValidationRule<string>,
     target_url: {
       required: true,
-      custom: (value: string) => validators.url(value),
-      message: 'Please enter a valid URL'
+      custom: (value: string) => validators.url(value)
     } as ValidationRule<string>
   },
 
   product: {
     name: {
       required: true,
-      minLength: 2,
-      maxLength: 100,
-      message: 'Product name must be between 2 and 100 characters'
+      minLength: VALIDATION.REQUIRED_FIELD_MIN_LENGTH,
+      maxLength: VALIDATION.REQUIRED_FIELD_MAX_LENGTH
     } as ValidationRule<string>,
     price: {
       required: true,
-      min: 0,
-      message: 'Price must be a positive number'
+      min: VALIDATION.PRICE_MIN
     } as ValidationRule<number>
   },
 
   changePassword: {
     currentPassword: {
-      required: true,
-      message: 'Current password is required'
+      required: true
     } as ValidationRule<string>,
     newPassword: commonSchemas.password,
     confirmNewPassword: {
-      required: true,
-      message: 'Please confirm your new password'
+      required: true
     } as ValidationRule<string>
   }
 }

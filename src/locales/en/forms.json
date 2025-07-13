@@ -42,11 +42,23 @@
     "targetUrl": "Target URL",
     "headquarter": "Headquarter",
     "establishedDate": "Established Date",
+    "established_in": "Established Year",
+    "full_name": "Full Name",
+    "target_url": "Target URL",
+    "featured_image_url": "Featured Image URL",
+    "is_visible": "Visibility",
+    "is_active": "Active Status",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "confirmPassword": "Confirm Password",
     "name": "Name",
     "logo": "Logo",
     "establishedYear": "Established Year",
     "bio": "Bio",
-    "location": "Location"
+    "location": "Location",
+    "bannerImage": "Banner Image",
+    "bannerStatus": "Banner Status"
   },
   "placeholders": {
     "enterFirstName": "Enter first name",
@@ -101,10 +113,12 @@
     "productPrice": "0.00",
     "productDescription": "Describe your product features, benefits, and details...",
     "bio": "Tell us about yourself - your background, interests, and experience...",
-    "city": "Enter city"
+    "city": "Enter city",
+    "enterFieldInLanguage": "Enter {{field}} in {{language}}"
   },
   "validation": {
-    "required": "{{field}} is required",
+    "required": "Required",
+    "fieldRequired": "{{field}} is required",
     "email": "Please enter a valid email address",
     "password": "Password must be at least 8 characters",
     "newPassword": "New password must be at least 8 characters",
@@ -126,11 +140,57 @@
     "image": "Please select a valid image file",
     "year": "Please enter a valid year between 1800 and current year",
     "fileType": "Unsupported file type",
-    "fileSize": "File size exceeds maximum limit"
+    "fileSize": "File size exceeds maximum limit",
+    "productName": "Product name must be between {{min}} and {{max}} characters",
+    "productPrice": "Price must be a positive number",
+    "brokerName": "Broker name must be between {{min}} and {{max}} characters",
+    "brokerHeadquarter": "Headquarter must be less than {{max}} characters",
+    "brokerYear": "Please enter a valid year between {{min}} and {{max}}",
+    "bannerName": "Banner name must be between {{min}} and {{max}} characters",
+    "bannerUrl": "Please enter a valid URL",
+    "description": "Description must be at least {{min}} characters",
+    "title": "Title must be between {{min}} and {{max}} characters",
+    "content": "Content must be at least {{min}} characters",
+    "name": "Name must be between {{min}} and {{max}} characters",
+    "city": "City must be less than {{max}} characters",
+    "bio": "Bio must be less than {{max}} characters",
+    "passwordRequirements": "Password must meet security requirements",
+    "countryInvalid": "Please select a valid country"
   },
   "hints": {
     "logoRecommendation": "Recommended: Square images work best",
     "thumbnailRecommendation": "Recommended: 16:9 aspect ratio for best display"
+  },
+  "helpers": {
+    "productPriceHelper": "Product price in USD",
+    "brokerNameHelper": "Enter the official name of the brokerage",
+    "brokerLocationHelper": "Primary business location",
+    "brokerEstablishedHelper": "Year the brokerage was founded",
+    "bannerNameHelper": "A clear name to identify this banner in your dashboard",
+    "bannerTargetUrlHelper": "Where users will be redirected when they click the banner",
+    "productNameHelper": "A clear, descriptive name for your product"
+  },
+  "bannerForm": {
+    "clickToUpload": "Click to upload banner image",
+    "dragAndDrop": "or drag & drop",
+    "supportedFormats": "PNG, JPG up to 10MB",
+    "uploadRequired": "Upload a banner image. Recommended: Wide landscape images (16:9 ratio) work best",
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "visibleToUsers": "Banner is visible to users",
+    "bannerHidden": "Banner is hidden",
+    "processing": "Processing...",
+    "updateBanner": "Update Banner",
+    "createBanner": "Create Banner",
+    "uploadBannerImage": "Please upload a banner image"
+  },
+  "imageUpload": {
+    "uploadImage": "Upload Image",
+    "altTextOptional": "Alt Text (Optional)",
+    "dropImageHere": "Drop an image here, or click to select",
+    "supportedFormatsModal": "PNG, JPG, GIF up to 10MB",
+    "insertImage": "Insert Image",
+    "preview": "Preview"
   },
   "userForm": {
     "profilePicture": "Profile Picture",
@@ -140,11 +200,32 @@
     "avatarMaxSize": "Maximum file size: 10MB",
     "avatarFormats": "Supported formats: JPG, PNG, GIF, WebP"
   },
-  "changePassword": "Change Password",
-  "passwordRequirements": "Password Requirements",
-  "passwordMinLength": "At least 8 characters long",
-  "passwordUppercase": "Include uppercase letters",
-  "passwordLowercase": "Include lowercase letters",
-  "passwordNumber": "Include at least one number",
-  "passwordSpecialChar": "Include at least one special character"
+  "changePassword": {
+    "title": "Change Password",
+    "description": "Update your account password",
+    "currentPasswordHelp": "Enter your current password to verify your identity",
+    "confirmPasswordHelp": "Re-enter your new password to confirm",
+    "changing": "Changing Password...",
+    "changePassword": "Change Password"
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "uploading": "Uploading..."
+  },
+  "passwordRequirements": {
+    "title": "Password Requirements",
+    "minLength": "At least {{min}} characters",
+    "lowercase": "One lowercase letter",
+    "uppercase": "One uppercase letter",
+    "number": "One number",
+    "specialChar": "One special character"
+  },
+  "passwordStrength": {
+    "title": "Password Strength",
+    "veryWeak": "Very Weak",
+    "weak": "Weak",
+    "fair": "Fair",
+    "good": "Good",
+    "strong": "Strong"
+  }
 }

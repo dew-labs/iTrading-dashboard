@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
-import { useToast } from '../useToast'
+import { useToast, type EntityType } from '../useToast'
 import { supabase } from '../../lib/supabase'
 
 /**
@@ -40,7 +40,7 @@ export interface UseCRUDReturn<T, CreateT, UpdateT> {
   create: (data: CreateT) => Promise<T>
   update: (id: string, data: UpdateT) => Promise<T>
   delete: (id: string) => Promise<void>
-  refetch: () => Promise<any>
+  refetch: () => Promise<unknown>
 
   // Mutation states
   isCreating: boolean
@@ -49,7 +49,7 @@ export interface UseCRUDReturn<T, CreateT, UpdateT> {
 
   // Helper functions
   getById: (id: string) => T | undefined
-  getByField: (field: keyof T, value: any) => T[]
+  getByField: (field: keyof T, value: unknown) => T[]
   search: (query: string, fields: (keyof T)[]) => T[]
 }
 
@@ -151,7 +151,7 @@ export function useCRUD<T extends { id: string }, CreateT = Partial<T>, UpdateT 
     },
     onSuccess: (data: T) => {
       queryClient.invalidateQueries({ queryKey })
-      toast.success('created', entityName.toLowerCase() as any)
+      toast.success('created', entityName.toLowerCase() as EntityType)
       onCreateSuccess?.(data)
     }
   })
@@ -202,7 +202,7 @@ export function useCRUD<T extends { id: string }, CreateT = Partial<T>, UpdateT 
     },
     onSuccess: (data: T) => {
       queryClient.invalidateQueries({ queryKey })
-      toast.success('updated', entityName.toLowerCase() as any)
+      toast.success('updated', entityName.toLowerCase() as EntityType)
       onUpdateSuccess?.(data)
     }
   })
@@ -238,7 +238,7 @@ export function useCRUD<T extends { id: string }, CreateT = Partial<T>, UpdateT 
     },
     onSuccess: (_, deletedId) => {
       queryClient.invalidateQueries({ queryKey })
-      toast.success('deleted', entityName.toLowerCase() as any)
+      toast.success('deleted', entityName.toLowerCase() as EntityType)
       onDeleteSuccess?.(deletedId)
     }
   })
@@ -248,7 +248,7 @@ export function useCRUD<T extends { id: string }, CreateT = Partial<T>, UpdateT 
     return data.find(item => item.id === id)
   }, [data])
 
-  const getByField = useCallback((field: keyof T, value: any) => {
+  const getByField = useCallback((field: keyof T, value: unknown) => {
     return data.filter(item => item[field] === value)
   }, [data])
 

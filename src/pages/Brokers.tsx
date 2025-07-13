@@ -413,6 +413,7 @@ const Brokers: React.FC = () => {
               ? `${tCommon('actions.edit')} ${tCommon('entities.brokers')}`
               : t('brokers.addNewBroker')
           }
+          size='xl'
         >
           <BrokerForm
             broker={editingBroker}

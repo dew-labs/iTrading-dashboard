@@ -22,6 +22,7 @@ const DetailViewModal: React.FC<DetailViewModalProps> = ({
   children
 }) => {
   const { t } = useTranslation()
+  const { t: tCommon } = useTranslation()
   const { images } = useImages()
 
   // Find images for this record
@@ -74,7 +75,7 @@ const DetailViewModal: React.FC<DetailViewModalProps> = ({
             onClick={onClose}
             className='px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'
           >
-            {t('actions.close')}
+            {tCommon('actions.close')}
           </button>
         </div>
       </div>

@@ -1,8 +1,8 @@
 import React, { useMemo, useCallback, useState } from 'react'
-import { X, Save, Plus, Building2, Calendar, MapPin, Languages } from 'lucide-react'
+import { X, Save, Plus, Building2, Calendar, MapPin, Languages, CheckCircle } from 'lucide-react'
 import type { Broker, BrokerInsert, Image } from '../../../types'
 import { useFormValidation } from '../../../hooks/useFormValidation'
-import { FormField } from '../../atoms'
+import { FormField, Button } from '../../atoms'
 import { MainImageUpload } from '../images'
 import { useFormTranslation, useTranslation } from '../../../hooks/useTranslation'
 import { supabase } from '../../../lib/supabase'
@@ -10,25 +10,23 @@ import type { UploadResult } from '../../../hooks/useFileUpload'
 import TranslationManager from '../translations/TranslationManager'
 import { SUPPORTED_LANGUAGE_CODES } from '../../../constants/languages'
 import type { LanguageCode } from '../../../types/translations'
+import { VALIDATION } from '../../../constants/ui'
 
 // Move schema outside component to prevent re-renders
 // Only description is handled in translations now
 const BROKER_FORM_SCHEMA = {
   name: {
     required: true,
-    minLength: 2,
-    maxLength: 100,
-    message: 'Broker name must be between 2 and 100 characters'
+    minLength: VALIDATION.REQUIRED_FIELD_MIN_LENGTH,
+    maxLength: VALIDATION.REQUIRED_FIELD_MAX_LENGTH
   },
   headquarter: {
-    maxLength: 100,
-    message: 'Headquarter must be less than 100 characters'
+    maxLength: VALIDATION.HEADQUARTER_MAX_LENGTH
   },
   established_in: {
-    min: 1800,
-    max: new Date().getFullYear(),
-    custom: (value: number | null) => !value || (value >= 1800 && value <= new Date().getFullYear()),
-    message: 'Please enter a valid year between 1800 and current year'
+    min: VALIDATION.YEAR_MIN,
+    max: VALIDATION.YEAR_MAX,
+    custom: (value: number | null) => !value || (value >= VALIDATION.YEAR_MIN && value <= VALIDATION.YEAR_MAX)
   }
 } as const
 
@@ -41,7 +39,7 @@ interface BrokerFormProps {
 
 const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, images }) => {
   const { t: tForm } = useFormTranslation()
-  const { t } = useTranslation()
+  const { t: tCommon } = useTranslation()
   const [_currentLanguage, setCurrentLanguage] = useState<LanguageCode>('en')
 
   const [logoImage, setLogoImage] = useState<
@@ -136,15 +134,73 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
   }, [onSubmit, logoImage])
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
-      {/* Enhanced layout for better organization */}
-      <div className='grid grid-cols-1 xl:grid-cols-4 gap-6'>
-        {/* Left column - Logo and basic info */}
-        <div className='xl:col-span-1 space-y-6'>
-          {/* Logo upload section */}
-          <div>
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8" noValidate>
+      {/* Main Layout Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+
+        {/* Left Sidebar - Settings & Media */}
+        <div className="xl:col-span-1 space-y-6">
+
+          {/* Broker Settings Card */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+            <div className="flex items-center space-x-2 mb-4">
+              <Building2 className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{tCommon('content.brokerSettings')}</h3>
+            </div>
+
+            <div className="space-y-4">
+              <FormField
+                label={tForm('labels.name')}
+                name='name'
+                value={formData.name}
+                onChange={handleChange('name')}
+                onBlur={handleBlur('name')}
+                placeholder={tForm('placeholders.enterBrokerName')}
+                required
+                disabled={isValidating}
+                {...(errors.name && { error: errors.name })}
+                icon={<Building2 className='w-5 h-5' />}
+                helperText={tForm('helpers.brokerNameHelper')}
+              />
+
+              <FormField
+                label={tForm('labels.headquarter')}
+                name='headquarter'
+                value={formData.headquarter || ''}
+                onChange={handleChange('headquarter')}
+                onBlur={handleBlur('headquarter')}
+                placeholder={tForm('placeholders.enterHeadquarter')}
+                disabled={isValidating}
+                {...(errors.headquarter && { error: errors.headquarter })}
+                icon={<MapPin className='w-5 h-5' />}
+                helperText={tForm('helpers.brokerLocationHelper')}
+              />
+
+              <FormField
+                label={tForm('labels.establishedYear')}
+                type='number'
+                name='established_in'
+                value={formData.established_in?.toString() || ''}
+                onChange={handleEstablishedYearChange}
+                onBlur={handleBlur('established_in')}
+                placeholder={tForm('placeholders.enterEstablishedYear')}
+                disabled={isValidating}
+                {...(errors.established_in && { error: errors.established_in })}
+                icon={<Calendar className='w-5 h-5' />}
+                helperText={tForm('helpers.brokerEstablishedHelper')}
+              />
+            </div>
+          </div>
+
+          {/* Logo Upload Card */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+            <div className="flex items-center space-x-2 mb-4">
+              <Calendar className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{tCommon('content.brokerLogo')}</h3>
+            </div>
+
             <MainImageUpload
-              label={tForm('labels.logo')}
+              label=""
               imageUrl={logoImage?.publicUrl || logoImage?.path || null}
               onChange={handleLogoUpload}
               bucket='brokers'
@@ -155,63 +211,18 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
               alt='Broker logo'
             />
           </div>
-
-          {/* Basic info fields using enhanced FormField components */}
-          <div className='space-y-4'>
-            <FormField
-              label={tForm('labels.name')}
-              name='name'
-              value={formData.name}
-              onChange={handleChange('name')}
-              onBlur={handleBlur('name')}
-              placeholder={tForm('placeholders.enterBrokerName')}
-              required
-              disabled={isValidating}
-              {...(errors.name && { error: errors.name })}
-              icon={<Building2 className='w-5 h-5' />}
-              helperText='Enter the official name of the brokerage'
-            />
-
-            <FormField
-              label={tForm('labels.headquarter')}
-              name='headquarter'
-              value={formData.headquarter || ''}
-              onChange={handleChange('headquarter')}
-              onBlur={handleBlur('headquarter')}
-              placeholder={tForm('placeholders.enterHeadquarter')}
-              disabled={isValidating}
-              {...(errors.headquarter && { error: errors.headquarter })}
-              icon={<MapPin className='w-5 h-5' />}
-              helperText='Primary business location'
-            />
-
-            <FormField
-              label={tForm('labels.establishedYear')}
-              type='number'
-              name='established_in'
-              value={formData.established_in?.toString() || ''}
-              onChange={handleEstablishedYearChange}
-              onBlur={handleBlur('established_in')}
-              placeholder={tForm('placeholders.enterEstablishedYear')}
-              min={1800}
-              max={new Date().getFullYear()}
-              disabled={isValidating}
-              {...(errors.established_in && { error: errors.established_in })}
-              icon={<Calendar className='w-5 h-5' />}
-              helperText='Year the brokerage was founded'
-            />
-          </div>
         </div>
 
-        {/* Right column - Content & Translations */}
+        {/* Right Main Content - Translations */}
         <div className="xl:col-span-3 space-y-6">
+
           {/* Content & Translations Card */}
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
             <div className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Languages className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Content & Translations</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{tCommon('content.contentAndTranslations')}</h3>
                 </div>
                 {broker && (
                   <div id="translation-status-container" className="flex items-center">
@@ -241,30 +252,42 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
 
                     {/* Main heading */}
                     <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                      Content & Translation Management
+                      {tCommon('content.contentTranslationManagement')}
                     </h4>
 
                     {/* Description */}
                     <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto leading-relaxed">
-                      The content editor and translation tools will become available once you save this broker.
-                      You'll be able to create and manage content in multiple languages.
+                      {tCommon('content.contentEditorDescription', { type: 'broker' })}
                     </p>
 
                     {/* Features preview */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                      <div className="flex items-start space-x-3 text-left">
-                        <div className="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                        <div>
-                          <div className="font-medium text-gray-900 dark:text-white">Multi-language Support</div>
-                          <div className="text-gray-500 dark:text-gray-400">Manage broker description in multiple languages</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-lg mx-auto mb-8">
+                      <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <div className="flex-shrink-0 w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                          <Building2 className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        </div>
+                        <div className="text-left">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">{tCommon('content.brokerDetailsEditor')}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">{tCommon('content.descriptionAndDetails')}</div>
                         </div>
                       </div>
-                      <div className="flex items-start space-x-3 text-left">
-                        <div className="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                        <div>
-                          <div className="font-medium text-gray-900 dark:text-white">Translation Status</div>
-                          <div className="text-gray-500 dark:text-gray-400">Track translation progress and completeness</div>
+
+                      <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                          <Languages className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                         </div>
+                        <div className="text-left">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">{tCommon('content.multiLanguageSupport')}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">{tCommon('content.englishAndPortuguese')}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Call to action */}
+                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                      <div className="flex items-center justify-center space-x-2 text-blue-800 dark:text-blue-200">
+                        <CheckCircle className="w-5 h-5" />
+                        <span className="font-medium">{tCommon('content.completeSettingsToEnableEditing', { type: 'broker' })}</span>
                       </div>
                     </div>
                   </div>
@@ -275,43 +298,37 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
         </div>
       </div>
 
-      {/* Action buttons */}
-      <div className='flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700'>
-        <button
-          type='button'
+      {/* Action Buttons */}
+      <div className="flex justify-end items-center space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <Button
+          type="button"
+          variant="ghost"
           onClick={onCancel}
-          className='px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center'
+          leftIcon={X}
           disabled={isValidating}
+          className="px-6"
         >
-          <X className='w-4 h-4 mr-2' />
-          {t('actions.cancel')}
-        </button>
-        <button
-          type='submit'
+          {tCommon('actions.cancel')}
+        </Button>
+
+        <Button
+          type="submit"
+          variant="primary"
           disabled={isValidating}
-          className='px-6 py-2 bg-gradient-to-r from-gray-900 to-black dark:from-white dark:to-gray-100 text-white dark:text-gray-900 rounded-lg hover:from-black hover:to-gray-900 dark:hover:from-gray-100 dark:hover:to-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center'
+          {...(!isValidating && { leftIcon: broker ? Save : Plus })}
+          className="px-8"
         >
           {isValidating ? (
             <>
-              <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white dark:border-b-gray-900 mr-2'></div>
-              {broker ? 'Updating...' : 'Creating...'}
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
+              {broker ? tCommon('feedback.updating') : tCommon('feedback.creating')}
             </>
           ) : (
             <>
-              {broker ? (
-                <>
-                  <Save className='w-4 h-4 mr-2' />
-                  {t('actions.update')} {t('entities.brokers')}
-                </>
-              ) : (
-                <>
-                  <Plus className='w-4 h-4 mr-2' />
-                  {t('actions.add')} {t('entities.brokers')}
-                </>
-              )}
+              {broker ? `${tCommon('actions.update')} ${tCommon('entities.brokers')}` : `${tCommon('actions.add')} ${tCommon('entities.brokers')}`}
             </>
           )}
-        </button>
+        </Button>
       </div>
     </form>
   )

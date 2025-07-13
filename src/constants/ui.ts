@@ -142,6 +142,7 @@ export type ContentType = (typeof CONTENT_TYPES)[keyof typeof CONTENT_TYPES]
 export const DEFAULT_VALUES = {
   READING_TIME: 1,
   PAGINATION_LIMIT: 10,
+  BROKERS_PAGINATION_LIMIT: 12, // Brokers use a different default for card view
   SEARCH_DEBOUNCE: 300,
   TOAST_DURATION: 3000,
   MODAL_ANIMATION_DURATION: 300,
@@ -165,7 +166,29 @@ export const VALIDATION = {
   TITLE_MIN_LENGTH: 3,
   TITLE_MAX_LENGTH: 200,
   DESCRIPTION_MAX_LENGTH: 1000,
-  CONTENT_MAX_LENGTH: 50000
+  CONTENT_MAX_LENGTH: 50000,
+  // Year validation
+  YEAR_MIN: 1800,
+  YEAR_MAX: new Date().getFullYear(),
+  // Price validation
+  PRICE_MIN: 0,
+  PRICE_STEP: 0.01,
+  // Bio validation
+  BIO_MAX_LENGTH: 500,
+  // City validation
+  CITY_MAX_LENGTH: 100,
+  // Headquarter validation
+  HEADQUARTER_MAX_LENGTH: 100,
+  // Banner validation
+  BANNER_NAME_MIN_LENGTH: 2,
+  BANNER_NAME_MAX_LENGTH: 100,
+  // Description validation
+  DESCRIPTION_MIN_LENGTH: 10,
+  // Content validation
+  CONTENT_MIN_LENGTH: 10,
+  // General validation
+  REQUIRED_FIELD_MIN_LENGTH: 2,
+  REQUIRED_FIELD_MAX_LENGTH: 100
 } as const
 
 // Animation durations

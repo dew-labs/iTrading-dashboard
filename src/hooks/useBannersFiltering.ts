@@ -1,12 +1,8 @@
 import { useState, useMemo } from 'react'
 import type { Banner } from '../types'
+import { DEFAULT_VALUES } from '../constants/ui'
 
-interface UseBannersFilteringProps {
-  banners: Banner[]
-  itemsPerPage?: number
-}
-
-interface FilterState {
+export interface FilterState {
   searchTerm: string
   filterStatus: string
   sortColumn: keyof Banner | null
@@ -16,22 +12,22 @@ interface FilterState {
   pageInputValue: string
 }
 
-interface UseBannersFilteringReturn {
-  // State
-  filterState: FilterState
+export interface UseBannersFilteringProps {
+  banners: Banner[]
+  itemsPerPage?: number
+}
 
-  // Computed data
+export interface UseBannersFilteringReturn {
+  filterState: FilterState
   filteredAndSortedBanners: Banner[]
   paginatedBanners: Banner[]
   totalPages: number
-
-  // Actions
   setSearchTerm: (term: string) => void
   setFilterStatus: (status: string) => void
   setSortColumn: (column: keyof Banner | null) => void
   setSortDirection: (direction: 'asc' | 'desc') => void
   setCurrentPage: (page: number) => void
-  setItemsPerPage: (itemsPerPage: number) => void
+  setItemsPerPage: (items: number) => void
   setPageInputValue: (value: string) => void
   handleSort: (column: keyof Banner) => void
   handlePageChange: (page: number) => void
@@ -39,7 +35,7 @@ interface UseBannersFilteringReturn {
 
 export const useBannersFiltering = ({
   banners,
-  itemsPerPage: initialItemsPerPage = 10
+  itemsPerPage: initialItemsPerPage = DEFAULT_VALUES.PAGINATION_LIMIT
 }: UseBannersFilteringProps): UseBannersFilteringReturn => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState<string>('all')

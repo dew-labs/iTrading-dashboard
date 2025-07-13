@@ -53,7 +53,7 @@ const AuthForm: React.FC<AuthFormProps> = () => {
           <p className='text-gray-600 dark:text-gray-300 mt-2'>{t('auth.signInToAccess')}</p>
         </div>
 
-        <form onSubmit={handleSubmit} className='space-y-6'>
+        <form onSubmit={handleSubmit} className='space-y-6' noValidate>
           <div>
             <label htmlFor='email' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'>
               {t('auth.emailAddress')}

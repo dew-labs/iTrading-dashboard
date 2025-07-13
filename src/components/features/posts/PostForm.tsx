@@ -13,11 +13,16 @@ import type { UploadResult } from '../../../hooks/useFileUpload'
 import TranslationManager from '../translations/TranslationManager'
 import { SUPPORTED_LANGUAGE_CODES } from '../../../constants/languages'
 import type { LanguageCode } from '../../../types/translations'
+import { VALIDATION } from '../../../constants/ui'
+import { FORM_OPTIONS } from '../../../constants/components'
 
 // Move schema outside component to prevent re-renders
 const POST_FORM_SCHEMA = {
   // Only non-translatable fields need validation here
   // title, excerpt, content are now handled in translations
+  views: {
+    min: VALIDATION.PRICE_MIN // Using PRICE_MIN (0) for views as it should be non-negative
+  }
 } as const
 
 interface PostFormProps {
@@ -126,42 +131,22 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
   )
 
   // Create type options with Badge component icons
-  const typeOptions = useMemo(() => [
-    {
-      value: 'news',
-      label: 'News',
-      icon: <FileText className='w-4 h-4' />
-    },
-    {
-      value: 'event',
-      label: 'Event',
-      icon: <Calendar className='w-4 h-4' />
-    },
-    {
-      value: 'terms_of_use',
-      label: 'Terms of Use',
-      icon: <Scale className='w-4 h-4' />
-    },
-    {
-      value: 'privacy_policy',
-      label: 'Privacy Policy',
-      icon: <Lock className='w-4 h-4' />
-    }
-  ], [])
+  const typeOptions = useMemo(() =>
+    FORM_OPTIONS.postType.map(option => ({
+      value: option.value,
+      label: tCommon(`content.${option.labelKey}`),
+      icon: option.icon === 'FileText' ? <FileText className='w-4 h-4' /> :
+            option.icon === 'Calendar' ? <Calendar className='w-4 h-4' /> :
+            option.icon === 'Scale' ? <Scale className='w-4 h-4' /> : <Lock className='w-4 h-4' />
+    })), [tCommon])
 
   // Create status options with Badge component icons
-  const statusOptions = useMemo(() => [
-    {
-      value: 'draft',
-      label: 'Draft',
-      icon: <PenTool className='w-4 h-4' />
-    },
-    {
-      value: 'published',
-      label: 'Published',
-      icon: <CheckCircle className='w-4 h-4' />
-    }
-  ], [])
+  const statusOptions = useMemo(() =>
+    FORM_OPTIONS.postStatus.map(option => ({
+      value: option.value,
+      label: tCommon(`status.${option.labelKey}`),
+      icon: option.icon === 'PenTool' ? <PenTool className='w-4 h-4' /> : <CheckCircle className='w-4 h-4' />
+    })), [tCommon])
 
   const handleFormSubmit = useCallback((data: typeof formData) => {
     onSubmit(
@@ -171,7 +156,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
   }, [onSubmit, thumbnailImage])
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8" noValidate>
       {/* Main Layout Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
 
@@ -182,7 +167,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
             <div className="flex items-center space-x-2 mb-4">
               <FileText className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Post Settings</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{tCommon('content.postSettings')}</h3>
             </div>
 
             <div className="space-y-4">
@@ -214,7 +199,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
             <div className="flex items-center space-x-2 mb-4">
               <Calendar className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Thumbnail Image</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{tCommon('content.thumbnailImage')}</h3>
             </div>
 
             <MainImageUpload
@@ -240,7 +225,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Languages className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Content & Translations</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{tCommon('content.contentAndTranslations')}</h3>
                 </div>
                 {post && (
                   <div id="translation-status-container" className="flex items-center">
@@ -270,13 +255,12 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
 
                     {/* Main heading */}
                     <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                      Content & Translation Management
+                      {tCommon('content.contentTranslationManagement')}
                     </h4>
 
                     {/* Description */}
                     <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto leading-relaxed">
-                      The content editor and translation tools will become available once you save this post.
-                      You'll be able to create and manage content in multiple languages.
+                      {tCommon('content.contentEditorDescription', { type: 'post' })}
                     </p>
 
                     {/* Features preview */}
@@ -286,8 +270,8 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
                           <Edit2 className="w-4 h-4 text-green-600 dark:text-green-400" />
                         </div>
                         <div className="text-left">
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">Rich Content Editor</div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">Title, excerpt & content</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">{tCommon('content.richContentEditor')}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">{tCommon('content.titleExcerptContent')}</div>
                         </div>
                       </div>
 
@@ -296,8 +280,8 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
                           <Languages className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div className="text-left">
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">Multi-language Support</div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">English & Portuguese</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">{tCommon('content.multiLanguageSupport')}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">{tCommon('content.englishAndPortuguese')}</div>
                         </div>
                       </div>
                     </div>
@@ -306,7 +290,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
                     <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                       <div className="flex items-center justify-center space-x-2 text-blue-800 dark:text-blue-200">
                         <CheckCircle className="w-5 h-5" />
-                        <span className="font-medium">Complete the post settings above, then save to enable content editing</span>
+                        <span className="font-medium">{tCommon('content.completeSettingsToEnableEditing', { type: 'post' })}</span>
                       </div>
                     </div>
                   </div>

@@ -15,31 +15,33 @@ export interface UseFormValidationOptions<T> {
   initialData?: T
 }
 
-export interface FormValidationState<T> {
+export interface UseFormValidationReturn<T> {
+  // State
   data: T
   errors: Partial<Record<keyof T, string>>
   touched: Partial<Record<keyof T, boolean>>
   isValidating: boolean
+
+  // Computed
   isValid: boolean
   isDirty: boolean
-}
 
-export interface FormValidationActions<T> {
+  // Actions
   setData: (data: T) => void
   updateField: (field: keyof T, value: T[keyof T]) => void
   validateField: (field: keyof T) => FieldValidationResult
-  validateForm: () => { isValid: boolean; errors: Partial<Record<keyof T, string>> }
+  validateForm: () => { isValid: boolean; errors: Record<string, string> }
   setFieldTouched: (field: keyof T, touched?: boolean) => void
   setError: (field: keyof T, error: string) => void
   clearError: (field: keyof T) => void
   clearErrors: () => void
-  reset: (newData?: T) => void
+  reset: (data?: T) => void
+
+  // Event handlers
   handleBlur: (field: keyof T) => (e: React.FocusEvent) => void
   handleChange: (field: keyof T) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
   handleSubmit: (onSubmit: (data: T) => void | Promise<void>) => (e: React.FormEvent) => Promise<void>
 }
-
-export type UseFormValidationReturn<T> = FormValidationState<T> & FormValidationActions<T>
 
 /**
  * Enhanced form validation hook with comprehensive features
@@ -51,7 +53,7 @@ export function useFormValidation<T extends Record<string, unknown>>({
   validateOnSubmit = true,
   initialData
 }: UseFormValidationOptions<T>): UseFormValidationReturn<T> {
-  const { t } = useTranslation()
+  const { t } = useTranslation('forms') // Use forms namespace for validation messages
 
   // Use refs to track latest values without adding them as dependencies
   const dataRef = useRef<T>(initialData || {} as T)
@@ -130,7 +132,7 @@ export function useFormValidation<T extends Record<string, unknown>>({
     setIsValidating(true)
 
     const result = validateForm(dataRef.current, schemaRef.current, t)
-    setErrors(result.errors)
+    setErrors(result.errors as Partial<Record<keyof T, string>>)
 
     setIsValidating(false)
     return result

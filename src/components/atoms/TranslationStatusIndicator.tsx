@@ -1,8 +1,9 @@
 import React from 'react'
-import { Languages, CheckCircle, AlertCircle, XCircle } from 'lucide-react'
+import { XCircle, AlertCircle, Languages } from 'lucide-react'
 import Badge from './Badge'
-import { cn } from '../../utils/theme'
+import { useTranslation } from '../../hooks/useTranslation'
 import { LANGUAGE_INFO } from '../../constants/languages'
+import { cn } from '../../utils/theme'
 
 interface TranslationStatusProps {
   hasEnglish: boolean
@@ -11,7 +12,7 @@ interface TranslationStatusProps {
   totalTranslations: number
   completedTranslations: number
   size?: 'sm' | 'md' | 'lg'
-  variant?: 'badges' | 'compact' | 'detailed'
+  variant?: 'badges' | 'progress' | 'detailed'
   className?: string
 }
 
@@ -25,6 +26,8 @@ const TranslationStatusIndicator: React.FC<TranslationStatusProps> = ({
   variant = 'badges',
   className = ''
 }) => {
+  const { t: tCommon } = useTranslation()
+
   // Determine overall translation status
   const getOverallStatus = () => {
     if (hasEnglish && hasPortuguese) return 'complete'
@@ -74,47 +77,40 @@ const TranslationStatusIndicator: React.FC<TranslationStatusProps> = ({
         {!hasAnyTranslation && (
           <Badge variant="inactive" size={size === 'lg' ? 'md' : 'sm'}>
             <XCircle className={cn(currentSize.icon, 'mr-1')} />
-            No translations
+            {tCommon('translations.notStarted')}
           </Badge>
         )}
         {hasAnyTranslation && !(hasEnglish && hasPortuguese) && (
           <Badge variant="draft" size={size === 'lg' ? 'md' : 'sm'}>
             <AlertCircle className={cn(currentSize.icon, 'mr-1')} />
-            Partial
+            {tCommon('translations.inProgress')}
           </Badge>
         )}
       </div>
     )
   }
 
-  // Render compact variant
-  if (variant === 'compact') {
-    const getStatusIcon = () => {
-      switch (status) {
-        case 'complete':
-          return <CheckCircle className={cn(currentSize.icon, 'text-green-500')} />
-        case 'partial':
-          return <AlertCircle className={cn(currentSize.icon, 'text-yellow-500')} />
-        default:
-          return <XCircle className={cn(currentSize.icon, 'text-gray-400')} />
-      }
-    }
-
+  // Render progress variant
+  if (variant === 'progress') {
     return (
-      <div className={cn('flex items-center gap-2', className)}>
-        {getStatusIcon()}
+      <div className={cn('flex items-center gap-3', className)}>
         <div className="flex items-center gap-1">
+          <div className={cn(
+            'w-3 h-3 rounded-full',
+            status === 'complete' ? 'bg-green-500' : status === 'partial' ? 'bg-yellow-500' : 'bg-gray-300'
+          )} />
           <span className={cn(
-            'font-medium',
             currentSize.text,
-            status === 'complete' ? 'text-green-600' :
-            status === 'partial' ? 'text-yellow-600' :
-            'text-gray-500'
+            status === 'complete' ? 'text-green-600' : status === 'partial' ? 'text-yellow-600' : 'text-gray-500'
           )}>
-            {totalTranslations}
+            {status === 'complete' ? tCommon('translations.completed') :
+             status === 'partial' ? tCommon('translations.inProgress') :
+             tCommon('translations.notStarted')}
           </span>
-          <Languages className={cn(currentSize.icon, 'text-gray-400')} />
         </div>
+        <span className={cn(currentSize.text, 'text-gray-500')}>
+          {completedTranslations} {tCommon('general.of')} {totalTranslations}
+        </span>
       </div>
     )
   }
@@ -125,7 +121,7 @@ const TranslationStatusIndicator: React.FC<TranslationStatusProps> = ({
       <div className="flex items-center gap-2">
         <Languages className={cn(currentSize.icon, 'text-gray-400')} />
         <span className={cn(currentSize.text, 'font-medium text-gray-900 dark:text-white')}>
-          Translations
+          {tCommon('translations.translationProgress')}
         </span>
       </div>
       <div className="flex items-center gap-2">
@@ -155,7 +151,7 @@ const TranslationStatusIndicator: React.FC<TranslationStatusProps> = ({
         </div>
       </div>
       <div className={cn(currentSize.text, 'text-gray-500')}>
-        {completedTranslations} of {totalTranslations} complete
+        {completedTranslations} {tCommon('general.of')} {totalTranslations} {tCommon('translations.completed').toLowerCase()}
       </div>
     </div>
   )

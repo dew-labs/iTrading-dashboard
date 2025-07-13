@@ -108,7 +108,7 @@ const BrokersTable: React.FC<BrokersTableProps> = ({
               totalTranslations={translationCount}
               completedTranslations={translationCount}
               size='sm'
-              variant='compact'
+              variant='badges'
             />
             <span className='text-xs text-gray-500 dark:text-gray-400'>
               {translationCount === 0 ? t('brokers.noTranslations') :

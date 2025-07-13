@@ -125,7 +125,7 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
                   getTypographyClasses('h1'),
                   'text-2xl lg:text-3xl leading-tight mb-4 text-gray-900 dark:text-white'
                 )}>
-                  {currentTranslation?.title || 'Untitled Post'}
+                  {currentTranslation?.title || tCommon('content.untitledPost')}
                 </h1>
 
                 {/* Author and meta info */}
@@ -202,7 +202,7 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
                     ) : (
                       <div className='text-center py-12 text-gray-500 dark:text-gray-400'>
                         <FileText className='w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600' />
-                        <p>No content available for this post in {availableLanguages.find(lang => lang === selectedLanguage) ? 'this language' : 'the selected language'}.</p>
+                        <p>{tCommon('general.noContent')} for this post in {availableLanguages.find(lang => lang === selectedLanguage) ? tCommon('content.thisLanguage') : tCommon('content.selectedLanguage')}.</p>
                       </div>
                     )}
                   </div>

@@ -276,4 +276,61 @@ export const FILTER_OPTIONS = {
   ]
 } as const
 
+/**
+ * Form select options for consistent form options across components
+ */
+export const FORM_OPTIONS = {
+  // Product type options
+  productType: [
+    {
+      value: 'false',
+      labelKey: 'oneTimePurchase',
+      icon: 'Package'
+    },
+    {
+      value: 'true',
+      labelKey: 'subscription',
+      icon: 'Zap'
+    }
+  ],
+
+  // Post type options
+  postType: [
+    {
+      value: 'news',
+      labelKey: 'news',
+      icon: 'FileText'
+    },
+    {
+      value: 'event',
+      labelKey: 'event',
+      icon: 'Calendar'
+    },
+    {
+      value: 'terms_of_use',
+      labelKey: 'termsOfUse',
+      icon: 'Scale'
+    },
+    {
+      value: 'privacy_policy',
+      labelKey: 'privacyPolicy',
+      icon: 'Lock'
+    }
+  ],
+
+  // Post status options
+  postStatus: [
+    {
+      value: 'draft',
+      labelKey: 'draft',
+      icon: 'PenTool'
+    },
+    {
+      value: 'published',
+      labelKey: 'published',
+      icon: 'CheckCircle'
+    }
+  ]
+} as const
+
 export default COMPONENTS

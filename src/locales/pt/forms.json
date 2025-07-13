@@ -42,11 +42,23 @@
     "targetUrl": "URL de Destino",
     "headquarter": "Sede",
     "establishedDate": "Data de Fundação",
+    "established_in": "Ano de Fundação",
+    "full_name": "Nome Completo",
+    "target_url": "URL de Destino",
+    "featured_image_url": "URL da Imagem Destacada",
+    "is_visible": "Visibilidade",
+    "is_active": "Status Ativo",
+    "currentPassword": "Senha Atual",
+    "newPassword": "Nova Senha",
+    "confirmNewPassword": "Confirmar Nova Senha",
+    "confirmPassword": "Confirmar Senha",
     "name": "Nome",
     "logo": "Logo",
     "establishedYear": "Ano de Fundação",
     "bio": "Bio",
-    "location": "Localização"
+    "location": "Localização",
+    "bannerImage": "Imagem do Banner",
+    "bannerStatus": "Status do Banner"
   },
   "placeholders": {
     "enterFirstName": "Digite o nome",
@@ -101,10 +113,12 @@
     "productDescription": "Descreva as características, benefícios e detalhes do seu produto...",
     "country": "Selecione o país",
     "bio": "Conte-nos sobre você - sua formação, interesses e experiência...",
-    "city": "Digite a cidade"
+    "city": "Digite a cidade",
+    "enterFieldInLanguage": "Digite {{field}} em {{language}}"
   },
   "validation": {
-    "required": "Este campo é obrigatório",
+    "required": "Obrigatório",
+    "fieldRequired": "Este campo é obrigatório",
     "email": "Por favor, digite um endereço de e-mail válido",
     "password": "A senha deve ter pelo menos 8 caracteres",
     "newPassword": "A nova senha deve ter pelo menos 8 caracteres",
@@ -119,11 +133,57 @@
     "positive": "Deve ser um número positivo",
     "url": "Por favor, digite uma URL válida",
     "file": "Por favor, selecione um arquivo válido",
-    "image": "Por favor, selecione um arquivo de imagem válido"
+    "image": "Por favor, selecione um arquivo de imagem válido",
+    "productName": "O nome do produto deve ter entre {{min}} e {{max}} caracteres",
+    "productPrice": "O preço deve ser um número positivo",
+    "brokerName": "O nome da corretora deve ter entre {{min}} e {{max}} caracteres",
+    "brokerHeadquarter": "A sede deve ter menos de {{max}} caracteres",
+    "brokerYear": "Por favor, digite um ano válido entre {{min}} e {{max}}",
+    "bannerName": "O nome do banner deve ter entre {{min}} e {{max}} caracteres",
+    "bannerUrl": "Por favor, digite uma URL válida",
+    "description": "A descrição deve ter pelo menos {{min}} caracteres",
+    "title": "O título deve ter entre {{min}} e {{max}} caracteres",
+    "content": "O conteúdo deve ter pelo menos {{min}} caracteres",
+    "name": "O nome deve ter entre {{min}} e {{max}} caracteres",
+    "city": "A cidade deve ter menos de {{max}} caracteres",
+    "bio": "A biografia deve ter menos de {{max}} caracteres",
+    "passwordRequirements": "A senha deve atender aos requisitos de segurança",
+    "countryInvalid": "Por favor, selecione um país válido"
   },
   "hints": {
     "logoRecommendation": "Recomendado: Imagens quadradas funcionam melhor",
     "thumbnailRecommendation": "Recomendado: Proporção 16:9 para melhor exibição"
+  },
+  "helpers": {
+    "productPriceHelper": "Preço do produto em USD",
+    "brokerNameHelper": "Digite o nome oficial da corretora",
+    "brokerLocationHelper": "Localização principal do negócio",
+    "brokerEstablishedHelper": "Ano em que a corretora foi fundada",
+    "bannerNameHelper": "Um nome claro para identificar este banner no seu painel",
+    "bannerTargetUrlHelper": "Para onde os usuários serão redirecionados ao clicar no banner",
+    "productNameHelper": "Um nome claro e descritivo para seu produto"
+  },
+  "bannerForm": {
+    "clickToUpload": "Clique para fazer upload da imagem do banner",
+    "dragAndDrop": "ou arraste e solte",
+    "supportedFormats": "PNG, JPG até 10MB",
+    "uploadRequired": "Faça upload de uma imagem do banner. Recomendado: Imagens paisagem largas (proporção 16:9) funcionam melhor",
+    "statusActive": "Ativo",
+    "statusInactive": "Inativo",
+    "visibleToUsers": "Banner está visível para os usuários",
+    "bannerHidden": "Banner está oculto",
+    "processing": "Processando...",
+    "updateBanner": "Atualizar Banner",
+    "createBanner": "Criar Banner",
+    "uploadBannerImage": "Por favor, faça upload de uma imagem do banner"
+  },
+  "imageUpload": {
+    "uploadImage": "Enviar Imagem",
+    "altTextOptional": "Texto Alt (Opcional)",
+    "dropImageHere": "Solte uma imagem aqui ou clique para selecionar",
+    "supportedFormatsModal": "PNG, JPG, GIF até 10MB",
+    "insertImage": "Inserir Imagem",
+    "preview": "Visualizar"
   },
   "userForm": {
     "profilePicture": "Foto de Perfil",
@@ -133,11 +193,32 @@
     "avatarMaxSize": "Tamanho máximo do arquivo: 10MB",
     "avatarFormats": "Formatos suportados: JPG, PNG, GIF, WebP"
   },
-  "changePassword": "Alterar Senha",
-  "passwordRequirements": "Requisitos da Senha",
-  "passwordMinLength": "Pelo menos 8 caracteres",
-  "passwordUppercase": "Incluir letras maiúsculas",
-  "passwordLowercase": "Incluir letras minúsculas",
-  "passwordNumber": "Incluir pelo menos um número",
-  "passwordSpecialChar": "Incluir pelo menos um caractere especial"
+  "changePassword": {
+    "title": "Alterar Senha",
+    "description": "Atualize a senha da sua conta",
+    "currentPasswordHelp": "Digite sua senha atual para verificar sua identidade",
+    "confirmPasswordHelp": "Digite novamente sua nova senha para confirmar",
+    "changing": "Alterando Senha...",
+    "changePassword": "Alterar Senha"
+  },
+  "actions": {
+    "cancel": "Cancelar",
+    "uploading": "Enviando..."
+  },
+  "passwordRequirements": {
+    "title": "Requisitos da Senha",
+    "minLength": "Pelo menos {{min}} caracteres",
+    "lowercase": "Uma letra minúscula",
+    "uppercase": "Uma letra maiúscula",
+    "number": "Um número",
+    "specialChar": "Um caractere especial"
+  },
+  "passwordStrength": {
+    "title": "Força da Senha",
+    "veryWeak": "Muito Fraca",
+    "weak": "Fraca",
+    "fair": "Razoável",
+    "good": "Boa",
+    "strong": "Forte"
+  }
 }

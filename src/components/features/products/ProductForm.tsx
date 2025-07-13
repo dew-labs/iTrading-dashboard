@@ -5,21 +5,21 @@ import { useFormValidation } from '../../../hooks/useFormValidation'
 import { FormField } from '../../atoms'
 import { Select } from '../../molecules'
 import { MainImageUpload } from '../images'
-import { useFormTranslation } from '../../../hooks/useTranslation'
+import { useFormTranslation, useTranslation } from '../../../hooks/useTranslation'
 import type { UploadResult } from '../../../hooks/useFileUpload'
+import { VALIDATION } from '../../../constants/ui'
+import { FORM_OPTIONS } from '../../../constants/components'
 
 // Move schema outside component to prevent re-renders
 const PRODUCT_FORM_SCHEMA = {
   name: {
     required: true,
-    minLength: 2,
-    maxLength: 100,
-    message: 'Product name must be between 2 and 100 characters'
+    minLength: VALIDATION.REQUIRED_FIELD_MIN_LENGTH,
+    maxLength: VALIDATION.REQUIRED_FIELD_MAX_LENGTH
   },
   price: {
     required: true,
-    min: 0,
-    message: 'Price must be a positive number'
+    min: VALIDATION.PRICE_MIN
   }
 } as const
 
@@ -57,6 +57,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
   })
 
   const { t: tForm } = useFormTranslation()
+  const { t: tCommon } = useTranslation()
 
   React.useEffect(() => {
     if (product) {
@@ -87,28 +88,22 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
   }, [updateField])
 
   // Create type options
-  const typeOptions = useMemo(() => [
-    {
-      value: 'false',
-      label: 'One-time Purchase',
-      icon: <Package className='w-4 h-4' />
-    },
-    {
-      value: 'true',
-      label: 'Subscription',
-      icon: <Zap className='w-4 h-4' />
-    }
-  ], [])
+  const typeOptions = useMemo(() =>
+    FORM_OPTIONS.productType.map(option => ({
+      value: option.value,
+      label: option.labelKey === 'oneTimePurchase' ? tCommon('content.oneTime') : tCommon('content.subscription'),
+      icon: option.icon === 'Package' ? <Package className='w-4 h-4' /> : <Zap className='w-4 h-4' />
+    })), [tCommon])
 
   const handleFormSubmit = useCallback((data: typeof formData) => {
     onSubmit(data as ProductInsert)
   }, [onSubmit])
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
+    <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6' noValidate>
       {/* Product name field using enhanced FormField */}
-      <FormField
-        label='Product Name'
+              <FormField
+          label={tForm('labels.name')}
         name='name'
         value={formData.name}
         onChange={handleChange('name')}
@@ -118,7 +113,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
         disabled={isValidating}
         {...(errors.name && { error: errors.name })}
         icon={<Package className='w-5 h-5' />}
-        helperText='A clear, descriptive name for your product'
+                      helperText={tForm('helpers.productNameHelper')}
       />
 
       {/* Enhanced layout */}
@@ -127,7 +122,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
         <div className='lg:col-span-1 space-y-6'>
           {/* Featured image upload */}
           <MainImageUpload
-            label='Featured Image'
+            label={tForm('labels.image')}
             imageUrl={formData.featured_image_url || null}
             onChange={handleImageChange}
             bucket='products'
@@ -141,24 +136,22 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel }
           {/* Price and type */}
           <div className='space-y-4'>
             <FormField
-              label='Price'
+              label={tForm('labels.price')}
               type='number'
               name='price'
               value={formData.price.toString()}
               onChange={handlePriceChange}
               onBlur={handleBlur('price')}
               placeholder={tForm('placeholders.productPrice')}
-              min={0}
-              step={0.01}
-              required
+              step={VALIDATION.PRICE_STEP}
               disabled={isValidating}
               {...(errors.price && { error: errors.price })}
               icon={<DollarSign className='w-5 h-5' />}
-              helperText='Product price in USD'
+              helperText={tForm('helpers.productPriceHelper')}
             />
 
             <Select
-              label='Product Type'
+              label={tForm('labels.type')}
               required
               value={formData.subscription.toString()}
               onChange={value => updateField('subscription', value === 'true')}

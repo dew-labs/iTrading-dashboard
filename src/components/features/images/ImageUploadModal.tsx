@@ -154,7 +154,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
       <div className='bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto'>
         {/* Header */}
         <div className='flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700'>
-          <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>Upload Image</h3>
+          <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>{tForm('imageUpload.uploadImage')}</h3>
           <button
             onClick={handleClose}
             disabled={isUploading}
@@ -194,9 +194,9 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                 </div>
                 <div>
                   <p className='text-lg font-medium text-gray-900 dark:text-white'>
-                    Drop an image here, or click to select
+                    {tForm('imageUpload.dropImageHere')}
                   </p>
-                  <p className='text-sm text-gray-500 dark:text-gray-400 mt-1'>PNG, JPG, GIF up to 10MB</p>
+                  <p className='text-sm text-gray-500 dark:text-gray-400 mt-1'>{tForm('imageUpload.supportedFormatsModal')}</p>
                 </div>
               </div>
             </div>
@@ -228,7 +228,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
               {/* Alt Text Input */}
               <div>
                 <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
-                  Alt Text (Optional)
+                  {tForm('imageUpload.altTextOptional')}
                 </label>
                 <input
                   type='text'
@@ -244,7 +244,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
               {isUploading && (
                 <div className='space-y-2'>
                   <div className='flex items-center justify-between text-sm'>
-                    <span className='text-gray-600 dark:text-gray-300'>Uploading...</span>
+                    <span className='text-gray-600 dark:text-gray-300'>{tForm('actions.uploading')}</span>
                     <span className='text-gray-600 dark:text-gray-300'>{progress}%</span>
                   </div>
                   <div className='w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2'>
@@ -274,7 +274,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
             disabled={isUploading}
             className='px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed'
           >
-            Cancel
+            {tForm('actions.cancel')}
           </button>
           <button
             onClick={handleUpload}
@@ -284,12 +284,12 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
             {isUploading ? (
               <>
                 <Loader2 className='w-4 h-4 mr-2 animate-spin' />
-                Uploading...
+                {tForm('actions.uploading')}
               </>
             ) : (
               <>
                 <ImageIcon className='w-4 h-4 mr-2' />
-                Insert Image
+                {tForm('imageUpload.insertImage')}
               </>
             )}
           </button>

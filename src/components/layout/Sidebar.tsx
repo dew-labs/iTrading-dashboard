@@ -10,7 +10,7 @@ import {
   Building2
 } from 'lucide-react'
 import { usePermissions } from '../../hooks/usePermissions'
-import { useNavigationTranslation } from '../../hooks/useTranslation'
+import { useNavigationTranslation, useTranslation } from '../../hooks/useTranslation'
 
 interface SidebarProps {
   isOpen: boolean
@@ -36,6 +36,7 @@ interface MenuSection {
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIsCollapsed }) => {
   const { can } = usePermissions()
   const { t } = useNavigationTranslation()
+  const { t: tCommon } = useTranslation()
 
   const menuSections: MenuSection[] = [
     {
@@ -210,7 +211,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
             <button
               onClick={toggleCollapse}
               className='hidden lg:flex p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600'
-              title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              title={isCollapsed ? tCommon('ui.accessibility.expandSidebar') : tCommon('ui.accessibility.collapseSidebar')}
             >
               <Pin
                 className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform duration-300 ease-in-out ${isCollapsed ? 'rotate-45' : ''}`}

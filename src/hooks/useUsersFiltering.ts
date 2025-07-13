@@ -1,12 +1,8 @@
 import { useState, useMemo } from 'react'
 import type { DatabaseUser } from '../types'
+import { DEFAULT_VALUES } from '../constants/ui'
 
-interface UseUsersFilteringProps {
-  users: DatabaseUser[]
-  itemsPerPage?: number
-}
-
-interface FilterState {
+export interface FilterState {
   searchTerm: string
   activeTab: string
   filterStatus: string
@@ -18,16 +14,16 @@ interface FilterState {
   pageInputValue: string
 }
 
-interface UseUsersFilteringReturn {
-  // State
-  filterState: FilterState
+export interface UseUsersFilteringProps {
+  users: DatabaseUser[]
+  itemsPerPage?: number
+}
 
-  // Computed data
+export interface UseUsersFilteringReturn {
+  filterState: FilterState
   filteredAndSortedUsers: DatabaseUser[]
   paginatedUsers: DatabaseUser[]
   totalPages: number
-
-  // Actions
   setSearchTerm: (term: string) => void
   setActiveTab: (tab: string) => void
   setFilterStatus: (status: string) => void
@@ -35,7 +31,7 @@ interface UseUsersFilteringReturn {
   setSortColumn: (column: keyof DatabaseUser | null) => void
   setSortDirection: (direction: 'asc' | 'desc') => void
   setCurrentPage: (page: number) => void
-  setItemsPerPage: (itemsPerPage: number) => void
+  setItemsPerPage: (items: number) => void
   setPageInputValue: (value: string) => void
   handleSort: (column: keyof DatabaseUser) => void
   handlePageChange: (page: number) => void
@@ -44,7 +40,7 @@ interface UseUsersFilteringReturn {
 
 export const useUsersFiltering = ({
   users,
-  itemsPerPage: initialItemsPerPage = 10
+  itemsPerPage: initialItemsPerPage = DEFAULT_VALUES.PAGINATION_LIMIT
 }: UseUsersFilteringProps): UseUsersFilteringReturn => {
   const [searchTerm, setSearchTerm] = useState('')
   const [activeTab, setActiveTab] = useState<string>('all')

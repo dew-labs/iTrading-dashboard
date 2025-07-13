@@ -18,8 +18,7 @@ const USER_FORM_SCHEMA = {
   // Add custom validation for role
   role: {
     required: true,
-    custom: (value: UserRole) => Object.values(USER_ROLES).includes(value),
-    message: 'Please select a valid role'
+    custom: (value: UserRole) => Object.values(USER_ROLES).includes(value)
   }
 } as const
 
@@ -35,6 +34,7 @@ interface UserFormProps {
 
 const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images }) => {
   const { t } = useTranslation()
+  const { t: tCommon } = useTranslation()
   const { t: tForm } = useFormTranslation()
   const { isAdmin } = usePermissions()
 
@@ -127,31 +127,31 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images })
   const roleOptions = useMemo(() => [
     {
       value: USER_ROLES.USER,
-      label: t('roles.user'),
+      label: tCommon('roles.user'),
       icon: <User className='w-4 h-4' />
     },
     {
       value: USER_ROLES.MODERATOR,
-      label: t('roles.moderator'),
+      label: tCommon('roles.moderator'),
       icon: <Gavel className='w-4 h-4' />
     },
     ...(isAdmin()
       ? [
         {
           value: USER_ROLES.ADMIN,
-          label: t('roles.admin'),
+          label: tCommon('roles.admin'),
           icon: <Shield className='w-4 h-4' />
         }
       ]
       : [])
-  ], [t, isAdmin])
+  ], [tCommon, isAdmin])
 
   const handleFormSubmit = useCallback((data: typeof formData) => {
     onSubmit(data, avatarImage)
   }, [onSubmit, avatarImage])
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
+    <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6' noValidate>
       {/* Avatar Upload Section */}
       <div className='bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border border-gray-200 dark:border-gray-700'>
         <div className='flex items-center space-x-4 mb-4'>
@@ -301,7 +301,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images })
           className='px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center'
         >
           <X className='w-4 h-4 mr-2' />
-          {t('actions.cancel')}
+          {tCommon('actions.cancel')}
         </button>
         <button
           type='submit'

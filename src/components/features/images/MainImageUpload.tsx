@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from 'react'
 import { Upload, Image as ImageIcon, Camera, Trash2 } from 'lucide-react'
 import { useFileUpload, type UploadResult } from '../../../hooks/useFileUpload'
 import { useToast } from '../../../hooks/useToast'
-import { useTranslation } from '../../../hooks/useTranslation'
+import { useTranslation, useFormTranslation } from '../../../hooks/useTranslation'
 import { useImageValidation } from '../../../hooks/useImageValidation'
 
 interface MainImageUploadProps {
@@ -34,18 +34,25 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
   bucket,
   folder = 'main-images',
   alt = 'Main image',
-  label = 'Main Image',
+  label,
   size = 'md',
   disabled = false,
   className = '',
-  recommendationText = 'Recommended: Square images work best'
+  recommendationText
 }) => {
   const [dragActive, setDragActive] = useState(false)
   const [preview, setPreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { uploadFile, isUploading, progress } = useFileUpload()
+    const { uploadFile, isUploading, progress } = useFileUpload()
   const toast = useToast()
   const { t: tCommon } = useTranslation()
+  const { t: tForm } = useFormTranslation()
+
+  // Use translation for default label if not provided
+  const displayLabel = label || tCommon('ui.imageUpload.mainImage')
+
+  // Use translation for default recommendation text if not provided
+  const displayRecommendationText = recommendationText || tForm('hints.logoRecommendation')
 
   // Validate the provided image URL
   const { isValid: isImageValid } = useImageValidation(imageUrl)
@@ -187,13 +194,13 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
 
   return (
     <div className={`space-y-2 ${className}`}>
-      {/* Label */}
-      <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
-        {label}
-        {isUploading && (
-          <span className='ml-2 text-xs text-blue-600 dark:text-blue-400'>Uploading... {progress}%</span>
-        )}
-      </label>
+              {/* Label */}
+        <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+          {displayLabel}
+          {isUploading && (
+            <span className='ml-2 text-xs text-blue-600 dark:text-blue-400'>{tCommon('ui.imageUpload.uploading')} {progress}%</span>
+          )}
+        </label>
 
       <div className={`relative ${config.container}`}>
         {/* Hidden file input */}
@@ -299,20 +306,20 @@ const MainImageUpload: React.FC<MainImageUploadProps> = ({
               <ImageIcon className={`${config.icon} text-gray-400 dark:text-gray-500`} />
               <div className='text-center'>
                 <span className={`${config.text} text-gray-600 dark:text-gray-300 font-medium block`}>
-                  {size === 'lg' ? 'Click to upload' : 'Upload'}
+                  {size === 'lg' ? tCommon('ui.imageUpload.clickToUpload') : tCommon('ui.imageUpload.upload')}
                 </span>
                 {size === 'lg' && (
-                  <span className={`${config.text} text-gray-500 dark:text-gray-400 block`}>or drag & drop</span>
+                  <span className={`${config.text} text-gray-500 dark:text-gray-400 block`}>{tCommon('ui.imageUpload.orDragAndDrop')}</span>
                 )}
               </div>
-              {size === 'lg' && <span className='text-xs text-gray-500 dark:text-gray-400'>PNG, JPG up to 10MB</span>}
+              {size === 'lg' && <span className='text-xs text-gray-500 dark:text-gray-400'>{tCommon('ui.imageUpload.supportedFormats')}</span>}
             </div>
           </div>
         )}
       </div>
 
       {/* Compact hint for large size only */}
-      {size === 'lg' && <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>{recommendationText}</p>}
+      {size === 'lg' && <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>{displayRecommendationText}</p>}
     </div>
   )
 }

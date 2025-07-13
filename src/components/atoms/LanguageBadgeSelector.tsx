@@ -2,6 +2,7 @@ import React from 'react'
 import { LANGUAGE_INFO } from '../../constants/languages'
 import type { LanguageCode } from '../../types/translations'
 import { cn } from '../../utils/theme'
+import { useTranslation } from '../../hooks/useTranslation'
 
 interface LanguageBadgeSelectorProps {
   availableLanguages: LanguageCode[]
@@ -22,6 +23,8 @@ const LanguageBadgeSelector: React.FC<LanguageBadgeSelectorProps> = ({
   showLabel = true,
   compact = false
 }) => {
+  const { t: tCommon } = useTranslation()
+
   if (availableLanguages.length <= 1) {
     return null
   }
@@ -30,7 +33,7 @@ const LanguageBadgeSelector: React.FC<LanguageBadgeSelectorProps> = ({
     <div className={cn('flex items-center space-x-3', className)}>
       {showLabel && !compact && (
         <span className='text-sm text-gray-600 dark:text-gray-400 font-medium'>
-          Languages:
+          {tCommon('translations.availableLanguages')}:
         </span>
       )}
       <div className='flex items-center space-x-2'>
@@ -52,8 +55,8 @@ const LanguageBadgeSelector: React.FC<LanguageBadgeSelectorProps> = ({
                   ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white'
                   : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
               )}
-              title={`Switch to ${langInfo.name}`}
-              aria-label={`Switch to ${langInfo.name}`}
+              title={tCommon('translations.switchToLanguage', { language: langInfo.name })}
+              aria-label={tCommon('translations.switchToLanguage', { language: langInfo.name })}
               aria-pressed={isSelected}
             >
               <span className='mr-1.5'>{langInfo.flag}</span>

@@ -1,12 +1,8 @@
 import { useState, useMemo } from 'react'
 import type { PostWithAuthor } from './usePosts'
+import { DEFAULT_VALUES } from '../constants/ui'
 
-interface UsePostsFilteringProps {
-  posts: PostWithAuthor[]
-  itemsPerPage?: number
-}
-
-interface FilterState {
+export interface FilterState {
   searchTerm: string
   activeTab: string
   filterStatus: 'all' | 'draft' | 'published'
@@ -17,23 +13,23 @@ interface FilterState {
   pageInputValue: string
 }
 
-interface UsePostsFilteringReturn {
-  // State
-  filterState: FilterState
+export interface UsePostsFilteringProps {
+  posts: PostWithAuthor[]
+  itemsPerPage?: number
+}
 
-  // Computed data
+export interface UsePostsFilteringReturn {
+  filterState: FilterState
   filteredAndSortedPosts: PostWithAuthor[]
   paginatedPosts: PostWithAuthor[]
   totalPages: number
-
-  // Actions
   setSearchTerm: (term: string) => void
   setActiveTab: (tab: string) => void
   setFilterStatus: (status: 'all' | 'draft' | 'published') => void
   setSortColumn: (column: keyof PostWithAuthor | null) => void
   setSortDirection: (direction: 'asc' | 'desc') => void
   setCurrentPage: (page: number) => void
-  setItemsPerPage: (itemsPerPage: number) => void
+  setItemsPerPage: (items: number) => void
   setPageInputValue: (value: string) => void
   handleSort: (column: keyof PostWithAuthor) => void
   handlePageChange: (page: number) => void
@@ -42,7 +38,7 @@ interface UsePostsFilteringReturn {
 
 export const usePostsFiltering = ({
   posts,
-  itemsPerPage: initialItemsPerPage = 10
+  itemsPerPage: initialItemsPerPage = DEFAULT_VALUES.PAGINATION_LIMIT
 }: UsePostsFilteringProps): UsePostsFilteringReturn => {
   const [searchTerm, setSearchTerm] = useState('')
   const [activeTab, setActiveTab] = useState<string>('all')

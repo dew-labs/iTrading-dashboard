@@ -119,7 +119,7 @@ const BrokerViewModal: React.FC<BrokerViewModalProps> = ({
                     getTypographyClasses('h1'),
                     'text-2xl lg:text-3xl font-bold leading-tight text-white truncate'
                   )}>
-                    {broker.name || 'Unnamed Broker'}
+                    {broker.name || tCommon('content.unnamedBroker')}
                   </h1>
                   <div className='flex flex-col space-y-1 mt-2'>
                     {broker.headquarter && (
@@ -191,7 +191,7 @@ const BrokerViewModal: React.FC<BrokerViewModalProps> = ({
                 <div>
                   <h2 className='text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center'>
                     <FileText className='w-5 h-5 mr-2 text-blue-600 dark:text-blue-400' />
-                    About {broker.name}
+                    {tCommon('general.about')} {broker.name}
                   </h2>
 
                   <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-6 min-h-[120px]'>

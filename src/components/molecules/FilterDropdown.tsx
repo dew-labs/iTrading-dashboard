@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Filter, ChevronDown, X } from 'lucide-react'
 import { cn } from '../../utils/theme'
-import { useMultipleTranslations } from '../../hooks/useTranslation'
+import { useMultipleTranslations, useTranslation } from '../../hooks/useTranslation'
 
 interface FilterOption {
   value: string
@@ -40,27 +40,28 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const { t } = useMultipleTranslations(['common', 'forms', 'navigation'])
+  const { t: tCommon } = useTranslation('common')
 
   // Helper function to get the display label for an option
   const getOptionLabel = (option: FilterOption): string => {
     if (option.labelKey) {
       // Try to get from common namespace with proper prefix
       if (option.labelKey.startsWith('all')) {
-        return t(`common:filters.${option.labelKey}`)
+        return tCommon(`filters.${option.labelKey}`)
       } else if (
         ['active', 'inactive', 'published', 'draft', 'invited', 'suspended'].includes(
           option.labelKey
         )
       ) {
-        return t(`common:status.${option.labelKey}`)
+        return tCommon(`status.${option.labelKey}`)
       } else if (
         ['news', 'tutorial', 'guide', 'announcement', 'event', 'subscription', 'oneTime'].includes(
           option.labelKey
         )
       ) {
-        return t(`common:content.${option.labelKey}`)
+        return tCommon(`content.${option.labelKey}`)
       } else if (['user', 'admin', 'moderator'].includes(option.labelKey)) {
-        return t(`common:roles.${option.labelKey}`)
+        return tCommon(`roles.${option.labelKey}`)
       } else {
         // Try without namespace first, then fallback to direct key
         return t(option.labelKey) || option.labelKey

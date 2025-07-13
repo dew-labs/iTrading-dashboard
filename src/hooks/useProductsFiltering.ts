@@ -1,12 +1,8 @@
 import { useState, useMemo } from 'react'
 import type { Product } from '../types'
+import { DEFAULT_VALUES } from '../constants/ui'
 
-interface UseProductsFilteringProps {
-  products: Product[]
-  itemsPerPage?: number
-}
-
-interface FilterState {
+export interface FilterState {
   searchTerm: string
   filterType: 'all' | 'subscription' | 'oneTime'
   sortColumn: keyof Product | null
@@ -16,22 +12,22 @@ interface FilterState {
   pageInputValue: string
 }
 
-interface UseProductsFilteringReturn {
-  // State
-  filterState: FilterState
+export interface UseProductsFilteringProps {
+  products: Product[]
+  itemsPerPage?: number
+}
 
-  // Computed data
+export interface UseProductsFilteringReturn {
+  filterState: FilterState
   filteredAndSortedProducts: Product[]
   paginatedProducts: Product[]
   totalPages: number
-
-  // Actions
   setSearchTerm: (term: string) => void
   setFilterType: (type: 'all' | 'subscription' | 'oneTime') => void
   setSortColumn: (column: keyof Product | null) => void
   setSortDirection: (direction: 'asc' | 'desc') => void
   setCurrentPage: (page: number) => void
-  setItemsPerPage: (itemsPerPage: number) => void
+  setItemsPerPage: (items: number) => void
   setPageInputValue: (value: string) => void
   handleSort: (column: keyof Product) => void
   handlePageChange: (page: number) => void
@@ -39,7 +35,7 @@ interface UseProductsFilteringReturn {
 
 export const useProductsFiltering = ({
   products,
-  itemsPerPage: initialItemsPerPage = 10
+  itemsPerPage: initialItemsPerPage = DEFAULT_VALUES.PAGINATION_LIMIT
 }: UseProductsFilteringProps): UseProductsFilteringReturn => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'subscription' | 'oneTime'>('all')

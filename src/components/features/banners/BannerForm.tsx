@@ -8,14 +8,14 @@ import { useFileUpload } from '../../../hooks/useFileUpload'
 import { useToast } from '../../../hooks/useToast'
 import { useFormTranslation, useTranslation } from '../../../hooks/useTranslation'
 import { getStorageUrl } from '../../../utils/storage'
+import { VALIDATION } from '../../../constants/ui'
 
 // Move schema outside component to prevent re-renders
 const BANNER_FORM_SCHEMA = {
   name: {
     required: true,
-    minLength: 2,
-    maxLength: 100,
-    message: 'Banner name must be between 2 and 100 characters'
+    minLength: VALIDATION.BANNER_NAME_MIN_LENGTH,
+    maxLength: VALIDATION.BANNER_NAME_MAX_LENGTH
   },
   target_url: {
     required: true,
@@ -26,8 +26,7 @@ const BANNER_FORM_SCHEMA = {
       } catch {
         return false
       }
-    },
-    message: 'Please enter a valid URL'
+    }
   }
 } as const
 
@@ -225,12 +224,12 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
 
     // Validate that image is provided
     if (!banner && !currentImage && !uploadResult) {
-      toast.error('required', null, 'Please upload a banner image')
+      toast.error('required', null, tForm('bannerForm.uploadBannerImage'))
       return
     }
 
     if (banner && !currentImage) {
-      toast.error('required', null, 'Please upload a banner image')
+      toast.error('required', null, tForm('bannerForm.uploadBannerImage'))
       return
     }
 
@@ -240,16 +239,16 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
     } catch (error) {
       console.error('Failed to save banner:', error)
     }
-  }, [banner, preview, imageUrl, uploadResult, onSubmit, toast])
+  }, [banner, preview, imageUrl, uploadResult, onSubmit, toast, tForm])
 
   const currentImage = preview || imageUrl
   const showRemoveButton = currentImage && !isUploading
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
+    <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6' noValidate>
       {/* Banner Name using enhanced FormField */}
       <FormField
-        label='Banner Name'
+                  label={tForm('labels.name')}
         name='name'
         value={formData.name}
         onChange={handleChange('name')}
@@ -259,13 +258,13 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
         disabled={isValidating || isUploading || isCreatingImage}
         {...(errors.name && { error: errors.name })}
         icon={<ImageIcon className='w-5 h-5' />}
-        helperText='A clear name to identify this banner in your dashboard'
+                      helperText={tForm('helpers.bannerNameHelper')}
       />
 
       {/* Image Upload Section */}
       <div className='space-y-2'>
         <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
-          Banner Image <span className='text-red-500'>*</span>
+          {tForm('labels.bannerImage')} <span className='text-red-500'>*</span>
           {isUploading && (
             <span className='ml-2 text-xs text-blue-600 dark:text-blue-400'>
               Uploading... {progress}%
@@ -365,14 +364,14 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
                 <ImageIcon className='w-6 h-6 text-gray-400 dark:text-gray-500' />
                 <div className='text-center'>
                   <span className='text-sm text-gray-600 dark:text-gray-300 font-medium block'>
-                    Click to upload banner image
+                    {tForm('bannerForm.clickToUpload')}
                   </span>
                   <span className='text-sm text-gray-500 dark:text-gray-400 block'>
-                    or drag & drop
+                    {tForm('bannerForm.dragAndDrop')}
                   </span>
                 </div>
                 <span className='text-xs text-gray-500 dark:text-gray-400'>
-                  PNG, JPG up to 10MB
+                  {tForm('bannerForm.supportedFormats')}
                 </span>
               </div>
             </div>
@@ -380,7 +379,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
         </div>
 
         <p className='text-xs text-gray-500 dark:text-gray-400'>
-          <span className='text-red-500'>Required:</span> Upload a banner image. Recommended: Wide landscape images (16:9 ratio) work best
+          <span className='text-red-500'>{tForm('validation.required')}:</span> {tForm('bannerForm.uploadRequired')}
         </p>
       </div>
 
@@ -389,7 +388,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
         {/* URL Field using enhanced FormField */}
         <div className='lg:col-span-2'>
           <FormField
-            label='Target URL'
+            label={tForm('labels.targetUrl')}
             type='url'
             name='target_url'
             value={formData.target_url || ''}
@@ -400,19 +399,19 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
             disabled={isValidating || isUploading || isCreatingImage}
             {...(errors.target_url && { error: errors.target_url })}
             icon={<Link className='w-5 h-5' />}
-            helperText='Where users will be redirected when they click the banner'
+                          helperText={tForm('helpers.bannerTargetUrlHelper')}
           />
         </div>
 
         {/* Active Status Toggle */}
         <div className='lg:col-span-1'>
           <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
-            Banner Status
+            {tForm('labels.bannerStatus')}
           </label>
           <div className='flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded-lg h-[42px]'>
             <div className='flex items-center space-x-3'>
               <span className='text-sm text-gray-700 dark:text-gray-300'>
-                {formData.is_visible ? 'Active' : 'Inactive'}
+                {formData.is_visible ? tForm('bannerForm.statusActive') : tForm('bannerForm.statusInactive')}
               </span>
               <button
                 type='button'
@@ -435,7 +434,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
             </div>
           </div>
           <p className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
-            {formData.is_visible ? 'Banner is visible to users' : 'Banner is hidden'}
+            {formData.is_visible ? tForm('bannerForm.visibleToUsers') : tForm('bannerForm.bannerHidden')}
           </p>
         </div>
       </div>
@@ -448,7 +447,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
           className='flex items-center space-x-2 px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
         >
           <X className='w-4 h-4' />
-          <span>Cancel</span>
+          <span>{tCommon('actions.cancel')}</span>
         </button>
         <button
           type='submit'
@@ -458,17 +457,17 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
           {isUploading || isCreatingImage ? (
             <>
               <Upload className='w-4 h-4 animate-spin' />
-              <span>Processing...</span>
+              <span>{tForm('bannerForm.processing')}</span>
             </>
           ) : banner ? (
             <>
               <Save className='w-4 h-4' />
-              <span>Update Banner</span>
+              <span>{tForm('bannerForm.updateBanner')}</span>
             </>
           ) : (
             <>
               <Plus className='w-4 h-4' />
-              <span>Create Banner</span>
+              <span>{tForm('bannerForm.createBanner')}</span>
             </>
           )}
         </button>

@@ -35,7 +35,7 @@ interface UseTranslatedContentReturn<T> {
   data: T[]
   loading: boolean
   error: Error | null
-  refetch: () => Promise<any>
+  refetch: () => Promise<unknown>
   getTranslationStatus: (item: T) => TranslationStatus
   getTranslatedField: (item: T, field: string, language?: LanguageCode) => string | undefined
   filterByTranslationStatus: (items: T[], status: 'complete' | 'incomplete' | 'missing') => T[]
@@ -87,7 +87,7 @@ export function useTranslatedContent<T extends { id: string; translations?: Tran
     isLoading: loading,
     error,
     refetch
-  } = useQuery<T[]>({ ...(queryOptions as any) })
+  } = useQuery<T[]>(queryOptions as unknown as Parameters<typeof useQuery<T[]>>[0])
 
   const data = rawData as T[]
 
@@ -103,7 +103,7 @@ export function useTranslatedContent<T extends { id: string; translations?: Tran
 
     const completedTranslations = translations.filter((t) => {
       return requiredFields.every(field =>
-        typeof (t as any)[field] === 'string' && String((t as any)[field]).trim() !== ''
+        typeof (t as unknown as Record<string, unknown>)[field] === 'string' && String((t as unknown as Record<string, unknown>)[field]).trim() !== ''
       )
     })
 
@@ -131,8 +131,8 @@ export function useTranslatedContent<T extends { id: string; translations?: Tran
 
     // Helper to safely get a string field from a translation
     const getStringField = (t: Translation, f: string): string | undefined => {
-      if (Object.prototype.hasOwnProperty.call(t, f) && typeof (t as any)[f] === 'string') {
-        return (t as any)[f]
+      if (Object.prototype.hasOwnProperty.call(t, f) && typeof (t as unknown as Record<string, unknown>)[f] === 'string') {
+        return (t as unknown as Record<string, unknown>)[f] as string
       }
       return undefined
     }

@@ -31,6 +31,7 @@ const TranslationManager: React.FC<TranslationManagerProps> = ({
   className = ''
 }) => {
   const { t } = useTranslation()
+  const { t: tCommon } = useTranslation()
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(defaultLanguage)
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState<Record<string, string>>({})
@@ -264,7 +265,7 @@ const TranslationManager: React.FC<TranslationManagerProps> = ({
           {contentType === 'posts' && (
             <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
               <Clock className="w-4 h-4" />
-              <span>{t('content.readingTime')}: <span className="font-medium text-gray-900 dark:text-white">{readingTime} {t('content.min')}</span></span>
+              <span>{tCommon('content.readingTime')}: <span className="font-medium text-gray-900 dark:text-white">{readingTime} {tCommon('content.min')}</span></span>
             </div>
           )}
         </div>
@@ -389,7 +390,7 @@ const TranslationManager: React.FC<TranslationManagerProps> = ({
             onClick={handleEdit}
             className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
           >
-            {t('actions.edit')}
+                            {tCommon('actions.edit')}
           </Button>
           <Button
             type="button"
@@ -399,7 +400,7 @@ const TranslationManager: React.FC<TranslationManagerProps> = ({
             onClick={handleDelete}
             className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
           >
-            {t('actions.delete')}
+                            {tCommon('actions.delete')}
           </Button>
         </div>
       )}
@@ -448,7 +449,7 @@ const TranslationManager: React.FC<TranslationManagerProps> = ({
             onClick={handleCancel}
             className="text-gray-600 hover:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
           >
-            {t('actions.cancel')}
+            {tCommon('actions.cancel')}
           </Button>
           <Button
             type="button"
@@ -458,7 +459,7 @@ const TranslationManager: React.FC<TranslationManagerProps> = ({
             onClick={handleSave}
             className="bg-blue-600 hover:bg-blue-700"
           >
-            {t('actions.save')}
+            {tCommon('actions.save')}
           </Button>
         </div>
       )}
@@ -478,7 +479,7 @@ const TranslationManager: React.FC<TranslationManagerProps> = ({
           </div>
         }
         confirmLabel={t('translations.deleteTranslation')}
-        cancelLabel={t('actions.cancel')}
+        cancelLabel={tCommon('actions.cancel')}
         isDestructive={true}
         isLoading={isDeleting}
         variant="danger"

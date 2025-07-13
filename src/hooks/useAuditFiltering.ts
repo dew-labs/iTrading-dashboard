@@ -1,5 +1,7 @@
 import { useState, useMemo } from 'react'
-import { type AuditLog, type AuditFilters, AUDIT_TABLES, AUDIT_ACTIONS } from '@/types/audits'
+import type { AuditLog, AuditFilters } from '../types'
+import { AUDIT_TABLES, AUDIT_ACTIONS } from '../types/audits'
+import { DEFAULT_VALUES } from '../constants/ui'
 
 interface FilterState {
   searchTerm: string
@@ -24,7 +26,7 @@ export const useAuditFiltering = (auditLogs: AuditLog[]) => {
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(20)
+  const [itemsPerPage, setItemsPerPage] = useState(DEFAULT_VALUES.PAGINATION_LIMIT * 2) // Audits use more items per page
   const [pageInputValue, setPageInputValue] = useState('1')
 
   // Get unique options for filters
