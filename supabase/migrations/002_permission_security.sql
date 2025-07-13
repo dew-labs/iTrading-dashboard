@@ -48,39 +48,36 @@ GRANT EXECUTE ON FUNCTION increment_post_views(bigint) TO authenticated;
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-    -- Check if user already exists to avoid duplicates
+    -- Check if user already exists
     IF EXISTS (SELECT 1 FROM public.users WHERE id = NEW.id) THEN
         RETURN NEW;
     END IF;
 
-    -- Insert new user with proper defaults
+    -- Insert with values from invitation metadata
     INSERT INTO public.users (
         id,
         email,
         role,
         status,
         full_name,
-        phone,
-        avatar_url,
         created_at,
         updated_at
     )
     VALUES (
         NEW.id,
         NEW.email,
-        CASE
-            WHEN COALESCE(NEW.raw_user_meta_data->>'role', 'user') IN ('user', 'moderator', 'admin')
-            THEN COALESCE(NEW.raw_user_meta_data->>'role', 'user')::user_role
-            ELSE 'user'::user_role
-        END,
-        CASE
-            WHEN COALESCE(NEW.raw_user_meta_data->>'status', 'invited') IN ('invited', 'active', 'inactive', 'suspended')
-            THEN COALESCE(NEW.raw_user_meta_data->>'status', 'invited')::user_status
-            ELSE 'invited'::user_status
-        END,
-        COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name'),
-        NEW.phone,
-        NEW.raw_user_meta_data->>'avatar_url',
+        COALESCE(
+            (NEW.raw_user_meta_data->>'role')::text,
+            'moderator'
+        )::public.user_role,
+        COALESCE(
+            (NEW.raw_user_meta_data->>'status')::text,
+            'invited'
+        )::public.user_status,
+        COALESCE(
+            (NEW.raw_user_meta_data->>'full_name')::text,
+            (NEW.raw_user_meta_data->>'name')::text
+        ),
         NOW(),
         NOW()
     );

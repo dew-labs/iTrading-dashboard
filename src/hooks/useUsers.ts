@@ -92,24 +92,23 @@ export const useUsers = () => {
     }
   })
 
-  // Create user mutation - restricted to super admins only
+  // Create user mutation - restricted to admins only
   const createMutation = useMutation({
     mutationFn: async (user: UserInsert) => {
       if (!isAdmin()) {
-        throw new Error('Only super admins can create users')
+        throw new Error('Only admins can create users')
       }
 
       const {
         success,
-        error: inviteError,
-        tempPassword
+        error: inviteError
       } = await inviteUser(user.email, user.role, user.full_name || undefined)
 
       if (!success) {
         throw new Error(inviteError || 'Failed to create user')
       }
 
-      return { email: user.email, tempPassword }
+      return { email: user.email }
     },
     onError: error => {
       const errorMessage = error instanceof Error ? error.message : 'Failed to create user'
@@ -199,6 +198,8 @@ export const useUsers = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.users() })
     }
   })
+
+
 
   // Error handling for permissions
   const permissionError = !can('users', 'read') ? 'You do not have permission to view users' : null

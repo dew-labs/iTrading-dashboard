@@ -145,6 +145,8 @@ const UsersTable: React.FC<UsersTableProps> = ({
             <Edit2 className={getIconClasses('action')} />
           </button>
 
+
+
           <button
             onClick={() => onDelete(row)}
             className='p-2 text-gray-600 dark:text-gray-300 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors'

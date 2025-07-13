@@ -15,10 +15,10 @@ import { supabase } from '../../../lib/supabase'
 // Move schema outside component to prevent re-renders
 const USER_FORM_SCHEMA = {
   ...formSchemas.user,
-  // Add custom validation for role
+  // Add custom validation for role - only allow moderator and admin
   role: {
     required: true,
-    custom: (value: UserRole) => Object.values(USER_ROLES).includes(value)
+    custom: (value: UserRole) => value === 'moderator' || value === 'admin'
   }
 } as const
 
@@ -50,7 +50,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images })
     country: '',
     city: '',
     bio: '',
-    role: 'user' as UserRole,
+    role: 'moderator' as UserRole,
     status: 'invited' as const
   }), [])
 
@@ -125,11 +125,6 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images })
   )
 
   const roleOptions = useMemo(() => [
-    {
-      value: USER_ROLES.USER,
-      label: tCommon('roles.user'),
-      icon: <User className='w-4 h-4' />
-    },
     {
       value: USER_ROLES.MODERATOR,
       label: tCommon('roles.moderator'),
@@ -241,7 +236,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images })
         <Select
           label={t('userForm.userRolePermissions')}
           required
-          value={formData.role || 'user'}
+          value={formData.role || 'moderator'}
           onChange={value => updateField('role', value as UserRole)}
           options={roleOptions}
           disabled={isValidating}

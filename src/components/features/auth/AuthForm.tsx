@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
+import { Eye, EyeOff, Mail, Lock, CheckCircle } from 'lucide-react'
 import { useAuthStore } from '../../../store/authStore'
 import { useTranslation } from '../../../hooks/useTranslation'
 import { LoadingSpinner } from '../../feedback'
@@ -12,13 +13,27 @@ interface AuthFormProps {
 
 const AuthForm: React.FC<AuthFormProps> = () => {
   const { t } = useTranslation()
+  const location = useLocation()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   })
   const [showPassword, setShowPassword] = useState(false)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   const { signIn, loading } = useAuthStore()
+
+  // Handle success message from onboarding or other flows
+  useEffect(() => {
+    const state = location.state as { message?: string; email?: string } | null
+    if (state?.message) {
+      setSuccessMessage(state.message)
+      // Pre-fill email if provided
+      if (state.email) {
+        setFormData(prev => ({ ...prev, email: state.email || '' }))
+      }
+    }
+  }, [location.state])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -52,6 +67,16 @@ const AuthForm: React.FC<AuthFormProps> = () => {
           <h1 className='text-2xl font-bold text-gray-900 dark:text-white'>{t('auth.adminDashboard')}</h1>
           <p className='text-gray-600 dark:text-gray-300 mt-2'>{t('auth.signInToAccess')}</p>
         </div>
+
+        {/* Success message from onboarding */}
+        {successMessage && (
+          <div className='bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6'>
+            <div className='flex items-center'>
+              <CheckCircle className='w-5 h-5 text-green-600 dark:text-green-400 mr-2' />
+              <span className='text-sm text-green-700 dark:text-green-300'>{successMessage}</span>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className='space-y-6' noValidate>
           <div>

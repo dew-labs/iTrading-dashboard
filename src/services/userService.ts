@@ -1,157 +1,64 @@
-import { supabase } from '../lib/supabase'
-import type { UserRole, DatabaseUser } from '../types'
+import { supabase, supabaseAdmin } from '../lib/supabase'
+import type { UserRole } from '../types'
 
-/**
- * Generate a secure temporary password
- */
-const generateTempPassword = (): string => {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*'
-  let password = ''
-  for (let i = 0; i < 16; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length))
-  }
-  return password
-}
+// No longer needed since inviteByEmail doesn't require a temporary password
+// The user will set their own password when accepting the invitation
 
 /**
  * Invite a new user to the system
+ * Only moderator and admin roles are allowed
  */
 export const inviteUser = async (
   email: string,
-  role: UserRole = 'user',
+  role: UserRole = 'moderator',
   fullName?: string
-): Promise<{success: boolean; error?: string; tempPassword?: string}> => {
+): Promise<{success: boolean; error?: string}> => {
   try {
-    // Return the temp password for admin use
-    // In production, this should be sent via email
-    const tempPassword = generateTempPassword()
+    // Validate role - only allow moderator and admin
+    if (role !== 'moderator' && role !== 'admin') {
+      const error = 'Only moderator and admin roles are allowed for user creation'
+      return { success: false, error }
+    }
 
-    // Create auth user with Supabase Admin API
-    // Note: This requires service role key in production
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
-      password: tempPassword,
-      options: {
-        data: {
-          full_name: fullName,
-          role,
-          status: 'invited'
-        }
-      }
+    // Check if admin client is available
+    if (!supabaseAdmin) {
+      const error = 'Admin operations require service role key. Please add VITE_SUPABASE_SERVICE_ROLE_KEY to your .env.local file.'
+      return { success: false, error }
+    }
+
+    // Use Supabase's inviteByEmail function to send invitation
+    // This sends an email invitation to the user who must accept it to create their account
+    const redirectUrl = import.meta.env.VITE_SUPABASE_INVITE_REDIRECT_URL || 'http://localhost:5173/onboarding'
+
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+      data: {
+        full_name: fullName,
+        role,
+        status: 'invited'
+      },
+      redirectTo: redirectUrl
     })
 
-    if (authError) throw authError
+    if (authError) {
+      throw authError
+    }
 
     if (!authData.user) {
-      throw new Error('No user data returned from signup')
+      const error = 'No user data returned from invitation'
+      throw new Error(error)
     }
 
-    /**
-     * Retry mechanism to handle timing gap between auth.users creation and public.users trigger
-     *
-     * Problem: After signup, there's a brief moment where:
-     * 1. User exists in auth.users (signup successful)
-     * 2. Trigger is still executing to create profile in public.users
-     * 3. API call to check profile returns 406 "Not Acceptable" due to RLS policies
-     *
-     * Solution: Implement exponential backoff retry mechanism:
-     * - Attempt 1: Wait 1000ms (1s)
-     * - Attempt 2: Wait 1500ms (1.5s)
-     * - Attempt 3: Wait 2250ms (2.25s)
-     * - Attempt 4: Wait 3375ms (3.375s)
-     * - Attempt 5: Wait 5000ms (5s - capped)
-     *
-     * Total wait time: ~13 seconds maximum before falling back to manual creation
-     */
-    const checkUserExists = async (
-      userId: string,
-      maxRetries: number = 5
-    ): Promise<DatabaseUser | null> => {
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-          const { data: existingUser, error: checkError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', userId)
-            .single()
-
-          if (!checkError && existingUser) {
-            console.warn(`✅ User profile found on attempt ${attempt}`)
-            return existingUser
-          }
-
-          if (checkError && checkError.code !== 'PGRST116') {
-            console.error('Error checking user existence:', checkError)
-            // For non-"not found" errors, continue retrying
-          }
-
-          // Wait progressively longer between attempts (exponential backoff)
-          const waitTime = Math.min(1000 * Math.pow(1.5, attempt - 1), 5000) // Cap at 5 seconds
-          console.warn(
-            `⏳ User profile not found on attempt ${attempt}/${maxRetries}, waiting ${waitTime}ms...`
-          )
-
-          if (attempt < maxRetries) {
-            await new Promise(resolve => setTimeout(resolve, waitTime))
-          }
-        } catch (error) {
-          console.error(`Attempt ${attempt} failed:`, error)
-          if (attempt === maxRetries) {
-            throw error
-          }
-          // Wait before retry
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempt))
-        }
-      }
-
-      return null
-    }
-
-    // Check if the user was created in public.users by the trigger
-    const existingUser = await checkUserExists(authData.user.id)
-
-    if (!existingUser) {
-      console.warn('⚠️ Trigger failed to create user profile, creating manually...')
-      // Manually create the user if trigger failed after all retries
-      const { error: manualError } = await supabase.from('users').insert({
-        id: authData.user.id,
-        email: email,
-        role: role,
-        status: 'invited',
-        full_name: fullName || null
-      })
-
-      if (manualError) {
-        console.error('Manual user creation failed:', manualError)
-        throw new Error(`Failed to create user profile: ${manualError.message}`)
-      }
-
-      console.warn('✅ User profile created manually')
-    } else if (fullName && existingUser.full_name !== fullName) {
-      // Update user with additional info if needed
-      await supabase
-        .from('users')
-        .update({
-          full_name: fullName,
-          status: 'invited'
-        })
-        .eq('id', authData.user.id)
-    }
-
-    // Grant default permissions for regular users
-    await grantDefaultPermissions(authData.user.id, role)
-
-    // Success message handled by component
-
+    // The trigger should handle creating the user profile with the available metadata
     return {
-      success: true,
-      ...(import.meta.env.DEV && { tempPassword })
+      success: true
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Failed to invite user'
     return { success: false, error: errorMessage }
   }
 }
+
+
 
 /**
  * Update user role
@@ -173,32 +80,22 @@ export const updateUserRole = async (
 }
 
 /**
- * Grant default read permissions for regular users
+ * Grant default permissions based on role
+ * Regular users are no longer created through invite system
  */
 export const grantDefaultPermissions = async (
   userId: string,
   role: UserRole
 ): Promise<{success: boolean; error?: string}> => {
   try {
-    // Only grant default permissions for regular users
-    if (role !== 'user') {
+    // Skip permission granting for invited users as they get permissions from role_permissions table
+    // Regular users are no longer created through invite system
+    if (role === 'moderator' || role === 'admin') {
       return { success: true }
     }
 
-    // Default read permissions for all resources
-    const defaultPermissions = [
-      { role, resource: 'posts', action: 'read' },
-      { role, resource: 'products', action: 'read' },
-      { role, resource: 'banners', action: 'read' },
-      { role, resource: 'users', action: 'read' },
-    ]
-
-    const { error } = await supabase.from('role_permissions').insert(defaultPermissions)
-
-    if (error) throw error
-
-    console.warn('Default read permissions granted for user:', userId)
-    return { success: true }
+    // If we reach here, it means someone tried to create a user with 'user' role
+    return { success: false, error: 'Regular users cannot be created through invite system' }
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Failed to grant default permissions'

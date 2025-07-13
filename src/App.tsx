@@ -8,6 +8,7 @@ import { ErrorBoundary, EnhancedLoadingScreen } from './components/feedback'
 import { ProtectedRoute } from './components/common'
 import { DashboardLayout } from './components'
 import Login from './pages/Login'
+import Onboarding from './pages/Onboarding'
 import Unauthorized from './pages/Unauthorized'
 
 function App () {
@@ -44,6 +45,7 @@ function App () {
         <div className='App'>
           <Routes>
             <Route path='/login' element={user ? <Navigate to='/' replace /> : <Login />} />
+            <Route path='/onboarding' element={<Onboarding />} />
             <Route path='/unauthorized' element={<Unauthorized />} />
             <Route
               path='/*'

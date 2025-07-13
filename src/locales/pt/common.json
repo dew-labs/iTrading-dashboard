@@ -307,7 +307,7 @@
   "userForm": {
     "basicInformation": "Informações Básicas",
     "userRolePermissions": "Papel do Usuário e Permissões",
-    "emailInviteHelpText": "Um convite será enviado para este endereço de email",
+    "emailInviteHelpText": "Um email de convite será enviado para este endereço. O usuário deve aceitá-lo para criar sua conta.",
     "phoneHelpText": "Opcional. Use formato internacional com código do país",
     "emailRequired": "Email é obrigatório",
     "emailInvalidFormat": "Formato de email inválido",
@@ -316,7 +316,27 @@
     "updating": "Atualizando...",
     "sendingInvite": "Enviando Convite...",
     "updateUser": "Atualizar Usuário",
-    "sendInvitation": "Enviar Convite"
+    "sendInvitation": "Enviar Convite",
+    "roleRestrictionNotice": "Apenas administradores podem criar usuários, e apenas funções de moderador e administrador podem ser criadas através do sistema de convites"
+  },
+  "onboarding": {
+    "title": "Complete a Configuração da Sua Conta",
+    "welcome": "Bem-vindo! Por favor, defina sua senha para completar a configuração da sua conta.",
+    "invalidInvitation": "Convite Inválido",
+    "invalidInvitationMessage": "Link de convite inválido. Por favor, solicite um novo convite.",
+    "newPassword": "Nova Senha",
+    "confirmPassword": "Confirmar Senha",
+    "passwordRequirements": "Requisitos da Senha:",
+    "minLength": "Pelo menos 8 caracteres",
+    "uppercase": "Uma letra maiúscula",
+    "lowercase": "Uma letra minúscula",
+    "number": "Um número",
+    "passwordsMatch": "As senhas coincidem",
+    "completeSetup": "Completar Configuração",
+    "settingUp": "Configurando conta...",
+    "alreadyHaveAccount": "Já tem uma conta?",
+    "signIn": "Entrar",
+    "goToLogin": "Ir para Login"
   },
   "entities": {
     "posts": "Posts",

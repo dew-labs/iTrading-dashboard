@@ -63,6 +63,8 @@ const Users: React.FC = () => {
     userName: null
   })
 
+
+
   // Theme classes
   const layout = getPageLayoutClasses()
 
@@ -147,6 +149,8 @@ const Users: React.FC = () => {
       userName: null
     })
   }
+
+
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
@@ -468,6 +472,8 @@ const Users: React.FC = () => {
           isLoading={isDeleting}
           isDestructive={true}
         />
+
+
       </div>
     </div>
   )
