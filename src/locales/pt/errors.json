@@ -22,7 +22,8 @@
     "passwordMismatch": "As senhas não coincidem",
     "loginFailed": "Falha no login. Tente novamente.",
     "logoutFailed": "Falha no logout. Tente novamente.",
-    "registrationFailed": "Falha no registro. Tente novamente."
+    "registrationFailed": "Falha no registro. Tente novamente.",
+    "dashboardAccessDenied": "Você não tem permissão para acessar o painel com esta conta. Por favor, use o aplicativo."
   },
   "validation": {
     "required": "Este campo é obrigatório",

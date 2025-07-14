@@ -22,7 +22,8 @@
     "passwordMismatch": "Passwords do not match",
     "loginFailed": "Login failed. Please try again.",
     "logoutFailed": "Logout failed. Please try again.",
-    "registrationFailed": "Registration failed. Please try again."
+    "registrationFailed": "Registration failed. Please try again.",
+    "dashboardAccessDenied": "You are not allowed to access the dashboard with this account. Please use the mobile app."
   },
   "validation": {
     "required": "This field is required",

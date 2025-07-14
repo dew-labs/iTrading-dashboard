@@ -3,6 +3,8 @@ import { supabase } from '../lib/supabase'
 import type { User } from '@supabase/supabase-js'
 import type { DatabaseUser } from '../types'
 import { toast } from '../utils/toast'
+import { USER_ROLES } from '../constants/general'
+import i18n from '../lib/i18n'
 
 /**
  * Auth Store with Deleted User Protection
@@ -55,6 +57,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       // Fetch user profile after successful login
       await get().fetchUserProfile()
+
+      // Restrict dashboard access for user role 'user'
+      const { profile } = get()
+      if (profile && profile.role === USER_ROLES.USER) {
+        await get().signOut()
+        set({ loading: false })
+        return { error: i18n.t('auth.dashboardAccessDenied', { ns: 'errors' }) }
+      }
 
       // Update last login
       if (data.user) {

@@ -331,7 +331,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                         renderTrigger={(selected) => (
                           <button
                             type='button'
-                            className='w-full flex items-center justify-between px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none transition-colors border-0 shadow-none'
+                            className='w-full flex items-center justify-between px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none transition-colors border-0 shadow-none hover:bg-gray-50 dark:hover:bg-gray-700'
                             aria-label='Language selector'
                           >
                             <div className='flex items-center'>
@@ -418,7 +418,7 @@ const ThemeSelectorDropdown: React.FC = () => {
         renderTrigger={(selected) => (
           <button
             type='button'
-            className='w-full flex items-center justify-between px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none transition-colors border-0 shadow-none'
+            className='w-full flex items-center justify-between px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none transition-colors border-0 shadow-none hover:bg-gray-50 dark:hover:bg-gray-700'
             aria-label={t('ui.theme.title')}
           >
             <div className='flex items-center'>
