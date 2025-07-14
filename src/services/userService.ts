@@ -1,8 +1,6 @@
-import { supabase, supabaseAdmin } from '../lib/supabase'
+import { supabase } from '../lib/supabase'
+import { sendInvitationOTP } from './otpService'
 import type { UserRole } from '../types'
-
-// No longer needed since inviteByEmail doesn't require a temporary password
-// The user will set their own password when accepting the invitation
 
 /**
  * Invite a new user to the system
@@ -20,38 +18,14 @@ export const inviteUser = async (
       return { success: false, error }
     }
 
-    // Check if admin client is available
-    if (!supabaseAdmin) {
-      const error = 'Admin operations require service role key. Please add VITE_SUPABASE_SERVICE_ROLE_KEY to your .env.local file.'
-      return { success: false, error }
+    // Use OTP service to send invitation
+    const { success, error } = await sendInvitationOTP(email, role, fullName)
+
+    if (!success) {
+      return { success: false, error: error || 'Failed to send OTP' }
     }
 
-    // Use Supabase's inviteByEmail function to send invitation
-    // This sends an email invitation to the user who must accept it to create their account
-    const redirectUrl = import.meta.env.VITE_SUPABASE_INVITE_REDIRECT_URL || 'http://localhost:5173/onboarding'
-
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-      data: {
-        full_name: fullName,
-        role,
-        status: 'invited'
-      },
-      redirectTo: redirectUrl
-    })
-
-    if (authError) {
-      throw authError
-    }
-
-    if (!authData.user) {
-      const error = 'No user data returned from invitation'
-      throw new Error(error)
-    }
-
-    // The trigger should handle creating the user profile with the available metadata
-    return {
-      success: true
-    }
+    return { success: true }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Failed to invite user'
     return { success: false, error: errorMessage }
@@ -162,3 +136,32 @@ export const uploadUserAvatar = async (
     return { error: errorMessage }
   }
 }
+
+/**
+ * Update the authenticated user's password and full name
+ * @param params.fullName - The new full name
+ * @param params.password - The new password
+ * @returns Success or error message
+ */
+export const updateUserProfile = async ({ fullName, password }: { fullName: string; password: string }): Promise<{ success: boolean; error?: string }> => {
+  try {
+    // Update password via Supabase Auth
+    const { error: passwordError } = await supabase.auth.updateUser({ password });
+    if (passwordError) throw passwordError;
+    // Get current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) throw userError || new Error('User not found');
+    // Update full_name in users table
+    const { error: profileError } = await supabase
+      .from('users')
+      .update({ full_name: fullName })
+      .eq('id', user.id);
+    if (profileError) throw profileError;
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update profile',
+    };
+  }
+};

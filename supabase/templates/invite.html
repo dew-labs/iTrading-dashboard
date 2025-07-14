@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>You're Invited!</title>
+  <style>
+    body { font-family: 'Inter', Arial, sans-serif; background: #18181b; color: #fff; margin: 0; padding: 0; }
+    .container { max-width: 480px; margin: 40px auto; background: #27272a; border-radius: 12px; padding: 32px; }
+    h1 { color: #38bdf8; }
+    a.button { display: inline-block; background: #38bdf8; color: #18181b; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; margin-top: 24px; }
+    p { color: #d4d4d8; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>You're invited to iTrading!</h1>
+    <p>You have been invited to join iTrading. Click the button below to accept your invitation and set up your account.</p>
+    <a href="{{ .InviteURL }}" class="button">Accept Invitation</a>
+    <p>If you do not wish to join, you can ignore this email.</p>
+  </div>
+</body>
+</html>

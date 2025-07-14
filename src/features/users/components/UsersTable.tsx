@@ -1,5 +1,5 @@
 import React from 'react'
-import { Edit2, Trash2, Calendar, Clock, User, MapPin } from 'lucide-react'
+import { Edit2, Trash2, Calendar, Clock, User, MapPin, Mail } from 'lucide-react'
 import { Table } from '../../../components/molecules'
 import { Badge } from '../../../components/atoms'
 import RecordImage from '../../../components/features/images/RecordImage'
@@ -7,17 +7,18 @@ import { usePageTranslation, useTranslation } from '../../../hooks/useTranslatio
 
 import { getTypographyClasses, getIconClasses, cn } from '../../../utils/theme'
 import { formatDateDisplay } from '../../../utils/format'
-import type { DatabaseUser } from '../../../types'
+import type { DatabaseUser, Image } from '../../../types'
 import { COUNTRY_OPTIONS } from '../../../constants/general'
 
 interface UsersTableProps {
   users: DatabaseUser[]
-  imagesByRecord?: Record<string, import('../../../types').Image[]>
+  imagesByRecord?: Record<string, Image[]>
   onEdit: (user: DatabaseUser) => void
   onDelete: (user: DatabaseUser) => void
   onSort: (column: keyof DatabaseUser) => void
   sortColumn: keyof DatabaseUser | null
   sortDirection: 'asc' | 'desc'
+  onResendInvitation?: (user: DatabaseUser) => void // new prop
 }
 
 const UsersTable: React.FC<UsersTableProps> = ({
@@ -27,13 +28,14 @@ const UsersTable: React.FC<UsersTableProps> = ({
   onDelete,
   onSort,
   sortColumn,
-  sortDirection
+  sortDirection,
+  onResendInvitation
 }) => {
   const { t } = usePageTranslation()
   const { t: tCommon } = useTranslation()
 
 
-  const columns = [
+  const columns = React.useMemo(() => [
     {
       header: t('users.userDetails'),
       accessor: 'email' as keyof DatabaseUser,
@@ -144,9 +146,15 @@ const UsersTable: React.FC<UsersTableProps> = ({
           >
             <Edit2 className={getIconClasses('action')} />
           </button>
-
-
-
+          {row.status === 'invited' && onResendInvitation && (
+            <button
+              onClick={() => onResendInvitation(row)}
+              className='p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors'
+              title={t('users.resendInvitation')}
+            >
+              <Mail className={getIconClasses('action')} />
+            </button>
+          )}
           <button
             onClick={() => onDelete(row)}
             className='p-2 text-gray-600 dark:text-gray-300 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors'
@@ -157,7 +165,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
         </div>
       )
     }
-  ]
+  ], [imagesByRecord, t, tCommon, onEdit, onDelete, onResendInvitation])
 
   return (
     <Table

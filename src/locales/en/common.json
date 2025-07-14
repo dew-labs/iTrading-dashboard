@@ -319,25 +319,6 @@
     "sendInvitation": "Send Invitation",
     "roleRestrictionNotice": "Only admins can create users, and only moderator and admin roles can be created through the invite system"
   },
-  "onboarding": {
-    "title": "Complete Your Account Setup",
-    "welcome": "Welcome! Please set your password to complete your account setup.",
-    "invalidInvitation": "Invalid Invitation",
-    "invalidInvitationMessage": "Invalid invitation link. Please request a new invitation.",
-    "newPassword": "New Password",
-    "confirmPassword": "Confirm Password",
-    "passwordRequirements": "Password Requirements:",
-    "minLength": "At least 8 characters",
-    "uppercase": "One uppercase letter",
-    "lowercase": "One lowercase letter",
-    "number": "One number",
-    "passwordsMatch": "Passwords match",
-    "completeSetup": "Complete Setup",
-    "settingUp": "Setting up account...",
-    "alreadyHaveAccount": "Already have an account?",
-    "signIn": "Sign in",
-    "goToLogin": "Go to Login"
-  },
   "entities": {
     "posts": "Posts",
     "post": "Post",

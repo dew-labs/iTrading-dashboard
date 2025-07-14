@@ -23,8 +23,8 @@
     "userGrowthRate": "Taxa de Crescimento de Usuários",
     "contentPublished": "Conteúdo Publicado",
     "bannerActivity": "Atividade de Banner",
-    "createUser": "Criar Usuário",
-    "createUserDescription": "Adicionar novo usuário ao sistema",
+    "inviteUser": "Convidar Usuário",
+    "inviteUserDescription": "Convidar novo usuário para o sistema",
     "addProduct": "Adicionar Produto",
     "addProductDescription": "Criar novo produto ou serviço",
     "writePost": "Escrever Post",
@@ -38,11 +38,11 @@
     "title": "Gerenciamento de Usuários",
     "description": "Gerencie contas de usuário, funções e permissões",
     "actions": "Ações",
-    "createUser": "Criar Usuário",
+    "inviteUser": "Convidar Usuário",
     "editUser": "Editar Usuário",
     "deleteUser": "Excluir Usuário",
 
-    "createNewUser": "Criar Novo Usuário",
+    "inviteNewUser": "Convidar Novo Usuário",
     "editUserTitle": "Editar Usuário",
     "deleteUserTitle": "Excluir Usuário",
     "deleteUserConfirm": "Tem certeza de que deseja excluir este usuário?",
@@ -70,7 +70,10 @@
     "never": "Nunca",
     "joined": "Ingressou",
 
-    "thisUser": "este usuário"
+    "thisUser": "este usuário",
+    "resendInvitation": "Reenviar Convite",
+    "resendInvitationSuccess": "Convite reenviado com sucesso.",
+    "resendInvitationError": "Falha ao reenviar o convite. Por favor, tente novamente."
   },
   "posts": {
     "title": "Gerenciamento de Posts",

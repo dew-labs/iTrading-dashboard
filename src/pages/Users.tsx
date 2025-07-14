@@ -15,6 +15,8 @@ import { groupImagesByRecord } from '../utils'
 import { supabase, queryKeys } from '../lib/supabase'
 import { useImages } from '../hooks/useImages'
 import { useFileUpload } from '../hooks/useFileUpload'
+import { sendInvitationOTP } from '../services/otpService'
+import { toast } from '../utils/toast'
 
 // Theme imports
 import {
@@ -248,6 +250,19 @@ const Users: React.FC = () => {
     }
   }
 
+  const handleResendInvitation = async (user: DatabaseUser) => {
+    try {
+      const { success, error } = await sendInvitationOTP(user.email, user.role, user.full_name || undefined)
+      if (success) {
+        toast.success(t('users.resendInvitationSuccess'))
+      } else {
+        toast.error(error || t('users.resendInvitationError'))
+      }
+    } catch (_err) {
+      toast.error(t('users.resendInvitationError'))
+    }
+  }
+
   // Use predefined filter options from constants
   const statusOptions = [
     { value: 'all', label: tCommon('general.all') },
@@ -305,7 +320,7 @@ const Users: React.FC = () => {
                 className={getButtonClasses('primary', 'md')}
               >
                 <Plus className='w-4 h-4 mr-2' />
-                {t('users.createUser')}
+                {t('users.inviteUser')}
               </button>
             </div>
           )}
@@ -362,6 +377,7 @@ const Users: React.FC = () => {
               onSort={handleSort}
               sortColumn={filterState.sortColumn}
               sortDirection={filterState.sortDirection}
+              onResendInvitation={handleResendInvitation}
             />
 
             {/* Pagination */}
@@ -453,7 +469,7 @@ const Users: React.FC = () => {
         <Modal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          title={editingUser ? t('users.editUserTitle') : t('users.createNewUser')}
+          title={editingUser ? t('users.editUserTitle') : t('users.inviteNewUser')}
         >
           <UserForm user={editingUser} onSubmit={handleSubmit} onCancel={handleCloseModal} images={images} />
         </Modal>

@@ -5,6 +5,7 @@
 
 import { COUNTRY_OPTIONS } from '../constants/general'
 import { VALIDATION } from '../constants/ui'
+import type { TOptions } from 'i18next'
 
 /**
  * Validation types and interfaces
@@ -195,8 +196,7 @@ export const validateField = <T>(
   value: T,
   rule: ValidationRule<T>,
   fieldName: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  t?: (key: string, params?: any) => string
+  t?: (key: string, options?: TOptions) => string
 ): FieldValidationResult => {
   const errors: string[] = []
   const fieldLabel = getFieldLabel(fieldName, t)
@@ -396,8 +396,7 @@ export const validateField = <T>(
 export const validateForm = <T extends Record<string, unknown>>(
   data: T,
   schema: ValidationSchema<T>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  t?: (key: string, params?: any) => string
+  t?: (key: string, options?: TOptions) => string
 ): FormValidationResult => {
   const errors: Record<string, string> = {}
 
@@ -470,7 +469,8 @@ export const formSchemas = {
     } as ValidationRule<string>,
     bio: {
       maxLength: VALIDATION.BIO_MAX_LENGTH
-    } as ValidationRule<string>
+    } as ValidationRule<string>,
+    role: { required: true } as ValidationRule<string>
   },
 
   post: {

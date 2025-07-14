@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Confirm Your Signup</title>
+  <style>
+    body { font-family: 'Inter', Arial, sans-serif; background: #18181b; color: #fff; margin: 0; padding: 0; }
+    .container { max-width: 480px; margin: 40px auto; background: #27272a; border-radius: 12px; padding: 32px; }
+    h1 {
+      color: #14b8a6; /* fallback */
+      background: linear-gradient(90deg, #14b8a6 0%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-fill-color: transparent;
+    }
+    a.button { display: inline-block; background: linear-gradient(90deg, #14b8a6 0%, #06b6d4 100%); color: #18181b; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; margin-top: 24px; }
+    p { color: #d4d4d8; }
+    .otp-token {
+      font-size: 1.5rem;
+      letter-spacing: 0.2em;
+      background: linear-gradient(90deg, #14b8a6 0%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-fill-color: transparent;
+      padding: 12px 0;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      text-align: center;
+      color: #14b8a6; /* fallback */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to iTrading!</h1>
+    <p>Thank you for signing up. Please confirm your email address to activate your account.</p>
+    <p><strong>Your One-Time Password (OTP):</strong></p>
+    <div class="otp-token">
+      {{ .Token }}
+    </div>
+    <p>Click the button below to verify your email and enter your OTP:</p>
+    <a href="{{ .SiteURL }}/verify-otp?email={{ .Email }}" class="button">Verify Email & Enter OTP</a>
+    <p>If you did not sign up, you can safely ignore this email.</p>
+  </div>
+</body>
+</html>

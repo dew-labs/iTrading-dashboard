@@ -8,8 +8,9 @@ import { ErrorBoundary, EnhancedLoadingScreen } from './components/feedback'
 import { ProtectedRoute } from './components/common'
 import { DashboardLayout } from './components'
 import Login from './pages/Login'
-import Onboarding from './pages/Onboarding'
+import VerifyOTP from './pages/VerifyOTP'
 import Unauthorized from './pages/Unauthorized'
+import SetupProfile from './pages/SetupProfile'
 
 function App () {
   const { initialize, initialized, user } = useAuthStore()
@@ -45,8 +46,9 @@ function App () {
         <div className='App'>
           <Routes>
             <Route path='/login' element={user ? <Navigate to='/' replace /> : <Login />} />
-            <Route path='/onboarding' element={<Onboarding />} />
+            <Route path='/verify-otp' element={<VerifyOTP />} />
             <Route path='/unauthorized' element={<Unauthorized />} />
+            <Route path='/setup-profile' element={<SetupProfile />} />
             <Route
               path='/*'
               element={
