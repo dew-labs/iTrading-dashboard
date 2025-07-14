@@ -107,7 +107,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
         disabled={disabled}
         className={cn(
           'inline-flex items-center space-x-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors duration-200',
-          'focus:outline-none focus:border-black dark:focus:border-white',
+          'focus:outline-none focus:ring-2 focus:ring-black focus:border-black dark:focus:ring-2 dark:focus:ring-white dark:focus:border-white',
           disabled
             ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-600 cursor-not-allowed'
             : isActive

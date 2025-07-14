@@ -47,7 +47,6 @@ const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(({
   ...props
 }, ref) => {
   const [showPassword, setShowPassword] = React.useState(false)
-  const [isFocused, setIsFocused] = React.useState(false)
   const { t: tCommon } = useTranslation()
 
   const generatedId = React.useId()
@@ -76,7 +75,7 @@ const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(({
       // Base styles
       'w-full rounded-lg transition-all duration-200',
       'text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400',
-      'focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-300',
+      'focus:outline-none focus:ring-2 focus:ring-black focus:border-black dark:focus:ring-2 dark:focus:ring-white dark:focus:border-white',
 
       // Size
       sizeClasses[size],
@@ -91,9 +90,6 @@ const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(({
       // Error state
       error && 'border-red-500 focus:border-red-500 focus:ring-red-500',
 
-      // Focus state
-      isFocused && !error && 'border-gray-900 dark:border-gray-300',
-
       // Disabled state
       disabled && 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-gray-700',
 
@@ -106,12 +102,10 @@ const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(({
   }
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    setIsFocused(true)
     props.onFocus?.(e)
   }
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    setIsFocused(false)
     props.onBlur?.(e)
   }
 

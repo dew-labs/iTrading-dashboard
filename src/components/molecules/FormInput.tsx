@@ -75,16 +75,16 @@ const FormInput: React.FC<FormInputProps> = ({
           disabled={disabled}
           className={`
             w-full ${showIcon ? 'pl-12' : 'pl-4'} pr-4 py-3.5 border-2 rounded-xl
-            transition-colors duration-200 ease-in-out
-            focus:outline-none text-gray-900 dark:text-white
+            transition-all duration-200 ease-in-out
+            focus:outline-none focus:ring-2 focus:ring-black focus:border-black dark:focus:ring-2 dark:focus:ring-white dark:focus:border-white
+            focus:w-[22rem] max-w-full
+            text-gray-900 dark:text-white
             placeholder:text-gray-400 dark:placeholder:text-gray-500
             ${
-    hasError
-      ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20 focus:border-red-500'
-      : hasValue
-        ? 'border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/20 focus:border-green-500'
-        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:border-black dark:focus:border-white hover:border-gray-300 dark:hover:border-gray-600'
-    }
+              hasError
+                ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20 focus:border-red-500 focus:ring-red-500'
+                : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'
+            }
             ${disabled ? 'bg-gray-50 dark:bg-gray-900 cursor-not-allowed opacity-75' : ''}
           `}
           placeholder={placeholder}

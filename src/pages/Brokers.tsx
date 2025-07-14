@@ -229,6 +229,7 @@ const Brokers: React.FC = () => {
                   onChange={e => setSearchTerm(e.target.value)}
                   leftIcon={Search}
                   variant='default'
+                  className='transition-all duration-200 w-full max-w-full focus:w-[32rem]'
                 />
               </div>
 

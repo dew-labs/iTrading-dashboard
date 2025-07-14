@@ -32,7 +32,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
   ) => {
     const getInputClasses = () => {
       const baseClasses = [
-        'border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400',
+        'border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black dark:focus:ring-2 dark:focus:ring-white dark:focus:border-white',
         'transition-all duration-200 ease-in-out',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         'dark:bg-gray-800 dark:text-white dark:placeholder-gray-400',

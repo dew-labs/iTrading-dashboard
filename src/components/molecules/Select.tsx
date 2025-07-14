@@ -138,7 +138,7 @@ const Select: React.FC<SelectProps> = ({
       relative w-full bg-white dark:bg-gray-800 border rounded-lg
       flex items-center justify-between
       transition-colors duration-200 ease-in-out
-      focus:outline-none focus:border-black dark:focus:border-white
+      focus:outline-none focus:border-black focus:ring-2 focus:ring-black dark:focus:border-white dark:focus:ring-2 dark:focus:ring-white
       ${config.button}
     `
 

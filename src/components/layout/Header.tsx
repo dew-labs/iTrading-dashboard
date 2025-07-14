@@ -16,14 +16,17 @@ import {
   Shield,
   ShieldCheck,
   Sun,
-  Moon
+  Moon,
+  ChevronRight
 } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 import { useTranslation, useNotificationTranslation } from '../../hooks/useTranslation'
 import { useRecentActivity } from '../../hooks/useRecentActivity'
-import { Badge, LanguageSelector, Button } from '../atoms'
+import { Badge } from '../atoms'
 import { Avatar } from '../features/users'
 import { useThemeStore } from '../../store/themeStore'
+import PopoverMenu from '../molecules/PopoverMenu'
+import { LANGUAGES } from '../../constants/languages'
 
 interface HeaderProps {
   onToggleSidebar: () => void
@@ -38,6 +41,9 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const [showNotifications, setShowNotifications] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const notificationRef = useRef<HTMLDivElement>(null)
+  // useTranslation is already imported; get i18n from it
+  // const { t } = useTranslation() // already declared above
+  const { i18n } = useTranslation()
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -309,12 +315,35 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                       <span className='block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1'>
                         {t('ui.language')}
                       </span>
-                      <LanguageSelector
-                        variant='default'
-                        size='md'
-                        showFlag={true}
-                        showText={true}
-                        className='w-full'
+                      <PopoverMenu
+                        options={LANGUAGES.map(lang => ({
+                          value: lang.code,
+                          label: lang.nativeName,
+                          sublabel: lang.name,
+                          icon: <span className='mr-2'>{lang.flag}</span>,
+                        }))}
+                        value={i18n.language as string}
+                        onChange={code => { if (code !== i18n.language) i18n.changeLanguage(code) }}
+                        className='w-full bg-white dark:bg-gray-800 focus:outline-none shadow-none border-0'
+                        placeholder='Select language'
+                        ariaLabel='Language selector'
+                        placement='left'
+                        renderTrigger={(selected) => (
+                          <button
+                            type='button'
+                            className='w-full flex items-center justify-between px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none transition-colors border-0 shadow-none'
+                            aria-label='Language selector'
+                          >
+                            <div className='flex items-center'>
+                              {selected && selected.icon}
+                              <span>{selected ? selected.label : 'Select language'}</span>
+                              {selected && selected.sublabel && (
+                                <span className='ml-2 text-xs text-gray-500'>{selected.sublabel}</span>
+                              )}
+                            </div>
+                            <ChevronRight className='w-4 h-4 ml-2 text-gray-400' />
+                          </button>
+                        )}
                       />
                     </div>
                     {/* Theme Selector */}
@@ -361,37 +390,45 @@ export default Header
 const ThemeSelectorDropdown: React.FC = () => {
   const { theme, setTheme } = useThemeStore()
   const { t } = useTranslation()
+  const themeOptions = [
+    {
+      value: 'light',
+      label: t('ui.theme.light'),
+      icon: <Sun className='w-4 h-4 mr-2' />,
+    },
+    {
+      value: 'dark',
+      label: t('ui.theme.dark'),
+      icon: <Moon className='w-4 h-4 mr-2' />,
+    },
+  ]
   return (
     <div>
       <span className='block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1'>
         {t('ui.theme.title')}
       </span>
-      <div className='flex gap-2' role='radiogroup' aria-label={t('ui.theme.title')}>
-        <Button
-          type='button'
-          variant={theme === 'light' ? 'primary' : 'secondary'}
-          size='sm'
-          aria-pressed={theme === 'light'}
-          aria-label={t('ui.theme.light')}
-          onClick={() => setTheme('light')}
-          className='flex-1 flex items-center justify-center'
-        >
-          <Sun className='w-4 h-4 mr-1' />
-          {t('ui.theme.light')}
-        </Button>
-        <Button
-          type='button'
-          variant={theme === 'dark' ? 'primary' : 'secondary'}
-          size='sm'
-          aria-pressed={theme === 'dark'}
-          aria-label={t('ui.theme.dark')}
-          onClick={() => setTheme('dark')}
-          className='flex-1 flex items-center justify-center'
-        >
-          <Moon className='w-4 h-4 mr-1' />
-          {t('ui.theme.dark')}
-        </Button>
-      </div>
+      <PopoverMenu
+        options={themeOptions}
+        value={theme}
+        onChange={(val) => setTheme(val as 'light' | 'dark')}
+        className='w-full bg-white dark:bg-gray-800 focus:outline-none shadow-none border-0'
+        placeholder={t('ui.theme.title')}
+        ariaLabel={t('ui.theme.title')}
+        placement='left'
+        renderTrigger={(selected) => (
+          <button
+            type='button'
+            className='w-full flex items-center justify-between px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none transition-colors border-0 shadow-none'
+            aria-label={t('ui.theme.title')}
+          >
+            <div className='flex items-center'>
+              {selected && selected.icon}
+              <span>{selected ? selected.label : t('ui.theme.title')}</span>
+            </div>
+            <ChevronRight className='w-4 h-4 ml-2 text-gray-400' />
+          </button>
+        )}
+      />
     </div>
   )
 }

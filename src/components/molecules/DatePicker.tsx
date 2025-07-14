@@ -174,8 +174,8 @@ const DatePicker: React.FC<DatePickerProps> = ({
           className={`
             w-full pl-10 pr-4 py-2 border rounded-lg cursor-pointer
             transition-colors duration-200 ease-in-out
-            focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-300 focus:border-transparent
-            ${error ? 'border-red-300 bg-red-50 dark:border-red-600 dark:bg-red-900/20' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:border-gray-500'}
+            focus:outline-none focus:ring-2 focus:ring-black focus:border-black dark:focus:ring-2 dark:focus:ring-white dark:focus:border-white
+            ${error ? 'border-red-300 bg-red-50 dark:border-red-600 dark:bg-red-900/20 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:border-gray-500'}
             ${disabled ? 'bg-gray-50 dark:bg-gray-700 cursor-not-allowed opacity-75' : ''}
           `}
         >

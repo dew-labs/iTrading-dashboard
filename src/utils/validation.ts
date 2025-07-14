@@ -5,7 +5,7 @@
 
 import { COUNTRY_OPTIONS } from '../constants/general'
 import { VALIDATION } from '../constants/ui'
-import type { TOptions } from 'i18next'
+import type { TFunction } from 'i18next'
 
 /**
  * Validation types and interfaces
@@ -149,7 +149,7 @@ export const validators = {
 /**
  * Get a user-friendly field label for validation messages
  */
-const getFieldLabel = (fieldName: string, t?: (key: string, params?: Record<string, unknown>) => string): string => {
+const getFieldLabel = (fieldName: string, t?: TFunction): string => {
   if (!t) return fieldName
 
   // Try to get field label from forms namespace
@@ -196,7 +196,7 @@ export const validateField = <T>(
   value: T,
   rule: ValidationRule<T>,
   fieldName: string,
-  t?: (key: string, options?: TOptions) => string
+  t?: TFunction
 ): FieldValidationResult => {
   const errors: string[] = []
   const fieldLabel = getFieldLabel(fieldName, t)
@@ -396,7 +396,7 @@ export const validateField = <T>(
 export const validateForm = <T extends Record<string, unknown>>(
   data: T,
   schema: ValidationSchema<T>,
-  t?: (key: string, options?: TOptions) => string
+  t?: TFunction
 ): FormValidationResult => {
   const errors: Record<string, string> = {}
 

@@ -179,6 +179,7 @@ const Products: React.FC = () => {
                   onChange={e => setSearchTerm(e.target.value)}
                   leftIcon={Search}
                   variant='default'
+                  className='transition-all duration-200 w-full max-w-full focus:w-[32rem]'
                 />
               </div>
 
@@ -270,7 +271,7 @@ const Products: React.FC = () => {
                         }
                       }
                     }}
-                    className='w-12 px-2 py-1 text-sm text-center border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+                    className='w-12 px-2 py-1 text-sm text-center border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black focus:border-black dark:focus:ring-2 dark:focus:ring-white dark:focus:border-white bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors duration-200'
                   />
                   <span className='text-sm text-gray-700'>
                     {tCommon('pagination.of')} {totalPages}
