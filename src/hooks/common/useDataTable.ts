@@ -290,10 +290,8 @@ export const createBrokersTableConfig = (): DataTableConfig<Broker> => ({
 })
 
 export const createProductsTableConfig = (): DataTableConfig<Product> => ({
-  searchFields: ['name', 'description'],
-  filterFields: [
-    { key: 'subscription', type: 'boolean' }
-  ],
-  sortableFields: ['name', 'price', 'created_at'],
+  searchFields: ['id', 'affiliate_link'],
+  filterFields: [],
+  sortableFields: ['price', 'created_at'],
   defaultSort: { field: 'created_at', direction: 'desc' }
 })

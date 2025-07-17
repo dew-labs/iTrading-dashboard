@@ -399,7 +399,8 @@
     "englishAndPortuguese": "English & Portuguese",
     "completeSettingsToEnableEditing": "Complete the {{type}} settings above, then save to enable content editing",
     "manageBrokerDescription": "Manage broker description in multiple languages",
-    "trackTranslationProgress": "Track translation progress and completeness"
+    "trackTranslationProgress": "Track translation progress and completeness",
+    "productSettings": "Product Settings"
   },
   "filters": {
     "allStatus": "All Status",

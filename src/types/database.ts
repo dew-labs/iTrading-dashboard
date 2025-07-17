@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instanciate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "12.2.3 (519615d)"
+  }
   public: {
     Tables: {
       audit_logs: {
@@ -125,6 +130,48 @@ export type Database = {
         }
         Relationships: []
       }
+      brokers_translations: {
+        Row: {
+          broker_id: string
+          created_at: string
+          description: string | null
+          id: string
+          language_code: string
+          updated_at: string
+        }
+        Insert: {
+          broker_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          language_code: string
+          updated_at?: string
+        }
+        Update: {
+          broker_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          language_code?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brokers_translations_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brokers_translations_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers_with_translations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       images: {
         Row: {
           alt_text: string | null
@@ -208,38 +255,125 @@ export type Database = {
           },
         ]
       }
+      posts_translations: {
+        Row: {
+          content: string | null
+          created_at: string
+          excerpt: string | null
+          id: string
+          language_code: string
+          post_id: string
+          reading_time: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          language_code: string
+          post_id: string
+          reading_time?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          language_code?: string
+          post_id?: string
+          reading_time?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_translations_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_translations_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts_with_translations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
+        Row: {
+          affiliate_link: string | null
+          created_at: string
+          id: string
+          price: number
+          updated_at: string
+        }
+        Insert: {
+          affiliate_link?: string | null
+          created_at?: string
+          id?: string
+          price: number
+          updated_at?: string
+        }
+        Update: {
+          affiliate_link?: string | null
+          created_at?: string
+          id?: string
+          price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      products_translations: {
         Row: {
           created_at: string
           description: string | null
-          featured_image_url: string | null
           id: string
+          language_code: string
           name: string
-          price: number
-          subscription: boolean | null
+          product_id: string
           updated_at: string
         }
         Insert: {
           created_at?: string
           description?: string | null
-          featured_image_url?: string | null
           id?: string
+          language_code: string
           name: string
-          price: number
-          subscription?: boolean | null
+          product_id: string
           updated_at?: string
         }
         Update: {
           created_at?: string
           description?: string | null
-          featured_image_url?: string | null
           id?: string
+          language_code?: string
           name?: string
-          price?: number
-          subscription?: boolean | null
+          product_id?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_translations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_translations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_translations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       role_permissions: {
         Row: {
@@ -268,126 +402,8 @@ export type Database = {
         }
         Relationships: []
       }
-      posts_translations: {
-        Row: {
-          id: string
-          post_id: string
-          language_code: string
-          title: string
-          excerpt: string | null
-          content: string | null
-          reading_time: number
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          post_id: string
-          language_code: string
-          title: string
-          excerpt?: string | null
-          content?: string | null
-          reading_time?: number
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          post_id?: string
-          language_code?: string
-          title?: string
-          excerpt?: string | null
-          content?: string | null
-          reading_time?: number
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "posts_translations_post_id_fkey"
-            columns: ["post_id"]
-            isOneToOne: false
-            referencedRelation: "posts"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      products_translations: {
-        Row: {
-          id: string
-          product_id: string
-          language_code: string
-          name: string
-          description: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          product_id: string
-          language_code: string
-          name: string
-          description?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          product_id?: string
-          language_code?: string
-          name?: string
-          description?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "products_translations_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      brokers_translations: {
-        Row: {
-          id: string
-          broker_id: string
-          language_code: string
-          description: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          broker_id: string
-          language_code: string
-          description?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          broker_id?: string
-          language_code?: string
-          description?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "brokers_translations_broker_id_fkey"
-            columns: ["broker_id"]
-            isOneToOne: false
-            referencedRelation: "brokers"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       users: {
         Row: {
-          avatar_url: string | null
           bio: string | null
           city: string | null
           country: string | null
@@ -402,7 +418,6 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          avatar_url?: string | null
           bio?: string | null
           city?: string | null
           country?: string | null
@@ -417,7 +432,6 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          avatar_url?: string | null
           bio?: string | null
           city?: string | null
           country?: string | null
@@ -435,52 +449,50 @@ export type Database = {
       }
     }
     Views: {
+      brokers_with_translations: {
+        Row: {
+          created_at: string | null
+          established_in: number | null
+          headquarter: string | null
+          id: string | null
+          is_visible: boolean | null
+          name: string | null
+          translations: Json | null
+          updated_at: string | null
+        }
+        Relationships: []
+      }
       posts_with_translations: {
         Row: {
-          id: string
           author_id: string | null
-          type: Database["public"]["Enums"]["post_type"]
-          status: Database["public"]["Enums"]["post_status"]
-          views: number
+          created_at: string | null
+          id: string | null
           published_at: string | null
-          created_at: string
-          updated_at: string
-          translations: Json
+          status: Database["public"]["Enums"]["post_status"] | null
+          translations: Json | null
+          type: Database["public"]["Enums"]["post_type"] | null
+          updated_at: string | null
+          views: number | null
         }
-        Insert: never
-        Update: never
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products_with_translations: {
         Row: {
-          id: string
-          subscription: boolean | null
-          name: string
-          featured_image_url: string | null
-          price: number
-          description: string | null
-          created_at: string
-          updated_at: string
-          translations: Json
+          affiliate_link: string | null
+          created_at: string | null
+          id: string | null
+          price: number | null
+          translations: Json | null
+          updated_at: string | null
         }
-        Insert: never
-        Update: never
-        Relationships: []
-      }
-      brokers_with_translations: {
-        Row: {
-          id: string
-          is_visible: boolean | null
-          name: string
-          headquarter: string | null
-          established_in: number | null
-          description: string | null
-          created_at: string
-          updated_at: string
-          translations: Json
-        }
-        Insert: never
-        Update: never
         Relationships: []
       }
     }
@@ -488,6 +500,23 @@ export type Database = {
       get_audit_stats: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      get_translated_content: {
+        Args: {
+          content_type: string
+          content_id: string
+          language_code?: string
+          fallback_language?: string
+        }
+        Returns: Json
+      }
+      has_translation: {
+        Args: {
+          content_type: string
+          content_id: string
+          language_code: string
+        }
+        Returns: boolean
       }
       increment_post_views: {
         Args: { post_id: number }
@@ -510,21 +539,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -542,14 +575,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -565,14 +600,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -588,14 +625,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -603,14 +642,16 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never

@@ -160,7 +160,7 @@ const Dashboard: React.FC = () => {
                 </div>
               </div>
               <div className='mt-4 flex items-center space-x-2'>
-                <Badge variant='subscription' size='sm' showIcon>
+                <Badge variant='active' size='sm' showIcon>
                   {stats.subscriptionProducts} {tCommon('content.subscription')}
                 </Badge>
               </div>

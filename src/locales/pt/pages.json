@@ -153,6 +153,8 @@
     "pricing": "Preços",
     "createdDate": "Data de Criação",
     "thisProduct": "este produto",
+    "affiliateLink": "Link de Afiliado",
+    "affiliateLinkShort": "Link de Afiliado",
     "tooltips": {
       "viewProduct": "Ver detalhes do produto",
       "editProduct": "Editar produto",

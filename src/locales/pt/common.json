@@ -399,7 +399,8 @@
     "englishAndPortuguese": "Inglês e Português",
     "completeSettingsToEnableEditing": "Complete as configurações do {{type}} acima, depois salve para habilitar a edição de conteúdo",
     "manageBrokerDescription": "Gerenciar descrição da corretora em vários idiomas",
-    "trackTranslationProgress": "Acompanhar progresso e completude da tradução"
+    "trackTranslationProgress": "Acompanhar progresso e completude da tradução",
+    "productSettings": "Configurações do Produto"
   },
   "filters": {
     "allStatus": "Todos os Status",

@@ -126,8 +126,6 @@ export const BADGE_VARIANTS = {
       'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800',
     'privacy_policy':
       'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800',
-    'subscription':
-      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800',
     'one-time':
       'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800'
   }
@@ -231,13 +229,6 @@ export const FILTER_OPTIONS = {
     { value: 'user', labelKey: 'user' }
   ],
 
-  // Product type filters
-  productType: [
-    { value: 'all', labelKey: 'allTypes' },
-    { value: 'subscription', labelKey: 'subscription' },
-    { value: 'one-time', labelKey: 'oneTime' }
-  ],
-
   // Post status filters
   postStatus: [
     { value: 'all', labelKey: 'allStatus' },
@@ -280,20 +271,6 @@ export const FILTER_OPTIONS = {
  * Form select options for consistent form options across components
  */
 export const FORM_OPTIONS = {
-  // Product type options
-  productType: [
-    {
-      value: 'false',
-      labelKey: 'oneTimePurchase',
-      icon: 'Package'
-    },
-    {
-      value: 'true',
-      labelKey: 'subscription',
-      icon: 'Zap'
-    }
-  ],
-
   // Post type options
   postType: [
     {

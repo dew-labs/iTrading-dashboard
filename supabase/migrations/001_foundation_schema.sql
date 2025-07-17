@@ -75,11 +75,8 @@ CREATE TABLE posts (
 -- Products table (e-commerce/catalog items)
 CREATE TABLE products (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  subscription boolean DEFAULT false,
-  name varchar NOT NULL,
-  featured_image_url text,
   price numeric NOT NULL,
-  description text,
+  affiliate_link text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
@@ -192,4 +189,4 @@ COMMENT ON COLUMN images.blurhash IS 'Blurhash string for low-res image placehol
 COMMENT ON COLUMN images.record_id IS 'UUID of the record this image belongs to (posts.id, products.id, etc.)';
 COMMENT ON COLUMN posts.author_id IS 'Reference to the user who created this post';
 COMMENT ON COLUMN posts.views IS 'Number of times this post has been viewed';
-COMMENT ON COLUMN products.featured_image_url IS 'Main product image for display and listings';
+COMMENT ON COLUMN products.affiliate_link IS 'Affiliate link for the product (external or internal URL)';

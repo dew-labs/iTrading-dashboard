@@ -9,8 +9,6 @@ import {
   Calendar,
   Scale,
   Lock,
-  Zap,
-  Package,
   Gavel,
   Shield
 } from 'lucide-react'
@@ -84,11 +82,6 @@ const Badge: React.FC<BadgeProps> = ({
       return <Lock className={iconSize} />
 
       // Product Types
-    case 'subscription':
-      return <Zap className={iconSize} />
-    case 'one-time':
-      return <Package className={iconSize} />
-
     default:
       return <User className={iconSize} />
     }

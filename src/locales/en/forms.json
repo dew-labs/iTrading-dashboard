@@ -29,6 +29,7 @@
     "category": "Category",
     "tags": "Tags",
     "image": "Image",
+    "featuredImage": "Featured Image",
     "file": "File",
     "price": "Price",
     "quantity": "Quantity",
@@ -58,7 +59,8 @@
     "bio": "Bio",
     "location": "Location",
     "bannerImage": "Banner Image",
-    "bannerStatus": "Banner Status"
+    "bannerStatus": "Banner Status",
+    "affiliateLink": "Affiliate Link"
   },
   "placeholders": {
     "enterFirstName": "Enter first name",
@@ -114,7 +116,8 @@
     "productDescription": "Describe your product features, benefits, and details...",
     "bio": "Tell us about yourself - your background, interests, and experience...",
     "city": "Enter city",
-    "enterFieldInLanguage": "Enter {{field}} in {{language}}"
+    "enterFieldInLanguage": "Enter {{field}} in {{language}}",
+    "affiliateLink": "Enter affiliate link"
   },
   "validation": {
     "required": "Required",
@@ -168,7 +171,8 @@
     "brokerEstablishedHelper": "Year the brokerage was founded",
     "bannerNameHelper": "A clear name to identify this banner in your dashboard",
     "bannerTargetUrlHelper": "Where users will be redirected when they click the banner",
-    "productNameHelper": "A clear, descriptive name for your product"
+    "productNameHelper": "A clear, descriptive name for your product",
+    "affiliateLinkHelper": "A referral or affiliate link for this product (optional)"
   },
   "bannerForm": {
     "clickToUpload": "Click to upload banner image",

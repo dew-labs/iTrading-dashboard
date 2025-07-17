@@ -74,6 +74,14 @@ export const formatNumber = (value: number, decimals = 0): string => {
   }).format(value)
 }
 
+// Custom price formatter: no decimals if integer, two decimals if not
+export const formatPrice = (value: number): string => {
+  if (Number.isInteger(value)) {
+    return value.toLocaleString('en-US')
+  }
+  return value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
 // Text formatting functions
 export const formatRoleLabel = (role: string): string => {
   switch (role) {
@@ -212,6 +220,7 @@ export default {
   formatCurrency,
   formatPercent,
   formatNumber,
+  formatPrice,
   formatRoleLabel,
   formatTypeLabel,
   formatStatusLabel,

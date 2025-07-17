@@ -7,7 +7,7 @@ export * from './users'
 export * from './images'
 export * from './brokers'
 export * from './audits'
-export * from './translations'
+// export * from './translations' // Remove this or only export non-duplicate types
 
 // Keep the main Database interface export
 export type { Database } from './database'

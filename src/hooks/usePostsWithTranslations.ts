@@ -28,7 +28,7 @@ export const usePostsWithTranslations = (languageCode?: LanguageCode) => {
     refetch
   } = useQuery<PostWithTranslations[]>({
     queryKey: ['posts-with-translations', currentLanguage],
-    queryFn: () => TranslationService.getPostsWithTranslations(currentLanguage),
+    queryFn: () => TranslationService.getPostsWithTranslations(),
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000 // Keep in cache for 5 minutes
   })
@@ -148,7 +148,7 @@ export const useProductsWithTranslations = (languageCode?: LanguageCode) => {
     refetch
   } = useQuery({
     queryKey: ['products-with-translations', currentLanguage],
-    queryFn: () => TranslationService.getProductsWithTranslations(currentLanguage),
+    queryFn: () => TranslationService.getProductsWithTranslations(),
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000 // Keep in cache for 5 minutes
   })
@@ -226,7 +226,7 @@ export const useBrokersWithTranslations = (languageCode?: LanguageCode) => {
     refetch
   } = useQuery({
     queryKey: ['brokers-with-translations', currentLanguage],
-    queryFn: () => TranslationService.getBrokersWithTranslations(currentLanguage),
+    queryFn: () => TranslationService.getBrokersWithTranslations(),
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000 // Keep in cache for 5 minutes
   })

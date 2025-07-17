@@ -171,63 +171,58 @@ END $$;
 -- PRODUCTS (Trading & Investment Products)
 -- ===============================================
 
-INSERT INTO products (name, price, description, featured_image_url, subscription) VALUES
-(
-  'Premium Trading Platform',
-  49.99,
-  'Advanced trading platform with real-time market data, advanced charting tools, portfolio analytics, and priority customer support. Perfect for active traders who need professional-grade tools.',
-  NULL,
-  true
-),
-(
-  'Market Research Pro',
-  29.99,
-  'Comprehensive market research and analysis tools including sector analysis, earnings forecasts, technical indicators, and expert market insights updated daily.',
-  NULL,
-  true
-),
-(
-  'Algorithmic Trading Suite',
-  199.99,
-  'Complete algorithmic trading solution with backtesting capabilities, strategy development tools, and automated execution. Includes popular trading algorithms and custom strategy builder.',
-  NULL,
-  false
-),
-(
-  'Risk Management Dashboard',
-  79.99,
-  'Professional risk management tools with portfolio risk assessment, Value at Risk (VaR) calculations, stress testing, and real-time risk monitoring for your investments.',
-  NULL,
-  true
-),
-(
-  'Mobile Trading App Pro',
-  19.99,
-  'Enhanced mobile trading experience with advanced order types, real-time alerts, mobile charts, and seamless synchronization across all your devices.',
-  NULL,
-  true
-),
-(
-  'Educational Trading Course',
-  149.99,
-  'Comprehensive online trading course covering fundamentals, technical analysis, risk management, and advanced trading strategies. Includes video lessons, quizzes, and certification.',
-  NULL,
-  false
-),
-(
-  'Portfolio Analytics Pro',
-  39.99,
-  'Advanced portfolio analysis with performance attribution, benchmark comparison, asset allocation tracking, and detailed reporting tools for serious investors.',
-  NULL,
-  true
-),
-(
-  'Options Trading Tools',
-  89.99,
-  'Specialized options trading platform with options chain analysis, volatility modeling, Greeks calculator, and strategy analyzer for options traders.',
-  NULL,
-  true
-);
+DO $$
+DECLARE
+    prod_id uuid;
+BEGIN
+    -- Premium Trading Platform
+    INSERT INTO products (price, affiliate_link) VALUES
+      (49.99, 'https://affiliate.example.com/premium-trading-platform') RETURNING id INTO prod_id;
+    INSERT INTO products_translations (product_id, language_code, name, description) VALUES
+      (prod_id, 'en', 'Premium Trading Platform', 'Advanced trading platform with real-time market data, advanced charting tools, portfolio analytics, and priority customer support. Perfect for active traders who need professional-grade tools.');
+
+    -- Market Research Pro
+    INSERT INTO products (price, affiliate_link) VALUES
+      (29.99, 'https://affiliate.example.com/market-research-pro') RETURNING id INTO prod_id;
+    INSERT INTO products_translations (product_id, language_code, name, description) VALUES
+      (prod_id, 'en', 'Market Research Pro', 'Comprehensive market research and analysis tools including sector analysis, earnings forecasts, technical indicators, and expert market insights updated daily.');
+
+    -- Algorithmic Trading Suite
+    INSERT INTO products (price, affiliate_link) VALUES
+      (199.99, 'https://affiliate.example.com/algorithmic-trading-suite') RETURNING id INTO prod_id;
+    INSERT INTO products_translations (product_id, language_code, name, description) VALUES
+      (prod_id, 'en', 'Algorithmic Trading Suite', 'Complete algorithmic trading solution with backtesting capabilities, strategy development tools, and automated execution. Includes popular trading algorithms and custom strategy builder.');
+
+    -- Risk Management Dashboard
+    INSERT INTO products (price, affiliate_link) VALUES
+      (79.99, 'https://affiliate.example.com/risk-management-dashboard') RETURNING id INTO prod_id;
+    INSERT INTO products_translations (product_id, language_code, name, description) VALUES
+      (prod_id, 'en', 'Risk Management Dashboard', 'Professional risk management tools with portfolio risk assessment, Value at Risk (VaR) calculations, stress testing, and real-time risk monitoring for your investments.');
+
+    -- Mobile Trading App Pro
+    INSERT INTO products (price, affiliate_link) VALUES
+      (19.99, 'https://affiliate.example.com/mobile-trading-app-pro') RETURNING id INTO prod_id;
+    INSERT INTO products_translations (product_id, language_code, name, description) VALUES
+      (prod_id, 'en', 'Mobile Trading App Pro', 'Enhanced mobile trading experience with advanced order types, real-time alerts, mobile charts, and seamless synchronization across all your devices.');
+
+    -- Educational Trading Course
+    INSERT INTO products (price, affiliate_link) VALUES
+      (149.99, 'https://affiliate.example.com/educational-trading-course') RETURNING id INTO prod_id;
+    INSERT INTO products_translations (product_id, language_code, name, description) VALUES
+      (prod_id, 'en', 'Educational Trading Course', 'Comprehensive online trading course covering fundamentals, technical analysis, risk management, and advanced trading strategies. Includes video lessons, quizzes, and certification.');
+
+    -- Portfolio Analytics Pro
+    INSERT INTO products (price, affiliate_link) VALUES
+      (39.99, 'https://affiliate.example.com/portfolio-analytics-pro') RETURNING id INTO prod_id;
+    INSERT INTO products_translations (product_id, language_code, name, description) VALUES
+      (prod_id, 'en', 'Portfolio Analytics Pro', 'Advanced portfolio analysis with performance attribution, benchmark comparison, asset allocation tracking, and detailed reporting tools for serious investors.');
+
+    -- Options Trading Tools
+    INSERT INTO products (price, affiliate_link) VALUES
+      (89.99, 'https://affiliate.example.com/options-trading-tools') RETURNING id INTO prod_id;
+    INSERT INTO products_translations (product_id, language_code, name, description) VALUES
+      (prod_id, 'en', 'Options Trading Tools', 'Specialized options trading platform with options chain analysis, volatility modeling, Greeks calculator, and strategy analyzer for options traders.');
+END $$;
 
 -- ===============================================
 -- POSTS (Trading News & Content) - Using Admin as Author

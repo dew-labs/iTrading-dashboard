@@ -7,7 +7,8 @@ import {
   Users,
   X,
   Pin,
-  Building2
+  Building2,
+  Package
 } from 'lucide-react'
 import { usePermissions } from '../../hooks/usePermissions'
 import { useNavigationTranslation, useTranslation } from '../../hooks/useTranslation'
@@ -54,6 +55,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
           icon: FileText,
           path: '/posts',
           resource: 'posts',
+          action: 'read'
+        },
+        {
+          id: 'products',
+          labelKey: 'products',
+          icon: Package,
+          path: '/products',
+          resource: 'products',
           action: 'read'
         },
         {

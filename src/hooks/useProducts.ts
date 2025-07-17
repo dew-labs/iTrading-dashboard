@@ -1,17 +1,43 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, queryKeys, supabaseHelpers } from '../lib/supabase'
-import type { Product, ProductInsert, ProductUpdate } from '../types'
+import type { ProductWithTranslations } from '../types'
 import { useToast } from './useToast'
 
 // Fetch functions
-const fetchProducts = async (): Promise<Product[]> => {
-  return supabaseHelpers.fetchData(
-    supabase.from('products').select('*').order('created_at', { ascending: false })
+const fetchProducts = async (): Promise<ProductWithTranslations[]> => {
+  const { data, error } = await supabase
+    .from('products_with_translations')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  // Parse translations JSON to array
+  return (
+    data?.map((row) => ({
+      ...row,
+      // Ensure all required fields are present and not null
+      id: row.id || '',
+      price: row.price ?? 0,
+      affiliate_link: row.affiliate_link ?? null,
+      created_at: row.created_at || '',
+      updated_at: row.updated_at || '',
+      translations: Array.isArray(row.translations)
+        ? row.translations
+        : typeof row.translations === 'string'
+        ? JSON.parse(row.translations)
+        : []
+    })) ?? []
   )
 }
 
-const createProductMutation = async (product: ProductInsert): Promise<Product> => {
-  return supabaseHelpers.insertData(supabase.from('products').insert([product]).select().single())
+const createProductMutation = async (product: ProductWithTranslations): Promise<ProductWithTranslations> => {
+  // eslint-disable-next-line camelcase
+  const { price, affiliate_link, created_at, updated_at } = product;
+
+  return supabaseHelpers.insertData(
+    // eslint-disable-next-line camelcase
+    supabase.from('products').insert([{ price, affiliate_link, created_at, updated_at }]).select().single()
+  );
 }
 
 const updateProductMutation = async ({
@@ -19,11 +45,15 @@ const updateProductMutation = async ({
   updates
 }: {
   id: string
-  updates: ProductUpdate
-}): Promise<Product> => {
+  updates: ProductWithTranslations
+}): Promise<ProductWithTranslations> => {
+  // eslint-disable-next-line camelcase
+  const { price, affiliate_link, updated_at } = updates;
+
   return supabaseHelpers.updateData(
-    supabase.from('products').update(updates).eq('id', id).select().single()
-  )
+    // eslint-disable-next-line camelcase
+    supabase.from('products').update({ price, affiliate_link, updated_at }).eq('id', id).select().single()
+  );
 }
 
 const deleteProductMutation = async (id: string): Promise<void> => {
@@ -55,21 +85,19 @@ export const useProducts = () => {
       await queryClient.cancelQueries({ queryKey: queryKeys.products() })
 
       // Snapshot the previous value
-      const previousProducts = queryClient.getQueryData<Product[]>(queryKeys.products())
+      const previousProducts = queryClient.getQueryData<ProductWithTranslations[]>(queryKeys.products())
 
       // Optimistically update to the new value
-      const optimisticProduct: Product = {
-        id: `temp-${Date.now()}`, // Temporary ID
-        name: newProduct.name,
-        description: newProduct.description || null,
+      const optimisticProduct: ProductWithTranslations = {
+        id: `temp-${Date.now()}`,
         price: newProduct.price,
-        subscription: newProduct.subscription || false,
-        featured_image_url: newProduct.featured_image_url || null,
+        affiliate_link: newProduct.affiliate_link || null,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        translations: newProduct.translations || []
       }
 
-      queryClient.setQueryData<Product[]>(queryKeys.products(), (old = []) => [
+      queryClient.setQueryData<ProductWithTranslations[]>(queryKeys.products(), (old = []) => [
         optimisticProduct,
         ...old
       ])
@@ -98,10 +126,10 @@ export const useProducts = () => {
     onMutate: async ({ id, updates }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.products() })
 
-      const previousProducts = queryClient.getQueryData<Product[]>(queryKeys.products())
+      const previousProducts = queryClient.getQueryData<ProductWithTranslations[]>(queryKeys.products())
 
       // Optimistically update
-      queryClient.setQueryData<Product[]>(queryKeys.products(), (old = []) =>
+      queryClient.setQueryData<ProductWithTranslations[]>(queryKeys.products(), (old = []) =>
         old.map(product => (product.id === id ? { ...product, ...updates } : product))
       )
 
@@ -126,10 +154,10 @@ export const useProducts = () => {
     onMutate: async deletedId => {
       await queryClient.cancelQueries({ queryKey: queryKeys.products() })
 
-      const previousProducts = queryClient.getQueryData<Product[]>(queryKeys.products())
+      const previousProducts = queryClient.getQueryData<ProductWithTranslations[]>(queryKeys.products())
 
       // Optimistically remove the product
-      queryClient.setQueryData<Product[]>(queryKeys.products(), (old = []) =>
+      queryClient.setQueryData<ProductWithTranslations[]>(queryKeys.products(), (old = []) =>
         old.filter(product => product.id !== deletedId)
       )
 
@@ -152,8 +180,8 @@ export const useProducts = () => {
     products,
     loading,
     error: error as Error | null,
-    createProduct: (product: ProductInsert) => createMutation.mutateAsync(product),
-    updateProduct: (id: string, updates: ProductUpdate) =>
+    createProduct: (product: ProductWithTranslations) => createMutation.mutateAsync(product),
+    updateProduct: (id: string, updates: ProductWithTranslations) =>
       updateMutation.mutateAsync({ id, updates }),
     deleteProduct: (id: string) => deleteMutation.mutateAsync(id),
     refetch,

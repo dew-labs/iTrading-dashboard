@@ -29,6 +29,7 @@
     "category": "Categoria",
     "tags": "Tags",
     "image": "Imagem",
+    "featuredImage": "Imagem Destacada",
     "file": "Arquivo",
     "price": "Preço",
     "quantity": "Quantidade",
@@ -58,7 +59,8 @@
     "bio": "Bio",
     "location": "Localização",
     "bannerImage": "Imagem do Banner",
-    "bannerStatus": "Status do Banner"
+    "bannerStatus": "Status do Banner",
+    "affiliateLink": "Link de Afiliado"
   },
   "placeholders": {
     "enterFirstName": "Digite o nome",
@@ -114,7 +116,8 @@
     "country": "Selecione o país",
     "bio": "Conte-nos sobre você - sua formação, interesses e experiência...",
     "city": "Digite a cidade",
-    "enterFieldInLanguage": "Digite {{field}} em {{language}}"
+    "enterFieldInLanguage": "Digite {{field}} em {{language}}",
+    "affiliateLink": "Insira o link de afiliado"
   },
   "validation": {
     "required": "Obrigatório",
@@ -161,7 +164,8 @@
     "brokerEstablishedHelper": "Ano em que a corretora foi fundada",
     "bannerNameHelper": "Um nome claro para identificar este banner no seu painel",
     "bannerTargetUrlHelper": "Para onde os usuários serão redirecionados ao clicar no banner",
-    "productNameHelper": "Um nome claro e descritivo para seu produto"
+    "productNameHelper": "Um nome claro e descritivo para seu produto",
+    "affiliateLinkHelper": "Um link de indicação ou afiliado para este produto (opcional)"
   },
   "bannerForm": {
     "clickToUpload": "Clique para fazer upload da imagem do banner",

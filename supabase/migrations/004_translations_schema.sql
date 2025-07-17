@@ -111,7 +111,11 @@ GROUP BY p.id, p.author_id, p.type, p.status, p.views, p.published_at, p.created
 -- Products with translations view
 CREATE VIEW products_with_translations AS
 SELECT
-  p.*,
+  p.id,
+  p.price,
+  p.affiliate_link,
+  p.created_at,
+  p.updated_at,
   json_agg(
     json_build_object(
       'id', pt.id,
@@ -124,7 +128,7 @@ SELECT
   ) FILTER (WHERE pt.id IS NOT NULL) as translations
 FROM products p
 LEFT JOIN products_translations pt ON p.id = pt.product_id
-GROUP BY p.id, p.subscription, p.name, p.featured_image_url, p.price, p.description, p.created_at, p.updated_at;
+GROUP BY p.id, p.price, p.affiliate_link, p.created_at, p.updated_at;
 
 -- Brokers with translations view
 CREATE VIEW brokers_with_translations AS

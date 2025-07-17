@@ -258,7 +258,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               </div>
 
               <Avatar
-                src={profile?.avatar_url ?? null}
+                src={null}
                 alt={`${profile?.full_name || user?.email} avatar`}
                 size='md'
                 fallback={user?.email?.charAt(0).toUpperCase() || 'U'}
@@ -281,7 +281,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 <div className='px-4 py-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800'>
                   <div className='flex items-center space-x-4'>
                     <Avatar
-                      src={profile?.avatar_url ?? null}
+                      src={null}
                       alt={`${profile?.full_name || user?.email} avatar`}
                       size='lg'
                       fallback={user?.email?.charAt(0).toUpperCase() || 'U'}

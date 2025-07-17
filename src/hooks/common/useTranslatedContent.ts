@@ -64,11 +64,11 @@ export function useTranslatedContent<T extends { id: string; translations?: Tran
     queryFn: async () => {
       switch (contentType) {
         case 'posts':
-          return TranslationService.getPostsWithTranslations(currentLanguage)
+          return TranslationService.getPostsWithTranslations()
         case 'products':
-          return TranslationService.getProductsWithTranslations(currentLanguage)
+          return TranslationService.getProductsWithTranslations()
         case 'brokers':
-          return TranslationService.getBrokersWithTranslations(currentLanguage)
+          return TranslationService.getBrokersWithTranslations()
         default:
           throw new Error(`Unsupported content type: ${contentType}`)
       }
@@ -309,11 +309,11 @@ export function useTranslationContext() {
         queryFn: async () => {
           switch (contentType) {
             case 'posts':
-              return TranslationService.getPostsWithTranslations(language)
+              return TranslationService.getPostsWithTranslations()
             case 'products':
-              return TranslationService.getProductsWithTranslations(language)
+              return TranslationService.getProductsWithTranslations()
             case 'brokers':
-              return TranslationService.getBrokersWithTranslations(language)
+              return TranslationService.getBrokersWithTranslations()
             default:
               return []
           }

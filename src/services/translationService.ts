@@ -57,9 +57,7 @@ export class TranslationService {
   /**
    * Get posts with translations
    */
-  static async getPostsWithTranslations(
-    languageCode?: LanguageCode
-  ): Promise<PostWithTranslations[]> {
+  static async getPostsWithTranslations(): Promise<PostWithTranslations[]> {
     const { data, error } = await supabase
       .from('posts_with_translations')
       .select('*')
@@ -71,16 +69,20 @@ export class TranslationService {
     }
 
     return (data || []).map(post => {
-      const translations = Array.isArray(post.translations)
-        ? (post.translations as unknown as PostTranslation[])
-        : []
-
       return {
         ...post,
-        translations,
-        currentTranslation: languageCode && translations.length > 0
-          ? translations.find((t: PostTranslation) => t.language_code === languageCode)
-          : undefined
+        id: post.id ?? '',
+        created_at: post.created_at ?? '',
+        updated_at: post.updated_at ?? '',
+        status: post.status ?? 'draft',
+        type: post.type ?? 'news',
+        views: post.views ?? 0,
+        translations: Array.isArray(post.translations)
+          ? post.translations
+          : typeof post.translations === 'string'
+            ? JSON.parse(post.translations)
+            : [],
+        // ... other fields
       }
     })
   }
@@ -225,9 +227,7 @@ export class TranslationService {
   /**
    * Get products with translations
    */
-  static async getProductsWithTranslations(
-    languageCode?: LanguageCode
-  ): Promise<ProductWithTranslations[]> {
+  static async getProductsWithTranslations(): Promise<ProductWithTranslations[]> {
     const { data, error } = await supabase
       .from('products_with_translations')
       .select('*')
@@ -239,16 +239,19 @@ export class TranslationService {
     }
 
     return (data || []).map(product => {
-      const translations = Array.isArray(product.translations)
-        ? (product.translations as unknown as ProductTranslation[])
-        : []
-
       return {
         ...product,
-        translations,
-        currentTranslation: languageCode && translations.length > 0
-          ? translations.find((t: ProductTranslation) => t.language_code === languageCode)
-          : undefined
+        id: product.id ?? '',
+        created_at: product.created_at ?? '',
+        updated_at: product.updated_at ?? '',
+        price: product.price ?? 0,
+        affiliate_link: product.affiliate_link ?? null,
+        translations: Array.isArray(product.translations)
+          ? product.translations
+          : typeof product.translations === 'string'
+            ? JSON.parse(product.translations)
+            : [],
+        // ... other fields
       }
     })
   }
@@ -393,9 +396,7 @@ export class TranslationService {
   /**
    * Get brokers with translations
    */
-  static async getBrokersWithTranslations(
-    languageCode?: LanguageCode
-  ): Promise<BrokerWithTranslations[]> {
+  static async getBrokersWithTranslations(): Promise<BrokerWithTranslations[]> {
     const { data, error } = await supabase
       .from('brokers_with_translations')
       .select('*')
@@ -407,16 +408,18 @@ export class TranslationService {
     }
 
     return (data || []).map(broker => {
-      const translations = Array.isArray(broker.translations)
-        ? (broker.translations as unknown as BrokerTranslation[])
-        : []
-
       return {
         ...broker,
-        translations,
-        currentTranslation: languageCode && translations.length > 0
-          ? translations.find((t: BrokerTranslation) => t.language_code === languageCode)
-          : undefined
+        id: broker.id ?? '',
+        name: broker.name ?? '',
+        created_at: broker.created_at ?? '',
+        updated_at: broker.updated_at ?? '',
+        translations: Array.isArray(broker.translations)
+          ? broker.translations
+          : typeof broker.translations === 'string'
+            ? JSON.parse(broker.translations)
+            : [],
+        // ... other fields
       }
     })
   }

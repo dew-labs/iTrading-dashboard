@@ -1,38 +1,31 @@
 import React, { useState } from 'react'
 import { Plus, Search } from 'lucide-react'
+import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
 import { useProducts } from '../hooks/useProducts'
 import { useProductsFiltering } from '../hooks/useProductsFiltering'
-import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
-import { FilterDropdown, ProductsTable, ProductsStats, Modal, PaginationSelector, Button, Input } from '../components'
-import { ProductForm } from '../components/features/products'
+import { ProductsTable, ProductsStats, ProductForm, Modal, PaginationSelector, Button, Input } from '../components'
 import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
-import { formatDateDisplay } from '../utils/format'
-import type { Product, ProductInsert } from '../types'
-import { useQuery } from '@tanstack/react-query'
+import type { ProductWithTranslations, ProductInsert, Image } from '../types'
+import { useImages } from '../hooks/useImages'
 import { groupImagesByRecord } from '../utils'
-import { supabase } from '../lib/supabase'
-
-// Theme imports
-import {
-  getPageLayoutClasses,
-  getTypographyClasses,
-  cn
-} from '../utils/theme'
+import { getPageLayoutClasses, getTypographyClasses, cn } from '../utils/theme'
+import ProductViewModal from '../components/features/products/ProductViewModal'
 
 const Products: React.FC = () => {
   const { products, loading, createProduct, updateProduct, deleteProduct } = useProducts()
-  const { t } = usePageTranslation() // Page-specific content
-  const { t: tCommon } = useTranslation() // Common actions and terms
+  const { t } = usePageTranslation()
+  const { t: tCommon, i18n } = useTranslation()
+  const { images: productImages, createImage, deleteImage } = useImages('products')
+  // useTranslation already provides i18n
 
-  // Use the filtering hook for all business logic
+  // Filtering logic
   const {
     filterState,
     filteredAndSortedProducts,
     paginatedProducts,
     totalPages,
     setSearchTerm,
-    setFilterType,
     setItemsPerPage,
     setPageInputValue,
     handleSort,
@@ -40,52 +33,46 @@ const Products: React.FC = () => {
   } = useProductsFiltering({ products })
 
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
-  const [viewingProduct, setViewingProduct] = useState<Product | null>(null)
-
-  // Confirm dialog state
-  const [confirmDialog, setConfirmDialog] = useState<{
+  const [editingProduct, setEditingProduct] = useState<ProductWithTranslations | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<{
     isOpen: boolean
-    productId: string | null
-    productName: string | null
+    product: ProductWithTranslations | null
+    isDeleting: boolean
   }>({
     isOpen: false,
-    productId: null,
-    productName: null
+    product: null,
+    isDeleting: false
   })
+  const [viewingProduct, setViewingProduct] = useState<ProductWithTranslations | null>(null)
 
   // Theme classes
   const layout = getPageLayoutClasses()
 
-  const handleView = (product: Product) => {
+  const handleView = (product: ProductWithTranslations) => {
     setViewingProduct(product)
   }
 
-  const handleEdit = (product: Product) => {
+  const handleEdit = (product: ProductWithTranslations) => {
     setEditingProduct(product)
     setIsModalOpen(true)
   }
 
-  const handleDelete = (product: Product) => {
-    setConfirmDialog({
-      isOpen: true,
-      productId: product.id.toString(),
-      productName: product.name
-    })
+  const handleDelete = (product: ProductWithTranslations) => {
+    setDeleteConfirm({ isOpen: true, product, isDeleting: false })
   }
 
   const confirmDelete = async () => {
-    if (!confirmDialog.productId) return
-
+    if (!deleteConfirm.product) return
+    setDeleteConfirm(prev => ({ ...prev, isDeleting: true }))
     try {
-      await deleteProduct(confirmDialog.productId)
-      setConfirmDialog({ isOpen: false, productId: null, productName: null })
-      // Reset to first page if current page becomes empty
+      await deleteProduct(deleteConfirm.product.id)
+      setDeleteConfirm({ isOpen: false, product: null, isDeleting: false })
       if (paginatedProducts.length === 1 && filterState.currentPage > 1) {
         handlePageChange(filterState.currentPage - 1)
       }
     } catch (error) {
       console.error('Failed to delete product:', error)
+      setDeleteConfirm(prev => ({ ...prev, isDeleting: false }))
     }
   }
 
@@ -94,14 +81,52 @@ const Products: React.FC = () => {
     setEditingProduct(null)
   }
 
-  const handleSubmit = async (data: ProductInsert) => {
+  const handleSubmit = async (
+    data: ProductInsert,
+    featuredImage: (Partial<Image> & { file?: File }) | null | undefined
+  ) => {
     try {
+      let productId = editingProduct?.id
       if (editingProduct) {
-        await updateProduct(editingProduct.id, data)
+        await updateProduct(editingProduct.id, {
+          ...editingProduct,
+          ...data,
+          updated_at: new Date().toISOString(),
+        })
       } else {
-        await createProduct(data)
-        // Go to first page to see the new product
+        const now = new Date().toISOString()
+        const newProductObj: ProductWithTranslations = {
+          id: '', // Supabase will assign
+          // name and description are handled via translations, not here
+          price: data.price,
+          affiliate_link: data.affiliate_link ?? null,
+          created_at: now,
+          updated_at: now,
+          translations: [],
+        }
+        const newProduct = await createProduct(newProductObj)
+        productId = newProduct.id
         handlePageChange(1)
+      }
+      if (!productId) return
+      const existingImage = productImages.find(
+        img => img.record_id === productId && img.type === 'featured'
+      )
+      // Remove image
+      if (!featuredImage && existingImage) {
+        await deleteImage(existingImage.id)
+      }
+      // Add or update image
+      if (featuredImage && featuredImage.file) {
+        if (existingImage) {
+          await deleteImage(existingImage.id)
+        }
+        // Remove 'file', 'publicUrl', and 'url' from the payload before saving
+        const { file: _file, publicUrl: _publicUrl, url: _url, ...imageData } = featuredImage as { publicUrl?: string; url?: string; file?: File } & typeof featuredImage
+        await createImage({
+          ...imageData,
+          record_id: productId,
+        } as Image)
       }
       handleCloseModal()
     } catch (error) {
@@ -109,28 +134,7 @@ const Products: React.FC = () => {
     }
   }
 
-  // Use predefined filter options
-  const typeOptions = [
-    { value: 'all', label: tCommon('general.all') },
-    { value: 'subscription', label: tCommon('content.subscription') },
-    { value: 'oneTime', label: tCommon('content.oneTime') }
-  ]
-
-  const productIds = paginatedProducts.map(product => String(product.id))
-  const { data: images = [] } = useQuery({
-    queryKey: ['images', 'products', productIds],
-    queryFn: async () => {
-      if (productIds.length === 0) return []
-      const { data } = await supabase
-        .from('images')
-        .select('*')
-        .eq('table_name', 'products')
-        .in('record_id', productIds)
-      return data || []
-    },
-    enabled: productIds.length > 0
-  })
-  const imagesByRecord = groupImagesByRecord(images)['products'] || {}
+  const imagesByRecord = groupImagesByRecord(productImages)['products'] || {}
 
   if (loading) {
     return (
@@ -167,7 +171,7 @@ const Products: React.FC = () => {
         <ProductsStats products={products} />
 
         {/* Enhanced Filters */}
-        <div className='bg-white rounded-xl border border-gray-200 shadow-sm'>
+        <div className='bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm'>
           <div className='p-6 space-y-4'>
             {/* Search and filters row */}
             <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4'>
@@ -182,32 +186,22 @@ const Products: React.FC = () => {
                   className='transition-all duration-200 w-full max-w-full focus:w-[32rem]'
                 />
               </div>
-
-              <div className='flex items-center space-x-3'>
-                <FilterDropdown
-                  options={typeOptions}
-                  value={filterState.filterType}
-                  onChange={value => {
-                    setFilterType(value as 'all' | 'subscription' | 'oneTime')
-                    handlePageChange(1)
-                  }}
-                  label={tCommon('general.type')}
-                />
-              </div>
             </div>
-
             {/* Table */}
             <ProductsTable
-              products={paginatedProducts}
+              products={paginatedProducts as ProductWithTranslations[]}
               imagesByRecord={imagesByRecord}
               onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDelete}
-              onSort={handleSort}
+              onSort={(col) => {
+                if (col === 'created_at' || col === 'price') {
+                  handleSort(col)
+                }
+              }}
               sortColumn={filterState.sortColumn}
               sortDirection={filterState.sortDirection}
             />
-
             {/* Pagination */}
             <div className='flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 py-3'>
               <div className='flex items-center space-x-6'>
@@ -215,11 +209,11 @@ const Products: React.FC = () => {
                   value={filterState.itemsPerPage}
                   onChange={value => {
                     setItemsPerPage(value)
-                    handlePageChange(1) // Reset to first page when changing items per page
+                    handlePageChange(1)
                   }}
                 />
                 <div className='flex items-center'>
-                  <span className='text-sm text-gray-700'>
+                  <span className='text-sm text-gray-700 dark:text-gray-300'>
                     {tCommon('pagination.showingRows', {
                       startItem: (filterState.currentPage - 1) * filterState.itemsPerPage + 1,
                       endItem: Math.min(
@@ -231,12 +225,11 @@ const Products: React.FC = () => {
                   </span>
                 </div>
               </div>
-
               <div className='flex items-center space-x-2'>
                 <button
                   onClick={() => handlePageChange(filterState.currentPage - 1)}
                   disabled={filterState.currentPage === 1}
-                  className='p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
+                  className='p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                 >
                   <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                     <path
@@ -248,7 +241,7 @@ const Products: React.FC = () => {
                   </svg>
                 </button>
                 <div className='flex items-center'>
-                  <span className='text-sm text-gray-700'>{tCommon('pagination.page')}</span>
+                  <span className='text-sm text-gray-700 dark:text-gray-300'>{tCommon('pagination.page')}</span>
                 </div>
                 <div className='flex items-center space-x-1'>
                   <input
@@ -271,16 +264,16 @@ const Products: React.FC = () => {
                         }
                       }
                     }}
-                    className='w-12 px-2 py-1 text-sm text-center border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black focus:border-black dark:focus:ring-2 dark:focus:ring-white dark:focus:border-white bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors duration-200'
+                    className='w-12 px-2 py-1 text-sm text-center border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-black focus:border-black dark:focus:ring-2 dark:focus:ring-white dark:focus:border-white bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors duration-200'
                   />
-                  <span className='text-sm text-gray-700'>
+                  <span className='text-sm text-gray-700 dark:text-gray-300'>
                     {tCommon('pagination.of')} {totalPages}
                   </span>
                 </div>
                 <button
                   onClick={() => handlePageChange(filterState.currentPage + 1)}
                   disabled={filterState.currentPage === totalPages}
-                  className='p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
+                  className='p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
                 >
                   <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                     <path
@@ -296,96 +289,58 @@ const Products: React.FC = () => {
           </div>
         </div>
 
-        {/* Modal for creating/editing products */}
+        {/* Modals */}
         <Modal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           title={editingProduct ? t('products.editProduct') : t('products.createNewProduct')}
+          size='xl'
         >
           <ProductForm
             product={editingProduct}
             onSubmit={handleSubmit}
             onCancel={handleCloseModal}
+            images={productImages}
           />
         </Modal>
 
-        {/* Modal for viewing product details */}
-        {viewingProduct && (
-          <Modal
-            isOpen={!!viewingProduct}
-            onClose={() => setViewingProduct(null)}
-            title={`${t('products.productDetails')}: ${viewingProduct.name}`}
-          >
-            <div className='space-y-4'>
-              {/* Featured Image */}
-              {viewingProduct.featured_image_url && (
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Featured Image
-                  </label>
-                  <img
-                    src={viewingProduct.featured_image_url}
-                    alt={`${viewingProduct.name} featured image`}
-                    className='w-full max-w-md h-48 object-cover rounded-lg border border-gray-200'
-                  />
-                </div>
-              )}
-
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>
-                  {tCommon('general.name')}
-                </label>
-                <p className='text-gray-900'>{viewingProduct.name}</p>
-              </div>
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>
-                  {tCommon('general.price')}
-                </label>
-                <p className='text-gray-900'>${viewingProduct.price}</p>
-              </div>
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>
-                  {tCommon('general.type')}
-                </label>
-                <p className='text-gray-900'>
-                  {tCommon(
-                    viewingProduct.subscription ? 'content.subscription' : 'content.oneTime'
-                  )}
-                </p>
-              </div>
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>
-                  {tCommon('general.date')}
-                </label>
-                <p className='text-gray-900'>{viewingProduct.created_at ? formatDateDisplay(viewingProduct.created_at) : 'N/A'}</p>
-              </div>
-              {viewingProduct.description && (
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    {tCommon('general.description')}
-                  </label>
-                  <div className='text-gray-900 prose prose-sm max-w-none'>
-                    <div dangerouslySetInnerHTML={{ __html: viewingProduct.description }} />
-                  </div>
-                </div>
-              )}
-            </div>
-          </Modal>
-        )}
-
-        {/* Confirm dialog for deleting products */}
+        {/* Delete Confirmation Dialog */}
         <ConfirmDialog
-          isOpen={confirmDialog.isOpen}
+          isOpen={deleteConfirm.isOpen}
+          onClose={() => setDeleteConfirm({ isOpen: false, product: null, isDeleting: false })}
           onConfirm={confirmDelete}
-          onClose={() => setConfirmDialog({ isOpen: false, productId: null, productName: null })}
           title={t('products.deleteProductTitle')}
-          message={t('products.deleteProductMessage', {
-            productName: confirmDialog.productName || t('products.thisProduct')
+          message={t('products.deleteConfirmText', {
+            name: (() => {
+              const lang = i18n.language || 'en';
+              const translations = deleteConfirm.product?.translations || [];
+              const translation =
+                translations.find(tr => tr.language_code === lang) ||
+                translations.find(tr => tr.language_code === 'en');
+              return translation?.name || t('products.thisProduct');
+            })()
           })}
           confirmLabel={tCommon('actions.delete')}
           cancelLabel={tCommon('actions.cancel')}
           isDestructive={true}
+          isLoading={deleteConfirm.isDeleting}
+          variant='danger'
         />
+
+        {/* Product Viewer Modal (optional, for details) */}
+        {viewingProduct && (
+          <ProductViewModal
+            isOpen={!!viewingProduct}
+            onClose={() => setViewingProduct(null)}
+            product={viewingProduct}
+            image={imagesByRecord[viewingProduct.id]?.[0] ?? null}
+            onEdit={() => {
+              setEditingProduct(viewingProduct)
+              setIsModalOpen(true)
+              setViewingProduct(null)
+            }}
+          />
+        )}
       </div>
     </div>
   )

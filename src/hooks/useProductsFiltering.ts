@@ -4,7 +4,6 @@ import { DEFAULT_VALUES } from '../constants/ui'
 
 export interface FilterState {
   searchTerm: string
-  filterType: 'all' | 'subscription' | 'oneTime'
   sortColumn: keyof Product | null
   sortDirection: 'asc' | 'desc'
   currentPage: number
@@ -23,7 +22,6 @@ export interface UseProductsFilteringReturn {
   paginatedProducts: Product[]
   totalPages: number
   setSearchTerm: (term: string) => void
-  setFilterType: (type: 'all' | 'subscription' | 'oneTime') => void
   setSortColumn: (column: keyof Product | null) => void
   setSortDirection: (direction: 'asc' | 'desc') => void
   setCurrentPage: (page: number) => void
@@ -38,8 +36,7 @@ export const useProductsFiltering = ({
   itemsPerPage: initialItemsPerPage = DEFAULT_VALUES.PAGINATION_LIMIT
 }: UseProductsFilteringProps): UseProductsFilteringReturn => {
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterType, setFilterType] = useState<'all' | 'subscription' | 'oneTime'>('all')
-  const [sortColumn, setSortColumn] = useState<keyof Product | null>('created_at')
+  const [sortColumn, setSortColumn] = useState<keyof Product | null>('created_at');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(initialItemsPerPage)
@@ -47,30 +44,12 @@ export const useProductsFiltering = ({
 
   // Enhanced filtering and sorting
   const filteredAndSortedProducts = useMemo(() => {
-    const filtered = products.filter(product => {
-      const matchesSearch =
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (product.description &&
-          product.description.toLowerCase().includes(searchTerm.toLowerCase()))
-
-      const matchesType =
-        filterType === 'all' ||
-        (filterType === 'subscription' && product.subscription) ||
-        (filterType === 'oneTime' && !product.subscription)
-
-      return matchesSearch && matchesType
-    })
-
-    // Sort products
-    filtered.sort((a, b) => {
+    const sorted = [...products]
+    sorted.sort((a, b) => {
       let aValue: string | number
       let bValue: string | number
 
       switch (sortColumn) {
-      case 'name':
-        aValue = a.name.toLowerCase()
-        bValue = b.name.toLowerCase()
-        break
       case 'price':
         aValue = a.price
         bValue = b.price
@@ -79,6 +58,7 @@ export const useProductsFiltering = ({
       default:
         aValue = a.created_at ? new Date(a.created_at).getTime() : 0
         bValue = b.created_at ? new Date(b.created_at).getTime() : 0
+        break;
       }
 
       if (sortDirection === 'asc') {
@@ -88,8 +68,8 @@ export const useProductsFiltering = ({
       }
     })
 
-    return filtered
-  }, [products, searchTerm, filterType, sortColumn, sortDirection])
+    return sorted
+  }, [products, sortColumn, sortDirection])
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedProducts.length / itemsPerPage)
@@ -101,12 +81,12 @@ export const useProductsFiltering = ({
   // Actions
   const handleSort = (column: keyof Product) => {
     if (column === sortColumn) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
-      setSortColumn(column)
-      setSortDirection('desc')
+      setSortColumn(column);
+      setSortDirection('desc');
     }
-  }
+  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
@@ -115,7 +95,6 @@ export const useProductsFiltering = ({
 
   const filterState: FilterState = {
     searchTerm,
-    filterType,
     sortColumn,
     sortDirection,
     currentPage,
@@ -124,17 +103,13 @@ export const useProductsFiltering = ({
   }
 
   return {
-    // State
     filterState,
 
-    // Computed data
     filteredAndSortedProducts,
     paginatedProducts,
     totalPages,
 
-    // Actions
     setSearchTerm,
-    setFilterType,
     setSortColumn,
     setSortDirection,
     setCurrentPage,
@@ -142,5 +117,5 @@ export const useProductsFiltering = ({
     setPageInputValue,
     handleSort,
     handlePageChange
-  }
+  };
 }

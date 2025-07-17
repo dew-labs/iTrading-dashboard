@@ -122,14 +122,6 @@ export const uploadUserAvatar = async (
       data: { publicUrl }
     } = supabase.storage.from('users').getPublicUrl(filePath)
 
-    // Update user profile
-    const { error: updateError } = await supabase
-      .from('users')
-      .update({ avatar_url: publicUrl })
-      .eq('id', userId)
-
-    if (updateError) throw updateError
-
     return { url: publicUrl }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Failed to upload avatar'

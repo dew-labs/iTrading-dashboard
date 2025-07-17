@@ -1,8 +1,9 @@
 import React from 'react'
-import { Package, Calendar, Tag, TrendingUp } from 'lucide-react'
+import { Package, TrendingUp } from 'lucide-react'
 import { usePageTranslation } from '../../../hooks/useTranslation'
 import { getPageLayoutClasses, getStatsCardProps, getIconClasses } from '../../../utils/theme'
 import type { Product } from '../../../types'
+import { formatPrice } from '../../../utils/format'
 
 interface ProductsStatsProps {
   products: Product[]
@@ -10,8 +11,6 @@ interface ProductsStatsProps {
 
 interface StatsData {
   totalProducts: number
-  subscriptionProducts: number
-  oneTimeProducts: number
   totalValue: number
 }
 
@@ -21,22 +20,15 @@ const ProductsStats: React.FC<ProductsStatsProps> = ({ products }) => {
 
   // Calculate stats
   const stats: StatsData = React.useMemo(() => {
-    const subscriptionProducts = products.filter(p => p.subscription).length
-    const oneTimeProducts = products.filter(p => !p.subscription).length
     const totalValue = products.reduce((sum, p) => sum + p.price, 0)
-
     return {
       totalProducts: products.length,
-      subscriptionProducts,
-      oneTimeProducts,
       totalValue
     }
   }, [products])
 
   // Theme props for each stat card
   const totalProductsProps = getStatsCardProps('products')
-  const subscriptionProps = getStatsCardProps('products')
-  const oneTimeProps = getStatsCardProps('products')
   const revenueProps = getStatsCardProps('products')
 
   return (
@@ -54,32 +46,6 @@ const ProductsStats: React.FC<ProductsStatsProps> = ({ products }) => {
         </div>
       </div>
 
-      {/* Subscription Products */}
-      <div className={subscriptionProps.cardClasses}>
-        <div className='flex items-center'>
-          <div className={getIconClasses('stats', 'posts')}>
-            <Calendar className='w-6 h-6 text-white' />
-          </div>
-          <div className='ml-4'>
-            <div className={subscriptionProps.valueClasses}>{stats.subscriptionProducts}</div>
-            <div className={subscriptionProps.labelClasses}>{t('products.subscriptions')}</div>
-          </div>
-        </div>
-      </div>
-
-      {/* One-Time Products */}
-      <div className={oneTimeProps.cardClasses}>
-        <div className='flex items-center'>
-          <div className={getIconClasses('stats', 'banners')}>
-            <Tag className='w-6 h-6 text-white' />
-          </div>
-          <div className='ml-4'>
-            <div className={oneTimeProps.valueClasses}>{stats.oneTimeProducts}</div>
-            <div className={oneTimeProps.labelClasses}>{t('products.oneTimeProducts')}</div>
-          </div>
-        </div>
-      </div>
-
       {/* Total Value */}
       <div className={revenueProps.cardClasses}>
         <div className='flex items-center'>
@@ -87,7 +53,7 @@ const ProductsStats: React.FC<ProductsStatsProps> = ({ products }) => {
             <TrendingUp className='w-6 h-6 text-white' />
           </div>
           <div className='ml-4'>
-            <div className={revenueProps.valueClasses}>${stats.totalValue.toLocaleString()}</div>
+            <div className={revenueProps.valueClasses}>${formatPrice(stats.totalValue)}</div>
             <div className={revenueProps.labelClasses}>{t('products.totalValue')}</div>
           </div>
         </div>
