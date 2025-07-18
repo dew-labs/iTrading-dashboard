@@ -165,15 +165,15 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 <div className='flex-1 overflow-y-auto min-h-0'>
                   {!hasPermission ? (
                     <div className='px-4 py-6 text-center text-gray-500 dark:text-gray-400'>
-                      <p>You don't have permission to view recent activity</p>
+                      <p>{t('loadingStates.noPermission')}</p>
                     </div>
                   ) : activityLoading ? (
                     <div className='px-4 py-6 text-center text-gray-500 dark:text-gray-400'>
-                      <p>Loading recent activity...</p>
+                      <p>{t('loadingStates.loadingActivity')}</p>
                     </div>
                   ) : recentActivity.length === 0 ? (
                     <div className='px-4 py-6 text-center text-gray-500 dark:text-gray-400'>
-                      <p>No recent activity</p>
+                      <p>{t('loadingStates.noActivity')}</p>
                     </div>
                   ) : (
                     recentActivity.map(notification => (
@@ -325,18 +325,18 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                         value={i18n.language as string}
                         onChange={code => { if (code !== i18n.language) i18n.changeLanguage(code) }}
                         className='w-full bg-white dark:bg-gray-800 focus:outline-none shadow-none border-0'
-                        placeholder='Select language'
-                        ariaLabel='Language selector'
+                        placeholder={t('accessibility.selectLanguage')}
+                        ariaLabel={t('accessibility.languageSelector')}
                         placement='left'
                         renderTrigger={(selected) => (
                           <button
                             type='button'
                             className='w-full flex items-center justify-between px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none transition-colors border-0 shadow-none hover:bg-gray-50 dark:hover:bg-gray-700'
-                            aria-label='Language selector'
+                            aria-label={t('accessibility.languageSelector')}
                           >
                             <div className='flex items-center'>
                               {selected && selected.icon}
-                              <span>{selected ? selected.label : 'Select language'}</span>
+                              <span>{selected ? selected.label : t('accessibility.selectLanguage')}</span>
                               {selected && selected.sublabel && (
                                 <span className='ml-2 text-xs text-gray-500'>{selected.sublabel}</span>
                               )}

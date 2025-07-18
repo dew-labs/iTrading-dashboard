@@ -6,6 +6,3 @@ export * from './api/types'
 
 // 🧬 Components
 export * from './components'
-
-// 📄 Pages
-export { default as UsersPage } from '../../pages/Users'

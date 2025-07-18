@@ -62,7 +62,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({ broker, image, onView, onEdit, 
                 {broker.established_in && (
                   <div className='flex items-center text-sm text-gray-600 dark:text-gray-400'>
                     <Calendar className='w-4 h-4 mr-1 flex-shrink-0' />
-                    <span>Est. {broker.established_in}</span>
+                    <span>{t('brokers.est')} {broker.established_in}</span>
                   </div>
                 )}
               </div>

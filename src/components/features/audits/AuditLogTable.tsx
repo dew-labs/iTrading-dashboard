@@ -258,4 +258,4 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
   )
 }
 
-export default AuditLogTable
+export default React.memo(AuditLogTable)

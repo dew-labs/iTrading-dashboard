@@ -275,21 +275,6 @@
     "update": "Update",
     "delete": "Delete"
   },
-  "validation": {
-    "required": "This field is required",
-    "invalidEmail": "Invalid email format",
-    "invalidPhone": "Invalid phone number format",
-    "tooShort": "Too short. Minimum {{min}} characters required",
-    "tooLong": "Too long. Maximum {{max}} characters allowed",
-    "invalidFormat": "Invalid format",
-    "passwordTooShort": "Password must be at least {{min}} characters",
-    "passwordsDoNotMatch": "Passwords do not match",
-    "fieldIsRequired": "{{field}} is required",
-    "emailInvalidFormat": "Invalid email format",
-    "phoneInvalidFormat": "Invalid phone number format. Use international format (e.g., +1 234 567 8900)",
-    "fullNameRequired": "Full name is required",
-    "emailRequired": "Email is required"
-  },
   "notifications": {
     "created": "Created successfully",
     "updated": "Updated successfully",
@@ -309,10 +294,6 @@
     "userRolePermissions": "User Role & Permissions",
     "emailInviteHelpText": "An invitation email will be sent to this address. The user must accept it to create their account.",
     "phoneHelpText": "Optional. Use international format with country code",
-    "emailRequired": "Email is required",
-    "emailInvalidFormat": "Invalid email format",
-    "fullNameRequired": "Full name is required",
-    "phoneInvalidFormat": "Invalid phone number format. Use international format (e.g., +1 234 567 8900)",
     "updating": "Updating...",
     "sendingInvite": "Sending Invite...",
     "updateUser": "Update User",
@@ -442,5 +423,31 @@
     "completed": "Completed",
     "inProgress": "In Progress",
     "notStarted": "Not Started"
+  },
+  "accessibility": {
+    "languageSelector": "Language selector",
+    "selectLanguage": "Select language",
+    "productFeaturedImage": "Product featured image",
+    "bannerPreview": "Banner preview",
+    "postThumbnail": "Post thumbnail",
+    "brokerLogo": "Broker logo",
+    "blurhashPlaceholder": "Blurhash placeholder",
+    "imagePreview": "Preview",
+    "tabs": "Tabs",
+    "pagination": "Pagination",
+    "itemsPerPage": "Items per page"
+  },
+  "loadingStates": {
+    "loadingPage": "Loading page...",
+    "loadingActivity": "Loading recent activity...",
+    "noActivity": "No recent activity",
+    "noPermission": "You don't have permission to view recent activity",
+    "loadingTranslations": "Loading translations...",
+    "noContentAvailable": "No content available",
+    "processing": "Processing...",
+    "published": "Published"
+  },
+  "statusLabels": {
+    "est": "Est."
   }
 }

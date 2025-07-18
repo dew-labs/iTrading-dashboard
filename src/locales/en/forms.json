@@ -129,7 +129,7 @@
     "confirmNewPassword": "New passwords do not match",
     "currentPasswordRequired": "Current password is required",
     "newPasswordRequired": "New password is required",
-    "phone": "Please enter a valid phone number with country code (e.g., +1234567890)",
+    "phone": "Please enter a valid phone number with country code (e.g., +1 234 567 8900)",
     "minLength": "{{field}} must be at least {{min}} characters",
     "maxLength": "{{field}} must be less than {{max}} characters",
     "min": "{{field}} must be at least {{min}}",

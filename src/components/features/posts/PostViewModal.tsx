@@ -16,7 +16,7 @@ import { RichTextRenderer } from '../../common'
 import { RecordImage } from '../images'
 import { SUPPORTED_LANGUAGE_CODES } from '../../../constants/languages'
 import type { Image } from '../../../types'
-import type { PostWithAuthor } from '../../../features/posts'
+import type { PostWithAuthor } from '../../../hooks/usePosts'
 import type { LanguageCode } from '../../../types/translations'
 import { getTypographyClasses, cn } from '../../../utils/theme'
 

@@ -211,7 +211,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
               size="lg"
               disabled={isValidating}
               recommendationText={tForm('hints.thumbnailRecommendation')}
-              alt="Post thumbnail"
+              alt={tCommon('accessibility.postThumbnail')}
             />
           </div>
         </div>

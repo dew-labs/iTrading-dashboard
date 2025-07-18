@@ -60,5 +60,22 @@
     "unsavedChanges": "Você tem alterações não salvas. Tem certeza de que deseja sair?",
     "permanentAction": "Esta ação não pode ser desfeita.",
     "confirmLogout": "Tem certeza de que deseja sair?"
+  },
+  "errorBoundary": {
+    "updateAvailable": "Atualização Disponível",
+    "updateAvailableMessage": "Uma nova versão da aplicação está disponível. Por favor, atualize a página para carregar a versão mais recente.",
+    "connectionError": "Erro de Conexão",
+    "connectionErrorMessage": "Não foi possível conectar ao servidor. Por favor, verifique sua conexão com a internet e tente novamente.",
+    "authenticationError": "Erro de Autenticação",
+    "authenticationErrorMessage": "Houve um problema com sua sessão. Por favor, faça login novamente.",
+    "somethingWentWrong": "Algo deu errado",
+    "somethingWentWrongMessage": "Desculpe, mas algo inesperado aconteceu. Nossa equipe foi notificada.",
+    "technicalDetails": "Detalhes Técnicos (Desenvolvimento)",
+    "errorLabel": "Erro:",
+    "errorIdLabel": "ID do Erro:",
+    "stackLabel": "Stack:",
+    "tryAgain": "Tentar Novamente",
+    "updateApp": "Atualizar App",
+    "refreshPage": "Atualizar Página"
   }
 }

@@ -46,7 +46,6 @@ const deleteUserMutation = async (id: string): Promise<void> => {
       console.error('Delete user error:', result.error)
       throw new Error(`Failed to delete user: ${result.error.message}`)
     }
-    console.warn('User deleted successfully (both public.users and auth.users):', id)
   } catch (error) {
     console.error('Delete user mutation failed:', error)
     throw error

@@ -12,7 +12,8 @@ import {
   type PostWithAuthor
 } from '../features/posts'
 import { usePostsWithTranslations } from '../hooks/usePostsWithTranslations'
-import { FilterDropdown, Modal, TabNavigation, PaginationSelector, Button, Input } from '../components'
+import { FilterDropdown, TabNavigation, PaginationSelector } from '../components/molecules'
+import { Modal, Button, Input } from '../components/atoms'
 import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
 import { POST_TYPES } from '../constants/general'

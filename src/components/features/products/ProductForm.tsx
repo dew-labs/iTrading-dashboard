@@ -190,7 +190,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel, 
               size='lg'
               disabled={isValidating}
               recommendationText='Use square images (1:1 ratio) for best display'
-              alt='Product featured image'
+              alt={tCommon('accessibility.productFeaturedImage')}
             />
           </div>
         </div>

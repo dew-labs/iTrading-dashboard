@@ -1,5 +1,5 @@
 import React from 'react'
-import { LoadingSpinner } from '../feedback'
+import LoadingSpinner from './LoadingSpinner'
 
 interface PageLoadingSpinnerProps {
   message?: string

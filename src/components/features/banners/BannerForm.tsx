@@ -288,7 +288,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSubmit, onCancel }) =
             <div className='relative group'>
               <img
                 src={currentImage}
-                alt='Banner preview'
+                alt={tCommon('accessibility.bannerPreview')}
                 className={`w-full object-contain rounded-lg border-2 border-gray-200 transition-opacity ${
                   isUploading ? 'opacity-50' : 'opacity-100'
                 }`}

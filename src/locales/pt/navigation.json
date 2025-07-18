@@ -18,7 +18,18 @@
   "systemSettings": "Configurações do Sistema",
   "home": "Início",
   "menu": "Menu",
-  "sidebar": "Barra Lateral",
+  "system": "Sistema",
+  "audits": "Atividades Recentes",
+  "sidebar": {
+    "dashboard": "Painel",
+    "users": "Usuários",
+    "posts": "Conteúdo",
+    "products": "Produtos",
+    "brokers": "Corretoras",
+    "banners": "Banners",
+    "audits": "Atividades Recentes",
+    "settings": "Configurações"
+  },
   "header": "Cabeçalho",
   "footer": "Rodapé",
   "breadcrumb": "Navegação",
@@ -29,5 +40,16 @@
   "account": "Conta",
   "preferences": "Preferências",
   "logout": "Sair",
-  "login": "Entrar"
+  "login": "Entrar",
+  "breadcrumbs": {
+    "home": "Início",
+    "dashboard": "Painel",
+    "users": "Usuários",
+    "posts": "Conteúdo",
+    "products": "Produtos",
+    "brokers": "Corretoras",
+    "banners": "Banners",
+    "audits": "Atividades Recentes",
+    "settings": "Configurações"
+  }
 }

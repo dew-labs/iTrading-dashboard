@@ -275,21 +275,6 @@
     "update": "Atualizar",
     "delete": "Excluir"
   },
-  "validation": {
-    "required": "Este campo é obrigatório",
-    "invalidEmail": "Formato de email inválido",
-    "invalidPhone": "Formato de telefone inválido",
-    "tooShort": "Muito curto. Mínimo de {{min}} caracteres necessários",
-    "tooLong": "Muito longo. Máximo de {{max}} caracteres permitidos",
-    "invalidFormat": "Formato inválido",
-    "passwordTooShort": "A senha deve ter pelo menos {{min}} caracteres",
-    "passwordsDoNotMatch": "As senhas não coincidem",
-    "fieldIsRequired": "{{field}} é obrigatório",
-    "emailInvalidFormat": "Formato de email inválido",
-    "phoneInvalidFormat": "Formato de telefone inválido. Use formato internacional (ex: +55 11 99999-9999)",
-    "fullNameRequired": "Nome completo é obrigatório",
-    "emailRequired": "Email é obrigatório"
-  },
   "notifications": {
     "created": "Criado com sucesso",
     "updated": "Atualizado com sucesso",
@@ -309,10 +294,6 @@
     "userRolePermissions": "Papel do Usuário e Permissões",
     "emailInviteHelpText": "Um email de convite será enviado para este endereço. O usuário deve aceitá-lo para criar sua conta.",
     "phoneHelpText": "Opcional. Use formato internacional com código do país",
-    "emailRequired": "Email é obrigatório",
-    "emailInvalidFormat": "Formato de email inválido",
-    "fullNameRequired": "Nome completo é obrigatório",
-    "phoneInvalidFormat": "Formato de telefone inválido. Use formato internacional (ex: +55 11 99999-9999)",
     "updating": "Atualizando...",
     "sendingInvite": "Enviando Convite...",
     "updateUser": "Atualizar Usuário",
@@ -442,5 +423,31 @@
     "completed": "Concluído",
     "inProgress": "Em Andamento",
     "notStarted": "Não Iniciado"
+  },
+  "accessibility": {
+    "languageSelector": "Seletor de idioma",
+    "selectLanguage": "Selecionar idioma",
+    "productFeaturedImage": "Imagem destacada do produto",
+    "bannerPreview": "Pré-visualização do banner",
+    "postThumbnail": "Miniatura do post",
+    "brokerLogo": "Logo da corretora",
+    "blurhashPlaceholder": "Placeholder blurhash",
+    "imagePreview": "Pré-visualização",
+    "tabs": "Abas",
+    "pagination": "Paginação",
+    "itemsPerPage": "Itens por página"
+  },
+  "loadingStates": {
+    "loadingPage": "Carregando página...",
+    "loadingActivity": "Carregando atividade recente...",
+    "noActivity": "Nenhuma atividade recente",
+    "noPermission": "Você não tem permissão para ver a atividade recente",
+    "loadingTranslations": "Carregando traduções...",
+    "noContentAvailable": "Nenhum conteúdo disponível",
+    "processing": "Processando...",
+    "published": "Publicado"
+  },
+  "statusLabels": {
+    "est": "Fund."
   }
 }

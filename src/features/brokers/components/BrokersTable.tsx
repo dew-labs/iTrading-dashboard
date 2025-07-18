@@ -196,4 +196,4 @@ const BrokersTable: React.FC<BrokersTableProps> = ({
   )
 }
 
-export default BrokersTable
+export default React.memo(BrokersTable)

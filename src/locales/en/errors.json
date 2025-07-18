@@ -60,5 +60,22 @@
     "unsavedChanges": "You have unsaved changes. Are you sure you want to leave?",
     "permanentAction": "This action cannot be undone.",
     "confirmLogout": "Are you sure you want to sign out?"
+  },
+  "errorBoundary": {
+    "updateAvailable": "Update Available",
+    "updateAvailableMessage": "A new version of the application is available. Please refresh the page to load the latest version.",
+    "connectionError": "Connection Error",
+    "connectionErrorMessage": "Unable to connect to the server. Please check your internet connection and try again.",
+    "authenticationError": "Authentication Error", 
+    "authenticationErrorMessage": "There was an issue with your session. Please sign in again.",
+    "somethingWentWrong": "Something went wrong",
+    "somethingWentWrongMessage": "We're sorry, but something unexpected happened. Our team has been notified.",
+    "technicalDetails": "Technical Details (Development)",
+    "errorLabel": "Error:",
+    "errorIdLabel": "Error ID:",
+    "stackLabel": "Stack:",
+    "tryAgain": "Try Again",
+    "updateApp": "Update App",
+    "refreshPage": "Refresh Page"
   }
 }

@@ -169,7 +169,9 @@ export const VALIDATION = {
   CONTENT_MAX_LENGTH: 50000,
   // Year validation
   YEAR_MIN: 1800,
-  YEAR_MAX: new Date().getFullYear(),
+  get YEAR_MAX() {
+    return new Date().getFullYear()
+  },
   // Price validation
   PRICE_MIN: 0,
   PRICE_STEP: 0.01,

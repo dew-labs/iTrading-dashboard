@@ -288,7 +288,6 @@ export const usePosts = () => {
   // Search functionality removed - this should be handled by components that have access to translations
   const searchPosts = (_query: string) => {
     // Search functionality should be implemented in components that have access to translations
-    console.warn('Search functionality moved to components with translation access')
     return posts
   }
 

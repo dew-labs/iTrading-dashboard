@@ -208,7 +208,7 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
               size='lg'
               disabled={isValidating}
               recommendationText={tForm('hints.logoRecommendation')}
-              alt='Broker logo'
+              alt={tCommon('accessibility.brokerLogo')}
             />
           </div>
         </div>

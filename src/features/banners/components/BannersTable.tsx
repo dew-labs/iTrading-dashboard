@@ -157,4 +157,4 @@ const BannersTable: React.FC<BannersTableProps> = ({
   )
 }
 
-export default BannersTable
+export default React.memo(BannersTable)

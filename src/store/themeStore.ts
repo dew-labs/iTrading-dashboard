@@ -52,20 +52,31 @@ export const useThemeStore = create<ThemeState>()(
  * Checks for saved theme or system preference
  */
 export const initializeTheme = () => {
-  // Give zustand time to rehydrate from localStorage
-  setTimeout(() => {
-    const store = useThemeStore.getState()
+  // Check for saved theme first (synchronous)
+  const savedThemeData = localStorage.getItem('itrading-theme')
+  let theme: Theme = 'light'
 
-    const savedTheme = localStorage.getItem('itrading-theme')
-
-    if (!savedTheme) {
-      // No saved theme, use system preference
+  if (savedThemeData) {
+    try {
+      const parsed = JSON.parse(savedThemeData)
+      theme = parsed.state?.theme || 'light'
+    } catch {
+      // If parsing fails, detect system preference
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      const initialTheme = prefersDark ? 'dark' : 'light'
-      store.setTheme(initialTheme)
-    } else {
-      // Apply current theme from store (which should be rehydrated by now)
-      applyTheme(store.theme)
+      theme = prefersDark ? 'dark' : 'light'
     }
-  }, 100) // Small delay to ensure zustand has rehydrated
+  } else {
+    // No saved theme, use system preference
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    theme = prefersDark ? 'dark' : 'light'
+  }
+
+  // Apply theme immediately for faster UI response
+  applyTheme(theme)
+
+  // Set theme in store (this will be overridden if zustand rehydrates with different value)
+  const store = useThemeStore.getState()
+  if (store.theme !== theme) {
+    store.setTheme(theme)
+  }
 }

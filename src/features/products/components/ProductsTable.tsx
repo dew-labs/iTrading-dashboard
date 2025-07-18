@@ -163,4 +163,4 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
   )
 }
 
-export default ProductsTable
+export default React.memo(ProductsTable)

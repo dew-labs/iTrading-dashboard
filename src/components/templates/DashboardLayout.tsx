@@ -4,6 +4,7 @@ import Sidebar from '../layout/Sidebar'
 import Header from '../layout/Header'
 import { ProtectedRoute } from '../common'
 import { PageLoadingSpinner } from '../feedback'
+import { useTranslation } from '../../hooks/useTranslation'
 
 // Lazy load page components for code splitting
 const Dashboard = React.lazy(() => import('../../pages/Dashboard'))
@@ -19,6 +20,7 @@ const Unauthorized = React.lazy(() => import('../../pages/Unauthorized'))
 const DashboardLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const { t } = useTranslation()
 
   return (
     <div className='h-screen bg-gray-50 dark:bg-gray-900 flex flex-col'>
@@ -35,7 +37,7 @@ const DashboardLayout: React.FC = () => {
         />
 
         <main className='flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900 p-6'>
-          <Suspense fallback={<PageLoadingSpinner message='Loading page...' />}>
+          <Suspense fallback={<PageLoadingSpinner message={t('loadingStates.loadingPage')} />}>
             <Routes>
               <Route path='/' element={<Dashboard />} />
 

@@ -178,4 +178,4 @@ const UsersTable: React.FC<UsersTableProps> = ({
   )
 }
 
-export default UsersTable
+export default React.memo(UsersTable)

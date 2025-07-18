@@ -164,4 +164,4 @@ const PostsTable: React.FC<PostsTableProps> = ({
   )
 }
 
-export default PostsTable
+export default React.memo(PostsTable)
