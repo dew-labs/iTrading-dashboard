@@ -2,9 +2,10 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { I18nextProvider } from 'react-i18next'
 import App from './App.tsx'
 import './index.css'
-import './lib/i18n'
+import i18n from './lib/i18n'
 import { initializeTheme } from './store/themeStore'
 
 // Initialize theme on app startup
@@ -81,9 +82,11 @@ queryClient.setMutationDefaults(['auth-error'], {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <App />
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <I18nextProvider i18n={i18n}>
+      <QueryClientProvider client={queryClient}>
+        <App />
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </I18nextProvider>
   </StrictMode>
 )

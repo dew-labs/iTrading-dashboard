@@ -240,8 +240,8 @@ const TranslationManager: React.FC<TranslationManagerProps> = ({
     const fieldLabel = field.charAt(0).toUpperCase() + field.slice(1)
     const isReadOnly = !isEditing
 
-    // Use RichTextEditor for content fields
-    if (field === 'content') {
+    // Use RichTextEditor for content fields and broker descriptions
+    if (field === 'content' || (field === 'description' && contentType === 'brokers')) {
       return (
         <div className="space-y-3">
           <RichTextEditor
@@ -255,6 +255,8 @@ const TranslationManager: React.FC<TranslationManagerProps> = ({
             height={300}
             disabled={isReadOnly}
             required={isRequired}
+            bucket={contentType === 'brokers' ? 'brokers' : 'posts'}
+            folder={contentType === 'brokers' ? 'images' : 'images'}
             {...(errors[field] && { error: errors[field] })}
             className={cn(
               hasError && 'border-red-500',
@@ -272,8 +274,8 @@ const TranslationManager: React.FC<TranslationManagerProps> = ({
       )
     }
 
-    // Use textarea for longer text fields
-    if (field === 'description' || field === 'excerpt') {
+    // Use textarea for excerpt and other longer text fields (but not broker descriptions)
+    if (field === 'excerpt' || (field === 'description' && contentType !== 'brokers')) {
       return (
         <Textarea
           label={fieldLabel}
