@@ -120,7 +120,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
       {/* Mobile overlay */}
       {isOpen && (
         <div
-          className='fixed inset-0 z-20 backdrop-blur-sm backdrop-opacity-75 bg-black/20 lg:hidden'
+          className='fixed inset-0 z-20 backdrop-blur-sm bg-black/20 lg:hidden transition-all duration-300 ease-in-out animate-in fade-in'
           onClick={() => setIsOpen(false)}
         />
       )}

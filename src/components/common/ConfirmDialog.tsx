@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { AlertTriangle, Trash2, AlertCircle, X, Check } from 'lucide-react'
 import { getTypographyClasses, cn } from '../../utils/theme'
 import { Button } from '../atoms'
@@ -28,7 +29,27 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   isLoading = false,
   variant = isDestructive ? 'danger' : 'warning'
 }) => {
-  if (!isOpen) return null
+  const [isVisible, setIsVisible] = useState(false)
+  const [isAnimating, setIsAnimating] = useState(false)
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsVisible(true)
+      setTimeout(() => setIsAnimating(true), 10)
+    } else {
+      setIsAnimating(false)
+      setTimeout(() => setIsVisible(false), 200)
+    }
+  }, [isOpen])
+
+  const handleClose = useCallback(() => {
+    if (isLoading) return
+    setIsAnimating(false)
+    setTimeout(() => {
+      setIsVisible(false)
+      onClose()
+    }, 200)
+  }, [onClose, isLoading])
 
   const handleConfirm = () => {
     onConfirm()
@@ -36,9 +57,30 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget && !isLoading) {
-      onClose()
+      handleClose()
     }
   }
+
+  // Handle ESC key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen && !isLoading) {
+        handleClose()
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'hidden'
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen, handleClose, isLoading])
+
+  if (!isVisible) return null
 
   const getVariantStyles = () => {
     switch (variant) {
@@ -71,18 +113,30 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 
   const { iconBg, iconColor, icon: Icon } = getVariantStyles()
 
-  return (
-    <div className='fixed inset-0 z-50 overflow-y-auto' aria-modal='true' role='dialog'>
+  const dialogContent = (
+    <div 
+      className='fixed inset-0 z-[100] flex items-center justify-center p-4' 
+      aria-modal='true' 
+      role='dialog'
+      onClick={handleBackdropClick}
+    >
       {/* Enhanced background overlay */}
       <div
-        className='fixed inset-0 backdrop-blur-md bg-black/30 dark:bg-black/50 transition-all duration-300 ease-out'
+        className={`absolute inset-0 backdrop-blur-md bg-black/30 dark:bg-black/50 transition-all duration-200 ease-out ${
+          isAnimating ? 'opacity-100' : 'opacity-0'
+        }`}
         onClick={handleBackdropClick}
       />
 
-      {/* Dialog container */}
-      <div className='flex min-h-full items-center justify-center p-4'>
-        {/* Dialog panel */}
-        <div className='relative bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-2xl border border-white/20 dark:border-gray-700/50 w-full max-w-md transform transition-all duration-300 ease-out scale-100'>
+      {/* Dialog panel */}
+      <div 
+        className={`relative z-10 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-2xl border border-white/20 dark:border-gray-700/50 w-full max-w-md transform transition-all duration-200 ease-out ${
+          isAnimating 
+            ? 'opacity-100 scale-100 translate-y-0' 
+            : 'opacity-0 scale-95 translate-y-4'
+        }`}
+        onClick={(e) => e.stopPropagation()}
+      >
           <div className='p-6'>
             {/* Icon and content */}
             <div className='flex items-start'>
@@ -111,7 +165,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                 variant='secondary'
                 size='md'
                 leftIcon={X}
-                onClick={onClose}
+                onClick={handleClose}
                 disabled={isLoading}
                 className='w-full sm:w-auto'
               >
@@ -131,9 +185,11 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             </div>
           </div>
         </div>
-      </div>
     </div>
   )
+
+  // Render dialog using portal to escape parent container constraints
+  return createPortal(dialogContent, document.body)
 }
 
 export default ConfirmDialog

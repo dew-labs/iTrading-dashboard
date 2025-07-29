@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import {
   X,
   Calendar,
@@ -66,20 +67,73 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
 
   const hasImages = !!image
 
+  const [isVisible, setIsVisible] = useState(false)
+  const [isAnimating, setIsAnimating] = useState(false)
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsVisible(true)
+      setTimeout(() => setIsAnimating(true), 10)
+    } else {
+      setIsAnimating(false)
+      setTimeout(() => setIsVisible(false), 200)
+    }
+  }, [isOpen])
+
+  const handleClose = useCallback(() => {
+    setIsAnimating(false)
+    setTimeout(() => {
+      setIsVisible(false)
+      onClose()
+    }, 200)
+  }, [onClose])
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        handleClose()
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'hidden'
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen, handleClose])
+
   if (!isOpen) return null
 
-  return (
-    <div className='fixed inset-0 z-50 overflow-y-auto'>
+  if (!isVisible) return null
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      handleClose()
+    }
+  }
+
+  const modalContent = (
+    <div className='fixed inset-0 z-[100] overflow-y-auto'>
       {/* Enhanced background overlay */}
       <div
-        className='fixed inset-0 backdrop-blur-md bg-black/40 dark:bg-black/60 transition-all duration-300 ease-out'
-        onClick={onClose}
+        className={`fixed inset-0 backdrop-blur-md bg-black/40 dark:bg-black/60 transition-all duration-200 ease-out ${
+          isAnimating ? 'opacity-100' : 'opacity-0'
+        }`}
+        onClick={handleBackdropClick}
       />
 
       {/* Modal container */}
       <div className='flex min-h-full items-center justify-center p-4'>
         {/* Enhanced modal with better dimensions for content reading */}
-        <div className='relative bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 dark:border-gray-700/50 w-full max-w-6xl max-h-[90vh] overflow-hidden transform transition-all duration-300 ease-out scale-100 flex flex-col'>
+        <div className={`relative bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 dark:border-gray-700/50 w-full max-w-6xl max-h-[90vh] overflow-hidden transform transition-all duration-200 ease-out flex flex-col ${
+          isAnimating 
+            ? 'opacity-100 scale-100 translate-y-0' 
+            : 'opacity-0 scale-95 translate-y-4'
+        }`}>
 
           {/* Enhanced Header with gradient and post meta */}
           <div className='flex-shrink-0 bg-gradient-to-r from-gray-50/95 to-white/95 dark:from-gray-800/95 dark:to-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 px-8 py-6'>
@@ -167,7 +221,7 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
                   </Button>
                 )}
                 <button
-                  onClick={onClose}
+                  onClick={handleClose}
                   className='text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800'
                 >
                   <X className='w-6 h-6' />
@@ -282,6 +336,8 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
       </div>
     </div>
   )
+
+  return createPortal(modalContent, document.body)
 }
 
 export default PostViewModal

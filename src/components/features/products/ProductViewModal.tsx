@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import {
   X,
   Calendar,
@@ -44,21 +45,79 @@ const ProductViewModal: React.FC<ProductViewModalProps> = ({
   };
   const { name, description } = getTranslation(product);
 
-  if (!isOpen) return null
+  const [isVisible, setIsVisible] = useState(false)
+  const [isAnimating, setIsAnimating] = useState(false)
 
-  return (
-    <div className='fixed inset-0 z-50 overflow-y-auto' aria-labelledby='modal-title' role='dialog' aria-modal='true'>
-      <div className='flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0'>
-        {/* Backdrop */}
-        <div
-          className='fixed inset-0 bg-gray-900/75 transition-opacity z-40'
-          aria-hidden='true'
-          onClick={onClose}
-        />
-        <span className='hidden sm:inline-block sm:align-middle sm:h-screen' aria-hidden='true'>
-          &#8203;
-        </span>
-        <div className='relative inline-block align-bottom bg-white dark:bg-gray-800 rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full z-50'>
+  useEffect(() => {
+    if (isOpen) {
+      setIsVisible(true)
+      setTimeout(() => setIsAnimating(true), 10)
+    } else {
+      setIsAnimating(false)
+      setTimeout(() => setIsVisible(false), 200)
+    }
+  }, [isOpen])
+
+  const handleClose = useCallback(() => {
+    setIsAnimating(false)
+    setTimeout(() => {
+      setIsVisible(false)
+      onClose()
+    }, 200)
+  }, [onClose])
+
+  // Handle ESC key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        handleClose()
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'hidden'
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen, handleClose])
+
+  if (!isVisible) return null
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      handleClose()
+    }
+  }
+
+  const modalContent = (
+    <div 
+      className='fixed inset-0 z-[100] flex items-center justify-center p-4' 
+      aria-labelledby='modal-title' 
+      role='dialog' 
+      aria-modal='true'
+      onClick={handleBackdropClick}
+    >
+      {/* Enhanced background overlay with blur */}
+      <div
+        className={`absolute inset-0 backdrop-blur-md bg-black/30 dark:bg-black/50 transition-all duration-200 ease-out ${
+          isAnimating ? 'opacity-100' : 'opacity-0'
+        }`}
+        aria-hidden='true'
+        onClick={handleBackdropClick}
+      />
+      
+      <div 
+        className={`relative z-10 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-2xl border border-white/20 dark:border-gray-700/50 w-full max-w-4xl max-h-[90vh] overflow-hidden transform transition-all duration-200 ease-out ${
+          isAnimating 
+            ? 'opacity-100 scale-100 translate-y-0' 
+            : 'opacity-0 scale-95 translate-y-4'
+        }`}
+        onClick={(e) => e.stopPropagation()}
+      >
           {/* Header */}
           <div className='bg-gradient-to-r from-gray-900 to-black dark:from-gray-700 dark:to-gray-800 px-8 py-6'>
             <div className='flex items-center justify-between'>
@@ -101,7 +160,7 @@ const ProductViewModal: React.FC<ProductViewModalProps> = ({
                 <button
                   type='button'
                   className='bg-white/10 hover:bg-white/20 text-white p-2 rounded-lg transition-colors'
-                  onClick={onClose}
+                  onClick={handleClose}
                 >
                   <X className='w-5 h-5' />
                 </button>
@@ -148,9 +207,10 @@ const ProductViewModal: React.FC<ProductViewModalProps> = ({
             </div>
           </div>
         </div>
-      </div>
     </div>
   )
+
+  return createPortal(modalContent, document.body)
 }
 
 export default ProductViewModal

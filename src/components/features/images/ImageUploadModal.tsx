@@ -1,4 +1,5 @@
-import React, { useState, useRef, useCallback } from 'react'
+import React, { useState, useRef, useCallback, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { X, Upload, Image as ImageIcon, AlertCircle, Loader2 } from 'lucide-react'
 import { useFileUpload } from '../../../hooks/useFileUpload'
 import { useImages } from '../../../hooks/useImages'
@@ -137,21 +138,80 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
     }
   }
 
-  // Handle close
-  const handleClose = () => {
+  const [isVisible, setIsVisible] = useState(false)
+  const [isAnimating, setIsAnimating] = useState(false)
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsVisible(true)
+      setTimeout(() => setIsAnimating(true), 10)
+    } else {
+      setIsAnimating(false)
+      setTimeout(() => setIsVisible(false), 200)
+    }
+  }, [isOpen])
+
+  const handleClose = useCallback(() => {
     if (isUploading) {
       toast.error('general', null, 'Please wait for upload to complete')
       return
     }
-    resetModal()
-    onClose()
-  }
+    setIsAnimating(false)
+    setTimeout(() => {
+      setIsVisible(false)
+      resetModal()
+      onClose()
+    }, 200)
+  }, [onClose, isUploading, toast, resetModal])
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        handleClose()
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'hidden'
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen, handleClose])
 
   if (!isOpen) return null
 
-  return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center z-50 p-4'>
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto'>
+  if (!isVisible) return null
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      handleClose()
+    }
+  }
+
+  const modalContent = (
+    <div 
+      className='fixed inset-0 flex items-center justify-center z-[100] p-4'
+      onClick={handleBackdropClick}
+    >
+      <div
+        className={`absolute inset-0 backdrop-blur-md bg-black/30 dark:bg-black/50 transition-all duration-200 ease-out ${
+          isAnimating ? 'opacity-100' : 'opacity-0'
+        }`}
+        aria-hidden='true'
+        onClick={handleBackdropClick}
+      />
+      <div 
+        className={`relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto transform transition-all duration-200 ease-out ${
+          isAnimating 
+            ? 'opacity-100 scale-100 translate-y-0' 
+            : 'opacity-0 scale-95 translate-y-4'
+        }`}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className='flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700'>
           <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>{tForm('imageUpload.uploadImage')}</h3>
@@ -297,6 +357,8 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
       </div>
     </div>
   )
+
+  return createPortal(modalContent, document.body)
 }
 
 export default ImageUploadModal
