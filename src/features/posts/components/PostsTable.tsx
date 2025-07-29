@@ -88,7 +88,7 @@ const PostsTable: React.FC<PostsTableProps> = ({
     },
     {
       header: t('posts.status'),
-      accessor: 'id' as keyof PostWithAuthor,
+      accessor: 'status' as keyof PostWithAuthor,
       render: (value: unknown, row: PostWithAuthor) => (
         <Badge variant={row.status as 'published' | 'draft'} size='sm' showIcon>
           {tCommon(`status.${row.status}`)}
@@ -114,7 +114,7 @@ const PostsTable: React.FC<PostsTableProps> = ({
     },
     {
       header: t('posts.engagement'),
-      accessor: 'id' as keyof PostWithAuthor,
+      accessor: 'views' as keyof PostWithAuthor,
       render: (value: unknown, row: PostWithAuthor) => (
         <div className={cn(getTypographyClasses('small'), 'text-gray-900 dark:text-gray-100')}>
           <div className='flex items-center space-x-4'>

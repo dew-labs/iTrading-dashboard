@@ -65,7 +65,7 @@ const BannersTable: React.FC<BannersTableProps> = ({
     },
     {
       header: t('banners.targetUrl'),
-      accessor: 'id' as keyof Banner,
+      accessor: 'target_url' as keyof Banner,
       render: (value: unknown, row: Banner) => {
         return (
           <div className={getTypographyClasses('small')}>

@@ -139,7 +139,7 @@
     "createNewProduct": "Create New Product",
     "productDetails": "Product Details",
     "deleteProductTitle": "Delete Product",
-    "deleteProductMessage": "Are you sure you want to delete {{productName}}? This action cannot be undone and will permanently remove the product from the system.",
+    "deleteConfirmText": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
     "loadingProducts": "Loading products...",
     "noDescription": "No description",
     "subscription": "Subscription",

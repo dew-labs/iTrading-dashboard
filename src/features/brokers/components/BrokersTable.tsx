@@ -91,7 +91,7 @@ const BrokersTable: React.FC<BrokersTableProps> = ({
     },
         ...(showTranslationStatus ? [{
       header: t('brokers.translations'),
-      accessor: 'id' as keyof Broker,
+      accessor: 'updated_at' as keyof Broker,
       render: (value: unknown, row: Broker | BrokerWithTranslations) => {
         const translationCount = 'translations' in row ? row.translations?.length || 0 : 0
         const hasTranslations = 'translations' in row && row.translations && row.translations.length > 0

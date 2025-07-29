@@ -139,7 +139,7 @@
     "createNewProduct": "Criar Novo Produto",
     "productDetails": "Detalhes do Produto",
     "deleteProductTitle": "Excluir Produto",
-    "deleteProductMessage": "Tem certeza de que deseja excluir {{productName}}? Esta ação não pode ser desfeita e removerá permanentemente o produto do sistema.",
+    "deleteConfirmText": "Tem certeza de que deseja excluir \"{{name}}\"? Esta ação não pode ser desfeita.",
     "loadingProducts": "Carregando produtos...",
     "noDescription": "Sem descrição",
     "subscription": "Assinatura",

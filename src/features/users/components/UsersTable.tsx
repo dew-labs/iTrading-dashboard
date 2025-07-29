@@ -70,7 +70,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
     },
     {
       header: tCommon('general.status'),
-      accessor: 'id' as keyof DatabaseUser,
+      accessor: 'status' as keyof DatabaseUser,
       render: (value: unknown, row: DatabaseUser) => {
         return (
           <Badge variant={row.status as 'active' | 'inactive' | 'invited'} size='sm' showIcon>

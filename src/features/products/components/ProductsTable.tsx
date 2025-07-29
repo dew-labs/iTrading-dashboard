@@ -53,7 +53,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
   const columns: Column<ProductWithTranslations>[] = [
     {
       header: t('products.productDetails'),
-      accessor: 'id', // Use a valid field, but render custom content
+      accessor: 'updated_at', // Use a valid field, but render custom content
       sortable: false,
       render: (_value: unknown, row: ProductWithTranslations) => {
         const image = imagesByRecord[row.id]?.[0]
