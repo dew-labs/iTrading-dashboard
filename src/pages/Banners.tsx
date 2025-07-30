@@ -379,9 +379,18 @@ const Banners: React.FC = () => {
           onClose={handleCancelDelete}
           onConfirm={handleConfirmDelete}
           title={t('banners.deleteBannerTitle')}
-          message={t('banners.deleteBannerMessage', {
-            bannerUrl: confirmDialog.bannerUrl || t('banners.thisBanner')
-          })}
+          message={
+            <div>
+              <p>
+                {t('banners.confirmDeleteMessage')}{' '}
+                <strong className='font-semibold text-gray-900 dark:text-gray-100'>
+                  {confirmDialog.bannerUrl || t('banners.thisBanner')}
+                </strong>
+                ?
+              </p>
+              <p className='mt-2 text-gray-600 dark:text-gray-400'>{t('banners.actionCannotBeUndone')}</p>
+            </div>
+          }
           confirmLabel={tCommon('actions.delete')}
           cancelLabel={tCommon('actions.cancel')}
           isDestructive={true}

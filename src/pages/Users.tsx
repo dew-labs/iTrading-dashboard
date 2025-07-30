@@ -483,9 +483,18 @@ const Users: React.FC = () => {
           onConfirm={handleConfirmDelete}
           onClose={handleCancelDelete}
           title={t('users.deleteUserTitle')}
-          message={t('users.deleteUserMessage', {
-            userName: confirmDialog.userName || t('users.thisUser')
-          })}
+          message={
+            <div>
+              <p>
+                {t('users.confirmDeleteMessage')}{' '}
+                <strong className='font-semibold text-gray-900 dark:text-gray-100'>
+                  {confirmDialog.userName || t('users.thisUser')}
+                </strong>
+                ?
+              </p>
+              <p className='mt-2 text-gray-600 dark:text-gray-400'>{t('users.actionCannotBeUndone')}</p>
+            </div>
+          }
           confirmLabel={tCommon('actions.delete')}
           cancelLabel={tCommon('actions.cancel')}
           isLoading={isDeleting}

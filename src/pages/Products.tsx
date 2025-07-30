@@ -312,16 +312,25 @@ const Products: React.FC = () => {
           onClose={() => setDeleteConfirm({ isOpen: false, product: null, isDeleting: false })}
           onConfirm={confirmDelete}
           title={t('products.deleteProductTitle')}
-          message={t('products.deleteConfirmText', {
-            name: (() => {
-              const lang = i18n.language || 'en';
-              const translations = deleteConfirm.product?.translations || [];
-              const translation =
-                translations.find(tr => tr.language_code === lang) ||
-                translations.find(tr => tr.language_code === 'en');
-              return translation?.name || t('products.thisProduct');
-            })()
-          })}
+          message={
+            <div>
+              <p>
+                {t('products.confirmDeleteMessage')}{' '}
+                <strong className='font-semibold text-gray-900 dark:text-gray-100'>
+                  {(() => {
+                    const lang = i18n.language || 'en';
+                    const translations = deleteConfirm.product?.translations || [];
+                    const translation =
+                      translations.find(tr => tr.language_code === lang) ||
+                      translations.find(tr => tr.language_code === 'en');
+                    return translation?.name || t('products.thisProduct');
+                  })()}
+                </strong>
+                ?
+              </p>
+              <p className='mt-2 text-gray-600 dark:text-gray-400'>{t('products.actionCannotBeUndone')}</p>
+            </div>
+          }
           confirmLabel={tCommon('actions.delete')}
           cancelLabel={tCommon('actions.cancel')}
           isDestructive={true}

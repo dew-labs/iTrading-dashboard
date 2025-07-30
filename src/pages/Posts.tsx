@@ -432,9 +432,18 @@ const Posts: React.FC = () => {
           onClose={() => setDeleteConfirm({ isOpen: false, post: null, isDeleting: false })}
           onConfirm={confirmDelete}
           title={t('posts.deletePostTitle')}
-          message={t('posts.deleteConfirmText', {
-            title: deleteConfirm.post?.title || t('posts.thisPost')
-          })}
+          message={
+            <div>
+              <p>
+                {t('posts.confirmDeleteMessage')}{' '}
+                <strong className='font-semibold text-gray-900 dark:text-gray-100'>
+                  {(deleteConfirm.post?.title || t('posts.thisPost')) as string}
+                </strong>
+                ?
+              </p>
+              <p className='mt-2 text-gray-600 dark:text-gray-400'>{t('posts.actionCannotBeUndone')}</p>
+            </div>
+          }
           confirmLabel={tCommon('actions.delete')}
           cancelLabel={tCommon('actions.cancel')}
           isDestructive={true}

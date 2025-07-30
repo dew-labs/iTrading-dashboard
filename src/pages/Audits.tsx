@@ -385,7 +385,12 @@ const Audits: React.FC = () => {
           onClose={() => setDeleteConfirm({ isOpen: false, log: null, isDeleting: false })}
           onConfirm={confirmDelete}
           title={t('audits.deleteLogTitle')}
-          message={t('audits.deleteLogMessage')}
+          message={
+            <div>
+              <p>{t('audits.confirmDeleteMessage')}</p>
+              <p className='mt-2 text-gray-600 dark:text-gray-400'>{t('audits.actionCannotBeUndone')}</p>
+            </div>
+          }
           confirmLabel={tCommon('actions.delete')}
           cancelLabel={tCommon('actions.cancel')}
           isDestructive={true}
@@ -398,7 +403,12 @@ const Audits: React.FC = () => {
           onClose={() => setBulkDeleteConfirm({ isOpen: false, isDeleting: false })}
           onConfirm={confirmBulkDelete}
           title={t('audits.bulkDeleteTitle')}
-          message={t('audits.bulkDeleteMessage')}
+          message={
+            <div>
+              <p>{t('audits.bulkConfirmDeleteMessage')}</p>
+              <p className='mt-2 text-gray-600 dark:text-gray-400'>{t('audits.actionCannotBeUndone')}</p>
+            </div>
+          }
           confirmLabel={tCommon('actions.delete')}
           cancelLabel={tCommon('actions.cancel')}
           isDestructive={true}
