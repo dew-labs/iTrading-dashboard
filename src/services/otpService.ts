@@ -39,6 +39,7 @@ export type VerifyOTPResult =
 
 /**
  * Verify OTP and authenticate user
+ * Also updates user status from 'invited' to 'active'
  */
 export const verifyOTP = async (
   email: string,
@@ -52,6 +53,20 @@ export const verifyOTP = async (
     })
     if (error) throw error
     if (!data.user || !data.user.id || !data.user.email) throw new Error('User not found')
+
+    // Update user status from 'invited' to 'active' after successful verification
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ status: 'active' })
+      .eq('id', data.user.id)
+      .eq('status', 'invited') // Only update if current status is 'invited'
+
+    if (updateError) {
+      console.error('Failed to update user status to active:', updateError)
+      // Don't fail the entire verification if status update fails
+      // The user can still proceed with account setup
+    }
+
     return { success: true, user: { id: data.user.id, email: data.user.email } }
   } catch (error) {
     return {

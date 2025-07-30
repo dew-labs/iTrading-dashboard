@@ -11,6 +11,7 @@ import Login from './pages/Login'
 import VerifyOTP from './pages/VerifyOTP'
 import Unauthorized from './pages/Unauthorized'
 import SetupProfile from './pages/SetupProfile'
+import AccountCreated from './pages/AccountCreated'
 
 function App () {
   const { initialize, initialized, user } = useAuthStore()
@@ -49,10 +50,11 @@ function App () {
             <Route path='/verify-otp' element={<VerifyOTP />} />
             <Route path='/unauthorized' element={<Unauthorized />} />
             <Route path='/setup-profile' element={<SetupProfile />} />
+            <Route path='/account-created' element={<AccountCreated />} />
             <Route
               path='/*'
               element={
-                <ProtectedRoute>
+                <ProtectedRoute requiredRole='moderator' redirectTo='/unauthorized'>
                   <DashboardLayout />
                 </ProtectedRoute>
               }

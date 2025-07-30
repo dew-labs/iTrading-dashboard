@@ -4,7 +4,7 @@ import { Shield, AlertCircle, Mail, RefreshCw } from 'lucide-react'
 import { toast } from '../utils/toast'
 import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
 import { verifyOTP, sendInvitationOTP } from '../services/otpService'
-import { FormField, Button } from '../components/atoms'
+import { Button, OTPInput } from '../components/atoms'
 
 // Extract resend countdown logic to useResendCountdown hook
 function useResendCountdown(initial: number) {
@@ -47,10 +47,15 @@ const VerifyOTP: React.FC = () => {
     try {
       const result = await verifyOTP(email, otp)
       if (!result.success) throw new Error(result.error)
+      
       // Set flag for OTP verified
       localStorage.setItem('otp_verified', 'true')
       localStorage.setItem('otp_verified_email', email)
-      navigate(`/setup-profile?email=${encodeURIComponent(email)}`)
+      
+      // Store the user role for redirect logic
+      localStorage.setItem('user_role', role)
+      
+      navigate(`/setup-profile?email=${encodeURIComponent(email)}&role=${encodeURIComponent(role)}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : t('verifyEmail.invalidOTP'))
     } finally {
@@ -119,17 +124,28 @@ const VerifyOTP: React.FC = () => {
               {t('verifyEmail.enterCode', { email })}
             </p>
           </div>
-          <FormField
-            label={t('verifyEmail.verificationCodeLabel')}
-            type="text"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            placeholder={t('verifyEmail.verificationCodePlaceholder')}
-            maxLength={6}
-            pattern="[0-9]{6}"
-            icon={<Mail className="w-5 h-5" />}
-            size="lg"
-          />
+          <div className="space-y-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 text-center">
+              {t('verifyEmail.verificationCodeLabel')}
+            </label>
+            <OTPInput
+              length={6}
+              value={otp}
+              onChange={(value) => {
+                const oldLength = otp.length
+                const newLength = value.length
+                
+                setOtp(value)
+                
+                // Only clear error when user is actively adding digits (not when clearing)
+                if (error && newLength > oldLength) {
+                  setError(null)
+                }
+              }}
+              disabled={isLoading}
+              error={Boolean(error)}
+            />
+          </div>
           {error && (
             <div className='bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4'>
               <div className='flex items-center'>
@@ -148,6 +164,15 @@ const VerifyOTP: React.FC = () => {
           >
             {t('verifyEmail.verifyCode')}
           </Button>
+          
+          {/* Help text for better user experience */}
+          {error && (
+            <div className="text-center">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t('verifyEmail.pressEscape')} <span className="text-gray-700 dark:text-gray-300 font-medium">Escape</span> {t('verifyEmail.toClearAndRetry')}
+              </p>
+            </div>
+          )}
           <div className="text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
               {t('verifyEmail.didNotReceiveCode')}

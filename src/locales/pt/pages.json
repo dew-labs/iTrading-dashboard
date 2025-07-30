@@ -401,6 +401,8 @@
     "didNotReceiveCode": "Não recebeu o código?",
     "resendCode": "Reenviar Código",
     "resendIn": "Reenviar em {{seconds}}s",
+    "pressEscape": "Pressione",
+    "toClearAndRetry": "para limpar e tentar novamente",
     "alreadyHaveAccount": "Já tem uma conta? ",
     "signIn": "Entrar",
     "invalidOTP": "Código OTP inválido"
@@ -409,6 +411,14 @@
     "invalidInvitation": "Convite Inválido",
     "goToLogin": "Ir para Login",
     "missingEmail": "Endereço de email ausente ou inválido."
+  },
+  "accountCreated": {
+    "title": "Conta Criada com Sucesso!",
+    "description": "Sua conta foi criada e agora está ativa. Você já pode acessar os serviços da nossa plataforma.",
+    "userNote": "Como usuário padrão, você tem acesso a todos os recursos para membros. O painel é reservado para administradores e moderadores.",
+    "goToWebsite": "Ir para o Site Principal",
+    "backToLogin": "Voltar ao Login",
+    "footerNote": "Se você precisar de acesso ao painel, entre em contato com um administrador."
   },
   "setupProfile": {
     "title": "Configurar Perfil",

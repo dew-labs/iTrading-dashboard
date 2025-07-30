@@ -296,6 +296,8 @@
     "basicInformation": "Informações Básicas",
     "userRolePermissions": "Papel do Usuário e Permissões",
     "emailInviteHelpText": "Um email de convite será enviado para este endereço. O usuário deve aceitá-lo para criar sua conta.",
+    "regularUserInviteNote": "Isso enviará um email de convite padrão com acesso básico à plataforma.",
+    "adminUserInviteNote": "Isso enviará um email de convite de admin/moderador com privilégios elevados.",
     "phoneHelpText": "Opcional. Use formato internacional com código do país",
     "updating": "Atualizando...",
     "sendingInvite": "Enviando Convite...",
@@ -460,5 +462,9 @@
   },
   "statusLabels": {
     "est": "Fund."
+  },
+  "users": {
+    "resendInvitationSuccess": "Email de convite reenviado com sucesso.",
+    "resendInvitationError": "Falha ao reenviar email de convite. Tente novamente."
   }
 }

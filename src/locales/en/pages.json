@@ -297,6 +297,8 @@
     "didNotReceiveCode": "Didn't receive the code?",
     "resendCode": "Resend Code",
     "resendIn": "Resend in {{seconds}}s",
+    "pressEscape": "Press",
+    "toClearAndRetry": "to clear and try again",
     "alreadyHaveAccount": "Already have an account? ",
     "signIn": "Sign In",
     "invalidOTP": "Invalid OTP code"
@@ -305,6 +307,14 @@
     "invalidInvitation": "Invalid Invitation",
     "goToLogin": "Go to Login",
     "missingEmail": "Missing or invalid email address."
+  },
+  "accountCreated": {
+    "title": "Account Created Successfully!",
+    "description": "Your account has been created and is now active. You can now access our platform services.",
+    "userNote": "As a standard user, you have access to all member features. The dashboard is reserved for administrators and moderators.",
+    "goToWebsite": "Go to Main Website",
+    "backToLogin": "Back to Login",
+    "footerNote": "If you need dashboard access, please contact an administrator."
   },
   "setupProfile": {
     "title": "Set Up Profile",

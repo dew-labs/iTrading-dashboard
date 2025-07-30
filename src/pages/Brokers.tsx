@@ -9,7 +9,9 @@ import { usePageTranslation, useTranslation } from '../hooks/useTranslation'
 import { BrokerForm, BrokerViewModal } from '../components/features/brokers'
 import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
-import type { Broker, BrokerInsert, Image } from '../types'
+import type { Broker, BrokerInsert, Image, Database } from '../types'
+
+type BrokerAccountType = Database['public']['Tables']['broker_account_types']['Insert']
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { groupImagesByRecord } from '../utils'
 import { supabase, queryKeys } from '../lib/supabase'
@@ -113,7 +115,7 @@ const Brokers: React.FC = () => {
   const handleSubmit = async (
     data: BrokerInsert,
     logoImage: (Partial<Image> & { publicUrl?: string; file?: File }) | null | undefined,
-    accountTypes: any[] = []
+    accountTypes: Partial<BrokerAccountType>[] = []
   ) => {
     try {
       let brokerId = editingBroker?.id
@@ -166,10 +168,10 @@ const Brokers: React.FC = () => {
 
         // Then insert the new account types
         const accountTypesToInsert = accountTypes
-          .filter(at => at.account_type.trim()) // Only save non-empty account types
+          .filter(at => at.account_type && at.account_type.trim()) // Only save non-empty account types
           .map(at => ({
             broker_id: brokerId,
-            account_type: at.account_type,
+            account_type: at.account_type!,
             spreads: at.spreads || null,
             commission: at.commission || null,
             min_deposit: at.min_deposit || null

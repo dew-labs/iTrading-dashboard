@@ -296,6 +296,8 @@
     "basicInformation": "Basic Information",
     "userRolePermissions": "User Role & Permissions",
     "emailInviteHelpText": "An invitation email will be sent to this address. The user must accept it to create their account.",
+    "regularUserInviteNote": "This will send a standard user invitation email with basic platform access.",
+    "adminUserInviteNote": "This will send an admin/moderator invitation email with elevated privileges.",
     "phoneHelpText": "Optional. Use international format with country code",
     "updating": "Updating...",
     "sendingInvite": "Sending Invite...",
@@ -460,5 +462,9 @@
   },
   "statusLabels": {
     "est": "Est."
+  },
+  "users": {
+    "resendInvitationSuccess": "Invitation email resent successfully.",
+    "resendInvitationError": "Failed to resend invitation email. Please try again."
   }
 }

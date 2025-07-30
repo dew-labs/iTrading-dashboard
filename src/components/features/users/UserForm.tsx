@@ -45,7 +45,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images })
   // Memoize initial data to prevent re-renders
   const initialData = useMemo(() =>
     isInviteMode
-      ? { email: '', role: USER_ROLES.MODERATOR as UserRole }
+      ? { email: '', role: USER_ROLES.USER as UserRole }
       : {
           email: '',
           full_name: '',
@@ -53,7 +53,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images })
           country: '',
           city: '',
           bio: '',
-          role: 'moderator' as UserRole,
+          role: 'user' as UserRole,
           status: 'invited' as const
         },
     [isInviteMode]

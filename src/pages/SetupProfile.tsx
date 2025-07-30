@@ -15,6 +15,7 @@ const SetupProfile: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const email = searchParams.get('email') || '';
+  const role = searchParams.get('role') || 'user';
   const [form, setForm] = useState<SetupProfileForm>({
     fullName: '',
     password: '',
@@ -81,7 +82,16 @@ const SetupProfile: React.FC = () => {
       // Clear OTP verified flag
       localStorage.removeItem('otp_verified');
       localStorage.removeItem('otp_verified_email');
-      navigate('/login');
+      localStorage.removeItem('user_role');
+      
+      // Redirect based on user role
+      if (role === 'user') {
+        // Regular users go to a success page or external site - not the dashboard
+        navigate('/account-created');
+      } else {
+        // Admin/moderator users can access the dashboard
+        navigate('/login');
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : t('setupProfile.failedToUpdateProfile')

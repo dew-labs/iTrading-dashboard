@@ -4,21 +4,21 @@ import type { UserRole } from '../types'
 
 /**
  * Invite a new user to the system
- * Only moderator and admin roles are allowed
+ * Supports all user roles including regular users
  */
 export const inviteUser = async (
   email: string,
-  role: UserRole = 'moderator',
+  role: UserRole = 'user',
   fullName?: string
 ): Promise<{success: boolean; error?: string}> => {
   try {
-    // Validate role - only allow moderator and admin
-    if (role !== 'moderator' && role !== 'admin') {
-      const error = 'Only moderator and admin roles are allowed for user creation'
+    // Validate role - allow all valid roles
+    if (!['user', 'moderator', 'admin'].includes(role)) {
+      const error = 'Invalid user role specified'
       return { success: false, error }
     }
 
-    // Use OTP service to send invitation
+    // Use OTP service to send invitation with role information
     const { success, error } = await sendInvitationOTP(email, role, fullName)
 
     if (!success) {
@@ -55,21 +55,21 @@ export const updateUserRole = async (
 
 /**
  * Grant default permissions based on role
- * Regular users are no longer created through invite system
+ * Supports all user roles including regular users
  */
 export const grantDefaultPermissions = async (
-  userId: string,
+  _userId: string,
   role: UserRole
 ): Promise<{success: boolean; error?: string}> => {
   try {
-    // Skip permission granting for invited users as they get permissions from role_permissions table
-    // Regular users are no longer created through invite system
-    if (role === 'moderator' || role === 'admin') {
+    // All users get permissions from role_permissions table based on their role
+    // This includes regular users, moderators, and admins
+    if (['user', 'moderator', 'admin'].includes(role)) {
       return { success: true }
     }
 
-    // If we reach here, it means someone tried to create a user with 'user' role
-    return { success: false, error: 'Regular users cannot be created through invite system' }
+    // If we reach here, it means an invalid role was provided
+    return { success: false, error: 'Invalid user role specified' }
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Failed to grant default permissions'
