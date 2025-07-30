@@ -15,7 +15,7 @@ import { useContentTranslation } from '../../../hooks/useContentTranslation'
 import { formatDateDisplay } from '../../../utils/format'
 import { Button, LanguageBadgeSelector, Badge } from '../../atoms'
 import { RichTextRenderer } from '../../common'
-import { SUPPORTED_LANGUAGE_CODES } from '../../../constants/languages'
+import { CONTENT_LANGUAGE_CODES, SUPPORTED_LANGUAGE_CODES } from '../../../constants/languages'
 import type { Broker, Image } from '../../../types'
 import type { LanguageCode } from '../../../types/translations'
 import { getTypographyClasses, cn } from '../../../utils/theme'
@@ -47,7 +47,7 @@ const BrokerViewModal: React.FC<BrokerViewModalProps> = ({
     {
       enabled: isOpen && !!broker.id,
       defaultLanguage: selectedLanguage,
-      requiredLanguages: SUPPORTED_LANGUAGE_CODES
+      requiredLanguages: CONTENT_LANGUAGE_CODES
     }
   )
 

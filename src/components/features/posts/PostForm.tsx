@@ -11,7 +11,7 @@ import { MainImageUpload } from '../images'
 import { supabase } from '../../../lib/supabase'
 import type { UploadResult } from '../../../hooks/useFileUpload'
 import TranslationManager from '../translations/TranslationManager'
-import { SUPPORTED_LANGUAGE_CODES } from '../../../constants/languages'
+import { CONTENT_LANGUAGE_CODES } from '../../../constants/languages'
 import type { LanguageCode } from '../../../types/translations'
 import { VALIDATION } from '../../../constants/ui'
 import { FORM_OPTIONS } from '../../../constants/components'
@@ -241,7 +241,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
                   contentType="posts"
                   contentId={post.id}
                   defaultLanguage="en"
-                  requiredLanguages={SUPPORTED_LANGUAGE_CODES}
+                  requiredLanguages={CONTENT_LANGUAGE_CODES}
                   onLanguageChange={setCurrentLanguage}
                   className="border-0 p-0 bg-transparent"
                 />

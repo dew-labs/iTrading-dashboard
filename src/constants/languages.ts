@@ -17,7 +17,8 @@
 // Supported language codes
 export const LANGUAGE_CODES = {
   ENGLISH: 'en',
-  PORTUGUESE: 'pt'
+  PORTUGUESE: 'pt',
+  VIETNAMESE: 'vi'
 } as const
 
 export type LanguageCode = (typeof LANGUAGE_CODES)[keyof typeof LANGUAGE_CODES]
@@ -28,8 +29,11 @@ export const DEFAULT_LANGUAGE: LanguageCode = LANGUAGE_CODES.ENGLISH
 // Number of supported languages
 export const SUPPORTED_LANGUAGES_COUNT = Object.keys(LANGUAGE_CODES).length
 
-// Array of supported language codes
-export const SUPPORTED_LANGUAGE_CODES: LanguageCode[] = Object.values(LANGUAGE_CODES)
+// Array of supported language codes for UI (dashboard interface)
+export const SUPPORTED_LANGUAGE_CODES: LanguageCode[] = [LANGUAGE_CODES.ENGLISH, LANGUAGE_CODES.PORTUGUESE]
+
+// Array of supported language codes for content translations (includes Vietnamese)
+export const CONTENT_LANGUAGE_CODES: LanguageCode[] = Object.values(LANGUAGE_CODES)
 
 // Language metadata with display information
 export const LANGUAGE_INFO = {
@@ -46,6 +50,13 @@ export const LANGUAGE_INFO = {
     nativeName: 'Português',
     flag: '🇧🇷',
     locale: 'pt-BR'
+  },
+  [LANGUAGE_CODES.VIETNAMESE]: {
+    code: LANGUAGE_CODES.VIETNAMESE,
+    name: 'Vietnamese',
+    nativeName: 'Tiếng Việt',
+    flag: '🇻🇳',
+    locale: 'vi-VN'
   }
 } as const
 

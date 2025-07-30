@@ -717,7 +717,7 @@ export class TranslationService {
 
       // Calculate completeness percentage
       const completenessPercentage = totalContent && totalContent > 0
-        ? Math.round(((totalTranslations || 0) / (totalContent * 2)) * 100) // Assuming 2 languages (en, pt)
+        ? Math.round(((totalTranslations || 0) / (totalContent * 3)) * 100) // 3 languages (en, pt, vi)
         : 0
 
       return {

@@ -8,7 +8,7 @@ import { FormField, Button } from '../../atoms'
 import { MainImageUpload } from '../images'
 import { useFormTranslation, useTranslation } from '../../../hooks/useTranslation'
 import TranslationManager from '../translations/TranslationManager'
-import { SUPPORTED_LANGUAGE_CODES } from '../../../constants/languages'
+import { CONTENT_LANGUAGE_CODES } from '../../../constants/languages'
 import { VALIDATION } from '../../../constants/ui'
 import { getStorageUrl } from '../../../utils/storage'
 import { formatPrice } from '../../../utils/format'
@@ -217,7 +217,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel, 
                   contentType="products"
                   contentId={product.id}
                   defaultLanguage="en"
-                  requiredLanguages={SUPPORTED_LANGUAGE_CODES}
+                  requiredLanguages={CONTENT_LANGUAGE_CODES}
                   onLanguageChange={() => {}}
                   className="border-0 p-0 bg-transparent"
                 />

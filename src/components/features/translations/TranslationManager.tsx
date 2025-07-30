@@ -7,7 +7,7 @@ import RichTextEditor from '../posts/RichTextEditor'
 import { useContentTranslation } from '../../../hooks/useContentTranslation'
 import { useTranslation } from '../../../hooks/useTranslation'
 import { cn } from '../../../utils/theme'
-import { LANGUAGE_INFO, SUPPORTED_LANGUAGE_CODES } from '../../../constants/languages'
+import { LANGUAGE_INFO, CONTENT_LANGUAGE_CODES } from '../../../constants/languages'
 import { calculateReadingTime } from '../../../utils/textUtils'
 import type {
   LanguageCode,
@@ -25,7 +25,7 @@ const TranslationManager: React.FC<TranslationManagerProps> = ({
   contentType,
   contentId,
   defaultLanguage = 'en',
-  requiredLanguages = SUPPORTED_LANGUAGE_CODES,
+  requiredLanguages = CONTENT_LANGUAGE_CODES,
   onTranslationChange,
   onLanguageChange,
   className = ''

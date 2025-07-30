@@ -31,7 +31,7 @@ DROP TABLE IF EXISTS brokers_translations CASCADE;
 CREATE TABLE posts_translations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id uuid NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-  language_code varchar(5) NOT NULL CHECK (language_code IN ('en', 'pt')),
+  language_code varchar(5) NOT NULL CHECK (language_code IN ('en', 'pt', 'vi')),
   title text NOT NULL,
   excerpt text,
   content text,
@@ -45,7 +45,7 @@ CREATE TABLE posts_translations (
 CREATE TABLE products_translations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   product_id uuid NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-  language_code varchar(5) NOT NULL CHECK (language_code IN ('en', 'pt')),
+  language_code varchar(5) NOT NULL CHECK (language_code IN ('en', 'pt', 'vi')),
   name text NOT NULL,
   description text,
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -57,7 +57,7 @@ CREATE TABLE products_translations (
 CREATE TABLE brokers_translations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   broker_id uuid NOT NULL REFERENCES brokers(id) ON DELETE CASCADE,
-  language_code varchar(5) NOT NULL CHECK (language_code IN ('en', 'pt')),
+  language_code varchar(5) NOT NULL CHECK (language_code IN ('en', 'pt', 'vi')),
   description text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
@@ -367,16 +367,16 @@ COMMENT ON TABLE products_translations IS 'Translation table for products conten
 COMMENT ON TABLE brokers_translations IS 'Translation table for brokers content in multiple languages';
 
 -- Column comments
-COMMENT ON COLUMN posts_translations.language_code IS 'Language code (en, pt) for the translation';
+COMMENT ON COLUMN posts_translations.language_code IS 'Language code (en, pt, vi) for the translation';
 COMMENT ON COLUMN posts_translations.title IS 'Translated title of the post';
 COMMENT ON COLUMN posts_translations.excerpt IS 'Translated excerpt/summary of the post';
 COMMENT ON COLUMN posts_translations.content IS 'Translated full content of the post';
 
-COMMENT ON COLUMN products_translations.language_code IS 'Language code (en, pt) for the translation';
+COMMENT ON COLUMN products_translations.language_code IS 'Language code (en, pt, vi) for the translation';
 COMMENT ON COLUMN products_translations.name IS 'Translated name of the product';
 COMMENT ON COLUMN products_translations.description IS 'Translated description of the product';
 
-COMMENT ON COLUMN brokers_translations.language_code IS 'Language code (en, pt) for the translation';
+COMMENT ON COLUMN brokers_translations.language_code IS 'Language code (en, pt, vi) for the translation';
 COMMENT ON COLUMN brokers_translations.description IS 'Translated description of the broker';
 
 -- ===============================================

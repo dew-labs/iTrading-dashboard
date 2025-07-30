@@ -12,8 +12,9 @@ export interface TranslationBase {
 
 /**
  * Language codes supported by the application
+ * Note: 'vi' is supported for content translations but not in UI language selector
  */
-export type LanguageCode = 'en' | 'pt'
+export type LanguageCode = 'en' | 'pt' | 'vi'
 
 /**
  * Content types that support translations

@@ -15,7 +15,7 @@ import { formatDateDisplay } from '../../../utils/format'
 import { Badge, Button, LanguageBadgeSelector } from '../../atoms'
 import { RichTextRenderer } from '../../common'
 import { RecordImage } from '../images'
-import { SUPPORTED_LANGUAGE_CODES } from '../../../constants/languages'
+import { CONTENT_LANGUAGE_CODES } from '../../../constants/languages'
 import type { Image } from '../../../types'
 import type { PostWithAuthor } from '../../../hooks/usePosts'
 import type { LanguageCode } from '../../../types/translations'
@@ -47,7 +47,7 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
     {
       enabled: true,
       defaultLanguage: selectedLanguage,
-      requiredLanguages: SUPPORTED_LANGUAGE_CODES
+      requiredLanguages: CONTENT_LANGUAGE_CODES
     }
   )
 

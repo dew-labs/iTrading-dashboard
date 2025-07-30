@@ -1,4 +1,4 @@
-import { SUPPORTED_LANGUAGE_CODES } from '../constants/languages'
+import { CONTENT_LANGUAGE_CODES } from '../constants/languages'
 import type {
   LanguageCode,
   TranslatableContentType,
@@ -117,7 +117,7 @@ export const hasTranslation = (
  */
 export const getTranslationCompleteness = (
   translations: Translation[],
-  requiredLanguages: LanguageCode[] = SUPPORTED_LANGUAGE_CODES
+  requiredLanguages: LanguageCode[] = CONTENT_LANGUAGE_CODES
 ): TranslationCompleteness => {
   const completed = requiredLanguages.filter(lang => hasTranslation(translations, lang))
   const missing = requiredLanguages.filter(lang => !hasTranslation(translations, lang))
@@ -135,7 +135,7 @@ export const getTranslationCompleteness = (
  */
 export const getTranslationStatus = (
   translations: Translation[],
-  requiredLanguages: LanguageCode[] = SUPPORTED_LANGUAGE_CODES
+  requiredLanguages: LanguageCode[] = CONTENT_LANGUAGE_CODES
 ): TranslationStatus[] => {
   return requiredLanguages.map(language => {
     const translation = translations.find(t => t.language_code === language)
@@ -272,7 +272,7 @@ export const validateTranslation = (
   }
 
   // Check language code
-  if (!translation.language_code || !['en', 'pt'].includes(translation.language_code)) {
+  if (!translation.language_code || !CONTENT_LANGUAGE_CODES.includes(translation.language_code as LanguageCode)) {
     errors.push('Valid language code is required')
   }
 
@@ -309,11 +309,13 @@ export const getContentIdField = (contentType: TranslatableContentType): string 
  */
 export const sortTranslationsByLanguage = (translations: Translation[]): Translation[] => {
   return translations.sort((a, b) => {
-    // Put English first, then Portuguese, then others alphabetically
+    // Put English first, then Portuguese, then Vietnamese, then others alphabetically
     if (a.language_code === 'en') return -1
     if (b.language_code === 'en') return 1
     if (a.language_code === 'pt') return -1
     if (b.language_code === 'pt') return 1
+    if (a.language_code === 'vi') return -1
+    if (b.language_code === 'vi') return 1
     return a.language_code.localeCompare(b.language_code)
   })
 }
@@ -342,7 +344,7 @@ export const hasAnyTranslations = (
  */
 export const getMissingTranslations = (
   content: PostWithTranslations | ProductWithTranslations | BrokerWithTranslations,
-  requiredLanguages: LanguageCode[] = SUPPORTED_LANGUAGE_CODES
+  requiredLanguages: LanguageCode[] = CONTENT_LANGUAGE_CODES
 ): LanguageCode[] => {
   if (!content.translations) return requiredLanguages
 
@@ -355,7 +357,7 @@ export const getMissingTranslations = (
  */
 export const getTranslationStatistics = (
   contents: (PostWithTranslations | ProductWithTranslations | BrokerWithTranslations)[],
-  requiredLanguages: LanguageCode[] = SUPPORTED_LANGUAGE_CODES
+  requiredLanguages: LanguageCode[] = CONTENT_LANGUAGE_CODES
 ): {
   totalContent: number
   withTranslations: number

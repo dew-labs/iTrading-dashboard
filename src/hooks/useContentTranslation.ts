@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { TranslationService } from '../services/translationService'
 import { useTranslation } from './useTranslation'
 import { useToast, type EntityType } from './useToast'
-import { SUPPORTED_LANGUAGE_CODES } from '../constants/languages'
+import { CONTENT_LANGUAGE_CODES } from '../constants/languages'
 import type {
   LanguageCode,
   TranslatableContentType,
@@ -36,7 +36,7 @@ export const useContentTranslation = (
   const {
     enabled = true,
     defaultLanguage = 'en',
-    requiredLanguages = SUPPORTED_LANGUAGE_CODES
+    requiredLanguages = CONTENT_LANGUAGE_CODES
   } = options
 
   const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>(defaultLanguage)
