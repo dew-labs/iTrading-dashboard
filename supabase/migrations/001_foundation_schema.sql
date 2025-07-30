@@ -38,7 +38,9 @@ CREATE TYPE user_status AS ENUM ('invited', 'active', 'inactive', 'suspended');
 -- Drop existing tables if they exist (in correct order to handle dependencies)
 DROP TABLE IF EXISTS role_permissions CASCADE;
 DROP TABLE IF EXISTS images CASCADE;
+DROP TABLE IF EXISTS broker_account_types CASCADE;
 DROP TABLE IF EXISTS brokers CASCADE;
+DROP TABLE IF EXISTS broker_categories CASCADE;
 DROP TABLE IF EXISTS banners CASCADE;
 DROP TABLE IF EXISTS products CASCADE;
 DROP TABLE IF EXISTS posts CASCADE;
@@ -81,6 +83,14 @@ CREATE TABLE products (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 
+-- Broker categories table (categories for brokers)
+CREATE TABLE broker_categories (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name varchar NOT NULL UNIQUE,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
 -- Brokers table (trading brokers/companies)
 CREATE TABLE brokers (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -88,6 +98,19 @@ CREATE TABLE brokers (
   name varchar NOT NULL,
   headquarter varchar,
   established_in integer,
+  category_id uuid REFERENCES broker_categories(id) ON DELETE SET NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- Broker account types table (account types for each broker)
+CREATE TABLE broker_account_types (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  broker_id uuid NOT NULL REFERENCES brokers(id) ON DELETE CASCADE,
+  account_type varchar NOT NULL,
+  spreads varchar,
+  commission varchar,
+  min_deposit varchar,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
@@ -164,7 +187,9 @@ CREATE INDEX idx_images_table_record ON images(table_name, record_id);
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE broker_categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE brokers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE broker_account_types ENABLE ROW LEVEL SECURITY;
 ALTER TABLE banners ENABLE ROW LEVEL SECURITY;
 ALTER TABLE role_permissions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE images ENABLE ROW LEVEL SECURITY;
@@ -177,7 +202,9 @@ ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 COMMENT ON TABLE users IS 'Central user management with roles and permissions';
 COMMENT ON TABLE posts IS 'Content management system with authorship and view tracking';
 COMMENT ON TABLE products IS 'Product catalog with pricing and subscription options';
+COMMENT ON TABLE broker_categories IS 'Categories for organizing different types of brokers';
 COMMENT ON TABLE brokers IS 'Trading broker information and profiles';
+COMMENT ON TABLE broker_account_types IS 'Account types and trading conditions for each broker';
 COMMENT ON TABLE banners IS 'Promotional banner management system';
 COMMENT ON TABLE role_permissions IS 'Role-based permission definitions';
 COMMENT ON TABLE images IS 'Centralized image metadata and storage references';

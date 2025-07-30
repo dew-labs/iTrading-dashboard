@@ -148,6 +148,15 @@ LEFT JOIN brokers_translations bt ON b.id = bt.broker_id
 GROUP BY b.id, b.is_visible, b.name, b.headquarter, b.established_in, b.created_at, b.updated_at;
 
 -- ===============================================
+-- SECURITY INVOKER FOR TRANSLATION VIEWS
+-- ===============================================
+
+-- Set security_invoker for all translation views to respect RLS policies
+ALTER VIEW public.posts_with_translations SET (security_invoker = on);
+ALTER VIEW public.products_with_translations SET (security_invoker = on);
+ALTER VIEW public.brokers_with_translations SET (security_invoker = on);
+
+-- ===============================================
 -- ENABLE ROW LEVEL SECURITY
 -- ===============================================
 
@@ -166,20 +175,20 @@ CREATE POLICY "Posts translations are viewable by everyone"
   TO public
   USING (true);
 
-CREATE POLICY "Authenticated users can insert posts translations"
+CREATE POLICY "Moderators and admins can insert posts translations"
   ON posts_translations FOR INSERT
   TO authenticated
-  WITH CHECK (true);
+  WITH CHECK (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can update posts translations"
+CREATE POLICY "Moderators and admins can update posts translations"
   ON posts_translations FOR UPDATE
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can delete posts translations"
+CREATE POLICY "Moderators and admins can delete posts translations"
   ON posts_translations FOR DELETE
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
 -- Products translations policies
 CREATE POLICY "Products translations are viewable by everyone"
@@ -187,20 +196,20 @@ CREATE POLICY "Products translations are viewable by everyone"
   TO public
   USING (true);
 
-CREATE POLICY "Authenticated users can insert products translations"
+CREATE POLICY "Moderators and admins can insert products translations"
   ON products_translations FOR INSERT
   TO authenticated
-  WITH CHECK (true);
+  WITH CHECK (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can update products translations"
+CREATE POLICY "Moderators and admins can update products translations"
   ON products_translations FOR UPDATE
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can delete products translations"
+CREATE POLICY "Moderators and admins can delete products translations"
   ON products_translations FOR DELETE
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
 -- Brokers translations policies
 CREATE POLICY "Brokers translations are viewable by everyone"
@@ -208,20 +217,20 @@ CREATE POLICY "Brokers translations are viewable by everyone"
   TO public
   USING (true);
 
-CREATE POLICY "Authenticated users can insert brokers translations"
+CREATE POLICY "Moderators and admins can insert brokers translations"
   ON brokers_translations FOR INSERT
   TO authenticated
-  WITH CHECK (true);
+  WITH CHECK (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can update brokers translations"
+CREATE POLICY "Moderators and admins can update brokers translations"
   ON brokers_translations FOR UPDATE
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can delete brokers translations"
+CREATE POLICY "Moderators and admins can delete brokers translations"
   ON brokers_translations FOR DELETE
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
 -- ===============================================
 -- AUDIT TRIGGERS
@@ -259,13 +268,13 @@ BEGIN
   -- Determine table and column names based on content type
   CASE content_type
     WHEN 'posts' THEN
-      table_name := 'posts_translations';
+      table_name := 'public.posts_translations';
       id_column := 'post_id';
     WHEN 'products' THEN
-      table_name := 'products_translations';
+      table_name := 'public.products_translations';
       id_column := 'product_id';
     WHEN 'brokers' THEN
-      table_name := 'brokers_translations';
+      table_name := 'public.brokers_translations';
       id_column := 'broker_id';
     ELSE
       RAISE EXCEPTION 'Invalid content type: %', content_type;
@@ -274,7 +283,7 @@ BEGIN
   -- Try to get translation in requested language
   EXECUTE format('
     SELECT row_to_json(t.*)
-    FROM %I t
+    FROM %s t
     WHERE %I = $1 AND language_code = $2
   ', table_name, id_column)
   INTO result
@@ -284,7 +293,7 @@ BEGIN
   IF result IS NULL AND language_code != fallback_language THEN
     EXECUTE format('
       SELECT row_to_json(t.*)
-      FROM %I t
+      FROM %s t
       WHERE %I = $1 AND language_code = $2
     ', table_name, id_column)
     INTO result
@@ -293,7 +302,7 @@ BEGIN
 
   RETURN result;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 
 -- Function to check if content has translation for specific language
 CREATE OR REPLACE FUNCTION has_translation(
@@ -309,13 +318,13 @@ BEGIN
   -- Determine table and column names based on content type
   CASE content_type
     WHEN 'posts' THEN
-      table_name := 'posts_translations';
+      table_name := 'public.posts_translations';
       id_column := 'post_id';
     WHEN 'products' THEN
-      table_name := 'products_translations';
+      table_name := 'public.products_translations';
       id_column := 'product_id';
     WHEN 'brokers' THEN
-      table_name := 'brokers_translations';
+      table_name := 'public.brokers_translations';
       id_column := 'broker_id';
     ELSE
       RAISE EXCEPTION 'Invalid content type: %', content_type;
@@ -324,7 +333,7 @@ BEGIN
   -- Check if translation exists
   EXECUTE format('
     SELECT EXISTS(
-      SELECT 1 FROM %I
+      SELECT 1 FROM %s
       WHERE %I = $1 AND language_code = $2
     )
   ', table_name, id_column)
@@ -333,7 +342,7 @@ BEGIN
 
   RETURN exists_flag;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 
 -- Grant execute permissions to authenticated users
 GRANT EXECUTE ON FUNCTION get_translated_content(text, uuid, text, text) TO authenticated;

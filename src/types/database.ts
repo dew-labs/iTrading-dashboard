@@ -100,8 +100,78 @@ export type Database = {
         }
         Relationships: []
       }
+      broker_account_types: {
+        Row: {
+          account_type: string
+          broker_id: string
+          commission: string | null
+          created_at: string
+          id: string
+          min_deposit: string | null
+          spreads: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_type: string
+          broker_id: string
+          commission?: string | null
+          created_at?: string
+          id?: string
+          min_deposit?: string | null
+          spreads?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_type?: string
+          broker_id?: string
+          commission?: string | null
+          created_at?: string
+          id?: string
+          min_deposit?: string | null
+          spreads?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broker_account_types_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broker_account_types_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers_with_translations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      broker_categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       brokers: {
         Row: {
+          category_id: string | null
           created_at: string
           established_in: number | null
           headquarter: string | null
@@ -111,6 +181,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          category_id?: string | null
           created_at?: string
           established_in?: number | null
           headquarter?: string | null
@@ -120,6 +191,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          category_id?: string | null
           created_at?: string
           established_in?: number | null
           headquarter?: string | null
@@ -128,7 +200,15 @@ export type Database = {
           name?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "brokers_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "broker_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       brokers_translations: {
         Row: {
@@ -451,6 +531,7 @@ export type Database = {
     Views: {
       brokers_with_translations: {
         Row: {
+          category_id: string | null
           created_at: string | null
           established_in: number | null
           headquarter: string | null

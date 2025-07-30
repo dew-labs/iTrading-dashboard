@@ -25,6 +25,8 @@
     "bannerActivity": "Banner Activity",
     "inviteUser": "Invite User",
     "inviteUserDescription": "Invite a new user to the system",
+    "createUser": "Create User",
+    "createUserDescription": "Create a new user account",
     "addProduct": "Add Product",
     "addProductDescription": "Create new product or service",
     "writePost": "Write Post",

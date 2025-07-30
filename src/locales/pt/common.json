@@ -38,7 +38,10 @@
     "collapse": "Recolher",
     "maximize": "Maximizar",
     "minimize": "Minimizar",
-    "clearFilters": "Limpar {{count}} filtro{{count, plural, one {} other {s}}}"
+    "clearFilters": "Limpar {{count}} filtro{{count, plural, one {} other {s}}}",
+    "addAccountType": "Adicionar Tipo de Conta",
+    "addFirstAccountType": "Adicionar Primeiro Tipo de Conta",
+    "deleteAccountType": "Excluir Tipo de Conta"
   },
   "status": {
     "active": "Ativo",
@@ -309,6 +312,7 @@
     "banner": "Banner",
     "brokers": "Corretoras",
     "broker": "Corretora",
+    "accountType": "Tipo de Conta",
     "users": "Usuários",
     "user": "Usuário",
     "notifications": "Notificações",
@@ -381,7 +385,14 @@
     "completeSettingsToEnableEditing": "Complete as configurações do {{type}} acima, depois salve para habilitar a edição de conteúdo",
     "manageBrokerDescription": "Gerenciar descrição da corretora em vários idiomas",
     "trackTranslationProgress": "Acompanhar progresso e completude da tradução",
-    "productSettings": "Configurações do Produto"
+    "productSettings": "Configurações do Produto",
+    "accountTypes": "Tipos de Conta",
+    "accountType": "Tipo de Conta",
+    "noAccountTypes": "Nenhum Tipo de Conta",
+    "addAccountTypesDescription": "Adicione diferentes tipos de conta com suas condições de negociação e requisitos.",
+    "confirmDeleteAccountType": "Tem certeza de que deseja excluir",
+    "thisAccountType": "este tipo de conta",
+    "actionCannotBeUndone": "Esta ação não pode ser desfeita."
   },
   "filters": {
     "allStatus": "Todos os Status",

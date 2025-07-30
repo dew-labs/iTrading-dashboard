@@ -27,6 +27,7 @@
     "readingTime": "Estimated reading time:",
     "thumbnail": "Thumbnail",
     "category": "Category",
+    "category_id": "Category",
     "tags": "Tags",
     "image": "Image",
     "featuredImage": "Featured Image",
@@ -60,7 +61,11 @@
     "location": "Location",
     "bannerImage": "Banner Image",
     "bannerStatus": "Banner Status",
-    "affiliateLink": "Affiliate Link"
+    "affiliateLink": "Affiliate Link",
+    "accountTypeName": "Account Type Name",
+    "spreads": "Spreads",
+    "commission": "Commission",
+    "minDeposit": "Minimum Deposit"
   },
   "placeholders": {
     "enterFirstName": "Enter first name",
@@ -117,7 +122,12 @@
     "bio": "Tell us about yourself - your background, interests, and experience...",
     "city": "Enter city",
     "enterFieldInLanguage": "Enter {{field}} in {{language}}",
-    "affiliateLink": "Enter affiliate link"
+    "affiliateLink": "Enter affiliate link",
+    "enterAccountType": "e.g., Standard, Premium, VIP",
+    "enterSpreads": "e.g., 1.5 pips, 0.8 pips",
+    "enterCommission": "e.g., $7 per lot, 0.25%",
+    "enterMinDeposit": "e.g., $100, $1000",
+    "selectCategory": "Select broker category"
   },
   "validation": {
     "required": "Required",
@@ -169,6 +179,7 @@
     "brokerNameHelper": "Enter the official name of the brokerage",
     "brokerLocationHelper": "Primary business location",
     "brokerEstablishedHelper": "Year the brokerage was founded",
+    "brokerCategoryHelper": "Select the primary category for this broker",
     "bannerNameHelper": "A clear name to identify this banner in your dashboard",
     "bannerTargetUrlHelper": "Where users will be redirected when they click the banner",
     "productNameHelper": "A clear, descriptive name for your product",

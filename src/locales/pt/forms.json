@@ -27,6 +27,7 @@
     "readingTime": "Tempo estimado de leitura:",
     "thumbnail": "Miniatura",
     "category": "Categoria",
+    "category_id": "Categoria",
     "tags": "Tags",
     "image": "Imagem",
     "featuredImage": "Imagem Destacada",
@@ -60,7 +61,11 @@
     "location": "Localização",
     "bannerImage": "Imagem do Banner",
     "bannerStatus": "Status do Banner",
-    "affiliateLink": "Link de Afiliado"
+    "affiliateLink": "Link de Afiliado",
+    "accountTypeName": "Nome do Tipo de Conta",
+    "spreads": "Spreads",
+    "commission": "Comissão",
+    "minDeposit": "Depósito Mínimo"
   },
   "placeholders": {
     "enterFirstName": "Digite o nome",
@@ -118,7 +123,11 @@
     "bio": "Conte-nos sobre você - sua formação, interesses e experiência...",
     "city": "Digite a cidade",
     "enterFieldInLanguage": "Digite {{field}} em {{language}}",
-    "affiliateLink": "Insira o link de afiliado"
+    "affiliateLink": "Insira o link de afiliado",
+    "enterAccountType": "ex., Padrão, Premium, VIP",
+    "enterSpreads": "ex., 1,5 pips, 0,8 pips",
+    "enterCommission": "ex., $7 por lote, 0,25%",
+    "enterMinDeposit": "ex., $100, $1000"
   },
   "validation": {
     "required": "Obrigatório",

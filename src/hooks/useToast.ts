@@ -17,6 +17,7 @@ export type EntityType =
   | 'image' | 'images'
   | 'permission' | 'permissions'
   | 'role' | 'avatar' | 'mainImage'
+  | 'accountType'
 
 export type SuccessAction =
   | 'general' | 'saved' | 'created' | 'updated' | 'deleted'

@@ -38,7 +38,10 @@
     "collapse": "Collapse",
     "maximize": "Maximize",
     "minimize": "Minimize",
-    "clearFilters": "Clear {{count}} filter{{count, plural, one {} other {s}}}"
+    "clearFilters": "Clear {{count}} filter{{count, plural, one {} other {s}}}",
+    "addAccountType": "Add Account Type",
+    "addFirstAccountType": "Add First Account Type",
+    "deleteAccountType": "Delete Account Type"
   },
   "status": {
     "active": "Active",
@@ -309,6 +312,7 @@
     "banner": "Banner",
     "brokers": "Brokers",
     "broker": "Broker",
+    "accountType": "Account Type",
     "users": "Users",
     "user": "User",
     "notifications": "Notifications",
@@ -381,7 +385,14 @@
     "completeSettingsToEnableEditing": "Complete the {{type}} settings above, then save to enable content editing",
     "manageBrokerDescription": "Manage broker description in multiple languages",
     "trackTranslationProgress": "Track translation progress and completeness",
-    "productSettings": "Product Settings"
+    "productSettings": "Product Settings",
+    "accountTypes": "Account Types",
+    "accountType": "Account Type",
+    "noAccountTypes": "No Account Types",
+    "addAccountTypesDescription": "Add different account types with their trading conditions and requirements.",
+    "confirmDeleteAccountType": "Are you sure you want to delete",
+    "thisAccountType": "this account type",
+    "actionCannotBeUndone": "This action cannot be undone."
   },
   "filters": {
     "allStatus": "All Status",

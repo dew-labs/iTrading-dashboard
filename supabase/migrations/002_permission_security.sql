@@ -22,16 +22,29 @@ BEGIN
     AND role = 'admin'
   );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+
+-- Function to check if a user is a moderator or admin
+CREATE OR REPLACE FUNCTION public.is_moderator_or_admin(user_id uuid)
+RETURNS boolean AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM public.users
+    WHERE id = user_id
+    AND role IN ('moderator', 'admin')
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 
 -- Function to increment post views atomically
 CREATE OR REPLACE FUNCTION increment_post_views(post_id bigint)
 RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = ''
 AS $$
 BEGIN
-  UPDATE posts
+  UPDATE public.posts
   SET views = views + 1
   WHERE id = post_id;
 END;
@@ -90,13 +103,14 @@ EXCEPTION
         RAISE WARNING 'Failed to create user profile for % (ID: %): % - %', NEW.email, NEW.id, SQLSTATE, SQLERRM;
         RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 
 -- Function to handle generic record deletion cascade to images
 CREATE OR REPLACE FUNCTION public.handle_record_deletion_cascade_to_images()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = ''
 AS $$
 DECLARE
   image_count INTEGER;
@@ -195,14 +209,14 @@ CREATE TRIGGER on_user_avatar_deleted
 CREATE OR REPLACE FUNCTION audit_trigger_function()
 RETURNS trigger AS $$
 DECLARE
-  current_user_record users%ROWTYPE;
+  current_user_record public.users%ROWTYPE;
   old_values jsonb := '{}';
   new_values jsonb := '{}';
   changed_fields text[] := ARRAY[]::text[];
   excluded_columns text[] := ARRAY['updated_at', 'last_login'];
   record_id_value uuid;
 BEGIN
-  SELECT * INTO current_user_record FROM users WHERE id = auth.uid();
+  SELECT * INTO current_user_record FROM public.users WHERE id = auth.uid();
   IF current_user_record.role NOT IN ('admin', 'moderator') THEN
     RETURN COALESCE(NEW, OLD);
   END IF;
@@ -227,7 +241,7 @@ BEGIN
       RETURN NEW;
     END IF;
   END IF;
-  INSERT INTO audit_logs (
+  INSERT INTO public.audit_logs (
     user_id, user_email, user_role, table_name, record_id, action, old_values, new_values, changed_fields, session_id
   ) VALUES (
     current_user_record.id, current_user_record.email, current_user_record.role, TG_TABLE_NAME, record_id_value, TG_OP, old_values, new_values, changed_fields, current_setting('audit.session_id', true)
@@ -238,7 +252,7 @@ EXCEPTION
     RAISE WARNING 'Audit logging failed for table % operation %: % - %', TG_TABLE_NAME, TG_OP, SQLSTATE, SQLERRM;
     RETURN COALESCE(NEW, OLD);
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 
 CREATE TRIGGER audit_users_trigger AFTER INSERT OR UPDATE OR DELETE ON users FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
 CREATE TRIGGER audit_posts_trigger AFTER INSERT OR UPDATE OR DELETE ON posts FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
@@ -265,16 +279,16 @@ DECLARE
   recent_activity jsonb;
 BEGIN
   -- Total activities
-  SELECT COUNT(*) INTO total_count FROM audit_logs;
+  SELECT COUNT(*) INTO total_count FROM public.audit_logs;
 
   -- Activities today
   SELECT COUNT(*) INTO today_count
-  FROM audit_logs
+  FROM public.audit_logs
   WHERE created_at >= CURRENT_DATE;
 
   -- Activities this week
   SELECT COUNT(*) INTO week_count
-  FROM audit_logs
+  FROM public.audit_logs
   WHERE created_at >= CURRENT_DATE - INTERVAL '7 days';
 
   -- Most active user
@@ -284,7 +298,7 @@ BEGIN
   ) INTO most_active
   FROM (
     SELECT user_email, COUNT(*) as activity_count
-    FROM audit_logs
+    FROM public.audit_logs
     WHERE user_email IS NOT NULL
       AND created_at >= CURRENT_DATE - INTERVAL '30 days'
     GROUP BY user_email
@@ -296,7 +310,7 @@ BEGIN
   SELECT jsonb_object_agg(table_name, activity_count) INTO activity_by_table
   FROM (
     SELECT table_name, COUNT(*) as activity_count
-    FROM audit_logs
+    FROM public.audit_logs
     WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
     GROUP BY table_name
     ORDER BY activity_count DESC
@@ -306,7 +320,7 @@ BEGIN
   SELECT jsonb_object_agg(action, activity_count) INTO activity_by_action
   FROM (
     SELECT action, COUNT(*) as activity_count
-    FROM audit_logs
+    FROM public.audit_logs
     WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
     GROUP BY action
     ORDER BY activity_count DESC
@@ -323,7 +337,7 @@ BEGIN
   ) INTO recent_activity
   FROM (
     SELECT user_email, table_name, action, created_at
-    FROM audit_logs
+    FROM public.audit_logs
     ORDER BY created_at DESC
     LIMIT 10
   ) recent_query;
@@ -338,7 +352,7 @@ BEGIN
     'recent_activity', COALESCE(recent_activity, '[]')
   );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 
 -- Grant execute permission to authenticated users
 GRANT EXECUTE ON FUNCTION get_audit_stats() TO authenticated;
@@ -352,9 +366,9 @@ CREATE POLICY "Users can view own profile"
   ON users FOR SELECT
   USING (auth.uid() = id);
 
-CREATE POLICY "Admins can view all users"
+CREATE POLICY "Moderators and admins can view all users"
   ON users FOR SELECT
-  USING (public.is_admin(auth.uid()));
+  USING (public.is_moderator_or_admin(auth.uid()));
 
 CREATE POLICY "Users can update own profile"
   ON users FOR UPDATE
@@ -364,17 +378,16 @@ CREATE POLICY "Admins can update all users"
   ON users FOR UPDATE
   USING (public.is_admin(auth.uid()));
 
-CREATE POLICY "Allow user creation via trigger and admins"
+CREATE POLICY "Allow user creation via trigger and admins only"
   ON users FOR INSERT
   WITH CHECK (
     public.is_admin(auth.uid())
-    OR auth.uid() = id
     OR auth.uid() IS NULL
   );
 
-CREATE POLICY "Admins can delete users"
+CREATE POLICY "Only admins can delete users"
   ON users FOR DELETE
-  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin'));
+  USING (public.is_admin(auth.uid()));
 
 -- Posts table policies
 CREATE POLICY "Posts are viewable by everyone"
@@ -382,20 +395,20 @@ CREATE POLICY "Posts are viewable by everyone"
   TO public
   USING (true);
 
-CREATE POLICY "Authenticated users can insert posts"
+CREATE POLICY "Moderators and admins can insert posts"
   ON posts FOR INSERT
   TO authenticated
-  WITH CHECK (true);
+  WITH CHECK (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can update posts"
+CREATE POLICY "Moderators and admins can update posts"
   ON posts FOR UPDATE
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can delete posts"
+CREATE POLICY "Moderators and admins can delete posts"
   ON posts FOR DELETE
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
 -- Products table policies
 CREATE POLICY "Products are viewable by everyone"
@@ -403,20 +416,20 @@ CREATE POLICY "Products are viewable by everyone"
   TO public
   USING (true);
 
-CREATE POLICY "Authenticated users can insert products"
+CREATE POLICY "Moderators and admins can insert products"
   ON products FOR INSERT
   TO authenticated
-  WITH CHECK (true);
+  WITH CHECK (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can update products"
+CREATE POLICY "Moderators and admins can update products"
   ON products FOR UPDATE
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can delete products"
+CREATE POLICY "Moderators and admins can delete products"
   ON products FOR DELETE
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
 -- Brokers table policies
 CREATE POLICY "Brokers are viewable by everyone"
@@ -424,25 +437,25 @@ CREATE POLICY "Brokers are viewable by everyone"
   TO public
   USING (is_visible = true);
 
-CREATE POLICY "Authenticated users can view all brokers"
+CREATE POLICY "Moderators and admins can view all brokers"
   ON brokers FOR SELECT
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can insert brokers"
+CREATE POLICY "Moderators and admins can insert brokers"
   ON brokers FOR INSERT
   TO authenticated
-  WITH CHECK (true);
+  WITH CHECK (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can update brokers"
+CREATE POLICY "Moderators and admins can update brokers"
   ON brokers FOR UPDATE
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can delete brokers"
+CREATE POLICY "Moderators and admins can delete brokers"
   ON brokers FOR DELETE
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
 -- Banners table policies
 CREATE POLICY "Visible banners are viewable by everyone"
@@ -450,35 +463,35 @@ CREATE POLICY "Visible banners are viewable by everyone"
   TO public
   USING (is_visible = true);
 
-CREATE POLICY "Authenticated users can view all banners"
+CREATE POLICY "Moderators and admins can view all banners"
   ON banners FOR SELECT
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can insert banners"
+CREATE POLICY "Moderators and admins can insert banners"
   ON banners FOR INSERT
   TO authenticated
-  WITH CHECK (true);
+  WITH CHECK (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can update banners"
+CREATE POLICY "Moderators and admins can update banners"
   ON banners FOR UPDATE
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can delete banners"
+CREATE POLICY "Moderators and admins can delete banners"
   ON banners FOR DELETE
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
 -- Role permissions table policies
-CREATE POLICY "Everyone can view role permissions"
+CREATE POLICY "Moderators and admins can view role permissions"
   ON role_permissions FOR SELECT
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
 CREATE POLICY "Admins can manage role permissions"
   ON role_permissions FOR ALL
-  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin'));
+  USING (public.is_admin(auth.uid()));
 
 -- Images table policies
 CREATE POLICY "Images are viewable by everyone"
@@ -486,43 +499,73 @@ CREATE POLICY "Images are viewable by everyone"
   TO public
   USING (true);
 
-CREATE POLICY "Authenticated users can insert images"
+CREATE POLICY "Moderators and admins can insert images"
   ON images FOR INSERT
   TO authenticated
-  WITH CHECK (true);
+  WITH CHECK (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can update images"
+CREATE POLICY "Moderators and admins can update images"
   ON images FOR UPDATE
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
-CREATE POLICY "Authenticated users can delete images"
+CREATE POLICY "Moderators and admins can delete images"
   ON images FOR DELETE
   TO authenticated
-  USING (true);
+  USING (public.is_moderator_or_admin(auth.uid()));
 
 -- Audit logs table policies
 CREATE POLICY "Admins can view all audit logs"
   ON audit_logs FOR SELECT
   TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM users
-      WHERE id = auth.uid()
-      AND role = 'admin'
-    )
-  );
+  USING (public.is_admin(auth.uid()));
 
 CREATE POLICY "Admins can manage audit logs"
   ON audit_logs FOR ALL
   TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM users
-      WHERE id = auth.uid()
-      AND role = 'admin'
-    )
-  );
+  USING (public.is_admin(auth.uid()));
+
+-- Broker categories table policies
+CREATE POLICY "Broker categories are viewable by everyone"
+  ON broker_categories FOR SELECT
+  TO public
+  USING (true);
+
+CREATE POLICY "Moderators and admins can insert broker categories"
+  ON broker_categories FOR INSERT
+  TO authenticated
+  WITH CHECK (public.is_moderator_or_admin(auth.uid()));
+
+CREATE POLICY "Moderators and admins can update broker categories"
+  ON broker_categories FOR UPDATE
+  TO authenticated
+  USING (public.is_moderator_or_admin(auth.uid()));
+
+CREATE POLICY "Moderators and admins can delete broker categories"
+  ON broker_categories FOR DELETE
+  TO authenticated
+  USING (public.is_moderator_or_admin(auth.uid()));
+
+-- Broker account types table policies
+CREATE POLICY "Broker account types are viewable by everyone"
+  ON broker_account_types FOR SELECT
+  TO public
+  USING (true);
+
+CREATE POLICY "Moderators and admins can insert broker account types"
+  ON broker_account_types FOR INSERT
+  TO authenticated
+  WITH CHECK (public.is_moderator_or_admin(auth.uid()));
+
+CREATE POLICY "Moderators and admins can update broker account types"
+  ON broker_account_types FOR UPDATE
+  TO authenticated
+  USING (public.is_moderator_or_admin(auth.uid()));
+
+CREATE POLICY "Moderators and admins can delete broker account types"
+  ON broker_account_types FOR DELETE
+  TO authenticated
+  USING (public.is_moderator_or_admin(auth.uid()));
 
 -- ===============================================
 -- ADMIN USER CREATION

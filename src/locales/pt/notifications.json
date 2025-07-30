@@ -119,7 +119,8 @@
       "permissions": "Permissões",
       "role": "Função",
       "avatar": "Avatar",
-      "mainImage": "Imagem principal"
+      "mainImage": "Imagem principal",
+      "accountType": "Tipo de conta"
     }
   }
 }

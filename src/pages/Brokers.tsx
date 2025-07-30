@@ -112,7 +112,8 @@ const Brokers: React.FC = () => {
 
   const handleSubmit = async (
     data: BrokerInsert,
-    logoImage: (Partial<Image> & { publicUrl?: string; file?: File }) | null | undefined
+    logoImage: (Partial<Image> & { publicUrl?: string; file?: File }) | null | undefined,
+    accountTypes: any[] = []
   ) => {
     try {
       let brokerId = editingBroker?.id
@@ -153,6 +154,37 @@ const Brokers: React.FC = () => {
           ...imageData,
           record_id: brokerId
         } as Image)
+      }
+
+      // Save account types if broker was created/updated successfully
+      if (brokerId && accountTypes.length > 0) {
+        // First, delete existing account types for this broker
+        await supabase
+          .from('broker_account_types')
+          .delete()
+          .eq('broker_id', brokerId)
+
+        // Then insert the new account types
+        const accountTypesToInsert = accountTypes
+          .filter(at => at.account_type.trim()) // Only save non-empty account types
+          .map(at => ({
+            broker_id: brokerId,
+            account_type: at.account_type,
+            spreads: at.spreads || null,
+            commission: at.commission || null,
+            min_deposit: at.min_deposit || null
+          }))
+
+        if (accountTypesToInsert.length > 0) {
+          const { error: accountTypesError } = await supabase
+            .from('broker_account_types')
+            .insert(accountTypesToInsert)
+          
+          if (accountTypesError) {
+            console.error('Failed to save account types:', accountTypesError)
+            throw accountTypesError
+          }
+        }
       }
 
       handleCloseModal()
@@ -416,7 +448,7 @@ const Brokers: React.FC = () => {
               ? `${tCommon('actions.edit')} ${tCommon('entities.brokers')}`
               : t('brokers.addNewBroker')
           }
-          size='xl'
+          size='full'
         >
           <BrokerForm
             broker={editingBroker}
