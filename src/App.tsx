@@ -54,7 +54,7 @@ function App () {
             <Route
               path='/*'
               element={
-                <ProtectedRoute requiredRole='moderator' redirectTo='/unauthorized'>
+                <ProtectedRoute requiredRole='moderator'>
                   <DashboardLayout />
                 </ProtectedRoute>
               }
