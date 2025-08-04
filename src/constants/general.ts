@@ -62,6 +62,11 @@ export const BANNER_STATUSES = {
 
 export type BannerStatus = (typeof BANNER_STATUSES)[keyof typeof BANNER_STATUSES]
 
+// Generic Badge Variants
+export const GENERIC_BADGE_VARIANTS = {
+  SECONDARY: 'secondary'
+} as const
+
 // Combined for Badge component usage
 export const ALL_BADGE_VARIANTS = {
   // User roles
@@ -71,7 +76,9 @@ export const ALL_BADGE_VARIANTS = {
   // Post statuses
   ...POST_STATUSES,
   // Post types
-  ...POST_TYPES
+  ...POST_TYPES,
+  // Generic variants
+  ...GENERIC_BADGE_VARIANTS
 } as const
 
 export type BadgeVariant = (typeof ALL_BADGE_VARIANTS)[keyof typeof ALL_BADGE_VARIANTS]
@@ -97,7 +104,10 @@ export const LABELS = {
   [POST_TYPES.NEWS]: 'News',
   [POST_TYPES.EVENT]: 'Event',
   [POST_TYPES.TERMS_OF_USE]: 'Terms of Use',
-  [POST_TYPES.PRIVACY_POLICY]: 'Privacy Policy'
+  [POST_TYPES.PRIVACY_POLICY]: 'Privacy Policy',
+
+  // Generic variants
+  [GENERIC_BADGE_VARIANTS.SECONDARY]: 'Secondary'
 } as const
 
 // Color schemes for different variants with light and dark theme support
@@ -173,6 +183,13 @@ export const BADGE_STYLES = {
     background: 'bg-teal-100 dark:bg-teal-900/30',
     text: 'text-teal-800 dark:text-teal-300',
     border: 'border-teal-200 dark:border-teal-700/50'
+  },
+
+  // Generic variants
+  [GENERIC_BADGE_VARIANTS.SECONDARY]: {
+    background: 'bg-gray-100 dark:bg-gray-700/50',  
+    text: 'text-gray-700 dark:text-gray-300',
+    border: 'border-gray-300 dark:border-gray-600/50'
   }
 } as const
 

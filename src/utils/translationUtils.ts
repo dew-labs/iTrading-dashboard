@@ -196,7 +196,7 @@ export const getOptionalFields = (contentType: TranslatableContentType): string[
     case 'products':
       return ['description']
     case 'brokers':
-      return []
+      return ['affiliate_link']
     default:
       return []
   }
@@ -245,7 +245,8 @@ export const createEmptyTranslation = (
       return {
         ...baseTranslation,
         broker_id: contentId,
-        description: ''
+        description: '',
+        affiliate_link: ''
       } as Partial<BrokerTranslation>
 
     default:

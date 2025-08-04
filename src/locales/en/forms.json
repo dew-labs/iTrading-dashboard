@@ -65,7 +65,8 @@
     "accountTypeName": "Account Type Name",
     "spreads": "Spreads",
     "commission": "Commission",
-    "minDeposit": "Minimum Deposit"
+    "minDeposit": "Minimum Deposit",
+    "affiliate_link": "Affiliate Link"
   },
   "placeholders": {
     "enterFirstName": "Enter first name",
@@ -127,7 +128,9 @@
     "enterSpreads": "e.g., 1.5 pips, 0.8 pips",
     "enterCommission": "e.g., $7 per lot, 0.25%",
     "enterMinDeposit": "e.g., $100, $1000",
-    "selectCategory": "Select broker category"
+    "selectCategory": "Select broker category",
+    "affiliate_link": "Enter affiliate link URL",
+    "description": "Enter description"
   },
   "validation": {
     "required": "Required",
@@ -183,7 +186,8 @@
     "bannerNameHelper": "A clear name to identify this banner in your dashboard",
     "bannerTargetUrlHelper": "Where users will be redirected when they click the banner",
     "productNameHelper": "A clear, descriptive name for your product",
-    "affiliateLinkHelper": "A referral or affiliate link for this product (optional)"
+    "affiliateLinkHelper": "A referral or affiliate link for this product (optional)",
+    "brokerAffiliateLinkHelper": "A referral or affiliate link for this broker (optional)"
   },
   "bannerForm": {
     "clickToUpload": "Click to upload banner image",

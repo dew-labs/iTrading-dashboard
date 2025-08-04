@@ -5,7 +5,7 @@ import { Button, Input, Textarea } from '../../atoms'
 import { ConfirmDialog } from '../../common'
 import RichTextEditor from '../posts/RichTextEditor'
 import { useContentTranslation } from '../../../hooks/useContentTranslation'
-import { useTranslation } from '../../../hooks/useTranslation'
+import { useTranslation, useFormTranslation } from '../../../hooks/useTranslation'
 import { cn } from '../../../utils/theme'
 import { LANGUAGE_INFO, CONTENT_LANGUAGE_CODES } from '../../../constants/languages'
 import { calculateReadingTime } from '../../../utils/textUtils'
@@ -32,6 +32,7 @@ const TranslationManager: React.FC<TranslationManagerProps> = ({
 }) => {
   const { t } = useTranslation()
   const { t: tCommon } = useTranslation()
+  const { t: tForm } = useFormTranslation()
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(defaultLanguage)
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState<Record<string, string>>({})
@@ -237,7 +238,35 @@ const TranslationManager: React.FC<TranslationManagerProps> = ({
   const renderField = (field: string, value: string) => {
     const isRequired = requiredFields.includes(field)
     const hasError = !!errors[field]
-    const fieldLabel = field.charAt(0).toUpperCase() + field.slice(1)
+    
+    // Get proper translations for known fields
+    const getFieldLabel = (fieldName: string): string => {
+      const labelKey = `labels.${fieldName}`
+      const translatedLabel = tForm(labelKey)
+      // If translation exists and is different from the key, use it
+      if (translatedLabel && translatedLabel !== labelKey) {
+        return translatedLabel
+      }
+      // Fallback to formatted field name
+      return fieldName.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+    }
+    
+    const getFieldPlaceholder = (fieldName: string): string => {
+      const placeholderKey = `placeholders.${fieldName}`
+      const translatedPlaceholder = tForm(placeholderKey)
+      // If translation exists and is different from the key, use it
+      if (translatedPlaceholder && translatedPlaceholder !== placeholderKey) {
+        return translatedPlaceholder
+      }
+      // Fallback to generic placeholder
+      return t('placeholders.enterFieldInLanguage', {
+        field: getFieldLabel(fieldName).toLowerCase(),
+        language: LANGUAGE_INFO[selectedLanguage].nativeName
+      })
+    }
+    
+    const fieldLabel = getFieldLabel(field)
+    const fieldPlaceholder = getFieldPlaceholder(field)
     const isReadOnly = !isEditing
 
     // Use RichTextEditor for content fields, broker descriptions, and product descriptions
@@ -248,10 +277,7 @@ const TranslationManager: React.FC<TranslationManagerProps> = ({
             content={value}
             onChange={(content: string) => handleFieldChange(field, content)}
             label={fieldLabel}
-            placeholder={t('placeholders.enterFieldInLanguage', {
-              field: fieldLabel.toLowerCase(),
-              language: LANGUAGE_INFO[selectedLanguage].nativeName
-            })}
+            placeholder={fieldPlaceholder}
             height={300}
             disabled={isReadOnly}
             required={isRequired}
@@ -282,10 +308,7 @@ const TranslationManager: React.FC<TranslationManagerProps> = ({
           value={value}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleFieldChange(field, e.target.value)}
           rows={4}
-          placeholder={t('placeholders.enterFieldInLanguage', {
-            field: fieldLabel.toLowerCase(),
-            language: LANGUAGE_INFO[selectedLanguage].nativeName
-          })}
+          placeholder={fieldPlaceholder}
           disabled={isReadOnly}
           required={isRequired}
           {...(errors[field] && { error: errors[field] })}
@@ -304,10 +327,7 @@ const TranslationManager: React.FC<TranslationManagerProps> = ({
         label={fieldLabel}
         value={value}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFieldChange(field, e.target.value)}
-        placeholder={t('placeholders.enterFieldInLanguage', {
-          field: fieldLabel.toLowerCase(),
-          language: LANGUAGE_INFO[selectedLanguage].nativeName
-        })}
+        placeholder={fieldPlaceholder}
         disabled={isReadOnly}
         required={isRequired}
         {...(errors[field] && { error: errors[field] })}

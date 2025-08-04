@@ -81,6 +81,10 @@ const Badge: React.FC<BadgeProps> = ({
     case 'privacy_policy':
       return <Lock className={iconSize} />
 
+      // Generic variants
+    case 'secondary':
+      return null // No default icon for secondary variant
+
       // Product Types
     default:
       return <User className={iconSize} />

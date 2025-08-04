@@ -7,19 +7,27 @@ import {
   Building2,
   FileText,
   Edit2,
-  Eye,
-  EyeOff
+  ExternalLink,
+  CreditCard,
+  DollarSign,
+  TrendingUp,
+  Bitcoin,
+  Coins
 } from 'lucide-react'
 import { useTranslation, usePageTranslation } from '../../../hooks/useTranslation'
 import { useContentTranslation } from '../../../hooks/useContentTranslation'
-import { formatDateDisplay } from '../../../utils/format'
 import { Button, LanguageBadgeSelector, Badge } from '../../atoms'
 import { RichTextRenderer } from '../../common'
 import { CONTENT_LANGUAGE_CODES, SUPPORTED_LANGUAGE_CODES } from '../../../constants/languages'
 import type { Broker, Image } from '../../../types'
 import type { LanguageCode } from '../../../types/translations'
+import type { Database } from '../../../types/database'
 import { getTypographyClasses, cn } from '../../../utils/theme'
 import RecordImage from '../images/RecordImage'
+import { useQuery } from '@tanstack/react-query'
+import { supabase } from '../../../lib/supabase'
+
+type BrokerAccountType = Database['public']['Tables']['broker_account_types']['Row']
 
 interface BrokerViewModalProps {
   isOpen: boolean
@@ -51,6 +59,73 @@ const BrokerViewModal: React.FC<BrokerViewModalProps> = ({
     }
   )
 
+  // Get broker account types
+  const { data: accountTypes, isLoading: accountTypesLoading } = useQuery({
+    queryKey: ['broker-account-types', broker.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('broker_account_types')
+        .select('*')
+        .eq('broker_id', broker.id)
+        .order('account_type')
+
+      if (error) {
+        console.error('Error fetching broker account types:', error)
+        return []
+      }
+      return data as BrokerAccountType[]
+    },
+    enabled: isOpen && !!broker.id
+  })
+
+  // Get broker category
+  const { data: brokerCategory } = useQuery({
+    queryKey: ['broker-category', broker.category_id],
+    queryFn: async () => {
+      if (!broker.category_id) return null
+
+      const { data, error } = await supabase
+        .from('broker_categories')
+        .select('*')
+        .eq('id', broker.category_id)
+        .single()
+
+      if (error) {
+        console.error('Error fetching broker category:', error)
+        return null
+      }
+      return data
+    },
+    enabled: isOpen && !!broker.category_id
+  })
+
+  // Helper function to get category icon and styling
+  const getCategoryDisplay = useCallback((categoryName: string) => {
+    const name = categoryName.toLowerCase()
+
+    if (name.includes('fx') || name.includes('cfd') || name.includes('forex')) {
+      return {
+        icon: TrendingUp,
+        className: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-700/50'
+      }
+    } else if (name.includes('crypto') || name.includes('bitcoin') || name.includes('digital')) {
+      return {
+        icon: Bitcoin,
+        className: 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-700/50'
+      }
+    } else if (name.includes('commodity') || name.includes('metal') || name.includes('gold')) {
+      return {
+        icon: Coins,
+        className: 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-700/50'
+      }
+    } else {
+      return {
+        icon: Building2,
+        className: 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700/50 dark:text-gray-300 dark:border-gray-600'
+      }
+    }
+  }, [])
+
   // Update selected language when i18n language changes
   useEffect(() => {
     if (i18n.language && SUPPORTED_LANGUAGE_CODES.includes(i18n.language as LanguageCode)) {
@@ -65,17 +140,17 @@ const BrokerViewModal: React.FC<BrokerViewModalProps> = ({
     // First try to find translation for selected language
     const selectedTranslation = translations.find(t => t.language_code === selectedLanguage)
     if (selectedTranslation) {
-      return selectedTranslation as { id: string; language_code: string; description?: string }
+      return selectedTranslation as { id: string; language_code: string; description?: string; affiliate_link?: string }
     }
 
     // Fallback to English if available
     const englishTranslation = translations.find(t => t.language_code === 'en')
     if (englishTranslation) {
-      return englishTranslation as { id: string; language_code: string; description?: string }
+      return englishTranslation as { id: string; language_code: string; description?: string; affiliate_link?: string }
     }
 
     // Fallback to first available translation
-    return translations[0] as { id: string; language_code: string; description?: string }
+    return translations[0] as { id: string; language_code: string; description?: string; affiliate_link?: string }
   }, [translations, selectedLanguage])
 
   // Get available languages for this broker
@@ -134,10 +209,10 @@ const BrokerViewModal: React.FC<BrokerViewModalProps> = ({
   }
 
   const modalContent = (
-    <div 
-      className='fixed inset-0 z-[100] flex items-center justify-center p-4' 
-      aria-labelledby='modal-title' 
-      role='dialog' 
+    <div
+      className='fixed inset-0 z-[100] flex items-center justify-center p-4'
+      aria-labelledby='modal-title'
+      role='dialog'
       aria-modal='true'
       onClick={handleBackdropClick}
     >
@@ -149,11 +224,11 @@ const BrokerViewModal: React.FC<BrokerViewModalProps> = ({
         aria-hidden='true'
         onClick={handleBackdropClick}
       />
-      
-      <div 
+
+      <div
         className={`relative z-10 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-2xl border border-white/20 dark:border-gray-700/50 w-full max-w-4xl max-h-[90vh] overflow-hidden transform transition-all duration-200 ease-out ${
-          isAnimating 
-            ? 'opacity-100 scale-100 translate-y-0' 
+          isAnimating
+            ? 'opacity-100 scale-100 translate-y-0'
             : 'opacity-0 scale-95 translate-y-4'
         }`}
         onClick={(e) => e.stopPropagation()}
@@ -177,17 +252,38 @@ const BrokerViewModal: React.FC<BrokerViewModalProps> = ({
                   )}>
                     {broker.name || tCommon('content.unnamedBroker')}
                   </h1>
-                  <div className='flex flex-col space-y-1 mt-2'>
-                    {broker.headquarter && (
-                      <div className='flex items-center text-gray-300'>
-                        <MapPin className='w-4 h-4 mr-1 flex-shrink-0' />
-                        <span className='text-sm truncate'>{broker.headquarter}</span>
+                  <div className='flex flex-col space-y-2 mt-2'>
+                    {(broker.headquarter || broker.established_in) && (
+                      <div className='flex items-center gap-4 text-gray-300'>
+                        {broker.headquarter && (
+                          <div className='flex items-center'>
+                            <MapPin className='w-4 h-4 mr-1 flex-shrink-0' />
+                            <span className='text-sm truncate'>{broker.headquarter}</span>
+                          </div>
+                        )}
+                        {broker.established_in && (
+                          <div className='flex items-center'>
+                            <Calendar className='w-4 h-4 mr-1 flex-shrink-0' />
+                            <span className='text-sm'>{t('brokers.est')} {broker.established_in}</span>
+                          </div>
+                        )}
                       </div>
                     )}
-                    {broker.established_in && (
-                      <div className='flex items-center text-gray-300'>
-                        <Calendar className='w-4 h-4 mr-1 flex-shrink-0' />
-                        <span className='text-sm'>{t('brokers.est')} {broker.established_in}</span>
+                    {brokerCategory && (
+                      <div className='flex items-center'>
+                        {(() => {
+                          const { icon: Icon, className } = getCategoryDisplay(brokerCategory.name)
+                          return (
+                            <Badge
+                              variant='secondary'
+                              size='sm'
+                              className={cn('inline-flex items-center', className)}
+                            >
+                              <Icon className='w-3 h-3 mr-1' />
+                              {brokerCategory.name}
+                            </Badge>
+                          )
+                        })()}
                       </div>
                     )}
                   </div>
@@ -275,95 +371,106 @@ const BrokerViewModal: React.FC<BrokerViewModalProps> = ({
                   </div>
                 </div>
 
-                {/* Broker details section */}
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-gray-200 dark:border-gray-700'>
 
-                  {/* Broker Details */}
-                  <div>
+                {/* Account Types Section */}
+                {accountTypes && accountTypes.length > 0 && (
+                  <div className='pt-6 border-t border-gray-200 dark:border-gray-700'>
                     <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center'>
-                      <Building2 className='w-5 h-5 mr-2 text-blue-600 dark:text-blue-400' />
-                      {t('brokers.brokerDetails')}
+                      <CreditCard className='w-5 h-5 mr-2 text-purple-600 dark:text-purple-400' />
+                      {t('brokers.accountTypes')}
                     </h3>
-                    <div className='space-y-4'>
-                      <div className='bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-600'>
-                        <div className='space-y-3'>
-                          <div className='flex items-start justify-between'>
-                            <span className='text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[100px]'>
-                              {t('brokers.name')}:
-                            </span>
-                            <span className='text-sm text-gray-900 dark:text-white text-right font-medium'>
-                              {broker.name || 'N/A'}
-                            </span>
+                    {accountTypesLoading ? (
+                      <div className='flex items-center justify-center py-8'>
+                        <div className='w-6 h-6 border-2 border-purple-600 border-t-transparent rounded-full animate-spin'></div>
+                        <span className='ml-2 text-sm text-gray-500 dark:text-gray-400'>Loading account types...</span>
+                      </div>
+                    ) : (
+                      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                        {accountTypes.map((accountType, index) => (
+                          <div key={accountType.id || index} className='bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-600'>
+                            <div className='space-y-3'>
+                              <div className='flex items-center justify-between'>
+                                <h4 className='text-sm font-semibold text-gray-900 dark:text-white flex items-center'>
+                                  <DollarSign className='w-4 h-4 mr-1 text-purple-600 dark:text-purple-400' />
+                                  {accountType.account_type}
+                                </h4>
+                              </div>
+
+                              {accountType.spreads && (
+                                <div className='flex items-start justify-between'>
+                                  <span className='text-xs font-medium text-gray-500 dark:text-gray-400'>
+                                    {t('brokers.spreads')}:
+                                  </span>
+                                  <span className='text-xs text-gray-900 dark:text-white text-right'>
+                                    {accountType.spreads}
+                                  </span>
+                                </div>
+                              )}
+
+                              {accountType.commission && (
+                                <div className='flex items-start justify-between'>
+                                  <span className='text-xs font-medium text-gray-500 dark:text-gray-400'>
+                                    {t('brokers.commission')}:
+                                  </span>
+                                  <span className='text-xs text-gray-900 dark:text-white text-right'>
+                                    {accountType.commission}
+                                  </span>
+                                </div>
+                              )}
+
+                              {accountType.min_deposit && (
+                                <div className='flex items-start justify-between'>
+                                  <span className='text-xs font-medium text-gray-500 dark:text-gray-400'>
+                                    {t('brokers.minDeposit')}:
+                                  </span>
+                                  <span className='text-xs text-gray-900 dark:text-white text-right font-medium'>
+                                    {accountType.min_deposit}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
                           </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
 
-                          {broker.headquarter && (
-                            <div className='flex items-start justify-between'>
-                              <span className='text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[100px]'>
-                                {t('brokers.headquarter')}:
-                              </span>
-                              <span className='text-sm text-gray-900 dark:text-white text-right'>
-                                {broker.headquarter}
-                              </span>
-                            </div>
-                          )}
-
-                          {broker.established_in && (
-                            <div className='flex items-start justify-between'>
-                              <span className='text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[100px]'>
-                                {t('brokers.established')}:
-                              </span>
-                              <span className='text-sm text-gray-900 dark:text-white text-right'>
-                                {broker.established_in}
-                              </span>
-                            </div>
-                          )}
+                {/* Affiliate Link Section */}
+                {currentTranslation?.affiliate_link && (
+                  <div className='pt-6 border-t border-gray-200 dark:border-gray-700'>
+                    <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center'>
+                      <ExternalLink className='w-5 h-5 mr-2 text-orange-600 dark:text-orange-400' />
+                      {t('brokers.affiliateLink')}
+                    </h3>
+                    <div className='bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-600'>
+                      <div className='flex items-center justify-between'>
+                        <div className='flex-1 min-w-0'>
+                          <span className='text-sm text-gray-500 dark:text-gray-400 block mb-1'>
+                            {t('brokers.partnerLink')}
+                          </span>
+                          <a
+                            href={currentTranslation.affiliate_link}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='text-sm text-blue-600 dark:text-blue-400 hover:underline break-all'
+                          >
+                            {currentTranslation.affiliate_link}
+                          </a>
                         </div>
+                        <a
+                          href={currentTranslation.affiliate_link}
+                          target='_blank'
+                          rel='noopener noreferrer'
+                          className='ml-3 flex-shrink-0 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors'
+                        >
+                          <ExternalLink className='w-3 h-3 mr-1' />
+                          {t('brokers.visitSite')}
+                        </a>
                       </div>
                     </div>
                   </div>
-
-                  {/* System Information */}
-                  <div>
-                    <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center'>
-                      <Calendar className='w-5 h-5 mr-2 text-green-600 dark:text-green-400' />
-                      {t('brokers.systemInfo')}
-                    </h3>
-                    <div className='space-y-4'>
-                      <div className='bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-600'>
-                        <div className='space-y-3'>
-                          <div className='flex items-start justify-between'>
-                            <span className='text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[100px]'>
-                              {t('brokers.createdDate')}:
-                            </span>
-                            <span className='text-sm text-gray-900 dark:text-white text-right'>
-                              {formatDateDisplay(broker.created_at || new Date().toISOString())}
-                            </span>
-                          </div>
-
-                          <div className='flex items-start justify-between'>
-                            <span className='text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[100px]'>
-                              {t('brokers.status')}:
-                            </span>
-                            <div className='text-right'>
-                              <Badge
-                                variant={broker.is_visible ? 'active' : 'inactive'}
-                                size='sm'
-                                className='inline-flex items-center'
-                              >
-                                {broker.is_visible ? (
-                                  <Eye className='w-3 h-3 mr-1' />
-                                ) : (
-                                  <EyeOff className='w-3 h-3 mr-1' />
-                                )}
-                                {broker.is_visible ? t('brokers.visible') : t('brokers.hidden')}
-                              </Badge>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>

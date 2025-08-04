@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useState } from 'react'
-import { X, Save, Plus, Building2, Calendar, MapPin, Languages, CheckCircle, Tag, CreditCard, Trash2 } from 'lucide-react'
+import { X, Save, Plus, Building2, Calendar, MapPin, Languages, CheckCircle, CreditCard, Trash2, TrendingUp, Bitcoin, Coins } from 'lucide-react'
 import type { Broker, BrokerInsert, Image } from '../../../types'
 import type { Tables } from '../../../types/database'
 import { useFormValidation } from '../../../hooks/useFormValidation'
@@ -54,7 +54,7 @@ interface AccountType {
 interface BrokerFormProps {
   broker?: Broker | null
   onSubmit: (
-    data: BrokerInsert, 
+    data: BrokerInsert,
     logoImage?: (Partial<Image> & { file?: File }) | null,
     accountTypes?: AccountType[]
   ) => void
@@ -73,7 +73,7 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
   >(null)
 
   const [accountTypes, setAccountTypes] = useState<AccountType[]>([])
-  
+
   // Delete confirmation state
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{
     isOpen: boolean
@@ -88,6 +88,21 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
   })
   const [isDeletingAccountType, setIsDeletingAccountType] = useState(false)
 
+  // Helper function to get category icon based on category name
+  const getCategoryIcon = useCallback((categoryName: string) => {
+    const name = categoryName.toLowerCase()
+
+    if (name.includes('fx') || name.includes('cfd') || name.includes('forex')) {
+      return TrendingUp
+    } else if (name.includes('crypto') || name.includes('bitcoin') || name.includes('digital')) {
+      return Bitcoin
+    } else if (name.includes('commodity') || name.includes('metal') || name.includes('gold')) {
+      return Coins
+    } else {
+      return Building2
+    }
+  }, [])
+
   // Load broker categories from database
   const { data: brokerCategories = [], isLoading: categoriesLoading } = useQuery({
     queryKey: ['broker_categories'],
@@ -96,7 +111,7 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
         .from('broker_categories')
         .select('*')
         .order('name')
-      
+
       if (error) throw error
       return data as BrokerCategory[]
     }
@@ -148,7 +163,7 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
       } else {
         setLogoImage(null)
       }
-      
+
       // Load existing account types for this broker
       const loadAccountTypes = async () => {
         const { data } = await supabase
@@ -157,8 +172,8 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
           .eq('broker_id', broker.id)
         if (data) {
           // Add stable IDs to existing account types for React keys and track database IDs
-          setAccountTypes(data.map(at => ({ 
-            ...at, 
+          setAccountTypes(data.map(at => ({
+            ...at,
             id: crypto.randomUUID(), // React key
             database_id: at.id // Database ID for deletion
           })))
@@ -223,12 +238,12 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
 
   const handleConfirmDeleteAccountType = useCallback(async () => {
     if (!deleteConfirmDialog.accountTypeId) return
-    
+
     const idToDelete = deleteConfirmDialog.accountTypeId
     const databaseId = deleteConfirmDialog.databaseId
-    
+
     setIsDeletingAccountType(true)
-    
+
     try {
       // If this account type exists in the database, delete it immediately
       if (databaseId) {
@@ -236,19 +251,19 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
           .from('broker_account_types')
           .delete()
           .eq('id', databaseId)
-        
+
         if (error) {
           console.error('Failed to delete account type from database:', error)
           toast.error(null, null, 'Failed to delete account type')
           return
         }
-        
+
         toast.success('deleted', 'accountType')
       }
-      
+
       // Remove from local state
       setAccountTypes(prev => prev.filter(at => at.id !== idToDelete))
-      
+
     } catch (error) {
       console.error('Error deleting account type:', error)
       toast.error(null, null, 'Failed to delete account type')
@@ -273,7 +288,7 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
   }, [])
 
   const updateAccountType = useCallback((index: number, field: keyof AccountType, value: string) => {
-    setAccountTypes(prev => prev.map((accountType, i) => 
+    setAccountTypes(prev => prev.map((accountType, i) =>
       i === index ? { ...accountType, [field]: value } : accountType
     ))
   }, [])
@@ -347,11 +362,14 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
                 label={tForm('labels.category')}
                 value={formData.category_id || ''}
                 onChange={(value) => updateField('category_id', value)}
-                options={brokerCategories.map(category => ({
-                  value: category.id,
-                  label: category.name,
-                  icon: <Tag className="w-4 h-4" />
-                }))}
+                options={brokerCategories.map(category => {
+                  const IconComponent = getCategoryIcon(category.name)
+                  return {
+                    value: category.id,
+                    label: category.name,
+                    icon: <IconComponent className="w-4 h-4" />
+                  }
+                })}
                 placeholder={categoriesLoading ? tCommon('feedback.loading') : tForm('placeholders.selectCategory')}
                 required
                 disabled={isValidating || categoriesLoading}
@@ -449,7 +467,7 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
                           {tCommon('actions.delete')}
                         </Button>
                       </div>
-                      
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <FormField
                           label={tForm('labels.accountTypeName')}
@@ -460,7 +478,7 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
                           required
                           disabled={isValidating}
                         />
-                        
+
                         <FormField
                           label={tForm('labels.spreads')}
                           name={`spreads_${index}`}
@@ -469,7 +487,7 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
                           placeholder={tForm('placeholders.enterSpreads')}
                           disabled={isValidating}
                         />
-                        
+
                         <FormField
                           label={tForm('labels.commission')}
                           name={`commission_${index}`}
@@ -478,7 +496,7 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
                           placeholder={tForm('placeholders.enterCommission')}
                           disabled={isValidating}
                         />
-                        
+
                         <FormField
                           label={tForm('labels.minDeposit')}
                           name={`min_deposit_${index}`}
