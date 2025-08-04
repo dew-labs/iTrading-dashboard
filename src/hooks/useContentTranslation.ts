@@ -103,7 +103,8 @@ export const useContentTranslation = (
           return await TranslationService.createBrokerTranslation({
             broker_id: contentId,
             language_code: languageCode,
-            ...(fields.description && { description: fields.description })
+            ...(fields.description && { description: fields.description }),
+            ...(fields.affiliate_link !== undefined && { affiliate_link: fields.affiliate_link })
           })
         default:
           throw new Error(`Unsupported content type: ${contentType}`)
@@ -143,7 +144,8 @@ export const useContentTranslation = (
           })
         case 'brokers':
           return await TranslationService.updateBrokerTranslation(id, {
-            ...(fields.description && { description: fields.description })
+            ...(fields.description && { description: fields.description }),
+            ...(fields.affiliate_link !== undefined && { affiliate_link: fields.affiliate_link })
           })
         default:
           throw new Error(`Unsupported content type: ${contentType}`)

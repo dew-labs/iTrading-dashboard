@@ -216,6 +216,24 @@ const Brokers: React.FC = () => {
   })
   const imagesByRecord = groupImagesByRecord(images)['brokers'] || {}
 
+  // Fetch broker categories
+  const { data: categories = [] } = useQuery({
+    queryKey: ['broker-categories'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('broker_categories')
+        .select('*')
+        .order('name')
+      return data || []
+    }
+  })
+  
+  // Create a lookup map for categories
+  const categoriesByRecord = categories.reduce((acc, category) => {
+    acc[category.id] = category
+    return acc
+  }, {} as Record<string, { id: string; name: string }>)
+
   if (loading) {
     return (
       <div className={layout.container}>
@@ -303,6 +321,7 @@ const Brokers: React.FC = () => {
               <BrokersTable
                 brokers={paginatedBrokers}
                 imagesByRecord={imagesByRecord}
+                categoriesByRecord={categoriesByRecord}
                 onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}

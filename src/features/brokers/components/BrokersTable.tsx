@@ -1,10 +1,10 @@
 import React from 'react'
-import { Edit2, Trash2, Eye, Building2, Calendar, FileText, EyeOff, Languages } from 'lucide-react'
+import { Edit2, Trash2, Eye, Building2, Calendar, FileText, EyeOff, Languages, TrendingUp, Bitcoin, Coins } from 'lucide-react'
 import Table from '../../../components/molecules/Table'
 import { usePageTranslation } from '../../../hooks/useTranslation'
 import { formatDateDisplay } from '../../../utils/format'
 import { getTypographyClasses, getIconClasses, cn } from '../../../utils/theme'
-import { TranslationStatusIndicator } from '../../../components/atoms'
+import { TranslationStatusIndicator, Badge } from '../../../components/atoms'
 import type { Broker } from '../../../types'
 import type { BrokerWithTranslations } from '../../../types/translations'
 import RecordImage from '../../../components/features/images/RecordImage'
@@ -12,6 +12,7 @@ import RecordImage from '../../../components/features/images/RecordImage'
 interface BrokersTableProps {
   brokers: (Broker | BrokerWithTranslations)[]
   imagesByRecord?: Record<string, import('../../../types').Image[]>
+  categoriesByRecord?: Record<string, { id: string; name: string }>
   onView: (broker: Broker | BrokerWithTranslations) => void
   onEdit: (broker: Broker | BrokerWithTranslations) => void
   onDelete: (broker: Broker | BrokerWithTranslations) => void
@@ -25,6 +26,7 @@ interface BrokersTableProps {
 const BrokersTable: React.FC<BrokersTableProps> = ({
   brokers,
   imagesByRecord = {},
+  categoriesByRecord = {},
   onView,
   onEdit,
   onDelete,
@@ -39,6 +41,37 @@ const BrokersTable: React.FC<BrokersTableProps> = ({
   const handleToggleVisible = async (broker: Broker | BrokerWithTranslations) => {
     if (typeof onToggleVisible === 'function') {
       await onToggleVisible(broker)
+    }
+  }
+
+  // Helper function to get category icon and styling
+  const getCategoryDisplay = (categoryName: string) => {
+    const name = categoryName.toLowerCase()
+    
+    if (name.includes('fx') || name.includes('cfd') || name.includes('forex')) {
+      return {
+        icon: TrendingUp,
+        variant: 'success' as const,
+        className: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-700/50'
+      }
+    } else if (name.includes('crypto') || name.includes('bitcoin') || name.includes('digital')) {
+      return {
+        icon: Bitcoin,
+        variant: 'warning' as const,
+        className: 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-700/50'
+      }
+    } else if (name.includes('commodity') || name.includes('metal') || name.includes('gold')) {
+      return {
+        icon: Coins,
+        variant: 'secondary' as const,
+        className: 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-700/50'
+      }
+    } else {
+      return {
+        icon: Building2,
+        variant: 'secondary' as const,
+        className: 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700/50 dark:text-gray-300 dark:border-gray-600'
+      }
     }
   }
 
@@ -68,6 +101,7 @@ const BrokersTable: React.FC<BrokersTableProps> = ({
       sortable: true,
       render: (value: unknown, row: Broker | BrokerWithTranslations) => {
         const displayContent = getDisplayContent(row)
+        
         return (
           <div className='flex items-center space-x-3'>
             <div className='flex-shrink-0'>
@@ -85,6 +119,38 @@ const BrokersTable: React.FC<BrokersTableProps> = ({
                 {displayContent.headquarter || t('brokers.noHeadquarterInfo')}
               </div>
             </div>
+          </div>
+        )
+      }
+    },
+    {
+      header: t('brokers.category'),
+      accessor: 'category_id' as keyof Broker,
+      render: (value: unknown, row: Broker | BrokerWithTranslations) => {
+        const category = row.category_id ? categoriesByRecord[row.category_id] : null
+        
+        if (!category) {
+          return (
+            <div className='flex items-center'>
+              <Badge variant='secondary' size='sm' className='bg-gray-100 text-gray-500 border-gray-200 dark:bg-gray-700/50 dark:text-gray-400 dark:border-gray-600'>
+                {t('brokers.notSpecified')}
+              </Badge>
+            </div>
+          )
+        }
+
+        const { icon: Icon, className } = getCategoryDisplay(category.name)
+        
+        return (
+          <div className='flex items-center'>
+            <Badge 
+              variant='secondary' 
+              size='sm' 
+              className={cn('inline-flex items-center', className)}
+            >
+              <Icon className='w-3 h-3 mr-1' />
+              {category.name}
+            </Badge>
           </div>
         )
       }

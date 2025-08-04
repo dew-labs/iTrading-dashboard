@@ -65,7 +65,8 @@
     "accountTypeName": "Nome do Tipo de Conta",
     "spreads": "Spreads",
     "commission": "Comissão",
-    "minDeposit": "Depósito Mínimo"
+    "minDeposit": "Depósito Mínimo",
+    "affiliate_link": "Link de Afiliado"
   },
   "placeholders": {
     "enterFirstName": "Digite o nome",
@@ -127,7 +128,9 @@
     "enterAccountType": "ex., Padrão, Premium, VIP",
     "enterSpreads": "ex., 1,5 pips, 0,8 pips",
     "enterCommission": "ex., $7 por lote, 0,25%",
-    "enterMinDeposit": "ex., $100, $1000"
+    "enterMinDeposit": "ex., $100, $1000",
+    "affiliate_link": "Digite a URL do link de afiliado",
+    "description": "Digite a descrição"
   },
   "validation": {
     "required": "Obrigatório",
@@ -180,7 +183,8 @@
     "bannerNameHelper": "Um nome claro para identificar este banner no seu painel",
     "bannerTargetUrlHelper": "Para onde os usuários serão redirecionados ao clicar no banner",
     "productNameHelper": "Um nome claro e descritivo para seu produto",
-    "affiliateLinkHelper": "Um link de indicação ou afiliado para este produto (opcional)"
+    "affiliateLinkHelper": "Um link de indicação ou afiliado para este produto (opcional)",
+    "brokerAffiliateLinkHelper": "Um link de indicação ou afiliado para esta corretora (opcional)"
   },
   "bannerForm": {
     "clickToUpload": "Clique para fazer upload da imagem do banner",

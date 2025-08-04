@@ -47,6 +47,7 @@ export interface ProductTranslation extends TranslationBase {
 export interface BrokerTranslation extends TranslationBase {
   broker_id: string
   description?: string | null
+  affiliate_link?: string | null
 }
 
 /**
@@ -77,6 +78,7 @@ export interface BrokerTranslationInsert {
   broker_id: string
   language_code: LanguageCode
   description?: string
+  affiliate_link?: string
 }
 
 /**
@@ -96,6 +98,7 @@ export interface ProductTranslationUpdate {
 
 export interface BrokerTranslationUpdate {
   description?: string
+  affiliate_link?: string
 }
 
 /**

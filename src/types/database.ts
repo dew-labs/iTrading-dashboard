@@ -212,6 +212,7 @@ export type Database = {
       }
       brokers_translations: {
         Row: {
+          affiliate_link: string | null
           broker_id: string
           created_at: string
           description: string | null
@@ -220,6 +221,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          affiliate_link?: string | null
           broker_id: string
           created_at?: string
           description?: string | null
@@ -228,6 +230,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          affiliate_link?: string | null
           broker_id?: string
           created_at?: string
           description?: string | null
