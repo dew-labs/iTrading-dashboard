@@ -14,6 +14,7 @@ export interface UploadResult {
   url: string
   path: string
   id: string
+  blurhash?: string
 }
 
 export const useFileUpload = () => {
@@ -56,7 +57,7 @@ export const useFileUpload = () => {
     })
   }
 
-  const uploadFile = async (file: File, options: UploadOptions): Promise<UploadResult & { blurhash?: string }> => {
+  const uploadFile = async (file: File, options: UploadOptions): Promise<UploadResult> => {
     const {
       bucket = 'posts',
       folder = 'images',
@@ -106,12 +107,12 @@ export const useFileUpload = () => {
 
       setProgress(100)
 
-      const result: UploadResult & { blurhash?: string } = {
+      const result: UploadResult = {
         url: urlData.publicUrl,
         path: filePath,
-        id: uploadData.id || fileName
+        id: uploadData.id || fileName,
+        ...(blurhash && { blurhash })
       }
-      if (blurhash) result.blurhash = blurhash
       return result
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Upload failed'

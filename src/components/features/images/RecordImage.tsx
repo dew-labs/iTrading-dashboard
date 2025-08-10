@@ -28,9 +28,27 @@ const RecordImage: React.FC<RecordImageProps> = ({
   const [imgLoaded, setImgLoaded] = React.useState(false)
   const [imageError, setImageError] = React.useState(false)
 
+  // Reset loading state when image changes
+  React.useEffect(() => {
+    setImgLoaded(false)
+    setImageError(false)
+  }, [image?.path])
+
   const imageUrl = image ? getStorageUrl(image.table_name, image.path) : null
 
-  if (!image || !imageUrl || imageError) {
+  // If no image exists at all, show fallback
+  if (!image || !imageUrl) {
+    if (!showFallback) return null
+
+    return (
+      <div className={fallbackClassName}>
+        {fallbackIcon || <ImageIcon className='w-1/2 h-1/2 text-gray-400' />}
+      </div>
+    )
+  }
+
+  // If image failed to load, show fallback
+  if (imageError) {
     if (!showFallback) return null
 
     return (
@@ -42,15 +60,13 @@ const RecordImage: React.FC<RecordImageProps> = ({
 
   return (
     <div className='relative'>
+      {/* Show blurhash placeholder while loading if available */}
       {!imgLoaded && image.blurhash && (
         <img
           src={blurhashToDataUri(image.blurhash, 32, 32)}
           alt="Blurhash placeholder"
+          className={className}
           style={{
-            width: '100%',
-            height: '100%',
-            borderRadius: '0.5rem',
-            objectFit: 'cover',
             position: 'absolute',
             top: 0,
             left: 0,
@@ -59,11 +75,19 @@ const RecordImage: React.FC<RecordImageProps> = ({
           aria-hidden="true"
         />
       )}
+      
+      {/* Show fallback icon while loading if no blurhash */}
+      {!imgLoaded && !image.blurhash && (
+        <div className={fallbackClassName} style={{ position: 'absolute', top: 0, left: 0, zIndex: 1 }}>
+          {fallbackIcon || <ImageIcon className='w-1/2 h-1/2 text-gray-400' />}
+        </div>
+      )}
+      
       <img
         src={imageUrl}
         alt={image.alt_text || alt}
         className={className}
-        style={!imgLoaded && image.blurhash ? { opacity: 0, position: 'absolute', zIndex: 2 } : {}}
+        style={!imgLoaded ? { opacity: 0, position: 'relative', zIndex: 2 } : { position: 'relative', zIndex: 2 }}
         onLoad={() => setImgLoaded(true)}
         onError={() => setImageError(true)}
       />

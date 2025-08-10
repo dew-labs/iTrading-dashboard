@@ -190,9 +190,8 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
   const handleLogoUpload = useCallback(
     (uploadResult: UploadResult | null, file?: File) => {
       if (uploadResult && file) {
-        const { url: publicUrl, path, id: storageObjectId } = uploadResult
-        setLogoImage(prev => ({
-          ...prev,
+        const { url: publicUrl, path, id: storageObjectId, blurhash } = uploadResult
+        setLogoImage({
           path,
           publicUrl,
           storage_object_id: storageObjectId,
@@ -202,8 +201,9 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
           alt_text: `${broker?.name || 'Broker'} logo`,
           file_size: file.size,
           mime_type: file.type,
+          blurhash: blurhash || null,
           file
-        }))
+        })
       } else {
         setLogoImage(null)
       }
