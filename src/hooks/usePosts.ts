@@ -143,6 +143,13 @@ export const usePosts = () => {
     gcTime: 3 * 60 * 1000 // Keep in cache for 3 minutes
   })
 
+  // Helper to invalidate all post-related queries
+  const invalidateAllPostQueries = () => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.posts() })
+    queryClient.invalidateQueries({ queryKey: ['posts-with-translations'] })
+    queryClient.invalidateQueries({ queryKey: ['translations', 'posts'] })
+  }
+
   // Create post mutation
   const createMutation = useMutation({
     mutationFn: createPostMutation,
@@ -176,7 +183,7 @@ export const usePosts = () => {
       toast.error(null, null, `Creation failed: ${errorMessage}`)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.posts() })
+      invalidateAllPostQueries()
       toast.success('created', 'post')
     }
   })
@@ -203,7 +210,7 @@ export const usePosts = () => {
       toast.error(null, null, `Update failed: ${errorMessage}`)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.posts() })
+      invalidateAllPostQueries()
       toast.success('updated', 'post')
     }
   })
@@ -231,7 +238,7 @@ export const usePosts = () => {
       toast.error(null, null, `Deletion failed: ${errorMessage}`)
     },
     onSuccess: (_data, _variables, _context) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.posts() })
+      invalidateAllPostQueries()
       toast.success('deleted', 'post')
     }
   })
@@ -260,7 +267,7 @@ export const usePosts = () => {
       toast.error(null, null, `Duplication failed: ${errorMessage}`)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.posts() })
+      invalidateAllPostQueries()
     }
   })
 
