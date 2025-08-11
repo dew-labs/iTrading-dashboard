@@ -3,7 +3,7 @@ import { Edit2, Trash2, Package, Calendar } from 'lucide-react'
 import { Table } from '../../../components/molecules'
 import { usePageTranslation, useTranslation } from '../../../hooks/useTranslation'
 import { getTypographyClasses, getIconClasses, cn } from '../../../utils/theme'
-import { formatDateDisplay, formatPrice } from '../../../utils/format'
+import { formatDateDisplay } from '../../../utils/format'
 import { stripHtmlAndTruncate } from '../../../utils/textUtils'
 import type { ProductWithTranslations } from '../../../types'
 import RecordImage from '../../../components/features/images/RecordImage'
@@ -77,19 +77,6 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
                   : t('products.noDescription')}
               </div>
             </div>
-          </div>
-        )
-      }
-    },
-    {
-      header: t('products.pricing'),
-      accessor: 'price',
-      sortable: true,
-      render: (value: unknown) => {
-        const price = value as number
-        return (
-          <div className={getTypographyClasses('small')}>
-            <div className='font-bold text-lg text-gray-900 dark:text-gray-100'>${formatPrice(price)}</div>
           </div>
         )
       }
