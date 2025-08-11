@@ -112,7 +112,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
         <div className='flex items-center'>
           <button
             onClick={onToggleSidebar}
-            className='lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+            className='lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 hover:scale-110 active:scale-95'
           >
             <Menu className='w-5 h-5 text-gray-600 dark:text-gray-300' />
           </button>
@@ -133,20 +133,20 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           <div className='relative' ref={notificationRef}>
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className='relative p-2.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all group'
+              className='relative p-2.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 group hover:scale-110 active:scale-95 touch-manipulation'
             >
-              <Bell className='w-5 h-5' />
+              <Bell className='w-5 h-5 transition-transform duration-200 group-hover:rotate-12' />
               {hasPermission && recentActivity.length > 0 && (
                 <>
-                  <span className='absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse'></span>
-                  <span className='absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping'></span>
+                  <span className='absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-lg'></span>
+                  <span className='absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping opacity-75'></span>
                 </>
               )}
             </button>
 
             {/* Notification Dropdown */}
             {showNotifications && (
-              <div className='absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50 max-h-[32rem] flex flex-col'>
+              <div className='absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] sm:w-96 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50 max-h-[32rem] flex flex-col animate-in slide-in-from-top-2 duration-200'>
                 {/* Header */}
                 <div className='px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex-shrink-0'>
                   <div className='flex items-center justify-between min-h-[32px]'>
@@ -176,10 +176,11 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                       <p>{t('loadingStates.noActivity')}</p>
                     </div>
                   ) : (
-                    recentActivity.map(notification => (
+                    recentActivity.map((notification, index) => (
                     <div
                       key={notification.id}
-                      className='px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-50 dark:border-gray-700 last:border-b-0'
+                      className='px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 border-b border-gray-50 dark:border-gray-700 last:border-b-0 animate-in slide-in-from-right duration-300 hover:scale-[1.02] cursor-pointer touch-manipulation'
+                      style={{ animationDelay: `${index * 50}ms` }}
                     >
                       <div className='flex items-start space-x-3'>
                         <div

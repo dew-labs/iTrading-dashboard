@@ -395,6 +395,7 @@ const Banners: React.FC = () => {
           cancelLabel={tCommon('actions.cancel')}
           isDestructive={true}
           isLoading={isDeleting}
+          loadingText={tCommon('feedback.deleting')}
           variant='danger'
         />
       </div>

@@ -76,7 +76,7 @@ const Dashboard: React.FC = () => {
             </p>
           </div>
 
-          <div className={layout.grid}>
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 animate-in slide-in-from-bottom duration-500 stagger">
             {/* Total Users */}
             <StatCard
               title={tCommon('entities.users')}
@@ -165,7 +165,7 @@ const Dashboard: React.FC = () => {
             </p>
           </div>
 
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 animate-in slide-in-from-left duration-500 stagger'>
             {/* User Growth */}
             <AnalyticsCard
               title={t('dashboard.userGrowthRate')}

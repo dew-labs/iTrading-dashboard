@@ -1,0 +1,41 @@
+{
+  "allowedBashCommands": [
+    "npm run dev*",
+    "npm run build*",
+    "npm run preview*",
+    "npm run lint",
+    "npm run type-check*",
+    "npm install",
+    "npm ls*",
+    "npx *",
+    "git status",
+    "git diff",
+    "git log*",
+    "ls*",
+    "find*",
+    "grep*",
+    "node*",
+    "echo*",
+    "mkdir*",
+    "cp*",
+    "mv*",
+    "rm*",
+    "curl*",
+    "timeout*"
+  ],
+  "allowedFileEdits": [
+    "src/**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.css",
+    "src/**/*.json",
+    "public/**/*",
+    "*.json",
+    "*.md",
+    "*.yml",
+    "*.yaml",
+    "*.js",
+    "*.mjs"
+  ],
+  "autoApproveFileEdits": true,
+  "autoApproveBashCommands": true
+}

@@ -165,12 +165,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
                       to={item.path}
                       onClick={() => setIsOpen(false)}
                       className={({ isActive }) =>
-                        `group relative flex items-center text-left rounded-xl transition-all duration-200 ${
+                        `group relative flex items-center text-left rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 ${
                           isCollapsed ? 'lg:justify-center lg:px-3 lg:py-3 px-4 py-3' : 'px-4 py-3'
                         } ${
                           isActive
-                            ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg shadow-teal-500/25'
-                            : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-teal-50 hover:to-cyan-50 dark:hover:from-teal-900/20 dark:hover:to-cyan-900/20 hover:text-teal-900 dark:hover:text-teal-200 hover:shadow-sm'
+                            ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg shadow-teal-500/25 transform scale-105'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-teal-50 hover:to-cyan-50 dark:hover:from-teal-900/20 dark:hover:to-cyan-900/20 hover:text-teal-900 dark:hover:text-teal-200 hover:shadow-md'
                         }`
                       }
                     >

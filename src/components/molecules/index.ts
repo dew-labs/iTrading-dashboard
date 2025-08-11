@@ -5,6 +5,8 @@ export { default as FormInput } from './FormInput'
 export { default as CheckboxGroup } from './CheckboxGroup'
 export { default as DatePicker } from './DatePicker'
 export { default as Select } from './Select'
+export { default as FormContainer } from './FormContainer'
+export { default as FormErrorBanner } from './FormErrorBanner'
 
 // Data Display
 export { default as StatsCard } from './StatsCard'

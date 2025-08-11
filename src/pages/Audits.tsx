@@ -395,6 +395,7 @@ const Audits: React.FC = () => {
           cancelLabel={tCommon('actions.cancel')}
           isDestructive={true}
           isLoading={deleteConfirm.isDeleting}
+          loadingText={tCommon('feedback.deleting')}
         />
 
         {/* Bulk Delete Confirmation Dialog */}
@@ -413,6 +414,7 @@ const Audits: React.FC = () => {
           cancelLabel={tCommon('actions.cancel')}
           isDestructive={true}
           isLoading={bulkDeleteConfirm.isDeleting}
+          loadingText={tCommon('feedback.deleting')}
         />
       </div>
     </div>

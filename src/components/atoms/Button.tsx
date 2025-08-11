@@ -37,17 +37,23 @@ const Button: React.FC<ButtonProps> = ({
   )
 
   return (
-    <button className={buttonClasses} disabled={isDisabled} {...props}>
+    <button 
+      className={buttonClasses} 
+      disabled={isDisabled} 
+      aria-disabled={isDisabled}
+      aria-live={loading ? 'polite' : undefined}
+      {...props}
+    >
       {loading ? (
         <>
-          <Loader2 className='w-4 h-4 mr-2 animate-spin' />
-          {loadingText || 'Loading...'}
+          <Loader2 className='w-4 h-4 mr-2 animate-spin' aria-hidden='true' />
+          <span>{loadingText || 'Loading...'}</span>
         </>
       ) : (
         <>
-          {LeftIcon && <LeftIcon className='w-4 h-4 mr-2' />}
+          {LeftIcon && <LeftIcon className='w-4 h-4 mr-2' aria-hidden='true' />}
           {children}
-          {RightIcon && <RightIcon className='w-4 h-4 ml-2' />}
+          {RightIcon && <RightIcon className='w-4 h-4 ml-2' aria-hidden='true' />}
         </>
       )}
     </button>

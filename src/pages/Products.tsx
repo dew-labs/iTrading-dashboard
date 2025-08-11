@@ -335,6 +335,7 @@ const Products: React.FC = () => {
           cancelLabel={tCommon('actions.cancel')}
           isDestructive={true}
           isLoading={deleteConfirm.isDeleting}
+          loadingText={tCommon('feedback.deleting')}
           variant='danger'
         />
 

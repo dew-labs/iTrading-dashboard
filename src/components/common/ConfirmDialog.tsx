@@ -14,6 +14,7 @@ interface ConfirmDialogProps {
   cancelLabel?: string
   isDestructive?: boolean
   isLoading?: boolean
+  loadingText?: string
   variant?: 'warning' | 'danger' | 'info'
 }
 
@@ -27,6 +28,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   cancelLabel = 'Cancel',
   isDestructive = false,
   isLoading = false,
+  loadingText = 'Deleting...',
   variant = isDestructive ? 'danger' : 'warning'
 }) => {
   const [isVisible, setIsVisible] = useState(false)
@@ -177,7 +179,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                 leftIcon={isDestructive ? Trash2 : Check}
                 onClick={handleConfirm}
                 loading={isLoading}
-                loadingText='Processing...'
+                loadingText={loadingText}
                 className='w-full sm:w-auto'
               >
                 {confirmLabel}

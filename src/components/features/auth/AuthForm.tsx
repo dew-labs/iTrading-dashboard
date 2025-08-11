@@ -3,8 +3,9 @@ import { useLocation } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, CheckCircle } from 'lucide-react'
 import { useAuthStore } from '../../../store/authStore'
 import { useTranslation } from '../../../hooks/useTranslation'
-import { LoadingSpinner } from '../../feedback'
 import { toast } from '../../../utils/toast'
+import { FormContainer, FormErrorBanner } from '../../molecules'
+import { Button } from '../../atoms'
 
 interface AuthFormProps {
   mode: 'login'
@@ -20,6 +21,7 @@ const AuthForm: React.FC<AuthFormProps> = () => {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [formError, setFormError] = useState<string | null>(null)
 
   const { signIn, loading } = useAuthStore()
 
@@ -37,16 +39,20 @@ const AuthForm: React.FC<AuthFormProps> = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setFormError(null) // Clear any existing errors
 
     try {
       const { error } = await signIn(formData.email, formData.password)
       if (error) {
+        setFormError(error)
         toast.error(error)
       } else {
         toast.success(t('auth.welcomeBack'))
       }
     } catch {
-      toast.error(t('messages.unexpectedError'))
+      const errorMessage = t('messages.unexpectedError')
+      setFormError(errorMessage)
+      toast.error(errorMessage)
     }
   }
 
@@ -78,67 +84,77 @@ const AuthForm: React.FC<AuthFormProps> = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className='space-y-6' noValidate>
-          <div>
-            <label htmlFor='email' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'>
-              {t('auth.emailAddress')}
-            </label>
-            <div className='relative'>
-              <Mail className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500' />
-              <input
-                type='email'
-                id='email'
-                name='email'
-                value={formData.email}
-                onChange={handleChange}
-                className='w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500'
-                placeholder={t('auth.enterEmail')}
-                required
-              />
-            </div>
-          </div>
+        <FormContainer>
+          {/* Display form error if any */}
+          <FormErrorBanner 
+            error={formError} 
+            onDismiss={() => setFormError(null)}
+            className='mb-6'
+          />
 
-          <div>
-            <label htmlFor='password' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'>
-              {t('general.password')}
-            </label>
-            <div className='relative'>
-              <Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500' />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id='password'
-                name='password'
-                value={formData.password}
-                onChange={handleChange}
-                className='w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500'
-                placeholder={t('auth.enterPassword')}
-                required
-              />
-              <button
-                type='button'
-                onClick={() => setShowPassword(!showPassword)}
-                className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
-              >
-                {showPassword ? <EyeOff className='w-5 h-5' /> : <Eye className='w-5 h-5' />}
-              </button>
-            </div>
-          </div>
-
-          <button
-            type='submit'
-            disabled={loading}
-            className='w-full bg-gradient-to-r from-teal-500 to-cyan-500 text-white py-3 rounded-lg font-medium hover:from-teal-600 hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg'
-          >
-            {loading ? (
-              <div className='flex items-center space-x-2'>
-                <LoadingSpinner size='sm' className='text-white' />
-                <span>{t('auth.signingIn')}</span>
+          <form onSubmit={handleSubmit} className='space-y-6' noValidate>
+            <div>
+              <label htmlFor='email' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'>
+                {t('auth.emailAddress')}
+              </label>
+              <div className='relative'>
+                <Mail className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500' />
+                <input
+                  type='email'
+                  id='email'
+                  name='email'
+                  value={formData.email}
+                  onChange={handleChange}
+                  disabled={loading}
+                  className='w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 disabled:opacity-50 disabled:cursor-not-allowed'
+                  placeholder={t('auth.enterEmail')}
+                  required
+                />
               </div>
-            ) : (
-              t('auth.signIn')
-            )}
-          </button>
-        </form>
+            </div>
+
+            <div>
+              <label htmlFor='password' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'>
+                {t('general.password')}
+              </label>
+              <div className='relative'>
+                <Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500' />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id='password'
+                  name='password'
+                  value={formData.password}
+                  onChange={handleChange}
+                  disabled={loading}
+                  className='w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 disabled:opacity-50 disabled:cursor-not-allowed'
+                  placeholder={t('auth.enterPassword')}
+                  required
+                />
+                <button
+                  type='button'
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
+                  className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed'
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className='w-5 h-5' /> : <Eye className='w-5 h-5' />}
+                </button>
+              </div>
+            </div>
+
+            <Button
+              type='submit'
+              variant='primary'
+              loading={loading}
+              loadingText={t('auth.signingIn')}
+              fullWidth
+              className='shadow-lg'
+              {...(formError && { 'aria-describedby': 'form-error-description' })}
+            >
+              {t('auth.signIn')}
+            </Button>
+          </form>
+        </FormContainer>
 
         <div className='mt-6 text-center'>
           <p className='text-gray-500 dark:text-gray-400 text-sm'>{t('auth.adminAccessOnly')}</p>
