@@ -6,7 +6,7 @@ import { useFormValidation } from '../../../hooks/useFormValidation'
 import { useFormTranslation, useTranslation } from '../../../hooks/useTranslation'
 import { useImageValidation } from '../../../hooks/useImageValidation'
 import { Button } from '../../atoms'
-import { Select } from '../../molecules'
+import { Select, FormContainer, FormErrorBanner } from '../../molecules'
 import { MainImageUpload } from '../images'
 import { supabase } from '../../../lib/supabase'
 import type { UploadResult } from '../../../hooks/useFileUpload'
@@ -45,6 +45,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
   const [thumbnailImage, setThumbnailImage] = useState<
     (Partial<Image> & { publicUrl?: string; file?: File }) | null
   >(null)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   // Validate thumbnail image URL
   const { isValid: isThumbnailValid } = useImageValidation(thumbnailImage?.publicUrl)
@@ -148,15 +149,30 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
       icon: option.icon === 'PenTool' ? <PenTool className='w-4 h-4' /> : <CheckCircle className='w-4 h-4' />
     })), [tCommon])
 
-  const handleFormSubmit = useCallback((data: typeof formData) => {
-    onSubmit(
-      data as PostInsert,
-      thumbnailImage
-    )
+  const handleFormSubmit = useCallback(async (data: typeof formData) => {
+    setSubmitError(null) // Clear any existing errors
+    
+    try {
+      await onSubmit(
+        data as PostInsert,
+        thumbnailImage
+      )
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred while saving the post'
+      setSubmitError(errorMessage)
+    }
   }, [onSubmit, thumbnailImage])
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8" noValidate>
+    <FormContainer>
+      {/* Display form error if any */}
+      <FormErrorBanner 
+        error={submitError} 
+        onDismiss={() => setSubmitError(null)}
+        className='mb-6'
+      />
+
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8" noValidate>
       {/* Main Layout Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
 
@@ -317,23 +333,17 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
         <Button
           type="submit"
           variant="primary"
-          disabled={isValidating}
-          {...(!isValidating && { leftIcon: post ? Save : Plus })}
+          loading={isValidating}
+          loadingText={post ? tCommon('feedback.updating') : tCommon('feedback.creating')}
+          leftIcon={post ? Save : Plus}
           className="px-8"
+          {...(submitError && { 'aria-describedby': 'form-error-description' })}
         >
-          {isValidating ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
-              {post ? tCommon('feedback.updating') : tCommon('feedback.creating')}
-            </>
-          ) : (
-            <>
-              {post ? `${tCommon('actions.update')} ${tCommon('entities.post')}` : `${tCommon('actions.create')} ${tCommon('entities.post')}`}
-            </>
-          )}
+          {post ? `${tCommon('actions.update')} ${tCommon('entities.post')}` : `${tCommon('actions.create')} ${tCommon('entities.post')}`}
         </Button>
       </div>
-    </form>
+      </form>
+    </FormContainer>
   )
 }
 

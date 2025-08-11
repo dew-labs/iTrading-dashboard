@@ -4,7 +4,7 @@ import type { Broker, BrokerInsert, Image } from '../../../types'
 import type { Tables } from '../../../types/database'
 import { useFormValidation } from '../../../hooks/useFormValidation'
 import { FormField, Button } from '../../atoms'
-import { Select } from '../../molecules'
+import { Select, FormContainer, FormErrorBanner } from '../../molecules'
 import { MainImageUpload } from '../images'
 import { ConfirmDialog } from '../../common'
 import { useFormTranslation, useTranslation } from '../../../hooks/useTranslation'
@@ -73,6 +73,7 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
   >(null)
 
   const [accountTypes, setAccountTypes] = useState<AccountType[]>([])
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   // Delete confirmation state
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{
@@ -293,16 +294,31 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
     ))
   }, [])
 
-  const handleFormSubmit = useCallback((data: typeof formData) => {
-    // Description is now handled by the translation system
-    const brokerData: BrokerInsert = {
-      ...data
+  const handleFormSubmit = useCallback(async (data: typeof formData) => {
+    setSubmitError(null) // Clear any existing errors
+    
+    try {
+      // Description is now handled by the translation system
+      const brokerData: BrokerInsert = {
+        ...data
+      }
+      await onSubmit(brokerData, logoImage, accountTypes)
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred while saving the broker'
+      setSubmitError(errorMessage)
     }
-    onSubmit(brokerData, logoImage, accountTypes)
   }, [onSubmit, logoImage, accountTypes])
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8" noValidate>
+    <FormContainer>
+      {/* Display form error if any */}
+      <FormErrorBanner 
+        error={submitError} 
+        onDismiss={() => setSubmitError(null)}
+        className='mb-6'
+      />
+
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8" noValidate>
       {/* Main Layout Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
 
@@ -611,20 +627,13 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
         <Button
           type="submit"
           variant="primary"
-          disabled={isValidating}
-          {...(!isValidating && { leftIcon: broker ? Save : Plus })}
+          loading={isValidating}
+          loadingText={broker ? tCommon('feedback.updating') : tCommon('feedback.creating')}
+          leftIcon={broker ? Save : Plus}
           className="px-8"
+          {...(submitError && { 'aria-describedby': 'form-error-description' })}
         >
-          {isValidating ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
-              {broker ? tCommon('feedback.updating') : tCommon('feedback.creating')}
-            </>
-          ) : (
-            <>
-              {broker ? `${tCommon('actions.update')} ${tCommon('entities.brokers')}` : `${tCommon('actions.add')} ${tCommon('entities.brokers')}`}
-            </>
-          )}
+          {broker ? `${tCommon('actions.update')} ${tCommon('entities.brokers')}` : `${tCommon('actions.add')} ${tCommon('entities.brokers')}`}
         </Button>
       </div>
 
@@ -652,9 +661,11 @@ const BrokerForm: React.FC<BrokerFormProps> = ({ broker, onSubmit, onCancel, ima
         cancelLabel={tCommon('actions.cancel')}
         isDestructive={true}
         isLoading={isDeletingAccountType}
+        loadingText={tCommon('feedback.deleting')}
         variant="danger"
       />
-    </form>
+      </form>
+    </FormContainer>
   )
 }
 

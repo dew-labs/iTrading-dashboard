@@ -165,6 +165,12 @@ const Users: React.FC = () => {
     data: Omit<UserInsert, 'id'>,
     avatarImage: (Partial<Image> & { publicUrl?: string; file?: File }) | null | undefined
   ) => {
+    // Validate email format before proceeding - critical data integrity check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(data.email)) {
+      throw new Error('Invalid email format. Please enter a valid email address.')
+    }
+
     try {
       let userId = editingUser?.id
 
@@ -245,6 +251,8 @@ const Users: React.FC = () => {
       handleCloseModal()
     } catch (error) {
       console.error('Failed to save user:', error)
+      // Re-throw the error so it propagates to the form's error handling
+      throw error
     } finally {
       // Invalidate queries to refetch brokers and images
       await queryClient.invalidateQueries({ queryKey: queryKeys.users() })
@@ -498,6 +506,7 @@ const Users: React.FC = () => {
           confirmLabel={tCommon('actions.delete')}
           cancelLabel={tCommon('actions.cancel')}
           isLoading={isDeleting}
+          loadingText={tCommon('feedback.deleting')}
           isDestructive={true}
         />
 

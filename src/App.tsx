@@ -66,6 +66,17 @@ function App () {
             expand={true}
             visibleToasts={4}
             closeButton={true}
+            richColors
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: 'white',
+                border: '1px solid #e5e7eb',
+                borderRadius: '12px',
+                boxShadow: '0 10px 38px -10px rgba(0, 0, 0, 0.35), 0 10px 20px -15px rgba(0, 0, 0, 0.2)',
+              },
+              className: 'animate-in slide-in-from-bottom-2 duration-300'
+            }}
           />
         </div>
       </Router>

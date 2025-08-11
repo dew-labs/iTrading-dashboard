@@ -61,12 +61,24 @@ export const StatCard: React.FC<StatCardProps> = ({
   }
 
   return (
-    <div className={cardProps.cardClasses}>
-      <div className="flex items-center">
-        <div className={getIconClasses('stats', type)}>
+    <div className={cn(
+      cardProps.cardClasses, 
+      "group relative overflow-hidden cursor-pointer",
+      "hover:shadow-xl hover:shadow-teal-500/5 hover:-translate-y-2 hover:border-teal-200 dark:hover:border-teal-800",
+      "hover:bg-gradient-to-br hover:from-white hover:to-teal-50/30 dark:hover:from-gray-800 dark:hover:to-teal-900/10",
+      "transition-all duration-300 ease-out"
+    )}>
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-gray-50/20 dark:to-gray-700/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      
+      <div className="relative flex items-center">
+        <div className={cn(
+          getIconClasses('stats', type), 
+          "group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg"
+        )}>
           <Icon className="w-6 h-6 text-white" />
         </div>
-        <div className="ml-4">
+        <div className="ml-4 transition-all duration-300 group-hover:translate-x-1">
           <div className={cardProps.valueClasses}>
             {typeof value === 'number' ? value.toLocaleString() : value}
           </div>

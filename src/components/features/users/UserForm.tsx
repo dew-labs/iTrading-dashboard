@@ -6,8 +6,8 @@ import { useTranslation, useFormTranslation } from '../../../hooks/useTranslatio
 import { useFormValidation } from '../../../hooks/useFormValidation'
 import { formSchemas } from '../../../utils/validation'
 import { USER_ROLES, COUNTRY_OPTIONS } from '../../../constants/general'
-import { FormField } from '../../atoms'
-import { Select } from '../../molecules'
+import { FormField, Button } from '../../atoms'
+import { Select, FormContainer, FormErrorBanner } from '../../molecules'
 import { MainImageUpload } from '../images'
 import type { UploadResult } from '../../../hooks/useFileUpload'
 import { supabase } from '../../../lib/supabase'
@@ -41,6 +41,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images })
   const [avatarImage, setAvatarImage] = useState<
     (Partial<Image> & { publicUrl?: string; file?: File }) | null
   >(null)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   // Memoize initial data to prevent re-renders
   const initialData = useMemo(() =>
@@ -160,17 +161,29 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images })
     />
   )
 
-  const handleFormSubmit = useCallback((data: typeof formData) => {
+  const handleFormSubmit = useCallback(async (data: typeof formData) => {
+    setSubmitError(null) // Clear any existing errors
+    
+    // Remove try/catch that was swallowing validation errors
+    // Let validation errors bubble up to prevent invalid user creation
     if (isInviteMode) {
       // Send email and role for invite
-      onSubmit({ email: data.email, role: data.role } as Omit<UserInsert, 'id'>, null)
+      await onSubmit({ email: data.email, role: data.role } as Omit<UserInsert, 'id'>, null)
     } else {
-      onSubmit(data, avatarImage)
+      await onSubmit(data, avatarImage)
     }
   }, [onSubmit, avatarImage, isInviteMode])
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6' noValidate>
+    <FormContainer>
+      {/* Display form error if any */}
+      <FormErrorBanner 
+        error={submitError} 
+        onDismiss={() => setSubmitError(null)}
+        className='mb-6'
+      />
+
+      <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6' noValidate>
       {/* Invite mode: Only show email field */}
       {isInviteMode ? (
         <>
@@ -345,36 +358,33 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images })
         </>
       )}
 
-      {/* Action buttons */}
-      <div className='flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700'>
-        <button
-          type='button'
-          onClick={onCancel}
-          disabled={isValidating}
-          className='px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center'
-        >
-          <X className='w-4 h-4 mr-2' />
-          {tCommon('actions.cancel')}
-        </button>
-        <button
-          type='submit'
-          disabled={isValidating}
-          className='px-6 py-2 bg-gradient-to-r from-gray-900 to-black dark:from-white dark:to-gray-100 text-white dark:text-gray-900 rounded-lg hover:from-black hover:to-gray-900 dark:hover:from-gray-100 dark:hover:to-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center'
-        >
-          {isValidating ? (
-            <>
-              <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2'></div>
-              {isInviteMode ? t('userForm.sendingInvite') : t('userForm.updating')}
-            </>
-          ) : (
-            <>
-              {isInviteMode ? <Mail className='w-4 h-4 mr-2' /> : <Save className='w-4 h-4 mr-2' />}
-              {isInviteMode ? t('userForm.sendInvitation') : t('userForm.updateUser')}
-            </>
-          )}
-        </button>
-      </div>
-    </form>
+        {/* Action buttons */}
+        <div className='flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700'>
+          <Button
+            type='button'
+            variant='secondary'
+            onClick={onCancel}
+            disabled={isValidating}
+            leftIcon={X}
+            className='px-6 py-2'
+          >
+            {tCommon('actions.cancel')}
+          </Button>
+          
+          <Button
+            type='submit'
+            variant='secondary'
+            loading={isValidating}
+            loadingText={isInviteMode ? t('userForm.sendingInvite') : t('userForm.updating')}
+            leftIcon={isInviteMode ? Mail : Save}
+            className='px-6 py-2 bg-gradient-to-r from-gray-900 to-black dark:from-white dark:to-gray-100 text-white dark:text-gray-900 hover:from-black hover:to-gray-900 dark:hover:from-gray-100 dark:hover:to-white'
+            {...(submitError && { 'aria-describedby': 'form-error-description' })}
+          >
+            {isInviteMode ? t('userForm.sendInvitation') : t('userForm.updateUser')}
+          </Button>
+        </div>
+      </form>
+    </FormContainer>
   )
 }
 

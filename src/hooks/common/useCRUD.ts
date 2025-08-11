@@ -292,7 +292,27 @@ export const createUsersConfig = () => ({
   selectQuery: '*',
   orderBy: { column: 'created_at', ascending: false },
   staleTime: 5 * 60 * 1000, // 5 minutes - users don't change frequently
-  gcTime: 10 * 60 * 1000
+  gcTime: 10 * 60 * 1000,
+  // Add email validation to prevent invalid emails from being created
+  validateCreate: (data: Record<string, unknown>) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const email = data.email as string
+    if (!email || !emailRegex.test(email)) {
+      return 'Invalid email format. Please enter a valid email address.'
+    }
+    return null
+  },
+  validateUpdate: (data: Record<string, unknown>) => {
+    // Only validate email if it's being updated
+    const email = data.email as string
+    if (email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(email)) {
+        return 'Invalid email format. Please enter a valid email address.'
+      }
+    }
+    return null
+  }
 })
 
 export const createPostsConfig = () => ({
