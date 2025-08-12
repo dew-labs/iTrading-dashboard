@@ -43,7 +43,7 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
   // Get translations for this post
   const { translations } = useContentTranslation(
     'posts',
-    post.id,
+    post.id as string,
     {
       enabled: true,
       defaultLanguage: selectedLanguage,
@@ -190,18 +190,18 @@ const PostViewModal: React.FC<PostViewModalProps> = ({
                   </div>
                   <div className='flex items-center space-x-2'>
                     <Calendar className='w-4 h-4' />
-                    <span>{formatDateDisplay(post.created_at || new Date().toISOString())}</span>
+                    <span>{formatDateDisplay((post.created_at as string) || new Date().toISOString())}</span>
                   </div>
                   {typeof post.views === 'number' && (
                     <div className='flex items-center space-x-2'>
                       <Eye className='w-4 h-4' />
-                      <span>{post.views.toLocaleString()} {t('posts.views').toLowerCase()}</span>
+                      <span>{(post.views as number).toLocaleString()} {t('posts.views').toLowerCase()}</span>
                     </div>
                   )}
                   {post.published_at && post.published_at !== post.created_at && (
                     <div className='flex items-center space-x-2'>
                       <Clock className='w-4 h-4' />
-                      <span>Published {formatDateDisplay(post.published_at)}</span>
+                      <span>Published {formatDateDisplay(post.published_at as string)}</span>
                     </div>
                   )}
                 </div>

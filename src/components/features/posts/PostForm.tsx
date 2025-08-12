@@ -80,7 +80,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
       reset({
         type: post.type,
         status: post.status,
-        author_id: post.author_id,
+        author_id: post.author_id || null,
         views: post.views || 0
       })
 
@@ -111,7 +111,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
     (uploadResult: UploadResult | null, file?: File) => {
       if (uploadResult && file) {
         const { url: publicUrl, path, id: storageObjectId } = uploadResult
-        setThumbnailImage(prev => ({
+        setThumbnailImage((prev: (Partial<Image> & { file?: File }) | null) => ({
           ...prev,
           path,
           publicUrl,
@@ -255,7 +255,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSubmit, onCancel, images })
               {post ? (
                 <TranslationManager
                   contentType="posts"
-                  contentId={post.id}
+                  contentId={post.id as string}
                   defaultLanguage="en"
                   requiredLanguages={CONTENT_LANGUAGE_CODES}
                   onLanguageChange={setCurrentLanguage}

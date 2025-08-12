@@ -110,7 +110,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images })
     (uploadResult: UploadResult | null, file?: File) => {
       if (uploadResult && file) {
         const { url: publicUrl, path, id: storageObjectId } = uploadResult
-        setAvatarImage(prev => ({
+        setAvatarImage((prev: (Partial<Image> & { publicUrl?: string; file?: File }) | null) => ({
           ...prev,
           path,
           publicUrl,

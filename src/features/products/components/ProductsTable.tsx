@@ -6,6 +6,7 @@ import { getTypographyClasses, getIconClasses, cn } from '../../../utils/theme'
 import { formatDateDisplay } from '../../../utils/format'
 import { stripHtmlAndTruncate } from '../../../utils/textUtils'
 import type { ProductWithTranslations } from '../../../types'
+import type { ProductTranslation } from '../../../types/translations'
 import RecordImage from '../../../components/features/images/RecordImage'
 
 // Local Column type (copied from Table.tsx)
@@ -44,8 +45,8 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
     const lang = i18n.language || 'en'
     if (!row.translations) return { name: '', description: '' }
     return (
-      row.translations.find(tr => tr.language_code === lang) ||
-      row.translations.find(tr => tr.language_code === 'en') ||
+      row.translations.find((tr: ProductTranslation) => tr.language_code === lang) ||
+      row.translations.find((tr: ProductTranslation) => tr.language_code === 'en') ||
       { name: '', description: '' }
     )
   }

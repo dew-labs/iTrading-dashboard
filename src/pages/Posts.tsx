@@ -17,7 +17,7 @@ import { Modal, Button, Input } from '../components/atoms'
 import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
 import { POST_TYPES } from '../constants/general'
-import type { PostInsert, Image, ImageInsert } from '../types'
+import type { PostInsert, Image, ImageInsert, PostType } from '../types'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { groupImagesByRecord } from '../utils'
 import { supabase, queryKeys } from '../lib/supabase'
@@ -111,7 +111,7 @@ const Posts: React.FC = () => {
       id: tab.id,
       label: t(tab.labelKey),
       description: t(tab.descriptionKey),
-      count: tab.id === 'all' ? displayPosts.length : displayPosts.filter(post => post.type === tab.id).length
+      count: tab.id === 'all' ? displayPosts.length : displayPosts.filter(post => (post as { type: PostType }).type === tab.id).length
     }))
   }, [displayPosts, t])
 
@@ -144,7 +144,7 @@ const Posts: React.FC = () => {
     setDeleteConfirm(prev => ({ ...prev, isDeleting: true }))
 
     try {
-      await deletePost(deleteConfirm.post.id)
+      await deletePost(deleteConfirm.post.id as string)
       setDeleteConfirm({ isOpen: false, post: null, isDeleting: false })
       // Reset to first page if current page becomes empty
       if (paginatedPosts.length === 1 && filterState.currentPage > 1) {
@@ -169,7 +169,7 @@ const Posts: React.FC = () => {
       let postId = editingPost?.id
 
       if (editingPost) {
-        await updatePost(editingPost.id, data)
+        await updatePost(editingPost.id as string, data)
       } else {
         const newPost = await createPost({ ...data, author_id: user?.id ?? '' })
         postId = newPost.id
@@ -243,7 +243,7 @@ const Posts: React.FC = () => {
     )
   }
 
-  const viewingPostImage = viewingPost ? imagesByRecord[viewingPost.id]?.[0] : undefined
+  const viewingPostImage = viewingPost ? imagesByRecord[viewingPost.id as string]?.[0] : undefined
 
   return (
     <div className={layout.container}>

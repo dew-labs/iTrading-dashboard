@@ -10,6 +10,7 @@ import { useTranslation, usePageTranslation } from '../../../hooks/useTranslatio
 import { formatDateDisplay } from '../../../utils/format'
 import { getTypographyClasses, cn } from '../../../utils/theme'
 import type { ProductWithTranslations, Image } from '../../../types'
+import type { ProductTranslation } from '../../../types/translations'
 import RecordImage from '../images/RecordImage'
 import { Button } from '../../atoms'
 
@@ -36,8 +37,8 @@ const ProductViewModal: React.FC<ProductViewModalProps> = ({
     const lang = i18n.language || 'en';
     if (!product.translations || product.translations.length === 0) return { name: '', description: '' };
     const translation =
-      product.translations.find(tr => tr.language_code === lang) ||
-      product.translations.find(tr => tr.language_code === 'en');
+      product.translations.find((tr: ProductTranslation) => tr.language_code === lang) ||
+      product.translations.find((tr: ProductTranslation) => tr.language_code === 'en');
     return {
       name: translation?.name || '',
       description: translation?.description || ''

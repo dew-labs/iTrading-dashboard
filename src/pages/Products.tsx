@@ -9,6 +9,7 @@ import { Modal, Button, Input } from '../components/atoms'
 import { ConfirmDialog } from '../components/common'
 import { PageLoadingSpinner } from '../components/feedback'
 import type { ProductWithTranslations, ProductInsert, Image } from '../types'
+import type { ProductTranslation } from '../types/translations'
 import { useImages } from '../hooks/useImages'
 import { groupImagesByRecord } from '../utils'
 import { getPageLayoutClasses, getTypographyClasses, cn } from '../utils/theme'
@@ -321,8 +322,8 @@ const Products: React.FC = () => {
                     const lang = i18n.language || 'en';
                     const translations = deleteConfirm.product?.translations || [];
                     const translation =
-                      translations.find(tr => tr.language_code === lang) ||
-                      translations.find(tr => tr.language_code === 'en');
+                      translations.find((tr: ProductTranslation) => tr.language_code === lang) ||
+                      translations.find((tr: ProductTranslation) => tr.language_code === 'en');
                     return translation?.name || t('products.thisProduct');
                   })()}
                 </strong>

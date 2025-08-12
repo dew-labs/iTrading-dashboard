@@ -3,7 +3,7 @@ import { Edit2, Trash2, Eye, Building2, Calendar, MapPin } from 'lucide-react'
 import { usePageTranslation } from '../../../hooks/useTranslation'
 import { stripHtmlAndTruncate } from '../../../utils'
 import type { Broker, Image } from '../../../types'
-import type { BrokerWithTranslations } from '../../../types/translations'
+import type { BrokerWithTranslations, BrokerTranslation } from '../../../types/translations'
 import RecordImage from '../../../components/features/images/RecordImage'
 
 interface BrokerCardProps {
@@ -21,7 +21,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({ broker, image, onView, onEdit, 
   const getDescription = () => {
     if ('translations' in broker && broker.translations && broker.translations.length > 0) {
       // Get the first available translation (preferably English)
-      const translation = broker.translations.find(t => t.language_code === 'en') || broker.translations[0]
+      const translation = broker.translations.find((t: BrokerTranslation) => t.language_code === 'en') || broker.translations[0]
       return translation?.description || null
     }
     return null

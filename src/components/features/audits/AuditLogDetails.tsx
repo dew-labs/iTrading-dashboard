@@ -162,7 +162,7 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({
           </div>
 
           <div className="space-y-4">
-            {auditLog.changed_fields.map((field, index) => {
+            {auditLog.changed_fields.map((field: string, index: number) => {
               const oldValue = auditLog.old_values ? (auditLog.old_values as Record<string, unknown>)[field] : undefined
               const newValue = auditLog.new_values ? (auditLog.new_values as Record<string, unknown>)[field] : undefined
 
