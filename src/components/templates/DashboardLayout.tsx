@@ -11,6 +11,7 @@ import { useTranslation } from '../../hooks/useTranslation'
 const Dashboard = React.lazy(() => import('../../pages/Dashboard'))
 const Posts = React.lazy(() => import('../../pages/Posts'))
 const Brokers = React.lazy(() => import('../../pages/Brokers'))
+const BrokerCategories = React.lazy(() => import('../../pages/BrokerCategories'))
 const Banners = React.lazy(() => import('../../pages/Banners'))
 const Users = React.lazy(() => import('../../pages/Users'))
 const Settings = React.lazy(() => import('../../pages/Settings'))
@@ -64,6 +65,14 @@ const DashboardLayout: React.FC = () => {
                   element={
                     <ProtectedRoute requiredPermission={{ resource: 'brokers', action: 'read' }}>
                       <Brokers />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path='/broker-categories'
+                  element={
+                    <ProtectedRoute requiredPermission={{ resource: 'brokers', action: 'read' }}>
+                      <BrokerCategories />
                     </ProtectedRoute>
                   }
                 />

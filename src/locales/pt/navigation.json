@@ -5,6 +5,7 @@
   "products": "Produtos",
   "banners": "Banners",
   "brokers": "Corretoras",
+  "brokerCategories": "Categorias de Corretoras",
   "analytics": "Análises",
   "settings": "Configurações",
   "help": "Central de Ajuda",
@@ -26,6 +27,7 @@
     "posts": "Conteúdo",
     "products": "Produtos",
     "brokers": "Corretoras",
+    "brokerCategories": "Categorias de Corretoras",
     "banners": "Banners",
     "audits": "Atividades Recentes",
     "settings": "Configurações"
@@ -48,6 +50,7 @@
     "posts": "Conteúdo",
     "products": "Produtos",
     "brokers": "Corretoras",
+    "brokerCategories": "Categorias de Corretoras",
     "banners": "Banners",
     "audits": "Atividades Recentes",
     "settings": "Configurações"

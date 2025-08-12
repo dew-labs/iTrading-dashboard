@@ -227,6 +227,57 @@
       "deleteBroker": "Delete broker"
     }
   },
+  "brokerCategories": {
+    "title": "Broker Categories",
+    "description": "Manage broker categories and classifications",
+    "loadingCategories": "Loading broker categories...",
+    "stats": {
+      "total": "Total Categories"
+    },
+    "actions": {
+      "create": "Create Category",
+      "edit": "Edit",
+      "delete": "Delete",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "form": {
+      "createTitle": "Create Broker Category",
+      "editTitle": "Edit Broker Category",
+      "namePlaceholder": "Enter category name"
+    },
+    "table": {
+      "name": "Category Name",
+      "createdAt": "Created At",
+      "actions": "Actions",
+      "empty": "No broker categories found. Create your first category to get started."
+    },
+    "card": {
+      "category": "Category",
+      "active": "Active",
+      "id": "ID"
+    },
+    "grid": {
+      "searchPlaceholder": "Search categories...",
+      "showing": "Showing {{count}} categories",
+      "totalCategories": "{{count}} total categories"
+    },
+    "empty": {
+      "title": "No Categories Yet",
+      "description": "Get started by creating your first broker category to organize and manage your brokers effectively."
+    },
+    "deleteDialog": {
+      "title": "Delete Category",
+      "message": "Are you sure you want to delete the category",
+      "confirm": "Delete Category"
+    },
+    "createSuccess": "Broker category created successfully",
+    "createError": "Failed to create broker category",
+    "updateSuccess": "Broker category updated successfully",
+    "updateError": "Failed to update broker category",
+    "deleteSuccess": "Broker category deleted successfully",
+    "deleteError": "Failed to delete broker category"
+  },
   "banners": {
     "title": "Banners Management",
     "description": "Create and manage your promotional banners",

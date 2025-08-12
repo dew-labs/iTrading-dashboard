@@ -6,6 +6,7 @@ export * from './banners'
 export * from './users'
 export * from './images'
 export * from './brokers'
+export * from './brokerCategories'
 export * from './audits'
 // export * from './translations' // Remove this or only export non-duplicate types
 

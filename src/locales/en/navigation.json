@@ -5,6 +5,7 @@
   "products": "Products",
   "banners": "Banners",
   "brokers": "Brokers",
+  "brokerCategories": "Broker Categories",
   "analytics": "Analytics",
   "settings": "Settings",
   "help": "Help Center",
@@ -26,6 +27,7 @@
     "posts": "Content",
     "products": "Products",
     "brokers": "Brokers",
+    "brokerCategories": "Broker Categories",
     "banners": "Banners",
     "audits": "Recent Activities",
     "settings": "Settings"
@@ -48,6 +50,7 @@
     "posts": "Content",
     "products": "Products",
     "brokers": "Brokers",
+    "brokerCategories": "Broker Categories",
     "banners": "Banners",
     "audits": "Recent Activities",
     "settings": "Settings"

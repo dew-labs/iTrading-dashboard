@@ -49,6 +49,12 @@ export const queryKeys = {
   brokers: () => ['brokers'] as const,
   broker: (id: number) => ['brokers', id] as const,
 
+  // Broker Categories
+  brokerCategories: {
+    all: () => ['broker-categories'] as const,
+    detail: (id: string) => ['broker-categories', id] as const
+  },
+
   // Banners
   banners: () => ['banners'] as const,
   banner: (id: string) => ['banners', id] as const,

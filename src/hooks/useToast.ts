@@ -13,6 +13,7 @@ export type EntityType =
   | 'post' | 'posts'
   | 'product' | 'products'
   | 'broker' | 'brokers'
+  | 'brokerCategories'
   | 'banner' | 'banners'
   | 'image' | 'images'
   | 'permission' | 'permissions'

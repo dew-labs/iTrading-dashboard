@@ -227,6 +227,57 @@
       "deleteBroker": "Excluir corretora"
     }
   },
+  "brokerCategories": {
+    "title": "Categorias de Corretoras",
+    "description": "Gerencie categorias e classificações de corretoras",
+    "loadingCategories": "Carregando categorias de corretoras...",
+    "stats": {
+      "total": "Total de Categorias"
+    },
+    "actions": {
+      "create": "Criar Categoria",
+      "edit": "Editar",
+      "delete": "Excluir",
+      "save": "Salvar",
+      "cancel": "Cancelar"
+    },
+    "form": {
+      "createTitle": "Criar Categoria de Corretora",
+      "editTitle": "Editar Categoria de Corretora",
+      "namePlaceholder": "Digite o nome da categoria"
+    },
+    "table": {
+      "name": "Nome da Categoria",
+      "createdAt": "Criado em",
+      "actions": "Ações",
+      "empty": "Nenhuma categoria de corretora encontrada. Crie sua primeira categoria para começar."
+    },
+    "card": {
+      "category": "Categoria",
+      "active": "Ativo",
+      "id": "ID"
+    },
+    "grid": {
+      "searchPlaceholder": "Buscar categorias...",
+      "showing": "Mostrando {{count}} categorias",
+      "totalCategories": "{{count}} categorias no total"
+    },
+    "empty": {
+      "title": "Nenhuma Categoria Ainda",
+      "description": "Comece criando sua primeira categoria de corretora para organizar e gerenciar suas corretoras de forma eficaz."
+    },
+    "deleteDialog": {
+      "title": "Excluir Categoria",
+      "message": "Tem certeza de que deseja excluir a categoria",
+      "confirm": "Excluir Categoria"
+    },
+    "createSuccess": "Categoria de corretora criada com sucesso",
+    "createError": "Falha ao criar categoria de corretora",
+    "updateSuccess": "Categoria de corretora atualizada com sucesso",
+    "updateError": "Falha ao atualizar categoria de corretora",
+    "deleteSuccess": "Categoria de corretora excluída com sucesso",
+    "deleteError": "Falha ao excluir categoria de corretora"
+  },
   "banners": {
     "title": "Gerenciamento de Banners",
     "description": "Crie e gerencie seus banners promocionais",

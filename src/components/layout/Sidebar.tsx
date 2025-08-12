@@ -8,7 +8,8 @@ import {
   X,
   Pin,
   Building2,
-  Package
+  Package,
+  Tags
 } from 'lucide-react'
 import { usePermissions } from '../../hooks/usePermissions'
 import { useNavigationTranslation, useTranslation } from '../../hooks/useTranslation'
@@ -91,7 +92,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
         }
       ]
     },
-
+    {
+      titleKey: 'settings',
+      items: [
+        {
+          id: 'brokerCategories',
+          labelKey: 'brokerCategories',
+          icon: Tags,
+          path: '/broker-categories',
+          resource: 'brokers',
+          action: 'read'
+        }
+      ]
+    }
   ]
 
   // Filter menu items based on permissions
