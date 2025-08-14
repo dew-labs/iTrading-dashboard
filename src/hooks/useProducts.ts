@@ -11,32 +11,28 @@ const fetchProducts = async (): Promise<ProductWithTranslations[]> => {
     .order('created_at', { ascending: false })
 
   if (error) throw error
-  // Parse translations JSON to array
+  // Ensure all required fields are present and not null
   return (
     data?.map((row) => ({
       ...row,
-      // Ensure all required fields are present and not null
       id: row.id || '',
-      price: row.price ?? 0,
       affiliate_link: row.affiliate_link ?? null,
       created_at: row.created_at || '',
       updated_at: row.updated_at || '',
-      translations: Array.isArray(row.translations)
-        ? row.translations
-        : typeof row.translations === 'string'
-        ? JSON.parse(row.translations)
-        : []
+      name: row.name || '',
+      description: row.description || '',
+      language: row.language || 'en'
     })) ?? []
   )
 }
 
 const createProductMutation = async (product: ProductWithTranslations): Promise<ProductWithTranslations> => {
   // eslint-disable-next-line camelcase
-  const { price, affiliate_link, created_at, updated_at } = product;
+  const { affiliate_link, created_at, updated_at } = product;
 
   return supabaseHelpers.insertData(
     // eslint-disable-next-line camelcase
-    supabase.from('products').insert([{ price, affiliate_link, created_at, updated_at }]).select().single()
+    supabase.from('products').insert([{ affiliate_link, created_at, updated_at }]).select().single()
   );
 }
 
@@ -48,11 +44,11 @@ const updateProductMutation = async ({
   updates: ProductWithTranslations
 }): Promise<ProductWithTranslations> => {
   // eslint-disable-next-line camelcase
-  const { price, affiliate_link, updated_at } = updates;
+  const { affiliate_link, updated_at } = updates;
 
   return supabaseHelpers.updateData(
     // eslint-disable-next-line camelcase
-    supabase.from('products').update({ price, affiliate_link, updated_at }).eq('id', id).select().single()
+    supabase.from('products').update({ affiliate_link, updated_at }).eq('id', id).select().single()
   );
 }
 
@@ -90,11 +86,12 @@ export const useProducts = () => {
       // Optimistically update to the new value
       const optimisticProduct: ProductWithTranslations = {
         id: `temp-${Date.now()}`,
-        price: newProduct.price,
         affiliate_link: newProduct.affiliate_link || null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        translations: newProduct.translations || []
+        name: newProduct.name || '',
+        description: newProduct.description || '',
+        language: newProduct.language || 'en'
       }
 
       queryClient.setQueryData<ProductWithTranslations[]>(queryKeys.products(), (old = []) => [

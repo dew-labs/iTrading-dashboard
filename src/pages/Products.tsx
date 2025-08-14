@@ -101,11 +101,12 @@ const Products: React.FC = () => {
         const newProductObj: ProductWithTranslations = {
           id: '', // Supabase will assign
           // name and description are handled via translations, not here
-          price: data.price,
           affiliate_link: data.affiliate_link ?? null,
           created_at: now,
           updated_at: now,
-          translations: [],
+          name: '', // Will be set via translations
+          description: '', // Will be set via translations
+          language: 'en' // Default language
         }
         const newProduct = await createProduct(newProductObj)
         productId = newProduct.id
@@ -198,7 +199,7 @@ const Products: React.FC = () => {
               onEdit={handleEdit}
               onDelete={handleDelete}
               onSort={(col) => {
-                if (col === 'created_at' || col === 'price') {
+                if (col === 'created_at') {
                   handleSort(col)
                 }
               }}

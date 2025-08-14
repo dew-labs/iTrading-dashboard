@@ -23,7 +23,6 @@ export interface DashboardStats {
   products: {
     total: number
     withAffiliateLink: number
-    averagePrice: number
   }
   brokers: {
     total: number
@@ -55,7 +54,7 @@ const fetchDashboardStats = async (): Promise<DashboardStats> => {
         .select('id, created_at, last_login, status, role')
         .neq('role', 'user'), // Only count non-user roles for dashboard
 
-      // Posts stats  
+      // Posts stats
       supabase
         .from('posts')
         .select('id, created_at, status, views'),
@@ -63,7 +62,7 @@ const fetchDashboardStats = async (): Promise<DashboardStats> => {
       // Products stats
       supabase
         .from('products')
-        .select('id, price, affiliate_link'),
+        .select('id, affiliate_link'),
 
       // Brokers stats
       supabase
@@ -93,7 +92,7 @@ const fetchDashboardStats = async (): Promise<DashboardStats> => {
     const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
 
     const totalUsers = usersStats.data?.length || 0
-    const activeUsers = usersStats.data?.filter(user => 
+    const activeUsers = usersStats.data?.filter(user =>
       user.last_login && new Date(user.last_login) >= thirtyDaysAgo
     ).length || 0
     const newUsersThisMonth = usersStats.data?.filter(user =>
@@ -104,7 +103,7 @@ const fetchDashboardStats = async (): Promise<DashboardStats> => {
     const roleBreakdown = userRoles.data?.reduce((acc, user) => {
       acc[user.role] = (acc[user.role] || 0) + 1
       return acc
-    }, { user: 0, moderator: 0, admin: 0 }) || { user: 0, moderator: 0, admin: 0 }
+    }, { user: 0, moderator: 0, admin: 0, affiliate: 0 }) || { user: 0, moderator: 0, admin: 0, affiliate: 0 }
 
     // Process posts data
     const totalPosts = postsStats.data?.length || 0
@@ -117,17 +116,15 @@ const fetchDashboardStats = async (): Promise<DashboardStats> => {
 
     // Process products data
     const totalProducts = productsStats.data?.length || 0
-    const productsWithAffiliateLink = productsStats.data?.filter(product => 
+    const productsWithAffiliateLink = productsStats.data?.filter(product =>
       product.affiliate_link
     ).length || 0
-    const averagePrice = productsStats.data?.length 
-      ? productsStats.data.reduce((sum, product) => sum + (product.price || 0), 0) / productsStats.data.length
-      : 0
+    // Remove average price calculation as price field no longer exists
 
     // Process brokers data
     const totalBrokers = brokersStats.data?.length || 0
     const visibleBrokers = brokersStats.data?.filter(broker => broker.is_visible).length || 0
-    
+
     // Broker categories breakdown
     const categoryMap = brokerCategories.data?.reduce((acc, category) => {
       acc[category.id] = category.name
@@ -161,8 +158,7 @@ const fetchDashboardStats = async (): Promise<DashboardStats> => {
       },
       products: {
         total: totalProducts,
-        withAffiliateLink: productsWithAffiliateLink,
-        averagePrice: Math.round(averagePrice * 100) / 100
+        withAffiliateLink: productsWithAffiliateLink
       },
       brokers: {
         total: totalBrokers,
@@ -203,7 +199,7 @@ export const useDashboardStats = () => {
   const defaultStats: DashboardStats = {
     users: { total: 0, active: 0, newThisMonth: 0, byRole: { user: 0, moderator: 0, admin: 0 } },
     posts: { total: 0, published: 0, draft: 0, views: 0, newThisMonth: 0 },
-    products: { total: 0, withAffiliateLink: 0, averagePrice: 0 },
+    products: { total: 0, withAffiliateLink: 0 },
     brokers: { total: 0, visible: 0, byCategory: {} },
     banners: { total: 0, active: 0, visibilityRate: 0 }
   }

@@ -19,6 +19,7 @@ export type EntityType =
   | 'permission' | 'permissions'
   | 'role' | 'avatar' | 'mainImage'
   | 'accountType'
+  | 'referralCode' | 'referral'
 
 export type SuccessAction =
   | 'general' | 'saved' | 'created' | 'updated' | 'deleted'

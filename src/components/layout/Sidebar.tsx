@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { usePermissions } from '../../hooks/usePermissions'
 import { useNavigationTranslation, useTranslation } from '../../hooks/useTranslation'
+import type { UserRole } from '../../types/users'
 
 interface SidebarProps {
   isOpen: boolean
@@ -28,6 +29,7 @@ interface MenuItem {
   path: string
   resource?: string
   action?: string
+  requiredRole?: UserRole
 }
 
 interface MenuSection {
@@ -36,7 +38,7 @@ interface MenuSection {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIsCollapsed }) => {
-  const { can } = usePermissions()
+  const { can, hasRole } = usePermissions()
   const { t } = useNavigationTranslation()
   const { t: tCommon } = useTranslation()
 
@@ -112,8 +114,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
     .map(section => ({
       ...section,
       items: section.items.filter(item => {
+        // Check role-based access first
+        if (item.requiredRole) {
+          return hasRole(item.requiredRole)
+        }
+
         // Items without resource are always visible
         if (!item.resource) return true
+
         // Check if user has permission to view this resource
         return can(item.resource, item.action || 'read')
       })

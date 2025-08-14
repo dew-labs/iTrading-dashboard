@@ -99,6 +99,12 @@ const Users: React.FC = () => {
         labelKey: 'users.moderators',
         count: 0,
         descriptionKey: 'users.moderatorUsers'
+      },
+      {
+        id: USER_ROLES.AFFILIATE,
+        labelKey: 'users.affiliates',
+        count: 0,
+        descriptionKey: 'users.affiliateUsers'
       }
     ]
 
@@ -285,7 +291,8 @@ const Users: React.FC = () => {
     { value: 'all', label: tCommon('general.all') },
     { value: 'user', label: tCommon('roles.user') },
     { value: 'admin', label: tCommon('roles.admin') },
-    { value: 'moderator', label: tCommon('roles.moderator') }
+    { value: 'moderator', label: tCommon('roles.moderator') },
+    { value: 'affiliate', label: tCommon('roles.affiliate') }
   ]
 
   const userIds = paginatedUsers.map(user => String(user.id))
@@ -481,6 +488,7 @@ const Users: React.FC = () => {
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           title={editingUser ? t('users.editUserTitle') : t('users.inviteNewUser')}
+          disableScroll={!editingUser}
         >
           <UserForm user={editingUser} onSubmit={handleSubmit} onCancel={handleCloseModal} images={images} />
         </Modal>

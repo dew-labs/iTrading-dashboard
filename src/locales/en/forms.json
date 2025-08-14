@@ -32,7 +32,7 @@
     "image": "Image",
     "featuredImage": "Featured Image",
     "file": "File",
-    "price": "Price",
+
     "quantity": "Quantity",
     "sku": "SKU",
     "brand": "Brand",
@@ -93,7 +93,7 @@
     "enterTags": "Enter tags",
     "selectImage": "Select image",
     "selectFile": "Select file",
-    "enterPrice": "Enter price",
+
     "enterQuantity": "Enter quantity",
     "enterSku": "Enter SKU",
     "enterBrand": "Enter brand",
@@ -130,7 +130,10 @@
     "enterMinDeposit": "e.g., $100, $1000",
     "selectCategory": "Select broker category",
     "affiliate_link": "Enter affiliate link URL",
-    "description": "Enter description"
+    "description": "Enter description",
+    "title": "Enter title",
+    "excerpt": "Enter excerpt",
+    "content": "Enter content"
   },
   "validation": {
     "required": "Required",
@@ -178,7 +181,7 @@
     "thumbnailRecommendation": "Recommended: 16:9 aspect ratio for best display"
   },
   "helpers": {
-    "productPriceHelper": "Product price in USD",
+
     "brokerNameHelper": "Enter the official name of the brokerage",
     "brokerLocationHelper": "Primary business location",
     "brokerEstablishedHelper": "Year the brokerage was founded",

@@ -19,6 +19,14 @@ const Products = React.lazy(() => import('../../pages/Products'))
 const Audits = React.lazy(() => import('../../pages/Audits'))
 const Unauthorized = React.lazy(() => import('../../pages/Unauthorized'))
 
+/**
+ * Component to show appropriate dashboard content based on user role
+ */
+const DashboardRootContent: React.FC = () => {
+  // All roles see the main dashboard
+  return <Dashboard />
+}
+
 const DashboardLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -42,7 +50,7 @@ const DashboardLayout: React.FC = () => {
           <PageTransition>
             <Suspense fallback={<PageLoadingSpinner message={t('loadingStates.loadingPage')} />}>
               <Routes>
-                <Route path='/' element={<Dashboard />} />
+                <Route path='/' element={<DashboardRootContent />} />
 
                 <Route
                   path='/posts'
@@ -93,6 +101,8 @@ const DashboardLayout: React.FC = () => {
                   }
                 />
                 <Route path='/settings' element={<Settings />} />
+
+
 
                 <Route
                   path='/audits'

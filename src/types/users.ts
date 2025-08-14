@@ -16,7 +16,7 @@ export type RolePermissionInsert = Database['public']['Tables']['role_permission
 export type RolePermissionUpdate = Database['public']['Tables']['role_permissions']['Update']
 
 // User-specific enums/unions
-export type UserRole = 'user' | 'moderator' | 'admin'
+export type UserRole = 'user' | 'moderator' | 'admin' | 'affiliate'
 export type UserStatus = 'invited' | 'active' | 'inactive' | 'suspended'
 
 // Permission helper types

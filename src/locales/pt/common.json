@@ -77,7 +77,7 @@
     "date": "Data",
     "time": "Hora",
     "size": "Tamanho",
-    "price": "Preço",
+
     "total": "Total",
     "count": "Contagem",
     "required": "Obrigatório",
@@ -268,9 +268,11 @@
     "user": "Usuário",
     "moderator": "Moderador",
     "admin": "Administrador",
+    "affiliate": "Afiliado",
     "userRoleDescription": "Acesso padrão com permissões básicas (somente leitura)",
     "moderatorRoleDescription": "Recursos de gerenciamento de conteúdo para posts, banners e corretoras",
-    "adminRoleDescription": "Controle completo do sistema e gerenciamento de usuários"
+    "adminRoleDescription": "Controle completo do sistema e gerenciamento de usuários",
+    "affiliateRoleDescription": "Acesso ao programa de afiliados com gestão de indicações e acompanhamento de comissões"
   },
   "permissions": {
     "read": "Ler",

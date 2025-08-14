@@ -21,7 +21,8 @@
 export const USER_ROLES = {
   ADMIN: 'admin',
   MODERATOR: 'moderator',
-  USER: 'user'
+  USER: 'user',
+  AFFILIATE: 'affiliate'
 } as const
 
 export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES]
@@ -89,6 +90,7 @@ export const LABELS = {
   [USER_ROLES.ADMIN]: 'Admin',
   [USER_ROLES.MODERATOR]: 'Moderator',
   [USER_ROLES.USER]: 'User',
+  [USER_ROLES.AFFILIATE]: 'Affiliate',
 
   // User Statuses
   [USER_STATUSES.ACTIVE]: 'Active',
@@ -127,6 +129,11 @@ export const BADGE_STYLES = {
     background: 'bg-gray-100 dark:bg-gray-700/50',
     text: 'text-gray-800 dark:text-gray-300',
     border: 'border-gray-200 dark:border-gray-600/50'
+  },
+  [USER_ROLES.AFFILIATE]: {
+    background: 'bg-emerald-100 dark:bg-emerald-900/30',
+    text: 'text-emerald-800 dark:text-emerald-300',
+    border: 'border-emerald-200 dark:border-emerald-700/50'
   },
 
   // User Statuses
@@ -187,7 +194,7 @@ export const BADGE_STYLES = {
 
   // Generic variants
   [GENERIC_BADGE_VARIANTS.SECONDARY]: {
-    background: 'bg-gray-100 dark:bg-gray-700/50',  
+    background: 'bg-gray-100 dark:bg-gray-700/50',
     text: 'text-gray-700 dark:text-gray-300',
     border: 'border-gray-300 dark:border-gray-600/50'
   }

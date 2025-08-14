@@ -1,4 +1,3 @@
-
 export type Json =
   | string
   | number
@@ -8,36 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "12.2.12 (cd3cf9e)"
-  }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          operationName?: string
-          query?: string
-          variables?: Json
-          extensions?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       audit_logs: {
@@ -420,21 +389,18 @@ export type Database = {
           affiliate_link: string | null
           created_at: string
           id: string
-          price: number
           updated_at: string
         }
         Insert: {
           affiliate_link?: string | null
           created_at?: string
           id?: string
-          price: number
           updated_at?: string
         }
         Update: {
           affiliate_link?: string | null
           created_at?: string
           id?: string
-          price?: number
           updated_at?: string
         }
         Relationships: []
@@ -510,6 +476,86 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      user_referral_codes: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean | null
+          referral_code: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          referral_code: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          referral_code?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_referral_codes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_referrals: {
+        Row: {
+          confirmed_at: string | null
+          id: string
+          referral_code: string
+          referred_at: string
+          referred_user_id: string
+          referrer_id: string
+          status: string | null
+        }
+        Insert: {
+          confirmed_at?: string | null
+          id?: string
+          referral_code: string
+          referred_at?: string
+          referred_user_id: string
+          referrer_id: string
+          status?: string | null
+        }
+        Update: {
+          confirmed_at?: string | null
+          id?: string
+          referral_code?: string
+          referred_at?: string
+          referred_user_id?: string
+          referrer_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_referrals_referred_user_id_fkey"
+            columns: ["referred_user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       users: {
         Row: {
@@ -606,32 +652,45 @@ export type Database = {
         Row: {
           affiliate_link: string | null
           created_at: string | null
+          description: string | null
           id: string | null
-          price: number | null
-          translations: Json | null
+          language: string | null
+          name: string | null
           updated_at: string | null
         }
         Relationships: []
       }
     }
     Functions: {
+      create_referral_relationship: {
+        Args: { referral_code_input: string; referred_user_uuid: string }
+        Returns: boolean
+      }
+      create_user_referral_code: {
+        Args: { user_uuid: string }
+        Returns: string
+      }
+      generate_referral_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_audit_stats: {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
       get_translated_content: {
         Args: {
-          content_type: string
           content_id: string
-          language_code?: string
+          content_type: string
           fallback_language?: string
+          language_code?: string
         }
         Returns: Json
       }
       has_translation: {
         Args: {
-          content_type: string
           content_id: string
+          content_type: string
           language_code: string
         }
         Returns: boolean
@@ -652,7 +711,7 @@ export type Database = {
     Enums: {
       post_status: "draft" | "published"
       post_type: "news" | "event" | "terms_of_use" | "privacy_policy"
-      user_role: "user" | "moderator" | "admin"
+      user_role: "user" | "moderator" | "admin" | "affiliate"
       user_status: "invited" | "active" | "inactive" | "suspended"
     }
     CompositeTypes: {
@@ -779,15 +838,13 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       post_status: ["draft", "published"],
       post_type: ["news", "event", "terms_of_use", "privacy_policy"],
-      user_role: ["user", "moderator", "admin"],
+      user_role: ["user", "moderator", "admin", "affiliate"],
       user_status: ["invited", "active", "inactive", "suspended"],
     },
   },
 } as const
+

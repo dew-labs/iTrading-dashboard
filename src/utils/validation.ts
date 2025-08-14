@@ -514,10 +514,7 @@ export const formSchemas = {
       minLength: VALIDATION.REQUIRED_FIELD_MIN_LENGTH,
       maxLength: VALIDATION.REQUIRED_FIELD_MAX_LENGTH
     } as ValidationRule<string>,
-    price: {
-      required: true,
-      min: VALIDATION.PRICE_MIN
-    } as ValidationRule<number>
+
   },
 
   changePassword: {

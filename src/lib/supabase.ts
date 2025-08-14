@@ -68,7 +68,10 @@ export const queryKeys = {
 
   // Permissions
   rolePermissions: (role: string) => ['role-permissions', role] as const,
-  permissions: () => ['permissions'] as const
+  permissions: () => ['permissions'] as const,
+
+  // Referrals and Affiliate System
+
 } as const
 
 // Helper functions for common Supabase operations

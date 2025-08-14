@@ -32,7 +32,7 @@
     "image": "Imagem",
     "featuredImage": "Imagem Destacada",
     "file": "Arquivo",
-    "price": "Preço",
+
     "quantity": "Quantidade",
     "sku": "SKU",
     "brand": "Marca",
@@ -130,7 +130,10 @@
     "enterCommission": "ex., $7 por lote, 0,25%",
     "enterMinDeposit": "ex., $100, $1000",
     "affiliate_link": "Digite a URL do link de afiliado",
-    "description": "Digite a descrição"
+    "description": "Digite a descrição",
+    "title": "Digite o título",
+    "excerpt": "Digite o resumo",
+    "content": "Digite o conteúdo"
   },
   "validation": {
     "required": "Obrigatório",

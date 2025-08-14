@@ -30,6 +30,7 @@
     "brokerCategories": "Broker Categories",
     "banners": "Banners",
     "audits": "Recent Activities",
+    "affiliate": "Affiliate",
     "settings": "Settings"
   },
   "header": "Header",
@@ -53,6 +54,7 @@
     "brokerCategories": "Broker Categories",
     "banners": "Banners",
     "audits": "Recent Activities",
+    "affiliate": "Affiliate",
     "settings": "Settings"
   }
 }
