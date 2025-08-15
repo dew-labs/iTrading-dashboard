@@ -4,6 +4,7 @@ export * from './posts'
 export * from './products'
 export * from './banners'
 export * from './users'
+export * from './affiliates'
 
 export * from './images'
 export * from './brokers'

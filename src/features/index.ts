@@ -9,6 +9,9 @@ export * from './brokers'
 // 👥 Users Feature
 export * from './users'
 
+// 🎯 Affiliates Feature
+export * from './affiliates'
+
 // 🎯 Banners Feature
 export * from './banners'
 

@@ -8,7 +8,7 @@
     "systemOverviewDescription": "Status do sistema em tempo real e métricas principais do banco de dados",
     "quickStatistics": "Análises e Insights",
     "quickStatisticsDescription": "Métricas de desempenho e indicadores de crescimento",
-    "recentActivity": "Atividade Recente", 
+    "recentActivity": "Atividade Recente",
     "recentActivityDescription": "Últimas ações do sistema e atividade dos usuários",
     "quickActions": "Ações Rápidas",
     "quickActionsDescription": "Comece com tarefas e operações comuns",
@@ -210,7 +210,7 @@
     "noDescriptionAvailable": "Nenhuma descrição disponível",
     "broker": "Corretora",
     "name": "Nome",
-    "headquarter": "Sede", 
+    "headquarter": "Sede",
     "category": "Categoria",
     "systemInfo": "Informações do Sistema",
     "visible": "Visível",
@@ -228,6 +228,111 @@
       "editBroker": "Editar corretora",
       "deleteBroker": "Excluir corretora"
     }
+  },
+  "affiliates": {
+    "title": "Gerenciamento de Afiliados",
+    "subtitle": "Gerencie usuários afiliados e monitore a performance de indicações",
+    "loading": {
+      "fetchingAffiliates": "Carregando afiliados..."
+    },
+    "errors": {
+      "loadingFailed": "Falha ao carregar afiliados",
+      "genericError": "Ocorreu um erro ao carregar dados de afiliados"
+    },
+    "stats": {
+      "totalAffiliates": "Total de Afiliados",
+      "activeAffiliates": "Afiliados Ativos",
+      "totalReferrals": "Total de Indicações",
+      "activeCodes": "Códigos Ativos"
+    },
+    "search": {
+      "placeholder": "Buscar afiliados por nome, email ou código de indicação..."
+    },
+    "filters": {
+      "status": "Status",
+      "performance": "Performance",
+      "highPerformers": "Alta Performance (>50%)",
+      "moderatePerformers": "Performance Moderada (20-50%)",
+      "lowPerformers": "Baixa Performance (<20%)",
+      "noActivity": "Sem Atividade"
+    },
+    "table": {
+      "affiliateDetails": "Detalhes do Afiliado",
+      "referralCodes": "Códigos de Indicação",
+      "status": "Status",
+      "performance": "Performance",
+      "totalReferrals": "Total de Indicações",
+      "joinedDate": "Data de Adesão",
+      "actions": "Ações",
+      "code": "código",
+      "codes": "códigos",
+      "activeCodes": "códigos ativos",
+      "topCode": "Top",
+      "noCodes": "Sem códigos",
+      "confirmed": "Confirmado",
+      "pending": "Pendente",
+      "referral": "indicação",
+      "referrals": "indicações",
+      "memberSince": "Membro desde",
+      "viewDetails": "Ver detalhes do afiliado"
+    },
+    "performance": {
+      "high": "Alta Performance",
+      "moderate": "Moderada",
+      "low": "Baixa Performance",
+      "none": "Sem Atividade"
+    },
+    "status": {
+      "confirmed": "Confirmado",
+      "pending": "Pendente",
+      "rejected": "Rejeitado"
+    },
+    "results": {
+      "showing": "Mostrando {{start}}-{{end}} de {{total}} afiliados",
+      "noResults": "Nenhum afiliado encontrado"
+    },
+    "empty": {
+      "noAffiliates": "Ainda não há afiliados",
+      "noAffiliatesDescription": "Usuários afiliados aparecerão aqui quando se registrarem.",
+      "noResults": "Nenhum afiliado corresponde aos seus filtros",
+      "tryDifferentFilters": "Tente ajustar seus termos de pesquisa ou filtros."
+    },
+    "details": {
+      "noName": "Nenhum nome fornecido",
+      "tabs": {
+        "overview": "Visão Geral",
+        "referrals": "Indicações",
+        "codes": "Códigos de Indicação"
+      },
+
+      "totalReferrals": "Total de Indicações",
+      "activeCodes": "Códigos Ativos",
+      "recentReferrals": "Indicações Recentes",
+      "noRecentReferrals": "Nenhuma indicação recente",
+      "allReferrals": "Todas as Indicações",
+      "referralCodes": "Códigos de Indicação",
+      "createCode": "Criar Código",
+      "createFirstCode": "Criar Primeiro Código",
+      "noReferralCodes": "Ainda não há códigos de indicação",
+      "createdOn": "Criado em",
+      "copyCode": "Copiar código",
+      "codeCopied": "Código de indicação copiado para a área de transferência!",
+      "copyFailed": "Falha ao copiar código",
+      "activateCode": "Ativar código",
+      "deactivateCode": "Desativar código",
+      "deleteCode": "Excluir código",
+      "referrals": {
+        "user": "Usuário",
+        "code": "Código",
+        "status": "Status",
+        "date": "Data",
+        "actions": "Ações",
+        "confirm": "Confirmar indicação",
+        "reject": "Rejeitar indicação",
+        "noName": "Sem nome"
+      }
+    },
+    "noName": "Sem nome"
   },
   "brokerCategories": {
     "title": "Categorias de Corretoras",
@@ -382,7 +487,7 @@
       "action": "Ação",
       "role": "Função"
     },
-    "clearFilters": "Limpar Filtros",
+
     "activityDetails": "Detalhes da Atividade",
     "userInfo": "Informações do Usuário",
     "targetAndTime": "Alvo e Tempo",
@@ -503,7 +608,7 @@
   },
   "affiliate": {
     "title": "Painel de Afiliado",
-    "subtitle": "Gerencie suas indicações e acompanhe sua performance", 
+    "subtitle": "Gerencie suas indicações e acompanhe sua performance",
     "dashboard": "Painel de Afiliado",
     "dashboardSubtitle": "Acompanhe suas indicações e gerencie seu programa de afiliados",
     "affiliateStatus": "Afiliado Ativo",
@@ -519,13 +624,12 @@
       "title": "Atividade Recente",
       "description": "Acompanhe suas atividades e eventos de afiliado recentes",
       "signups": "Cadastros",
-      "confirmations": "Confirmações", 
+      "confirmations": "Confirmações",
       "rejections": "Rejeições",
       "codeEvents": "Eventos de Código",
       "searchActivities": "Buscar atividades...",
       "filterByType": "Filtrar por tipo...",
-      "referralConfirmed": "Indicação Confirmada",
-      "userSignedUpAndConfirmed": "Usuário se cadastrou via sua indicação e foi confirmado",
+
       "newReferralSignup": "Nova Inscrição por Indicação",
       "userSignedUpViaCode": "Usuário se cadastrou usando seu código de indicação",
       "codeCreated": "Código de Indicação Criado",
@@ -587,9 +691,8 @@
       "selectFile": "Selecionar Arquivo"
     },
     "totalReferrals": "Total de Indicações",
-    "confirmedReferrals": "Indicações Confirmadas",
-    "pendingReferrals": "Indicações Pendentes",
-    "conversionRate": "Taxa de Conversão",
+
+
     "fromLastMonth": "do mês passado",
     "performanceChart": "Gráfico de Performance",
     "referralsAndConversions": "Indicações e conversões ao longo do tempo",
@@ -627,13 +730,13 @@
     "showingResults": "Mostrando {{start}}-{{end}} de {{total}} resultados",
     "noReferralsMatchingFilters": "Nenhuma indicação corresponde aos seus filtros atuais",
     "noReferralsYet": "Ainda não há indicações",
-    "performanceTrends": "Tendências de Performance", 
+    "performanceTrends": "Tendências de Performance",
     "referralsConversionsOverTime": "Acompanhe suas indicações e conversões ao longo do tempo",
     "conversionFunnel": "Funil de Conversão",
     "funnelDescription": "Veja como os visitantes se convertem através do seu processo de indicação",
     "funnel": {
       "visits": "Visitas",
-      "signups": "Cadastros", 
+      "signups": "Cadastros",
       "conversions": "Conversões"
     },
     "topPerformingCodes": "Códigos de Melhor Performance",

@@ -6,7 +6,7 @@
     "welcomeMessage": "Welcome to your iTrading dashboard. Monitor your system overview and quick actions.",
     "systemOverview": "System Overview",
     "systemOverviewDescription": "Real-time system status and key metrics from your database",
-    "quickStatistics": "Analytics & Insights", 
+    "quickStatistics": "Analytics & Insights",
     "quickStatisticsDescription": "Performance metrics and growth indicators",
     "recentActivity": "Recent Activity",
     "recentActivityDescription": "Latest system actions and user activity",
@@ -229,6 +229,111 @@
       "deleteBroker": "Delete broker"
     }
   },
+  "affiliates": {
+    "title": "Affiliate Management",
+    "subtitle": "Manage affiliate users and monitor referral performance",
+    "loading": {
+      "fetchingAffiliates": "Loading affiliates..."
+    },
+    "errors": {
+      "loadingFailed": "Failed to load affiliates",
+      "genericError": "An error occurred while loading affiliate data"
+    },
+    "stats": {
+      "totalAffiliates": "Total Affiliates",
+      "activeAffiliates": "Active Affiliates",
+      "totalReferrals": "Total Referrals",
+      "activeCodes": "Active Codes"
+    },
+    "search": {
+      "placeholder": "Search affiliates by name, email, or referral code..."
+    },
+    "filters": {
+      "status": "Status",
+      "performance": "Performance",
+      "highPerformers": "High Performers (>50%)",
+      "moderatePerformers": "Moderate Performers (20-50%)",
+      "lowPerformers": "Low Performers (<20%)",
+      "noActivity": "No Activity"
+    },
+    "table": {
+      "affiliateDetails": "Affiliate Details",
+      "referralCodes": "Referral Codes",
+      "status": "Status",
+      "performance": "Performance",
+      "totalReferrals": "Total Referrals",
+      "joinedDate": "Joined Date",
+      "actions": "Actions",
+      "code": "code",
+      "codes": "codes",
+      "activeCodes": "active codes",
+      "topCode": "Top",
+      "noCodes": "No codes",
+      "confirmed": "Confirmed",
+      "pending": "Pending",
+      "referral": "referral",
+      "referrals": "referrals",
+      "memberSince": "Member since",
+      "viewDetails": "View affiliate details"
+    },
+    "performance": {
+      "high": "High Performer",
+      "moderate": "Moderate",
+      "low": "Low Performer",
+      "none": "No Activity"
+    },
+    "status": {
+      "confirmed": "Confirmed",
+      "pending": "Pending",
+      "rejected": "Rejected"
+    },
+    "results": {
+      "showing": "Showing {{start}}-{{end}} of {{total}} affiliates",
+      "noResults": "No affiliates found"
+    },
+    "empty": {
+      "noAffiliates": "No affiliates yet",
+      "noAffiliatesDescription": "Affiliate users will appear here when they register.",
+      "noResults": "No affiliates match your filters",
+      "tryDifferentFilters": "Try adjusting your search terms or filters."
+    },
+    "details": {
+      "noName": "No name provided",
+      "tabs": {
+        "overview": "Overview",
+        "referrals": "Referrals",
+        "codes": "Referral Codes"
+      },
+
+      "totalReferrals": "Total Referrals",
+      "activeCodes": "Active Codes",
+      "recentReferrals": "Recent Referrals",
+      "noRecentReferrals": "No recent referrals",
+      "allReferrals": "All Referrals",
+      "referralCodes": "Referral Codes",
+      "createCode": "Create Code",
+      "createFirstCode": "Create First Code",
+      "noReferralCodes": "No referral codes yet",
+      "createdOn": "Created on",
+      "copyCode": "Copy code",
+      "codeCopied": "Referral code copied to clipboard!",
+      "copyFailed": "Failed to copy code",
+      "activateCode": "Activate code",
+      "deactivateCode": "Deactivate code",
+      "deleteCode": "Delete code",
+      "referrals": {
+        "user": "User",
+        "code": "Code",
+        "status": "Status",
+        "date": "Date",
+        "actions": "Actions",
+        "confirm": "Confirm referral",
+        "reject": "Reject referral",
+        "noName": "No name"
+      }
+    },
+    "noName": "No name"
+  },
   "brokerCategories": {
     "title": "Broker Categories",
     "description": "Manage broker categories and classifications",
@@ -446,7 +551,7 @@
       "action": "Action",
       "role": "Role"
     },
-    "clearFilters": "Clear Filters",
+
     "activityDetails": "Activity Details",
     "userInfo": "User Information",
     "targetAndTime": "Target & Time",
@@ -502,7 +607,7 @@
     "activitiesWillAppear": "Administrative activities will appear here as they happen."
   },
   "affiliate": {
-    "title": "Affiliate Dashboard", 
+    "title": "Affiliate Dashboard",
     "subtitle": "Manage your referrals and track your performance",
     "dashboard": "Affiliate Dashboard",
     "dashboardSubtitle": "Track your referrals and manage your affiliate program",
@@ -519,13 +624,11 @@
       "title": "Recent Activity",
       "description": "Track your recent affiliate activities and events",
       "signups": "Sign-ups",
-      "confirmations": "Confirmations", 
+      "confirmations": "Confirmations",
       "rejections": "Rejections",
       "codeEvents": "Code Events",
       "searchActivities": "Search activities...",
       "filterByType": "Filter by type...",
-      "referralConfirmed": "Referral Confirmed",
-      "userSignedUpAndConfirmed": "User signed up via your referral and was confirmed",
       "newReferralSignup": "New Referral Sign-up",
       "userSignedUpViaCode": "User signed up using your referral code",
       "codeCreated": "Referral Code Created",
@@ -587,9 +690,8 @@
       "selectFile": "Select File"
     },
     "totalReferrals": "Total Referrals",
-    "confirmedReferrals": "Confirmed Referrals",
-    "pendingReferrals": "Pending Referrals",
-    "conversionRate": "Conversion Rate",
+
+
     "fromLastMonth": "from last month",
     "performanceChart": "Performance Chart",
     "referralsAndConversions": "Referrals and conversions over time",
@@ -627,13 +729,13 @@
     "showingResults": "Showing {{start}}-{{end}} of {{total}} results",
     "noReferralsMatchingFilters": "No referrals match your current filters",
     "noReferralsYet": "No referrals yet",
-    "performanceTrends": "Performance Trends", 
+    "performanceTrends": "Performance Trends",
     "referralsConversionsOverTime": "Track your referrals and conversions over time",
     "conversionFunnel": "Conversion Funnel",
     "funnelDescription": "See how visitors convert through your referral process",
     "funnel": {
       "visits": "Visits",
-      "signups": "Sign-ups", 
+      "signups": "Sign-ups",
       "conversions": "Conversions"
     },
     "topPerformingCodes": "Top Performing Codes",

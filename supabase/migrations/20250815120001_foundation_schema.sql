@@ -188,7 +188,6 @@ CREATE TABLE user_referrals (
   referred_user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   referral_code varchar(20) NOT NULL,
   referred_at timestamptz NOT NULL DEFAULT now(),
-  confirmed_at timestamptz,
 
   -- Prevent self-referral and duplicate referrals
   CONSTRAINT no_self_referral CHECK (referrer_id != referred_user_id),
@@ -253,4 +252,3 @@ COMMENT ON COLUMN products.affiliate_link IS 'Affiliate link for the product (ex
 COMMENT ON COLUMN user_referral_codes.referral_code IS 'Unique referral code (e.g., 123ABC)';
 COMMENT ON COLUMN user_referral_codes.is_active IS 'Whether this referral code is currently active and can be used';
 COMMENT ON COLUMN user_referrals.referred_at IS 'When the referral was initially created (user signed up with code)';
-COMMENT ON COLUMN user_referrals.confirmed_at IS 'When the referral was confirmed (user became active/completed requirements)';

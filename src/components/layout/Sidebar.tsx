@@ -9,7 +9,8 @@ import {
   Pin,
   Building2,
   Package,
-  Tags
+  Tags,
+  HandCoins
 } from 'lucide-react'
 import { usePermissions } from '../../hooks/usePermissions'
 import { useNavigationTranslation, useTranslation } from '../../hooks/useTranslation'
@@ -91,6 +92,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed, setIs
           path: '/users',
           resource: 'users',
           action: 'read'
+        },
+        {
+          id: 'affiliates',
+          labelKey: 'affiliates',
+          icon: HandCoins,
+          path: '/affiliates',
+          requiredRole: 'admin'
         }
       ]
     },

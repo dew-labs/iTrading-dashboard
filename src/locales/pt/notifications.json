@@ -74,7 +74,11 @@
       "granted": "concedida com sucesso",
       "revoked": "revogada com sucesso",
       "restored": "Restaurado com sucesso",
-      "duplicated": "Duplicado com sucesso"
+      "duplicated": "Duplicado com sucesso",
+      "referralCodeCreated": "Código de indicação criado com sucesso",
+
+      "referralCodeStatusUpdated": "Status do código de indicação atualizado com sucesso",
+      "referralCodeDeleted": "Código de indicação excluído com sucesso"
     },
     "error": {
       "general": "Algo deu errado. Tente novamente.",
@@ -91,7 +95,12 @@
       "alreadyExists": "Item já existe",
       "sessionExpired": "Sua sessão expirou. Faça login novamente.",
       "accountRemoved": "Sua conta foi removida. Entre em contato com o administrador.",
-      "unexpectedError": "Ocorreu um erro inesperado"
+      "unexpectedError": "Ocorreu um erro inesperado",
+      "failedToCreateReferralCode": "Falha ao criar código de indicação",
+
+      "failedToUpdateReferralCodeStatus": "Falha ao atualizar status do código de indicação",
+      "failedToDeleteReferralCode": "Falha ao excluir código de indicação",
+      "affiliateAlreadyHasActiveCode": "Afiliado {{name}} já possui um código de indicação ativo"
     },
     "info": {
       "loading": "Carregando...",

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Download, Trash2, Search, X } from 'lucide-react'
+import { Download, Trash2, Search } from 'lucide-react'
 import { useAuditLogs } from '../hooks/useAuditLogs'
 import { useAuditFiltering } from '../hooks/useAuditFiltering'
 import { usePermissions } from '../hooks/usePermissions'
@@ -37,8 +37,6 @@ const Audits: React.FC = () => {
     setItemsPerPage,
     setPageInputValue,
     handlePageChange,
-    clearFilters,
-    activeFiltersCount,
     filterState
   } = useAuditFiltering(auditLogs)
 
@@ -245,16 +243,7 @@ const Audits: React.FC = () => {
                   }}
                   label={t('audits.filters.action')}
                 />
-                {activeFiltersCount > 0 && (
-                  <Button
-                    variant='ghost'
-                    size='sm'
-                    onClick={clearFilters}
-                    leftIcon={X}
-                  >
-                    {tCommon('actions.clearFilters', { count: activeFiltersCount })}
-                  </Button>
-                )}
+
               </div>
             </div>
 

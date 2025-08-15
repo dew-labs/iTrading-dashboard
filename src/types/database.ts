@@ -514,31 +514,25 @@ export type Database = {
       }
       user_referrals: {
         Row: {
-          confirmed_at: string | null
           id: string
           referral_code: string
           referred_at: string
           referred_user_id: string
           referrer_id: string
-          status: string | null
         }
         Insert: {
-          confirmed_at?: string | null
           id?: string
           referral_code: string
           referred_at?: string
           referred_user_id: string
           referrer_id: string
-          status?: string | null
         }
         Update: {
-          confirmed_at?: string | null
           id?: string
           referral_code?: string
           referred_at?: string
           referred_user_id?: string
           referrer_id?: string
-          status?: string | null
         }
         Relationships: [
           {

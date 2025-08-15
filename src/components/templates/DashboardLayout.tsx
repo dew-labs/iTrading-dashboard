@@ -14,6 +14,7 @@ const Brokers = React.lazy(() => import('../../pages/Brokers'))
 const BrokerCategories = React.lazy(() => import('../../pages/BrokerCategories'))
 const Banners = React.lazy(() => import('../../pages/Banners'))
 const Users = React.lazy(() => import('../../pages/Users'))
+const Affiliates = React.lazy(() => import('../../pages/Affiliates'))
 const Settings = React.lazy(() => import('../../pages/Settings'))
 const Products = React.lazy(() => import('../../pages/Products'))
 const Audits = React.lazy(() => import('../../pages/Audits'))
@@ -97,6 +98,14 @@ const DashboardLayout: React.FC = () => {
                   element={
                     <ProtectedRoute requiredPermission={{ resource: 'users', action: 'read' }}>
                       <Users />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path='/affiliates'
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <Affiliates />
                     </ProtectedRoute>
                   }
                 />

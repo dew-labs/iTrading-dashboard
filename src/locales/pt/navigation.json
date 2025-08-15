@@ -6,6 +6,7 @@
   "banners": "Banners",
   "brokers": "Corretoras",
   "brokerCategories": "Categorias de Corretoras",
+  "affiliates": "Afiliados",
   "analytics": "Análises",
   "settings": "Configurações",
   "help": "Central de Ajuda",
@@ -30,7 +31,7 @@
     "brokerCategories": "Categorias de Corretoras",
     "banners": "Banners",
     "audits": "Atividades Recentes",
-    "affiliate": "Afiliado",
+    "affiliates": "Afiliados",
     "settings": "Configurações"
   },
   "header": "Cabeçalho",
@@ -54,7 +55,7 @@
     "brokerCategories": "Categorias de Corretoras",
     "banners": "Banners",
     "audits": "Atividades Recentes",
-    "affiliate": "Afiliado",
+    "affiliates": "Afiliados",
     "settings": "Configurações"
   }
 }
