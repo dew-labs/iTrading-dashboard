@@ -59,6 +59,7 @@ CREATE TABLE brokers_translations (
   broker_id uuid NOT NULL REFERENCES brokers(id) ON DELETE CASCADE,
   language_code varchar(5) NOT NULL CHECK (language_code IN ('en', 'pt', 'vi')),
   description text,
+  affiliate_link text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT unique_broker_language UNIQUE(broker_id, language_code)
@@ -112,7 +113,6 @@ GROUP BY p.id, p.author_id, p.type, p.status, p.views, p.published_at, p.created
 CREATE VIEW products_with_translations AS
 SELECT
   p.id,
-  p.price,
   p.affiliate_link,
   p.created_at,
   p.updated_at,
@@ -128,7 +128,7 @@ SELECT
   ) FILTER (WHERE pt.id IS NOT NULL) as translations
 FROM products p
 LEFT JOIN products_translations pt ON p.id = pt.product_id
-GROUP BY p.id, p.price, p.affiliate_link, p.created_at, p.updated_at;
+GROUP BY p.id, p.affiliate_link, p.created_at, p.updated_at;
 
 -- Brokers with translations view
 CREATE VIEW brokers_with_translations AS
@@ -139,13 +139,14 @@ SELECT
       'id', bt.id,
       'language_code', bt.language_code,
       'description', bt.description,
+      'affiliate_link', bt.affiliate_link,
       'created_at', bt.created_at,
       'updated_at', bt.updated_at
     ) ORDER BY bt.language_code
   ) FILTER (WHERE bt.id IS NOT NULL) as translations
 FROM brokers b
 LEFT JOIN brokers_translations bt ON b.id = bt.broker_id
-GROUP BY b.id, b.is_visible, b.name, b.headquarter, b.established_in, b.created_at, b.updated_at;
+GROUP BY b.id, b.is_visible, b.name, b.headquarter, b.established_in, b.category_id, b.created_at, b.updated_at;
 
 -- ===============================================
 -- SECURITY INVOKER FOR TRANSLATION VIEWS
@@ -387,6 +388,7 @@ COMMENT ON COLUMN products_translations.description IS 'Translated description o
 
 COMMENT ON COLUMN brokers_translations.language_code IS 'Language code (en, pt, vi) for the translation';
 COMMENT ON COLUMN brokers_translations.description IS 'Translated description of the broker';
+COMMENT ON COLUMN brokers_translations.affiliate_link IS 'Language-specific affiliate link URL for the broker';
 
 -- ===============================================
 -- VERIFICATION & LOGGING

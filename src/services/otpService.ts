@@ -75,23 +75,3 @@ export const verifyOTP = async (
     }
   }
 }
-
-/**
- * Resend OTP to user
- */
-export const resendOTP = async (email: string): Promise<{success: boolean; error?: string}> => {
-  try {
-    const { error } = await supabase.auth.resend({
-      type: 'signup',
-      email
-    })
-
-    if (error) throw error
-    return { success: true }
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to resend OTP'
-    }
-  }
-}
