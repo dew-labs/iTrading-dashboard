@@ -244,12 +244,11 @@ export class TranslationService {
         id: product.id ?? '',
         created_at: product.created_at ?? '',
         updated_at: product.updated_at ?? '',
-        price: product.price ?? 0,
         affiliate_link: product.affiliate_link ?? null,
-        translations: Array.isArray(product.translations)
-          ? product.translations
-          : typeof product.translations === 'string'
-            ? JSON.parse(product.translations)
+        translations: Array.isArray((product as unknown as { translations?: unknown }).translations)
+          ? (product as unknown as { translations: unknown[] }).translations
+          : typeof (product as unknown as { translations?: unknown }).translations === 'string'
+            ? JSON.parse((product as unknown as { translations: string }).translations)
             : [],
         // ... other fields
       }

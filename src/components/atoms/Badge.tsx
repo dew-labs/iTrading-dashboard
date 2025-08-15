@@ -10,7 +10,8 @@ import {
   Scale,
   Lock,
   Gavel,
-  Shield
+  Shield,
+  HandCoins
 } from 'lucide-react'
 import { cn } from '../../utils/theme'
 import { type BadgeVariant, getLabel, getBadgeStyle } from '../../constants/general'
@@ -54,6 +55,8 @@ const Badge: React.FC<BadgeProps> = ({
       return <Shield className={iconSize} aria-label={t('ui.accessibility.admin')} />
     case 'user':
       return <User className={iconSize} aria-label={t('ui.accessibility.user')} />
+    case 'affiliate':
+      return <HandCoins className={iconSize} aria-label='Affiliate' />
 
       // User Statuses
     case 'active':

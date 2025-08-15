@@ -122,17 +122,7 @@ export const useAuditFiltering = (auditLogs: AuditLog[]) => {
     setPageInputValue(page.toString())
   }
 
-  const clearFilters = () => {
-    setSearchTerm('')
-    setSelectedTable('all')
-    setSelectedAction('all')
-    setSelectedUser('all')
-    setSelectedRole('all')
-    setDateFrom('')
-    setDateTo('')
-    setCurrentPage(1)
-    setPageInputValue('1')
-  }
+
 
   const getActiveFiltersCount = () => {
     let count = 0
@@ -197,7 +187,6 @@ export const useAuditFiltering = (auditLogs: AuditLog[]) => {
     setItemsPerPage,
     setPageInputValue,
     handlePageChange,
-    clearFilters,
     getApiFilters
   }
 }

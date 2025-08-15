@@ -38,7 +38,6 @@
     "collapse": "Collapse",
     "maximize": "Maximize",
     "minimize": "Minimize",
-    "clearFilters": "Clear {{count}} filter{{count, plural, one {} other {s}}}",
     "addAccountType": "Add Account Type",
     "addFirstAccountType": "Add First Account Type",
     "deleteAccountType": "Delete Account Type"
@@ -77,7 +76,7 @@
     "date": "Date",
     "time": "Time",
     "size": "Size",
-    "price": "Price",
+
     "total": "Total",
     "count": "Count",
     "required": "Required",
@@ -268,9 +267,11 @@
     "user": "User",
     "moderator": "Moderator",
     "admin": "Admin",
+    "affiliate": "Affiliate",
     "userRoleDescription": "Standard access with basic permissions (read-only)",
     "moderatorRoleDescription": "Content management capabilities for posts, banners, and brokers",
-    "adminRoleDescription": "Complete system control and user management"
+    "adminRoleDescription": "Complete system control and user management",
+    "affiliateRoleDescription": "Affiliate program access with referral management and commission tracking"
   },
   "permissions": {
     "read": "Read",
@@ -290,7 +291,15 @@
     "received": "Received successfully",
     "synchronized": "Synchronized successfully",
     "exported": "Exported successfully",
-    "imported": "Imported successfully"
+    "imported": "Imported successfully",
+    "success": {
+      "referralCodeCreated": "Referral code created successfully"
+    },
+    "toast": {
+      "success": {
+        "referralCodeCreated": "Referral code created successfully"
+      }
+    }
   },
   "userForm": {
     "basicInformation": "Basic Information",
@@ -394,9 +403,12 @@
     "addAccountTypesDescription": "Add different account types with their trading conditions and requirements.",
     "confirmDeleteAccountType": "Are you sure you want to delete",
     "thisAccountType": "this account type",
-    "actionCannotBeUndone": "This action cannot be undone."
+    "actionCannotBeUndone": "This action cannot be undone.",
+    "productDetailsEditor": "Product Details Editor",
+    "nameAndDescription": "Name and Description"
   },
   "filters": {
+    "all": "All",
     "allStatus": "All Status",
     "allRoles": "All Roles",
     "allTypes": "All Types",
@@ -407,12 +419,21 @@
     "publishedFirst": "Published First",
     "draftFirst": "Draft First"
   },
+  "affiliates": {
+    "filters": {
+      "highPerformers": "High Performers",
+      "moderatePerformers": "Moderate Performers",
+      "lowPerformers": "Low Performers",
+      "noActivity": "No Activity"
+    }
+  },
   "placeholders": {
     "searchUsersPlaceholder": "Search users by name or email...",
     "searchPostsPlaceholder": "Search posts by title, content, or author...",
     "searchProductsPlaceholder": "Search products by name or description...",
     "searchBannersPlaceholder": "Search banners by URL...",
     "searchBrokersPlaceholder": "Search brokers by headquarter or description...",
+    "searchAffiliatesPlaceholder": "Search affiliates by name, email, or referral code...",
     "searchActivitiesPlaceholder": "Search activities by user, action, or target...",
     "enterFieldInLanguage": "Enter {{field}} in {{language}}...",
     "selectLanguage": "Select language",

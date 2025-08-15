@@ -11,12 +11,22 @@ import { useTranslation } from '../../hooks/useTranslation'
 const Dashboard = React.lazy(() => import('../../pages/Dashboard'))
 const Posts = React.lazy(() => import('../../pages/Posts'))
 const Brokers = React.lazy(() => import('../../pages/Brokers'))
+const BrokerCategories = React.lazy(() => import('../../pages/BrokerCategories'))
 const Banners = React.lazy(() => import('../../pages/Banners'))
 const Users = React.lazy(() => import('../../pages/Users'))
+const Affiliates = React.lazy(() => import('../../pages/Affiliates'))
 const Settings = React.lazy(() => import('../../pages/Settings'))
 const Products = React.lazy(() => import('../../pages/Products'))
 const Audits = React.lazy(() => import('../../pages/Audits'))
 const Unauthorized = React.lazy(() => import('../../pages/Unauthorized'))
+
+/**
+ * Component to show appropriate dashboard content based on user role
+ */
+const DashboardRootContent: React.FC = () => {
+  // All roles see the main dashboard
+  return <Dashboard />
+}
 
 const DashboardLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -41,7 +51,7 @@ const DashboardLayout: React.FC = () => {
           <PageTransition>
             <Suspense fallback={<PageLoadingSpinner message={t('loadingStates.loadingPage')} />}>
               <Routes>
-                <Route path='/' element={<Dashboard />} />
+                <Route path='/' element={<DashboardRootContent />} />
 
                 <Route
                   path='/posts'
@@ -68,6 +78,14 @@ const DashboardLayout: React.FC = () => {
                   }
                 />
                 <Route
+                  path='/broker-categories'
+                  element={
+                    <ProtectedRoute requiredPermission={{ resource: 'brokers', action: 'read' }}>
+                      <BrokerCategories />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path='/banners'
                   element={
                     <ProtectedRoute requiredPermission={{ resource: 'banners', action: 'read' }}>
@@ -83,7 +101,17 @@ const DashboardLayout: React.FC = () => {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path='/affiliates'
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <Affiliates />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path='/settings' element={<Settings />} />
+
+
 
                 <Route
                   path='/audits'

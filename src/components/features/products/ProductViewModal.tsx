@@ -7,9 +7,10 @@ import {
   Edit2
 } from 'lucide-react'
 import { useTranslation, usePageTranslation } from '../../../hooks/useTranslation'
-import { formatDateDisplay, formatPrice } from '../../../utils/format'
+import { formatDateDisplay } from '../../../utils/format'
 import { getTypographyClasses, cn } from '../../../utils/theme'
 import type { ProductWithTranslations, Image } from '../../../types'
+import type { ProductTranslation } from '../../../types/translations'
 import RecordImage from '../images/RecordImage'
 import { Button } from '../../atoms'
 
@@ -36,8 +37,8 @@ const ProductViewModal: React.FC<ProductViewModalProps> = ({
     const lang = i18n.language || 'en';
     if (!product.translations || product.translations.length === 0) return { name: '', description: '' };
     const translation =
-      product.translations.find(tr => tr.language_code === lang) ||
-      product.translations.find(tr => tr.language_code === 'en');
+      product.translations.find((tr: ProductTranslation) => tr.language_code === lang) ||
+      product.translations.find((tr: ProductTranslation) => tr.language_code === 'en');
     return {
       name: translation?.name || '',
       description: translation?.description || ''
@@ -171,10 +172,9 @@ const ProductViewModal: React.FC<ProductViewModalProps> = ({
           <div className='flex-1 overflow-y-auto max-h-[calc(95vh-8rem)]'>
             <div className='px-8 py-6'>
               <div className='space-y-8'>
-                {/* Product Price & Affiliate Link */}
+                {/* Product Affiliate Link */}
                 <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200 dark:border-gray-700 pb-4'>
                   <div className='flex items-center gap-2'>
-                    <span className='text-lg font-semibold text-green-600 dark:text-green-400'>${formatPrice(product.price)}</span>
                   </div>
                   {product.affiliate_link && (
                     <div className='flex items-center gap-2'>

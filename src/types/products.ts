@@ -15,4 +15,10 @@ export interface ProductTranslation {
   updated_at: string
 }
 
-export type ProductWithTranslations = Product & { translations?: ProductTranslation[] }
+// Updated type to match the new products_with_translations view structure
+export interface ProductWithTranslations extends Product, Record<string, unknown> {
+  name: string
+  description: string
+  language: string
+  translations?: ProductTranslation[]
+}

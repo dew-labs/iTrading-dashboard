@@ -73,8 +73,8 @@ export const usePostsFiltering = ({
       switch (sortColumn) {
       case 'created_at':
       default:
-        aValue = new Date(a.created_at || 0).getTime()
-        bValue = new Date(b.created_at || 0).getTime()
+        aValue = new Date((a.created_at as string) || 0).getTime()
+        bValue = new Date((b.created_at as string) || 0).getTime()
       }
 
       if (sortDirection === 'asc') {

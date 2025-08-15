@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useState } from 'react'
-import { User, Shield, X, Save, Mail, Camera, Gavel } from 'lucide-react'
+import { User, Shield, X, Save, Mail, Camera, Gavel, HandCoins } from 'lucide-react'
 import type { DatabaseUser, UserInsert, UserRole, Image } from '../../../types'
 // import { usePermissions } from '../../../hooks/usePermissions'
 import { useTranslation, useFormTranslation } from '../../../hooks/useTranslation'
@@ -110,7 +110,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images })
     (uploadResult: UploadResult | null, file?: File) => {
       if (uploadResult && file) {
         const { url: publicUrl, path, id: storageObjectId } = uploadResult
-        setAvatarImage(prev => ({
+        setAvatarImage((prev: (Partial<Image> & { publicUrl?: string; file?: File }) | null) => ({
           ...prev,
           path,
           publicUrl,
@@ -135,6 +135,11 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images })
       value: USER_ROLES.USER,
       label: tCommon('roles.user'),
       icon: <User className='w-4 h-4' />
+    },
+    {
+      value: USER_ROLES.AFFILIATE,
+      label: tCommon('roles.affiliate'),
+      icon: <HandCoins className='w-4 h-4' />
     },
     {
       value: USER_ROLES.MODERATOR,
@@ -163,7 +168,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images })
 
   const handleFormSubmit = useCallback(async (data: typeof formData) => {
     setSubmitError(null) // Clear any existing errors
-    
+
     // Remove try/catch that was swallowing validation errors
     // Let validation errors bubble up to prevent invalid user creation
     if (isInviteMode) {
@@ -177,8 +182,8 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images })
   return (
     <FormContainer>
       {/* Display form error if any */}
-      <FormErrorBanner 
-        error={submitError} 
+      <FormErrorBanner
+        error={submitError}
         onDismiss={() => setSubmitError(null)}
         className='mb-6'
       />
@@ -370,7 +375,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel, images })
           >
             {tCommon('actions.cancel')}
           </Button>
-          
+
           <Button
             type='submit'
             variant='secondary'

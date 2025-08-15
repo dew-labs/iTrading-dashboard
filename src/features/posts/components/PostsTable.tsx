@@ -56,7 +56,7 @@ const PostsTable: React.FC<PostsTableProps> = ({
           <div className='flex items-center space-x-3'>
             <div className='flex-shrink-0'>
               <RecordImage
-                image={imagesByRecord[row.id]?.[0] || null}
+                image={imagesByRecord[row.id as string]?.[0] || null}
                 className='w-12 h-12 rounded-lg object-cover border border-gray-200 dark:border-gray-700'
                 alt={`${title} post image`}
                 showFallback={false}

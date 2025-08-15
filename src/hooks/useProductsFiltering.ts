@@ -50,10 +50,6 @@ export const useProductsFiltering = ({
       let bValue: string | number
 
       switch (sortColumn) {
-      case 'price':
-        aValue = a.price
-        bValue = b.price
-        break
       case 'created_at':
       default:
         aValue = a.created_at ? new Date(a.created_at).getTime() : 0

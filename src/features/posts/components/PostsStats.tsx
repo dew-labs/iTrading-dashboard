@@ -24,7 +24,7 @@ const PostsStats: React.FC<PostsStatsProps> = ({ posts }) => {
   const stats: StatsData = React.useMemo(() => {
     const publishedPosts = posts.filter(p => p.status === POST_STATUSES.PUBLISHED).length
     const draftPosts = posts.filter(p => p.status === POST_STATUSES.DRAFT).length
-    const totalViews = posts.reduce((sum, p) => sum + (p.views || 0), 0)
+    const totalViews = posts.reduce((sum, p) => sum + ((p.views as number) || 0), 0)
 
     return {
       totalPosts: posts.length,

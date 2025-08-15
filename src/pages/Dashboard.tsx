@@ -126,11 +126,7 @@ const Dashboard: React.FC = () => {
                 variant: 'active',
                 showIcon: true
               }}
-              trend={{
-                value: `$${stats.products.averagePrice}`,
-                isPositive: stats.products.averagePrice > 0,
-                description: 'avg price'
-              }}
+
               loading={statsLoading}
             />
 

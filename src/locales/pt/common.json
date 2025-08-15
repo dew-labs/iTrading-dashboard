@@ -38,7 +38,7 @@
     "collapse": "Recolher",
     "maximize": "Maximizar",
     "minimize": "Minimizar",
-    "clearFilters": "Limpar {{count}} filtro{{count, plural, one {} other {s}}}",
+
     "addAccountType": "Adicionar Tipo de Conta",
     "addFirstAccountType": "Adicionar Primeiro Tipo de Conta",
     "deleteAccountType": "Excluir Tipo de Conta"
@@ -77,7 +77,7 @@
     "date": "Data",
     "time": "Hora",
     "size": "Tamanho",
-    "price": "Preço",
+
     "total": "Total",
     "count": "Contagem",
     "required": "Obrigatório",
@@ -268,9 +268,11 @@
     "user": "Usuário",
     "moderator": "Moderador",
     "admin": "Administrador",
+    "affiliate": "Afiliado",
     "userRoleDescription": "Acesso padrão com permissões básicas (somente leitura)",
     "moderatorRoleDescription": "Recursos de gerenciamento de conteúdo para posts, banners e corretoras",
-    "adminRoleDescription": "Controle completo do sistema e gerenciamento de usuários"
+    "adminRoleDescription": "Controle completo do sistema e gerenciamento de usuários",
+    "affiliateRoleDescription": "Acesso ao programa de afiliados com gestão de indicações e acompanhamento de comissões"
   },
   "permissions": {
     "read": "Ler",
@@ -290,7 +292,15 @@
     "received": "Recebido com sucesso",
     "synchronized": "Sincronizado com sucesso",
     "exported": "Exportado com sucesso",
-    "imported": "Importado com sucesso"
+    "imported": "Importado com sucesso",
+    "success": {
+      "referralCodeCreated": "Código de indicação criado com sucesso"
+    },
+    "toast": {
+      "success": {
+        "referralCodeCreated": "Código de indicação criado com sucesso"
+      }
+    }
   },
   "userForm": {
     "basicInformation": "Informações Básicas",
@@ -394,9 +404,12 @@
     "addAccountTypesDescription": "Adicione diferentes tipos de conta com suas condições de negociação e requisitos.",
     "confirmDeleteAccountType": "Tem certeza de que deseja excluir",
     "thisAccountType": "este tipo de conta",
-    "actionCannotBeUndone": "Esta ação não pode ser desfeita."
+    "actionCannotBeUndone": "Esta ação não pode ser desfeita.",
+    "productDetailsEditor": "Editor de Detalhes do Produto",
+    "nameAndDescription": "Nome e Descrição"
   },
   "filters": {
+    "all": "Todos",
     "allStatus": "Todos os Status",
     "allRoles": "Todos os Papéis",
     "allTypes": "Todos os Tipos",
@@ -407,12 +420,21 @@
     "publishedFirst": "Publicados Primeiro",
     "draftFirst": "Rascunhos Primeiro"
   },
+  "affiliates": {
+    "filters": {
+      "highPerformers": "Alto Desempenho",
+      "moderatePerformers": "Desempenho Moderado",
+      "lowPerformers": "Baixo Desempenho",
+      "noActivity": "Sem Atividade"
+    }
+  },
   "placeholders": {
     "searchUsersPlaceholder": "Pesquisar usuários por nome ou email...",
     "searchPostsPlaceholder": "Pesquisar posts por título, conteúdo ou autor...",
     "searchProductsPlaceholder": "Pesquisar produtos por nome ou descrição...",
     "searchBannersPlaceholder": "Pesquisar banners por URL...",
     "searchBrokersPlaceholder": "Pesquisar corretoras por sede ou descrição...",
+    "searchAffiliatesPlaceholder": "Pesquisar afiliados por nome, email ou código de indicação...",
     "searchActivitiesPlaceholder": "Pesquisar atividades por usuário, ação ou alvo...",
     "enterFieldInLanguage": "Digite {{field}} em {{language}}...",
     "selectLanguage": "Selecionar idioma",

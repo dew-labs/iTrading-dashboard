@@ -8,7 +8,7 @@
     "systemOverviewDescription": "Status do sistema em tempo real e métricas principais do banco de dados",
     "quickStatistics": "Análises e Insights",
     "quickStatisticsDescription": "Métricas de desempenho e indicadores de crescimento",
-    "recentActivity": "Atividade Recente", 
+    "recentActivity": "Atividade Recente",
     "recentActivityDescription": "Últimas ações do sistema e atividade dos usuários",
     "quickActions": "Ações Rápidas",
     "quickActionsDescription": "Comece com tarefas e operações comuns",
@@ -62,11 +62,13 @@
     "allUsers": "Todos os Usuários",
     "admins": "Administradores",
     "moderators": "Moderadores",
+    "affiliates": "Afiliados",
 
     "allRegisteredUsers": "Todos os usuários registrados",
     "regularUsers": "Usuários regulares",
     "administratorUsers": "Usuários administradores",
     "moderatorUsers": "Usuários moderadores",
+    "affiliateUsers": "Usuários afiliados",
 
     "noName": "Sem nome",
     "noCountry": "Sem país",
@@ -208,7 +210,7 @@
     "noDescriptionAvailable": "Nenhuma descrição disponível",
     "broker": "Corretora",
     "name": "Nome",
-    "headquarter": "Sede", 
+    "headquarter": "Sede",
     "category": "Categoria",
     "systemInfo": "Informações do Sistema",
     "visible": "Visível",
@@ -226,6 +228,162 @@
       "editBroker": "Editar corretora",
       "deleteBroker": "Excluir corretora"
     }
+  },
+  "affiliates": {
+    "title": "Gerenciamento de Afiliados",
+    "subtitle": "Gerencie usuários afiliados e monitore a performance de indicações",
+    "loading": {
+      "fetchingAffiliates": "Carregando afiliados..."
+    },
+    "errors": {
+      "loadingFailed": "Falha ao carregar afiliados",
+      "genericError": "Ocorreu um erro ao carregar dados de afiliados"
+    },
+    "stats": {
+      "totalAffiliates": "Total de Afiliados",
+      "activeAffiliates": "Afiliados Ativos",
+      "totalReferrals": "Total de Indicações",
+      "activeCodes": "Códigos Ativos"
+    },
+    "search": {
+      "placeholder": "Buscar afiliados por nome, email ou código de indicação..."
+    },
+    "filters": {
+      "status": "Status",
+      "performance": "Performance",
+      "highPerformers": "Alta Performance (>50%)",
+      "moderatePerformers": "Performance Moderada (20-50%)",
+      "lowPerformers": "Baixa Performance (<20%)",
+      "noActivity": "Sem Atividade"
+    },
+    "table": {
+      "affiliateDetails": "Detalhes do Afiliado",
+      "referralCodes": "Códigos de Indicação",
+      "status": "Status",
+      "performance": "Performance",
+      "totalReferrals": "Total de Indicações",
+      "joinedDate": "Data de Adesão",
+      "actions": "Ações",
+      "code": "código",
+      "codes": "códigos",
+      "activeCodes": "códigos ativos",
+      "topCode": "Top",
+      "noCodes": "Sem códigos",
+      "confirmed": "Confirmado",
+      "pending": "Pendente",
+      "referral": "indicação",
+      "referrals": "indicações",
+      "memberSince": "Membro desde",
+      "viewDetails": "Ver detalhes do afiliado"
+    },
+    "performance": {
+      "high": "Alta Performance",
+      "moderate": "Moderada",
+      "low": "Baixa Performance",
+      "none": "Sem Atividade"
+    },
+    "status": {
+      "confirmed": "Confirmado",
+      "pending": "Pendente",
+      "rejected": "Rejeitado"
+    },
+    "results": {
+      "showing": "Mostrando {{start}}-{{end}} de {{total}} afiliados",
+      "noResults": "Nenhum afiliado encontrado"
+    },
+    "empty": {
+      "noAffiliates": "Ainda não há afiliados",
+      "noAffiliatesDescription": "Usuários afiliados aparecerão aqui quando se registrarem.",
+      "noResults": "Nenhum afiliado corresponde aos seus filtros",
+      "tryDifferentFilters": "Tente ajustar seus termos de pesquisa ou filtros."
+    },
+    "details": {
+      "noName": "Nenhum nome fornecido",
+      "tabs": {
+        "overview": "Visão Geral",
+        "referrals": "Indicações",
+        "codes": "Códigos de Indicação"
+      },
+
+      "totalReferrals": "Total de Indicações",
+      "activeCodes": "Códigos Ativos",
+      "recentReferrals": "Indicações Recentes",
+      "noRecentReferrals": "Nenhuma indicação recente",
+      "allReferrals": "Todas as Indicações",
+      "referralCodes": "Códigos de Indicação",
+      "createCode": "Criar Código",
+      "createFirstCode": "Criar Primeiro Código",
+      "noReferralCodes": "Ainda não há códigos de indicação",
+      "createdOn": "Criado em",
+      "copyCode": "Copiar código",
+      "codeCopied": "Código de indicação copiado para a área de transferência!",
+      "copyFailed": "Falha ao copiar código",
+      "activateCode": "Ativar código",
+      "deactivateCode": "Desativar código",
+      "deleteCode": "Excluir código",
+      "referrals": {
+        "user": "Usuário",
+        "code": "Código",
+        "status": "Status",
+        "date": "Data",
+        "actions": "Ações",
+        "confirm": "Confirmar indicação",
+        "reject": "Rejeitar indicação",
+        "noName": "Sem nome"
+      }
+    },
+    "noName": "Sem nome"
+  },
+  "brokerCategories": {
+    "title": "Categorias de Corretoras",
+    "description": "Gerencie categorias e classificações de corretoras",
+    "loadingCategories": "Carregando categorias de corretoras...",
+    "stats": {
+      "total": "Total de Categorias"
+    },
+    "actions": {
+      "create": "Criar Categoria",
+      "edit": "Editar",
+      "delete": "Excluir",
+      "save": "Salvar",
+      "cancel": "Cancelar"
+    },
+    "form": {
+      "createTitle": "Criar Categoria de Corretora",
+      "editTitle": "Editar Categoria de Corretora",
+      "namePlaceholder": "Digite o nome da categoria"
+    },
+    "table": {
+      "name": "Nome da Categoria",
+      "createdAt": "Criado em",
+      "actions": "Ações",
+      "empty": "Nenhuma categoria de corretora encontrada. Crie sua primeira categoria para começar."
+    },
+    "card": {
+      "category": "Categoria",
+      "active": "Ativo",
+      "id": "ID"
+    },
+    "grid": {
+      "searchPlaceholder": "Buscar categorias...",
+      "showing": "Mostrando {{count}} categorias",
+      "totalCategories": "{{count}} categorias no total"
+    },
+    "empty": {
+      "title": "Nenhuma Categoria Ainda",
+      "description": "Comece criando sua primeira categoria de corretora para organizar e gerenciar suas corretoras de forma eficaz."
+    },
+    "deleteDialog": {
+      "title": "Excluir Categoria",
+      "message": "Tem certeza de que deseja excluir a categoria",
+      "confirm": "Excluir Categoria"
+    },
+    "createSuccess": "Categoria de corretora criada com sucesso",
+    "createError": "Falha ao criar categoria de corretora",
+    "updateSuccess": "Categoria de corretora atualizada com sucesso",
+    "updateError": "Falha ao atualizar categoria de corretora",
+    "deleteSuccess": "Categoria de corretora excluída com sucesso",
+    "deleteError": "Falha ao excluir categoria de corretora"
   },
   "banners": {
     "title": "Gerenciamento de Banners",
@@ -329,7 +487,7 @@
       "action": "Ação",
       "role": "Função"
     },
-    "clearFilters": "Limpar Filtros",
+
     "activityDetails": "Detalhes da Atividade",
     "userInfo": "Informações do Usuário",
     "targetAndTime": "Alvo e Tempo",
@@ -447,5 +605,147 @@
     "alreadyHaveAccount": "Já tem uma conta?",
     "signIn": "Entrar",
     "failedToUpdateProfile": "Falha ao atualizar o perfil. Por favor, tente novamente."
+  },
+  "affiliate": {
+    "title": "Painel de Afiliado",
+    "subtitle": "Gerencie suas indicações e acompanhe sua performance",
+    "dashboard": "Painel de Afiliado",
+    "dashboardSubtitle": "Acompanhe suas indicações e gerencie seu programa de afiliados",
+    "affiliateStatus": "Afiliado Ativo",
+    "overview": "Visão Geral",
+    "overviewDescription": "Sua performance de afiliado em um relance",
+    "referralCodes": "Códigos de Indicação",
+    "referralCodesDescription": "Gerencie seus códigos e links de indicação",
+    "referrals": "Indicações",
+    "referralsDescription": "Acompanhe todos os usuários que você indicou",
+    "analytics": "Análises",
+    "analyticsDescription": "Análises detalhadas de performance",
+    "activity": {
+      "title": "Atividade Recente",
+      "description": "Acompanhe suas atividades e eventos de afiliado recentes",
+      "signups": "Cadastros",
+      "confirmations": "Confirmações",
+      "rejections": "Rejeições",
+      "codeEvents": "Eventos de Código",
+      "searchActivities": "Buscar atividades...",
+      "filterByType": "Filtrar por tipo...",
+
+      "newReferralSignup": "Nova Inscrição por Indicação",
+      "userSignedUpViaCode": "Usuário se cadastrou usando seu código de indicação",
+      "codeCreated": "Código de Indicação Criado",
+      "newReferralCodeCreated": "Novo código de indicação foi criado",
+      "referralRejected": "Indicação Rejeitada",
+      "referralDidNotMeetRequirements": "A indicação não atendeu aos requisitos",
+      "codeActivated": "Código Ativado",
+      "referralCodeActivated": "Código de indicação foi ativado",
+      "signup": "Cadastro",
+      "confirmed": "Confirmado",
+      "rejected": "Rejeitado",
+      "created": "Criado",
+      "activated": "Ativado",
+      "deactivated": "Desativado",
+      "loadMore": "Carregar Mais Atividades",
+      "noMatchingActivities": "Nenhuma atividade corresponde aos seus filtros",
+      "tryAdjustingFilters": "Tente ajustar seus filtros para ver mais resultados",
+      "noActivities": "Ainda não há atividades",
+      "activitiesWillAppearHere": "Suas atividades de afiliado aparecerão aqui"
+    },
+    "settings": {
+      "title": "Configurações do Afiliado",
+      "description": "Gerencie suas configurações e preferências da conta de afiliado",
+      "profile": "Perfil",
+      "notifications": "Notificações",
+      "security": "Segurança",
+      "payments": "Pagamentos",
+      "profilePicture": "Foto do Perfil",
+      "profilePictureDescription": "Atualize sua foto de perfil",
+      "emailNotifications": "Notificações por E-mail",
+      "chooseEmailNotifications": "Escolha quais notificações por e-mail você gostaria de receber",
+      "referralAlerts": "Alertas de Atividade de Indicação",
+      "weeklyReports": "Relatórios Semanais de Performance",
+      "monthlyReports": "Relatórios Mensais de Resumo",
+      "generalUpdates": "Atualizações Gerais e Notícias",
+      "smsNotifications": "Notificações por SMS",
+      "smsNotificationsDescription": "Receba atualizações importantes via SMS",
+      "enableSms": "Habilitar Notificações por SMS",
+      "changePassword": "Alterar Senha",
+      "changePasswordDescription": "Atualize a senha da sua conta",
+      "updatePassword": "Atualizar Senha",
+      "twoFactor": "Autenticação de Dois Fatores",
+      "twoFactorDescription": "Adicione uma camada extra de segurança à sua conta",
+      "setup2FA": "Configurar 2FA",
+      "paymentMethod": "Método de Pagamento",
+      "paymentMethodDescription": "Configure como você gostaria de receber pagamentos",
+      "preferredMethod": "Método de Pagamento Preferido",
+      "bankTransfer": "Transferência Bancária",
+      "paypal": "PayPal",
+      "crypto": "Criptomoeda",
+      "accountHolder": "Nome do Portador da Conta",
+      "enterAccountHolder": "Digite o nome do portador da conta",
+      "accountNumber": "Número da Conta",
+      "enterAccountNumber": "Digite o número da conta",
+      "routingNumber": "Número de Roteamento",
+      "enterRoutingNumber": "Digite o número de roteamento",
+      "uploadAvatar": "Carregar Foto de Perfil",
+      "dragDropImage": "Arraste e solte sua imagem aqui, ou clique para navegar",
+      "selectFile": "Selecionar Arquivo"
+    },
+    "totalReferrals": "Total de Indicações",
+
+
+    "fromLastMonth": "do mês passado",
+    "performanceChart": "Gráfico de Performance",
+    "referralsAndConversions": "Indicações e conversões ao longo do tempo",
+    "referrals": "Indicações",
+    "conversions": "Conversões",
+    "recentReferrals": "Indicações Recentes",
+    "unknownUser": "Usuário Desconhecido",
+    "status": {
+      "pending": "Pendente",
+      "confirmed": "Confirmado",
+      "rejected": "Rejeitado"
+    },
+    "noRecentReferrals": "Nenhuma indicação recente",
+    "quickActions": "Ações Rápidas",
+    "manageReferralCodes": "Gerenciar Códigos de Indicação",
+    "viewAnalytics": "Ver Análises",
+    "updateSettings": "Atualizar Configurações",
+    "viewPublicProfile": "Ver Perfil Público",
+    "createNewCode": "Criar Novo Código",
+    "createFirstCode": "Criar Seu Primeiro Código",
+    "editReferralCode": "Editar Código de Indicação",
+    "deleteReferralCode": "Excluir Código de Indicação",
+    "deleteReferralCodeConfirm": "Tem certeza de que deseja excluir este código de indicação? Esta ação não pode ser desfeita.",
+    "referralCode": "Código de Indicação",
+    "createdOn": "Criado em",
+    "fullReferralLink": "Link completo de indicação",
+    "noReferralCodes": "Ainda não há códigos de indicação",
+    "noReferralCodesDescription": "Crie seu primeiro código de indicação para começar a ganhar com indicações",
+    "codeCreationTip": "Use códigos memoráveis que são fáceis de compartilhar. Os códigos devem ter de 4 a 20 caracteres.",
+    "referredUser": "Usuário Indicado",
+    "referredAt": "Indicado Em",
+    "confirmedAt": "Confirmado Em",
+    "searchReferrals": "Buscar indicações...",
+    "filterByStatus": "Filtrar por status...",
+    "showingResults": "Mostrando {{start}}-{{end}} de {{total}} resultados",
+    "noReferralsMatchingFilters": "Nenhuma indicação corresponde aos seus filtros atuais",
+    "noReferralsYet": "Ainda não há indicações",
+    "performanceTrends": "Tendências de Performance",
+    "referralsConversionsOverTime": "Acompanhe suas indicações e conversões ao longo do tempo",
+    "conversionFunnel": "Funil de Conversão",
+    "funnelDescription": "Veja como os visitantes se convertem através do seu processo de indicação",
+    "funnel": {
+      "visits": "Visitas",
+      "signups": "Cadastros",
+      "conversions": "Conversões"
+    },
+    "topPerformingCodes": "Códigos de Melhor Performance",
+    "bestConvertingCodes": "Seus códigos de indicação com melhor conversão",
+    "performanceInsights": "Insights de Performance",
+    "bestPerformingDay": "Melhor Dia de Performance",
+    "avgConversions": "Conversões média",
+    "averageTimeToConvert": "Tempo Médio para Converter",
+    "industry average": "Média da indústria",
+    "estimatedRevenue": "Receita Estimada"
   }
 }

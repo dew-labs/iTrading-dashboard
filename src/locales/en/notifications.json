@@ -74,7 +74,11 @@
       "granted": "granted successfully",
       "revoked": "revoked successfully",
       "restored": "Restored successfully",
-      "duplicated": "Duplicated successfully"
+      "duplicated": "Duplicated successfully",
+      "referralCodeCreated": "Referral code created successfully",
+
+      "referralCodeStatusUpdated": "Referral code status updated successfully",
+      "referralCodeDeleted": "Referral code deleted successfully"
     },
     "error": {
       "general": "Something went wrong. Please try again.",
@@ -91,7 +95,12 @@
       "alreadyExists": "Item already exists",
       "sessionExpired": "Your session has expired. Please sign in again.",
       "accountRemoved": "Your account has been removed. Please contact your administrator.",
-      "unexpectedError": "An unexpected error occurred"
+      "unexpectedError": "An unexpected error occurred",
+      "failedToCreateReferralCode": "Failed to create referral code",
+
+      "failedToUpdateReferralCodeStatus": "Failed to update referral code status",
+      "failedToDeleteReferralCode": "Failed to delete referral code",
+      "affiliateAlreadyHasActiveCode": "Affiliate {{name}} already has an active referral code"
     },
     "info": {
       "loading": "Loading...",
@@ -111,6 +120,7 @@
       "products": "Products",
       "broker": "Broker",
       "brokers": "Brokers",
+      "brokerCategories": "Broker category",
       "banner": "Banner",
       "banners": "Banners",
       "image": "Image",

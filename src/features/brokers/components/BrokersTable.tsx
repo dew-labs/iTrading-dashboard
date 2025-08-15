@@ -6,7 +6,7 @@ import { formatDateDisplay } from '../../../utils/format'
 import { getTypographyClasses, getIconClasses, cn } from '../../../utils/theme'
 import { TranslationStatusIndicator, Badge } from '../../../components/atoms'
 import type { Broker } from '../../../types'
-import type { BrokerWithTranslations } from '../../../types/translations'
+import type { BrokerWithTranslations, BrokerTranslation } from '../../../types/translations'
 import RecordImage from '../../../components/features/images/RecordImage'
 
 interface BrokersTableProps {
@@ -80,7 +80,7 @@ const BrokersTable: React.FC<BrokersTableProps> = ({
     let description = null
     if ('translations' in broker && broker.translations && broker.translations.length > 0) {
       // Get the first available translation (preferably English)
-      const translation = broker.translations.find(t => t.language_code === 'en') || broker.translations[0]
+      const translation = broker.translations.find((t: BrokerTranslation) => t.language_code === 'en') || broker.translations[0]
       if (translation) {
         description = translation.description
       }
@@ -161,8 +161,8 @@ const BrokersTable: React.FC<BrokersTableProps> = ({
       render: (value: unknown, row: Broker | BrokerWithTranslations) => {
         const translationCount = 'translations' in row ? row.translations?.length || 0 : 0
         const hasTranslations = 'translations' in row && row.translations && row.translations.length > 0
-        const hasEnglish = hasTranslations ? row.translations!.some(t => t.language_code === 'en') : false
-        const hasPortuguese = hasTranslations ? row.translations!.some(t => t.language_code === 'pt') : false
+        const hasEnglish = hasTranslations ? row.translations!.some((t: BrokerTranslation) => t.language_code === 'en') : false
+        const hasPortuguese = hasTranslations ? row.translations!.some((t: BrokerTranslation) => t.language_code === 'pt') : false
 
         return (
           <div className='flex items-center space-x-2'>

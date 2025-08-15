@@ -133,7 +133,7 @@ const Select: React.FC<SelectProps> = ({
     }
   }
 
-  const getButtonStyles = () => {
+    const getButtonStyles = () => {
     const baseStyles = `
       relative w-full bg-white dark:bg-gray-800 border rounded-lg
       flex items-center justify-between
@@ -159,8 +159,8 @@ const Select: React.FC<SelectProps> = ({
 
   const getDropdownStyles = () => {
     return `
-      absolute z-50 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg
-      max-h-60 overflow-auto
+      absolute z-[60] w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg
+      max-h-48 overflow-auto
       ${config.dropdown}
       ${isOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'}
       transition-all duration-200 ease-out

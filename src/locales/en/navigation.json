@@ -5,6 +5,8 @@
   "products": "Products",
   "banners": "Banners",
   "brokers": "Brokers",
+  "brokerCategories": "Broker Categories",
+  "affiliates": "Affiliates",
   "analytics": "Analytics",
   "settings": "Settings",
   "help": "Help Center",
@@ -26,8 +28,10 @@
     "posts": "Content",
     "products": "Products",
     "brokers": "Brokers",
+    "brokerCategories": "Broker Categories",
     "banners": "Banners",
     "audits": "Recent Activities",
+    "affiliates": "Affiliates",
     "settings": "Settings"
   },
   "header": "Header",
@@ -48,8 +52,10 @@
     "posts": "Content",
     "products": "Products",
     "brokers": "Brokers",
+    "brokerCategories": "Broker Categories",
     "banners": "Banners",
     "audits": "Recent Activities",
+    "affiliates": "Affiliates",
     "settings": "Settings"
   }
 }

@@ -167,14 +167,14 @@ export const VALIDATION = {
   TITLE_MAX_LENGTH: 200,
   DESCRIPTION_MAX_LENGTH: 1000,
   CONTENT_MAX_LENGTH: 50000,
+  // Price validation
+  PRICE_MIN: 0,
   // Year validation
   YEAR_MIN: 1800,
   get YEAR_MAX() {
     return new Date().getFullYear()
   },
-  // Price validation
-  PRICE_MIN: 0,
-  PRICE_STEP: 0.01,
+
   // Bio validation
   BIO_MAX_LENGTH: 500,
   // City validation

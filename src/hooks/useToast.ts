@@ -13,11 +13,13 @@ export type EntityType =
   | 'post' | 'posts'
   | 'product' | 'products'
   | 'broker' | 'brokers'
+  | 'brokerCategories'
   | 'banner' | 'banners'
   | 'image' | 'images'
   | 'permission' | 'permissions'
   | 'role' | 'avatar' | 'mainImage'
   | 'accountType'
+  | 'referralCode' | 'referral'
 
 export type SuccessAction =
   | 'general' | 'saved' | 'created' | 'updated' | 'deleted'

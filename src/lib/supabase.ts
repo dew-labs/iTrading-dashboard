@@ -49,6 +49,12 @@ export const queryKeys = {
   brokers: () => ['brokers'] as const,
   broker: (id: number) => ['brokers', id] as const,
 
+  // Broker Categories
+  brokerCategories: {
+    all: () => ['broker-categories'] as const,
+    detail: (id: string) => ['broker-categories', id] as const
+  },
+
   // Banners
   banners: () => ['banners'] as const,
   banner: (id: string) => ['banners', id] as const,
@@ -62,7 +68,10 @@ export const queryKeys = {
 
   // Permissions
   rolePermissions: (role: string) => ['role-permissions', role] as const,
-  permissions: () => ['permissions'] as const
+  permissions: () => ['permissions'] as const,
+
+  // Referrals and Affiliate System
+
 } as const
 
 // Helper functions for common Supabase operations

@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useState } from 'react'
-import { DollarSign, Package, Save, X, Link2, Languages, CheckCircle } from 'lucide-react'
+import { Package, Save, X, Link2, Languages, CheckCircle } from 'lucide-react'
 import type { Product, ProductInsert } from '../../../types'
 import type { Image } from '../../../types/images'
 import type { UploadResult } from '../../../hooks/useFileUpload'
@@ -9,20 +9,16 @@ import { MainImageUpload } from '../images'
 import { useFormTranslation, useTranslation } from '../../../hooks/useTranslation'
 import TranslationManager from '../translations/TranslationManager'
 import { CONTENT_LANGUAGE_CODES } from '../../../constants/languages'
-import { VALIDATION } from '../../../constants/ui'
+
 import { getStorageUrl } from '../../../utils/storage'
-import { formatPrice } from '../../../utils/format'
+
 
 // Move schema outside component to prevent re-renders
 const PRODUCT_FORM_SCHEMA = {
-  price: {
-    required: true,
-    min: VALIDATION.PRICE_MIN
-  },
   affiliate_link: {
     required: false,
     // Use a simple URL regex or remove pattern if not needed
-    pattern: /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[^\s]*)?$/i
+    pattern: /^(https?:\/\/)?([w-]+\.)+[w-]+(\/[^s]*)?$/i
   }
 } as const
 
@@ -37,10 +33,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel, 
   const { t: tForm } = useFormTranslation()
   const { t: tCommon } = useTranslation()
   const [featuredImage, setFeaturedImage] = useState<(Partial<Image> & { publicUrl?: string; file?: File }) | null>(null)
-  const [priceDisplay, setPriceDisplay] = useState<string>('0')
   // Memoize initial data to prevent re-renders
   const initialData = useMemo(() => ({
-  price: 0,
   affiliate_link: '',
 }), [])
 
@@ -69,40 +63,11 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel, 
     }
     // Set form fields for edit mode
     if (product) {
-      updateField('price', product.price)
-      setPriceDisplay(formatPrice(product.price))
       updateField('affiliate_link', product.affiliate_link || '')
-    } else {
-      setPriceDisplay('0')
     }
   }, [product, images, updateField])
 
-  // Handle price input change
-  const handlePriceChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/,/g, '')
-    // Allow empty string for controlled input
-    if (value === '') {
-      updateField('price', 0)
-      setPriceDisplay('')
-      return
-    }
-    // Only allow valid numbers
-    const num = parseFloat(value)
-    if (!isNaN(num)) {
-      updateField('price', num)
-      setPriceDisplay(value)
-    }
-  }, [updateField])
 
-  // Format price on blur
-  const handlePriceBlur = useCallback(() => {
-    setPriceDisplay(formatPrice(formData.price))
-  }, [formData.price])
-
-  // Show raw value on focus
-  const handlePriceFocus = useCallback(() => {
-    setPriceDisplay(formData.price ? formData.price.toString() : '')
-  }, [formData.price])
 
   const handleAffiliateLinkChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     updateField('affiliate_link', e.target.value)
@@ -146,21 +111,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onCancel, 
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{tCommon('content.productSettings')}</h3>
             </div>
             <div className="space-y-4">
-              <FormField
-                label={tForm('labels.price')}
-                type='text'
-                name='price'
-                value={priceDisplay}
-                onChange={handlePriceChange}
-                onBlur={e => { handleBlur('price')(e); handlePriceBlur(); }}
-                onFocus={handlePriceFocus}
-                placeholder={tForm('placeholders.productPrice')}
-                step={VALIDATION.PRICE_STEP}
-                disabled={isValidating}
-                {...(errors.price && { error: errors.price })}
-                icon={<DollarSign className='w-5 h-5' />}
-                helperText={tForm('helpers.productPriceHelper') + ' (e.g. 1,000 or 324.12)'}
-              />
               <FormField
                 label={tForm('labels.affiliateLink')}
                 name='affiliate_link'

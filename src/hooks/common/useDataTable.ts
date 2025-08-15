@@ -54,7 +54,7 @@ export interface UseDataTableReturn<T> {
   setPage: (page: number) => void
   setItemsPerPage: (items: number) => void
   setPageInputValue: (value: string) => void
-  resetFilters: () => void
+
 
   // Handlers
   handleSort: (column: keyof T) => void
@@ -183,12 +183,7 @@ export function useDataTable<T extends Record<string, unknown>>(
     setPageInputValue(String(page))
   }, [totalPages])
 
-  const resetFilters = useCallback(() => {
-    setSearchTerm('')
-    setFilters({})
-    setCurrentPage(1)
-    setPageInputValue('1')
-  }, [])
+
 
   // Handlers
   const handleSort = useCallback((column: keyof T) => {
@@ -229,7 +224,6 @@ export function useDataTable<T extends Record<string, unknown>>(
     setPage,
     setItemsPerPage,
     setPageInputValue,
-    resetFilters,
     handleSort,
     handlePageChange,
     handleSearch
@@ -292,6 +286,6 @@ export const createBrokersTableConfig = (): DataTableConfig<Broker> => ({
 export const createProductsTableConfig = (): DataTableConfig<Product> => ({
   searchFields: ['id', 'affiliate_link'],
   filterFields: [],
-  sortableFields: ['price', 'created_at'],
+  sortableFields: ['created_at'],
   defaultSort: { field: 'created_at', direction: 'desc' }
 })

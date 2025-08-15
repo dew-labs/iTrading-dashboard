@@ -5,6 +5,8 @@
   "products": "Produtos",
   "banners": "Banners",
   "brokers": "Corretoras",
+  "brokerCategories": "Categorias de Corretoras",
+  "affiliates": "Afiliados",
   "analytics": "Análises",
   "settings": "Configurações",
   "help": "Central de Ajuda",
@@ -26,8 +28,10 @@
     "posts": "Conteúdo",
     "products": "Produtos",
     "brokers": "Corretoras",
+    "brokerCategories": "Categorias de Corretoras",
     "banners": "Banners",
     "audits": "Atividades Recentes",
+    "affiliates": "Afiliados",
     "settings": "Configurações"
   },
   "header": "Cabeçalho",
@@ -48,8 +52,10 @@
     "posts": "Conteúdo",
     "products": "Produtos",
     "brokers": "Corretoras",
+    "brokerCategories": "Categorias de Corretoras",
     "banners": "Banners",
     "audits": "Atividades Recentes",
+    "affiliates": "Afiliados",
     "settings": "Configurações"
   }
 }

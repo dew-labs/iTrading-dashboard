@@ -1,6 +1,6 @@
 /*
   # Comprehensive Seed Data for iTrading Dashboard
-  
+
   This file contains comprehensive seed data including:
   - Role permissions
   - Broker categories and brokers with translations
@@ -9,7 +9,7 @@
   - Banners
   - Image metadata (paths for manual upload)
   - Broker account types
-  
+
   Note: Users are excluded as requested
 */
 
@@ -110,7 +110,7 @@ DECLARE
     cards_category_id uuid;
     copy_trading_category_id uuid;
     prop_trading_category_id uuid;
-    
+
     -- Broker IDs
     oanda_id uuid;
     ig_group_id uuid;
@@ -121,7 +121,7 @@ DECLARE
     revolut_id uuid;
     etoro_id uuid;
     ftmo_id uuid;
-    
+
     -- Post IDs
     post1_id uuid;
     post2_id uuid;
@@ -131,21 +131,21 @@ DECLARE
     post6_id uuid;
     post7_id uuid;
     post8_id uuid;
-    
+
     -- Product IDs
     product1_id uuid;
     product2_id uuid;
     product3_id uuid;
     product4_id uuid;
     product5_id uuid;
-    
+
     -- Banner IDs
     banner1_id uuid;
     banner2_id uuid;
     banner3_id uuid;
     banner4_id uuid;
     banner5_id uuid;
-    
+
 BEGIN
     -- Generate UUIDs
     fx_cfd_category_id := gen_random_uuid();
@@ -153,7 +153,7 @@ BEGIN
     cards_category_id := gen_random_uuid();
     copy_trading_category_id := gen_random_uuid();
     prop_trading_category_id := gen_random_uuid();
-    
+
     oanda_id := gen_random_uuid();
     ig_group_id := gen_random_uuid();
     fxcm_id := gen_random_uuid();
@@ -163,7 +163,7 @@ BEGIN
     revolut_id := gen_random_uuid();
     etoro_id := gen_random_uuid();
     ftmo_id := gen_random_uuid();
-    
+
     post1_id := gen_random_uuid();
     post2_id := gen_random_uuid();
     post3_id := gen_random_uuid();
@@ -172,13 +172,13 @@ BEGIN
     post6_id := gen_random_uuid();
     post7_id := gen_random_uuid();
     post8_id := gen_random_uuid();
-    
+
     product1_id := gen_random_uuid();
     product2_id := gen_random_uuid();
     product3_id := gen_random_uuid();
     product4_id := gen_random_uuid();
     product5_id := gen_random_uuid();
-    
+
     banner1_id := gen_random_uuid();
     banner2_id := gen_random_uuid();
     banner3_id := gen_random_uuid();
@@ -188,7 +188,7 @@ BEGIN
     -- ===============================================
     -- BROKER CATEGORIES
     -- ===============================================
-    
+
     INSERT INTO broker_categories (id, name) VALUES
     (fx_cfd_category_id, 'FX/CFD'),
     (crypto_category_id, 'Crypto'),
@@ -337,69 +337,69 @@ BEGIN
 
     INSERT INTO posts_translations (post_id, language_code, title, excerpt, content, reading_time) VALUES
     -- Post 1: Market Analysis
-    (post1_id, 'en', 'Global Markets Reach New Heights in December 2024', 'Major stock indices continue their upward trajectory as investors remain optimistic about economic recovery and technological advancement.', 
+    (post1_id, 'en', 'Global Markets Reach New Heights in December 2024', 'Major stock indices continue their upward trajectory as investors remain optimistic about economic recovery and technological advancement.',
     '<h2>Market Overview</h2><p>The global financial markets have shown remarkable resilience in December 2024, with major indices reaching new all-time highs. The S&P 500 has gained 3.2% this month alone, while the NASDAQ has surged 4.1%.</p><h3>Key Drivers</h3><ul><li>Strong corporate earnings reports</li><li>Positive economic indicators</li><li>Technological breakthroughs in AI sector</li><li>Improved global trade relations</li></ul><p>Analysts predict this bullish trend may continue into Q1 2025, though they caution about potential volatility around major economic announcements.</p>', 5),
 
-    (post1_id, 'pt', 'Mercados Globais Atingem Novos Patamares em Dezembro de 2024', 'Os principais índices de ações continuam sua trajetória ascendente enquanto os investidores permanecem otimistas sobre a recuperação econômica e avanço tecnológico.', 
+    (post1_id, 'pt', 'Mercados Globais Atingem Novos Patamares em Dezembro de 2024', 'Os principais índices de ações continuam sua trajetória ascendente enquanto os investidores permanecem otimistas sobre a recuperação econômica e avanço tecnológico.',
     '<h2>Visão Geral do Mercado</h2><p>Os mercados financeiros globais mostraram uma resistência notável em dezembro de 2024, com os principais índices atingindo novos máximos históricos. O S&P 500 ganhou 3,2% apenas neste mês, enquanto o NASDAQ disparou 4,1%.</p><h3>Principais Fatores</h3><ul><li>Relatórios corporativos sólidos</li><li>Indicadores econômicos positivos</li><li>Avanços tecnológicos no setor de IA</li><li>Melhoria nas relações comerciais globais</li></ul><p>Analistas preveem que essa tendência altista pode continuar no primeiro trimestre de 2025, embora alertem sobre potencial volatilidade em torno de anúncios econômicos importantes.</p>', 5),
 
-    (post1_id, 'vi', 'Thị Trường Toàn Cầu Đạt Đỉnh Mới Trong Tháng 12/2024', 'Các chỉ số chứng khoán chính tiếp tục xu hướng tăng khi các nhà đầu tư vẫn lạc quan về phục hồi kinh tế và tiến bộ công nghệ.', 
+    (post1_id, 'vi', 'Thị Trường Toàn Cầu Đạt Đỉnh Mới Trong Tháng 12/2024', 'Các chỉ số chứng khoán chính tiếp tục xu hướng tăng khi các nhà đầu tư vẫn lạc quan về phục hồi kinh tế và tiến bộ công nghệ.',
     '<h2>Tổng Quan Thị Trường</h2><p>Các thị trường tài chính toàn cầu đã cho thấy khả năng phục hồi đáng kể trong tháng 12/2024, với các chỉ số chính đạt mức cao kỷ lục mới. S&P 500 đã tăng 3,2% chỉ trong tháng này, trong khi NASDAQ tăng vọt 4,1%.</p><h3>Động Lực Chính</h3><ul><li>Báo cáo thu nhập doanh nghiệp mạnh mẽ</li><li>Các chỉ số kinh tế tích cực</li><li>Đột phá công nghệ trong lĩnh vực AI</li><li>Cải thiện quan hệ thương mại toàn cầu</li></ul><p>Các nhà phân tích dự đoán xu hướng tăng giá này có thể tiếp tục vào Q1 2025, mặc dù họ cảnh báo về khả năng biến động xung quanh các thông báo kinh tế quan trọng.</p>', 5),
 
     -- Post 2: Forex Analysis
-    (post2_id, 'en', 'USD Strengthens Against Major Currencies Amid Fed Policy Changes', 'The US Dollar has shown significant strength this week following the Federal Reserve''s latest policy announcement and economic data releases.', 
+    (post2_id, 'en', 'USD Strengthens Against Major Currencies Amid Fed Policy Changes', 'The US Dollar has shown significant strength this week following the Federal Reserve''s latest policy announcement and economic data releases.',
     '<h2>Currency Markets Update</h2><p>The US Dollar Index (DXY) has climbed 1.8% this week, reaching its highest level since October 2024. This surge comes after the Federal Reserve hinted at potential policy adjustments in their latest meeting.</p><h3>Impact on Major Pairs</h3><ul><li>EUR/USD: Down 2.1% to 1.0845</li><li>GBP/USD: Declined 1.9% to 1.2650</li><li>USD/JPY: Rose 2.3% to 151.20</li><li>AUD/USD: Fell 1.6% to 0.6720</li></ul><p>Trading volumes have increased significantly, with institutional investors repositioning their portfolios ahead of year-end.</p>', 4),
 
-    (post2_id, 'pt', 'Dólar Americano se Fortalece Contra as Principais Moedas em Meio a Mudanças na Política do Fed', 'O Dólar Americano mostrou força significativa esta semana após o último anúncio de política do Federal Reserve e divulgação de dados econômicos.', 
+    (post2_id, 'pt', 'Dólar Americano se Fortalece Contra as Principais Moedas em Meio a Mudanças na Política do Fed', 'O Dólar Americano mostrou força significativa esta semana após o último anúncio de política do Federal Reserve e divulgação de dados econômicos.',
     '<h2>Atualização dos Mercados de Moedas</h2><p>O Índice do Dólar Americano (DXY) subiu 1,8% nesta semana, atingindo seu nível mais alto desde outubro de 2024. Esse aumento veio após o Federal Reserve sugerir potenciais ajustes de política em sua última reunião.</p><h3>Impacto nos Principais Pares</h3><ul><li>EUR/USD: Queda de 2,1% para 1,0845</li><li>GBP/USD: Declinou 1,9% para 1,2650</li><li>USD/JPY: Subiu 2,3% para 151,20</li><li>AUD/USD: Caiu 1,6% para 0,6720</li></ul><p>Os volumes de negociação aumentaram significativamente, com investidores institucionais reposicionando seus portfólios antes do final do ano.</p>', 4),
 
-    (post2_id, 'vi', 'USD Tăng Mạnh So Với Các Đồng Tiền Chính Giữa Bối Cảnh Thay Đổi Chính Sách Fed', 'Đồng Dollar Mỹ đã cho thấy sức mạnh đáng kể trong tuần này sau thông báo chính sách mới nhất của Federal Reserve và công bố dữ liệu kinh tế.', 
+    (post2_id, 'vi', 'USD Tăng Mạnh So Với Các Đồng Tiền Chính Giữa Bối Cảnh Thay Đổi Chính Sách Fed', 'Đồng Dollar Mỹ đã cho thấy sức mạnh đáng kể trong tuần này sau thông báo chính sách mới nhất của Federal Reserve và công bố dữ liệu kinh tế.',
     '<h2>Cập Nhật Thị Trường Tiền Tệ</h2><p>Chỉ số Dollar Mỹ (DXY) đã tăng 1,8% trong tuần này, đạt mức cao nhất kể từ tháng 10/2024. Sự tăng vọt này xảy ra sau khi Federal Reserve ám chỉ về các điều chỉnh chính sách tiềm năng trong cuộc họp gần đây.</p><h3>Tác Động Lên Các Cặp Tiền Chính</h3><ul><li>EUR/USD: Giảm 2,1% xuống 1,0845</li><li>GBP/USD: Giảm 1,9% xuống 1,2650</li><li>USD/JPY: Tăng 2,3% lên 151,20</li><li>AUD/USD: Giảm 1,6% xuống 0,6720</li></ul><p>Khối lượng giao dịch đã tăng đáng kể, với các nhà đầu tư tổ chức tái cấu trúc danh mục trước cuối năm.</p>', 4),
 
     -- Post 3: Crypto News
-    (post3_id, 'en', 'Bitcoin Surpasses $100,000 Milestone as Institutional Adoption Accelerates', 'Bitcoin reaches a historic milestone, breaking through the $100,000 barrier for the first time, driven by massive institutional investment and regulatory clarity.', 
+    (post3_id, 'en', 'Bitcoin Surpasses $100,000 Milestone as Institutional Adoption Accelerates', 'Bitcoin reaches a historic milestone, breaking through the $100,000 barrier for the first time, driven by massive institutional investment and regulatory clarity.',
     '<h2>Historic Achievement</h2><p>Bitcoin has officially crossed the $100,000 threshold, marking a pivotal moment in cryptocurrency history. This achievement comes after months of steady growth fueled by institutional adoption and favorable regulatory developments.</p><h3>Key Factors Behind the Rally</h3><ul><li>Major corporations adding Bitcoin to treasury reserves</li><li>Bitcoin ETF approvals gaining momentum</li><li>Institutional trading platforms expanding crypto offerings</li><li>Growing acceptance from traditional financial institutions</li></ul><h2>Market Impact</h2><p>The broader cryptocurrency market has responded positively, with Ethereum reaching $4,200 and many altcoins posting double-digit gains. Total crypto market cap now exceeds $3.5 trillion.</p><p>Analysts suggest this could be the beginning of a new bull cycle, though they remind investors to exercise caution and proper risk management.</p>', 6),
 
-    (post3_id, 'pt', 'Bitcoin Supera Marco de $100.000 Enquanto Adoção Institucional Acelera', 'Bitcoin atinge um marco histórico, rompendo a barreira de $100.000 pela primeira vez, impulsionado por investimento institucional massivo e clareza regulatória.', 
+    (post3_id, 'pt', 'Bitcoin Supera Marco de $100.000 Enquanto Adoção Institucional Acelera', 'Bitcoin atinge um marco histórico, rompendo a barreira de $100.000 pela primeira vez, impulsionado por investimento institucional massivo e clareza regulatória.',
     '<h2>Conquista Histórica</h2><p>O Bitcoin oficialmente cruzou o limite de $100.000, marcando um momento crucial na história das criptomoedas. Esta conquista vem após meses de crescimento constante alimentado pela adoção institucional e desenvolvimentos regulatórios favoráveis.</p><h3>Fatores Principais Por Trás do Rally</h3><ul><li>Grandes corporações adicionando Bitcoin às reservas do tesouro</li><li>Aprovações de ETF de Bitcoin ganhando momentum</li><li>Plataformas de negociação institucionais expandindo ofertas cripto</li><li>Crescente aceitação de instituições financeiras tradicionais</li></ul><h2>Impacto no Mercado</h2><p>O mercado mais amplo de criptomoedas respondeu positivamente, com Ethereum atingindo $4.200 e muitas altcoins registrando ganhos de dois dígitos. A capitalização total do mercado cripto agora excede $3,5 trilhões.</p><p>Analistas sugerem que este pode ser o início de um novo ciclo de alta, embora lembrem aos investidores para exercer cautela e gerenciamento adequado de risco.</p>', 6),
 
-    (post3_id, 'vi', 'Bitcoin Vượt Mốc $100,000 Khi Việc Áp Dụng Thể Chế Tăng Tốc', 'Bitcoin đạt được mốc son lịch sử, vượt qua rào cản $100,000 lần đầu tiên, được thúc đẩy bởi đầu tư thể chế lớn và sự rõ ràng về quy định.', 
+    (post3_id, 'vi', 'Bitcoin Vượt Mốc $100,000 Khi Việc Áp Dụng Thể Chế Tăng Tốc', 'Bitcoin đạt được mốc son lịch sử, vượt qua rào cản $100,000 lần đầu tiên, được thúc đẩy bởi đầu tư thể chế lớn và sự rõ ràng về quy định.',
     '<h2>Thành Tựu Lịch Sử</h2><p>Bitcoin đã chính thức vượt qua ngưỡng $100,000, đánh dấu một khoảnh khắc quan trọng trong lịch sử tiền điện tử. Thành tựu này đến sau nhiều tháng tăng trưởng ổn định được thúc đẩy bởi việc áp dụng thể chế và các phát triển quy định thuận lợi.</p><h3>Các Yếu Tố Chính Đằng Sau Đợt Tăng Giá</h3><ul><li>Các tập đoàn lớn thêm Bitcoin vào dự trữ ngân quỹ</li><li>Việc phê duyệt Bitcoin ETF tăng động lực</li><li>Các nền tảng giao dịch thể chế mở rộng dịch vụ crypto</li><li>Sự chấp nhận ngày càng tăng từ các tổ chức tài chính truyền thống</li></ul><h2>Tác Động Thị Trường</h2><p>Thị trường tiền điện tử rộng lớn hơn đã phản ứng tích cực, với Ethereum đạt $4,200 và nhiều altcoin tăng hai chữ số. Tổng vốn hóa thị trường crypto hiện vượt $3,5 nghìn tỷ.</p><p>Các nhà phân tích cho rằng đây có thể là khởi đầu của chu kỳ tăng giá mới, mặc dù họ nhắc nhở các nhà đầu tư cần thận trọng và quản lý rủi ro phù hợp.</p>', 6),
 
     -- Draft Post
-    (post6_id, 'en', 'Future of Algorithmic Trading - Draft', 'This is a draft post about the future developments in algorithmic trading and AI-powered trading systems.', 
+    (post6_id, 'en', 'Future of Algorithmic Trading - Draft', 'This is a draft post about the future developments in algorithmic trading and AI-powered trading systems.',
     '<h2>Draft Content</h2><p>This post is still being written and will cover the latest developments in algorithmic trading, machine learning applications, and future trends in automated trading systems.</p>', 3),
 
     -- Terms of Use
-    (post7_id, 'en', 'Terms of Use', 'Please read these terms of use carefully before using our trading platform and services.', 
+    (post7_id, 'en', 'Terms of Use', 'Please read these terms of use carefully before using our trading platform and services.',
     '<h2>Terms of Use</h2><p>Welcome to our trading platform. By accessing and using our services, you agree to be bound by these terms and conditions.</p><h3>1. Acceptance of Terms</h3><p>By using our platform, you acknowledge that you have read, understood, and agree to be bound by these Terms of Use.</p><h3>2. Use of Services</h3><p>Our services are provided for informational and educational purposes. Trading involves substantial risk and may not be suitable for all investors.</p><h3>3. Risk Disclosure</h3><p>Trading in financial instruments involves substantial risk of loss and may not be suitable for all investors. Past performance is not indicative of future results.</p>', 10),
 
-    (post7_id, 'pt', 'Termos de Uso', 'Por favor, leia estes termos de uso cuidadosamente antes de usar nossa plataforma de trading e serviços.', 
+    (post7_id, 'pt', 'Termos de Uso', 'Por favor, leia estes termos de uso cuidadosamente antes de usar nossa plataforma de trading e serviços.',
     '<h2>Termos de Uso</h2><p>Bem-vindo à nossa plataforma de trading. Ao acessar e usar nossos serviços, você concorda em estar vinculado a estes termos e condições.</p><h3>1. Aceitação dos Termos</h3><p>Ao usar nossa plataforma, você reconhece que leu, entendeu e concorda em estar vinculado a estes Termos de Uso.</p><h3>2. Uso dos Serviços</h3><p>Nossos serviços são fornecidos para fins informativos e educacionais. O trading envolve risco substancial e pode não ser adequado para todos os investidores.</p><h3>3. Divulgação de Risco</h3><p>O trading em instrumentos financeiros envolve risco substancial de perda e pode não ser adequado para todos os investidores. Desempenho passado não é indicativo de resultados futuros.</p>', 10),
 
-    (post7_id, 'vi', 'Điều Khoản Sử Dụng', 'Vui lòng đọc kỹ các điều khoản sử dụng này trước khi sử dụng nền tảng trading và dịch vụ của chúng tôi.', 
+    (post7_id, 'vi', 'Điều Khoản Sử Dụng', 'Vui lòng đọc kỹ các điều khoản sử dụng này trước khi sử dụng nền tảng trading và dịch vụ của chúng tôi.',
     '<h2>Điều Khoản Sử Dụng</h2><p>Chào mừng bạn đến với nền tảng trading của chúng tôi. Bằng cách truy cập và sử dụng dịch vụ của chúng tôi, bạn đồng ý bị ràng buộc bởi các điều khoản và điều kiện này.</p><h3>1. Chấp Nhận Điều Khoản</h3><p>Bằng cách sử dụng nền tảng của chúng tôi, bạn thừa nhận rằng bạn đã đọc, hiểu và đồng ý bị ràng buộc bởi các Điều khoản Sử dụng này.</p><h3>2. Sử Dụng Dịch Vụ</h3><p>Dịch vụ của chúng tôi được cung cấp cho mục đích thông tin và giáo dục. Trading liên quan đến rủi ro đáng kể và có thể không phù hợp với tất cả nhà đầu tư.</p><h3>3. Tiết Lộ Rủi Ro</h3><p>Trading các công cụ tài chính liên quan đến rủi ro mất mát đáng kể và có thể không phù hợp với tất cả nhà đầu tư. Hiệu suất trong quá khứ không phải là chỉ báo của kết quả tương lai.</p>', 10),
 
     -- Privacy Policy
-    (post8_id, 'en', 'Privacy Policy', 'This privacy policy explains how we collect, use, and protect your personal information when you use our services.', 
+    (post8_id, 'en', 'Privacy Policy', 'This privacy policy explains how we collect, use, and protect your personal information when you use our services.',
     '<h2>Privacy Policy</h2><p>We are committed to protecting your privacy and ensuring the security of your personal information.</p><h3>1. Information We Collect</h3><p>We collect information you provide directly to us, such as when you create an account, use our services, or contact us for support.</p><h3>2. How We Use Your Information</h3><p>We use the information we collect to provide, maintain, and improve our services, process transactions, and communicate with you.</p><h3>3. Information Sharing</h3><p>We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as described in this policy.</p>', 8),
 
-    (post8_id, 'pt', 'Política de Privacidade', 'Esta política de privacidade explica como coletamos, usamos e protegemos suas informações pessoais quando você usa nossos serviços.', 
+    (post8_id, 'pt', 'Política de Privacidade', 'Esta política de privacidade explica como coletamos, usamos e protegemos suas informações pessoais quando você usa nossos serviços.',
     '<h2>Política de Privacidade</h2><p>Estamos comprometidos em proteger sua privacidade e garantir a segurança de suas informações pessoais.</p><h3>1. Informações que Coletamos</h3><p>Coletamos informações que você nos fornece diretamente, como quando você cria uma conta, usa nossos serviços ou entra em contato conosco para suporte.</p><h3>2. Como Usamos Suas Informações</h3><p>Usamos as informações que coletamos para fornecer, manter e melhorar nossos serviços, processar transações e nos comunicar com você.</p><h3>3. Compartilhamento de Informações</h3><p>Não vendemos, negociamos ou transferimos suas informações pessoais para terceiros sem seu consentimento, exceto conforme descrito nesta política.</p>', 8),
 
-    (post8_id, 'vi', 'Chính Sách Bảo Mật', 'Chính sách bảo mật này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ thông tin cá nhân của bạn khi bạn sử dụng dịch vụ của chúng tôi.', 
+    (post8_id, 'vi', 'Chính Sách Bảo Mật', 'Chính sách bảo mật này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ thông tin cá nhân của bạn khi bạn sử dụng dịch vụ của chúng tôi.',
     '<h2>Chính Sách Bảo Mật</h2><p>Chúng tôi cam kết bảo vệ quyền riêng tư của bạn và đảm bảo an toàn thông tin cá nhân của bạn.</p><h3>1. Thông Tin Chúng Tôi Thu Thập</h3><p>Chúng tôi thu thập thông tin bạn cung cấp trực tiếp cho chúng tôi, chẳng hạn như khi bạn tạo tài khoản, sử dụng dịch vụ của chúng tôi hoặc liên hệ với chúng tôi để được hỗ trợ.</p><h3>2. Cách Chúng Tôi Sử Dụng Thông Tin Của Bạn</h3><p>Chúng tôi sử dụng thông tin chúng tôi thu thập để cung cấp, duy trì và cải thiện dịch vụ của chúng tôi, xử lý giao dịch và giao tiếp với bạn.</p><h3>3. Chia Sẻ Thông Tin</h3><p>Chúng tôi không bán, trao đổi hoặc chuyển giao thông tin cá nhân của bạn cho bên thứ ba mà không có sự đồng ý của bạn, trừ khi được mô tả trong chính sách này.</p>', 8);
 
     -- ===============================================
     -- PRODUCTS
     -- ===============================================
 
-    INSERT INTO products (id, price, affiliate_link) VALUES
-    (product1_id, 29.99, 'https://affiliate.tradingtools.com/premium-signals'),
-    (product2_id, 99.99, 'https://partner.tradingcourse.com/masterclass'),
-    (product3_id, 199.99, 'https://refer.tradingbot.ai/pro-version'),
-    (product4_id, 49.99, 'https://affiliate.riskmanager.com/tool'),
-    (product5_id, 79.99, 'https://partner.chartanalysis.com/premium');
+    INSERT INTO products (id, affiliate_link) VALUES
+    (product1_id, 'https://affiliate.tradingtools.com/premium-signals'),
+    (product2_id, 'https://partner.tradingcourse.com/masterclass'),
+    (product3_id, 'https://refer.tradingbot.ai/pro-version'),
+    (product4_id, 'https://affiliate.riskmanager.com/tool'),
+    (product5_id, 'https://partner.chartanalysis.com/premium');
 
     -- ===============================================
     -- PRODUCTS TRANSLATIONS

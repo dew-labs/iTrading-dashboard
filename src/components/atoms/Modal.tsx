@@ -8,9 +8,10 @@ interface ModalProps {
   title: string
   children: React.ReactNode
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+  disableScroll?: boolean
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, size = 'lg' }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, size = 'lg', disableScroll = false }) => {
   const [isVisible, setIsVisible] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
 
@@ -72,7 +73,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, size = 
   }
 
   const modalContent = (
-    <div 
+    <div
       className='fixed inset-0 z-[100] flex items-center justify-center p-4'
       onClick={handleBackdropClick}
     >
@@ -85,10 +86,10 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, size = 
       />
 
       {/* Modal with smooth scale and slide animation */}
-      <div 
-        className={`relative z-10 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-2xl border border-white/20 dark:border-gray-700/50 w-full ${sizeClasses[size]} max-h-[95vh] overflow-hidden transform transition-all duration-200 ease-out ${
-          isAnimating 
-            ? 'opacity-100 scale-100 translate-y-0' 
+            <div
+        className={`relative z-10 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-2xl border border-white/20 dark:border-gray-700/50 w-full ${sizeClasses[size]} max-h-[85vh] overflow-hidden transform transition-all duration-200 ease-out ${
+          isAnimating
+            ? 'opacity-100 scale-100 translate-y-0'
             : 'opacity-0 scale-95 translate-y-4'
         }`}
         onClick={(e) => e.stopPropagation()}
@@ -106,8 +107,8 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, size = 
             </div>
           </div>
 
-          {/* Scrollable Content */}
-          <div className='overflow-y-auto max-h-[calc(95vh-5rem)] p-6'>{children}</div>
+          {/* Content */}
+          <div className={`p-6 ${disableScroll ? 'pb-10' : 'overflow-y-auto max-h-[calc(85vh-5rem)]'}`}>{children}</div>
         </div>
     </div>
   )
